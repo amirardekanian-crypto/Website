@@ -1,0 +1,22 @@
+{
+  "area": "Crew moment cards (2026-11-20, direction A Trophy Rows): the big line, the small line, the badges. Drafts until Amir has read them.",
+  "exact": {
+    "in a row": "پشت‌سرهم",
+    "held": "نگه داشت",
+    "Welcome to the crew": "به تیم خوش اومدی",
+    "a new level": "یه سطح جدید",
+    "a first best on this lift": "اولین رکورد تو این حرکت",
+    "a new best": "یه رکورد جدید",
+    "held the week": "هفته رو نگه داشت",
+    "a new achievement": "یه دستاورد جدید",
+    "a new mark": "یه نشان جدید",
+    "an honour from Amir": "یه افتخار از طرف امیر",
+    "BEST": "رکورد",
+    "CYCLE": "دوره",
+    "What this is": "این چیه"
+  },
+  "patterns": [
+    ["Welcome, (.+)", "خوش اومدی $1"],
+    ["(\\d+) more new bests?", "{n1} رکورد جدید دیگه"]
+  ]
+}

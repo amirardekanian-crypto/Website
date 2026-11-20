@@ -538,7 +538,7 @@ emblems, the record card's three options and four calls: https://claude.ai/artif
 
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
-| 121 | Moment Cards | #115 Trophy Lines grown into a family: every Bell moment (level, best, held weeks, achievement, mark, cycle, joined) as a card with its badge (the level medal, the achievement's emblem, the mark's emblem, a NEW BEST or CYCLE disc, the new member's face), one big fact with a clay change, who and the detail, the heart (Say hello on a join). The record's number is Amir's call: the lift only, the gain as a percent (pick, a server change), or the weight (changes the never-a-weight rule) | 112, 115 | pitched 2026-11-20, three directions |
+| 121 | Moment Cards | #115 Trophy Lines grown into a family: every Bell moment (level, best, held weeks, achievement, mark, cycle, joined) as a card with its badge (the level medal, the achievement's emblem, the mark's emblem, a NEW BEST or CYCLE disc, the new member's face), one big fact with a clay change, who and the detail, the heart (Say hello on a join). The record's number is Amir's call: the lift only, the gain as a percent (pick, a server change), or the weight (changes the never-a-weight rule) | 112, 115 | **built** 2026-11-20, direction A Trophy Rows ("go with your picks"): the gain as a percent (stage112), a card for every level, the face with NEW and Say hello on a join |
 
 ## Grown out of deep-dives
 

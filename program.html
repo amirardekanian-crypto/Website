@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=2" data-fa="/assets/js/i18n-fa.js?v=3"></script>
+<script src="/assets/js/i18n.js?v=2" data-fa="/assets/js/i18n-fa.js?v=4"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -6313,6 +6313,31 @@
   #screen-crew .cr-ttn { max-width: 54px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 var(--fs-label)/1.2 'Barlow', sans-serif; color: var(--grey); }
   #screen-crew .cr-tth { margin: 8px 0 0; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
   @media (prefers-reduced-motion: reduce) { .cr-hburst { display: none; } }
+  /* ── MOMENT CARDS (2026-11-20; Amir: "go with your picks", direction A "Trophy Rows") ─────────────────────────────────────────────────────
+     One card per moment line: the badge (the cabinet's emblem, a green disc for NEW BEST and CYCLE, a new member's face with NEW), one big fact in Barlow
+     Condensed with its change in clay, who and the rest of the day in the small line, the heart at the right end (Say hello on someone else's join). */
+  #screen-crew .cr-line.cr-mc { position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; align-items: center; gap: 12px;
+    margin: 0 var(--g) 10px; padding: 12px 6px 12px 12px; border: 1px solid var(--hair); border-radius: 14px; background: var(--row); touch-action: manipulation; }
+  #screen-crew .cr-mcb { display: grid; place-items: center; width: 56px; height: 56px; padding: 0; border: 0; background: none; color: inherit; }
+  #screen-crew button.cr-mcb { cursor: pointer; }
+  #screen-crew button.cr-mcb:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; border-radius: 50%; }
+  #screen-crew .cr-mcb svg { display: block; width: 56px; height: 56px; }
+  #screen-crew .cr-mcd { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: var(--btn); color: var(--on-accent);
+    font: 800 var(--fs-small)/.95 'Barlow Condensed', sans-serif; letter-spacing: .04em; text-align: center; }
+  #screen-crew .cr-mcf { position: relative; display: grid; place-items: center; width: 56px; height: 56px; }
+  #screen-crew .cr-mcf .cr-ttf { margin: 0; }
+  #screen-crew .cr-mcnew { position: absolute; left: 50%; bottom: -4px; transform: translateX(-50%); padding: 0 6px; border-radius: 999px; background: var(--mint); color: #0E4A36;
+    font: 700 var(--fs-label)/1.35 'Barlow', sans-serif; font-style: normal; letter-spacing: .06em; }
+  #screen-crew .cr-mct { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  #screen-crew .cr-mcbig { font: 800 var(--fs-title)/1 'Barlow Condensed', sans-serif; letter-spacing: .01em; text-transform: uppercase; color: var(--ink); overflow-wrap: anywhere; }
+  #screen-crew .cr-mcbig .c { color: var(--clay-ink); white-space: nowrap; }
+  #screen-crew .cr-mcsub { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); overflow-wrap: anywhere; }
+  #screen-crew .cr-mcsub .cr-nb { font-weight: 600; color: var(--ink); }
+  #screen-crew .cr-mc small { font: 400 var(--fs-label)/1.2 'Barlow', sans-serif; color: var(--grey); }
+  #screen-crew .cr-mc .cr-react { align-self: center; }
+  #screen-crew .cr-mc .cr-react.is-menu { grid-column: 1 / -1; margin: 2px 0 0; }
+  #screen-crew .cr-mc .cr-mchi { align-self: center; margin: 0 6px 0 0; }
+  #screen-crew .cr-mc .cr-hburst { width: 56px; height: 56px; margin: -28px 0 0 -28px; }
   /* PLAYERS' LOUNGE · THE CYCLE BARS, PLAYER FACTS AND THE FACE STACK (steps 4 to 6, 2026-10-24). Week Bars, with the extra sessions as small round dots after the bar
      (Amir: "the workouts can be anything other than their cycles, they can do extra, it needs to show that as well"); Player Facts for every racket sport and for people
      who play none (Amir: "applicable to all racket sports, and general people as well"); the Face Stack on an achievement ("i like face stack a bit more"). Colours are the
@@ -12129,7 +12154,7 @@ const APP_GUIDE = [
 // names a control the athlete cannot see (CNT-01).
 APP_GUIDE.splice(APP_GUIDE.findIndex(c => c.title === 'What to report & how often'), 0,
   { icon: 'compass', key: 'crew', title: 'Crew', when: () => crewOn(),   // was "Crew and the Bell"; nothing in the app carries that name any more (round 7, 2026-10-25, "78")
-    body: `<p><strong>Crew</strong> is our crew's own place. At the top, <strong>Last 7 days</strong> says what the whole crew has done this week. The row of initials, and <strong>In the crew ›</strong> beside the numbers, open everyone who is in it. The first time you open the tab I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. If you keep it to yourself, a <strong>Join the crew</strong> button waits under the title of the Bell for when you change your mind. Join and the Bell rings for you when you finish a session, reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift, never the weight), finish a cycle or win one of the month's honours. Sessions are folded into one line a day naming everyone who trained, so a busy day is still one line. It's one line a day each and the crew sees it for 7 days. Weights, effort, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it. If you have not joined yet, it takes you to Crew first, where you can see what the crew would see.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. On a moment the Like stands alone and <strong>＋</strong> opens the other four: Fire, Strong, Well done and Love it. <strong>Reply</strong> under a post says something back, up to 140 characters; it goes after 7 days with the post, you can delete your own and I can remove any. Nothing on Crew earns XP. Under the Bell is <strong>This season</strong>, the crew's points this season, and <strong>The whole board ›</strong> opens the rest of it.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><p>When I pick someone for the month, a card at the top of Crew shows who and why, for a week. Tap <strong>Cheer</strong> to tell them well done.</p><p>Each week I ask the crew one question, under the green band. Tap a half to vote, tap the other half to change it. When I set a photo theme for the week, <strong>Post one</strong> opens the box with it ready. Got a question for me? Open the Coach tab and tap <strong>Ask for the crew</strong>. I answer one a week, and the answer shows on Crew with your question above it. <strong>Asked by the crew</strong>, in the Library under Playbook, keeps every answer. <strong>Reply…</strong> under a post opens the box for a reply. Nobody is named or counted who has not joined.</p><!--pages--><p>To leave the crew, or turn off any of what the crew sees about you, tap your initials, then <strong>What the crew sees</strong>.</p>` });
+    body: `<p><strong>Crew</strong> is our crew's own place. At the top, <strong>Last 7 days</strong> says what the whole crew has done this week. The row of initials, and <strong>In the crew ›</strong> beside the numbers, open everyone who is in it. The first time you open the tab I ask you one thing: <strong>Join the crew</strong> or <strong>Keep it to me</strong>. If you keep it to yourself, a <strong>Join the crew</strong> button waits under the title of the Bell for when you change your mind. Join and the Bell rings for you when you finish a session, reach a new level, hold a week, hit a mark, earn an achievement, set a personal best (the lift and its weight), finish a cycle or win one of the month's honours. Sessions are folded into one line a day naming everyone who trained, so a busy day is still one line. It's one line a day each and the crew sees it for 7 days. A new best shows its weight. Effort, your check-in, pain, body weight and habits never go there.</p><p><strong>Share something with the crew</strong>, at the top of the Bell, posts a message (up to 280 characters) and a photo if you like. Your phone makes the photo smaller before it's sent and takes its location off. Everything you post is gone after 7 days, and I can remove any post. On the finished card, <strong>Tell the crew</strong> posts your session with a photo from it. If you have not joined yet, it takes you to Crew first, where you can see what the crew would see.</p><p><strong>Like</strong> on a post or a line tells the crew you saw it, with your name. On a moment the Like stands alone and <strong>＋</strong> opens the other four: Fire, Strong, Well done and Love it. <strong>Reply</strong> under a post says something back, up to 140 characters; it goes after 7 days with the post, you can delete your own and I can remove any. Nothing on Crew earns XP. Under the Bell is <strong>This season</strong>, the crew's points this season, and <strong>The whole board ›</strong> opens the rest of it.</p><p><strong>The Open</strong> is one challenge for the whole crew, at the top of Crew. I set it and say what counts. Do it, send me the clip on WhatsApp, and I put your result on the board. The board is ranked by the result, and it stays up until I close the challenge.</p><p>When I pick someone for the month, a card at the top of Crew shows who and why, for a week. Tap <strong>Cheer</strong> to tell them well done.</p><p>Each week I ask the crew one question, under the green band. Tap a half to vote, tap the other half to change it. When I set a photo theme for the week, <strong>Post one</strong> opens the box with it ready. Got a question for me? Open the Coach tab and tap <strong>Ask for the crew</strong>. I answer one a week, and the answer shows on Crew with your question above it. <strong>Asked by the crew</strong>, in the Library under Playbook, keeps every answer. <strong>Reply…</strong> under a post opens the box for a reply. Nobody is named or counted who has not joined.</p><!--pages--><p>To leave the crew, or turn off any of what the crew sees about you, tap your initials, then <strong>What the crew sees</strong>.</p>` });
 function buildAppGuideCards(openKey) {
   // Players' Lounge, step 1: the Player Page. Named only while the server has it (crewPagesOn()), so the guide never names a control that is not there.
   const GUIDE_PAGES = `<p>Tap a name, a face or a row anywhere on Crew and you see that person's page: their numbers, their trophies and what they posted this week. You only see what they chose to show. Amir's name opens the Coach tab. <strong>Your page</strong> is in the <strong>Profile</strong> group when you tap your initials, with <strong>Your photo</strong>, <strong>Your game</strong> and <strong>What the crew sees</strong>. Your page is what the crew sees. When you are asked to join the crew, your own page is shown first, so you know what they would see.</p><p>To add your photo, tap your initials, then <strong>Your photo</strong>. Or open <strong>Your page</strong> and tap your face. Choose a photo, drag it into place, pinch or use the slider to zoom, then tap <strong>Save</strong>. <strong>Remove</strong> takes it off again. The crew sees it in a circle wherever your name is. Until you add one, your initials stay.</p><p>To cheer someone, open their page and tap <strong>Cheer</strong>. Add a word if you like, up to 100 characters, and tap <strong>Send</strong>. The crew sees your word for 7 days. You can cheer each person once a day. Or on Crew, double-tap a face in the green band and the cheer goes at once, with no word. A ring round a face means they held their week. <strong>NEW</strong> under a face means they joined this week, so say hello. Cheers earn no XP. The <strong>cheers</strong> number on a page counts only the cheers people sent that person with the <strong>Cheer</strong> button since they joined the crew. Likes are not in it. When your phone can take notifications and they are off, a line under <strong>Cheers this week</strong> on your own page turns them on, so the next cheer reaches you. Your own page also shows your <strong>comebacks</strong> in a thin line under your numbers, marked Only you.</p><p>On your own page, <strong>This cycle</strong> shows one bar for each week, cut into the sessions the plan has that week. A filled piece is a session done. A solid bar that says <strong>Held</strong> is a week held. A session beyond the plan is a small dot after the bar, with a number like +1. Tap a week to see its sessions by date. On someone else's page you see <strong>This week</strong>: one bar for their week, and how many sessions they have done this cycle. You never see their past weeks. The crew sees only the dates.</p><p><strong>Player facts</strong> is a small card for your game. Tap your initials, then <strong>Your game</strong>, or open your own page, and tap a row to change it: your sport or sports (any racket sport, or none), your hand, your backhand or your side where they apply, your level, your club, what you train for, what you are working on and your Instagram name. A row you leave empty stays off your page, and the crew sees the rest.</p><p>Tap a trophy on someone's page, or the name of an achievement on Crew, to see what it is and what it asks for.</p><p>To name someone in a reply, type <strong>@</strong> and tap their name in the row above the box. Keep typing and the row shortens. Their name in your reply opens their page, and they get a note on their phone. You can name 5 people in one reply.</p><p>A photo you post with <strong>Tell the crew</strong> wears a small stamp across its foot: the session, the minutes, <strong>WEEK HELD</strong> when that session held your week, and the day. You read the stamp before you post. On your own session photo, tap <strong>Share</strong> and you get the session card for Instagram with that photo behind it. Nobody else's photo has Share.</p><p><strong>Share my card</strong>, on your own page, opens the same card as <strong>Share your card</strong> on Progress.</p><p><strong>The Open</strong> on Crew is a wall of tiles: the place, the face, the result and the name. Your tile has a green outline. Tap a tile to see that person's page. When more than 8 are on the board, tap <strong>All</strong> to see every one.</p>`;
@@ -13194,7 +13219,7 @@ function renderSystemGuide() {
   if ((() => { try { return crewOn(); } catch (e) { return false; } })()) {
     h += sysCard('The crew', 'mindset',
       `<p>Nothing on <strong>Crew</strong> earns XP. It is the one part of the app that is not scoring you.</p>`
-      + `<p>The Bell rings for the crew when you finish a session, reach a level, hold a week, hit a mark or win an achievement. Weights, effort, your check-in, pain, body weight and habits never go there.</p>`
+      + `<p>The Bell rings for the crew when you finish a session, reach a level, hold a week, hit a mark or win an achievement. A new best shows its weight. Effort, your check-in, pain, body weight and habits never go there.</p>`
       + `<p><strong>The Open</strong> is one challenge for the whole crew. I set it, I say what counts, and I put your result on the board.</p>`);
   }
 
@@ -14587,7 +14612,7 @@ var _acHtml = '';
 var _cabFilter = null, _cabNew = null, _cabOpen = false;
 function cabE() { return window.AAEmblem || null; }
 // The emblem script is `defer`: a repaint once it has arrived, for what was drawn before it (the career card's medal).
-function emblemsReady() { try { paintCareerCard(); } catch (e) { /* the next answer paints it */ } }
+function emblemsReady() { try { paintCareerCard(); } catch (e) { /* the next answer paints it */ } try { if (onCrew()) renderCrew(); } catch (e) { /* the moment cards wait for the emblems; the slim rows stand in */ } }
 var CAB_MEANING = { held_weeks: 'consistency', century: 'commitment', bests: 'progress', comebacks: 'resilience' };
 var CAB_FILTERS = ['all', 'won', 'todo', 'consistency', 'commitment', 'progress', 'resilience'];
 function cabFilter() {
@@ -16225,7 +16250,88 @@ function crewDayWord(iso) {
   if (diff === 1) return 'Yesterday';
   return d.toLocaleDateString('en-GB', { weekday: 'long' });
 }
+// ── MOMENT CARDS (2026-11-20; Amir: "go with your picks" on https://claude.ai/artifact/7bydrN3KFDsDhEtZuyGv4w, direction A "Trophy Rows") ──────
+// Grew from round 10's #115 Trophy Lines card, which he sent back ("i liked it ... like for their level, in an interesting way, even their records in a more
+// interesting way, or joining or other achievements"). Every moment line becomes ONE card: a badge (the cabinet's own emblem, emblems.js; no new art), one big
+// fact with a clay part, who and the rest of the day's moments in words, and the heart (Say hello on someone else's join). A day's line can hold several moments
+// (a level, a best and a held week): the biggest leads the card, by CREW_MC_RANK, and the others are words in its small line.
+// The record shows its WEIGHT and how much it went up (stage113 `bests`), as Amir's picture did ("125 kg +5"): asked, he chose "The weight, like my
+// picture" (2026-11-20). That ends stage81's "a best names the lift and never a weight"; the join text says so.
+const CREW_MC_RANK = ['honour', 'mark', 'achievement', 'cycle', 'best', 'week', 'level', 'joined'];
+function crewMomentLead(it) {
+  const parts = (it && it.parts) || [];
+  for (const k of CREW_MC_RANK) { const i = parts.findIndex(p => p && p.k === k); if (i >= 0) return { p: parts[i], i }; }
+  return null;
+}
+function crewMcOn() { return crewPagesOn() && !!cabE(); }
+function crewMcDisc(t) { return `<span class="cr-mcd" aria-hidden="true">${t}</span>`; }
+const CREW_HONOUR_WORDS = { sessions: 'Most sessions', improved: 'Most improved', full_month: 'Full Month', pick: "Amir's Pick" };
+function crewWeekAch(run) { return run >= 7 ? 'weeks_7' : run >= 6 ? 'weeks_6' : run >= 5 ? 'weeks_5' : run >= 3 ? 'weeks_3' : run >= 2 ? 'back_to_back' : 'held'; }
+// { badge, big, sub } for the lead moment, in plain words (COM-3). `first` is the person's first name, or "You".
+function crewMcFace(it, lead, first) {
+  const E = cabE(), p = lead.p, won = { won: true };
+  switch (p.k) {
+    case 'level': return { badge: E.level(Number(p.n) || 1, won), big: `Level <span class="c">${Number(p.n) || ''}</span>`, sub: 'a new level' };
+    case 'best': {
+      // the weight and how much it went up (stage113 `bests`; Amir 2026-11-20: "The weight, like my picture", "125 kg +5"). The biggest gain leads.
+      const lifts = (p.lifts || []).filter(Boolean), B = (p.bests && typeof p.bests === 'object') ? p.bests : {};
+      let top = lifts[0] || '', best = B[top] || null;
+      lifts.forEach(l => { const b = B[l]; if (b && (!best || (Number(b.up) || 0) > (Number(best.up) || 0))) { best = b; top = l; } });
+      if (!top) return null;
+      const n = v => String(Math.round(Number(v) * 10) / 10);
+      const more = lifts.length - 1 + (Number(p.more) || 0), liftH = `<span class="lift" translate="no">${esc(top)}</span>`;
+      const tail = more > 0 ? ` · ${more} more new best${more === 1 ? '' : 's'}` : '';
+      if (best && Number(best.kg) > 0) return { badge: crewMcDisc('NEW<br>BEST'), big: `${n(best.kg)} kg${Number(best.up) > 0 ? ` <span class="c">+${n(best.up)}</span>` : ''}`, sub: liftH + tail };
+      return { badge: crewMcDisc('NEW<br>BEST'), big: liftH, sub: 'a new best' + tail };
+    }
+    case 'week': {
+      const run = Number(p.run) || 1;
+      return { badge: E.ach(crewWeekAch(run), won), big: run > 1 ? `${run} weeks <span class="c">in a row</span>` : `Week <span class="c">held</span>`, sub: 'held the week' };
+    }
+    case 'achievement': {
+      const d = achDetailOf(p);
+      return { badge: d ? d.svg : E.ach(String(p.id || ''), won), big: esc(momName(p.name || p.id || 'An achievement')), sub: d && d.rule ? esc(d.rule) : 'a new achievement', door: true };
+    }
+    case 'mark': {
+      const d = achDetailOf(p), mk = careerMarks()[p.item], n = Number(p.at) || 0;
+      if (!n) return null;
+      const words = mk ? careerMarkWords(mk.key, n) : '';
+      return { badge: d ? d.svg : crewMcDisc(String(n)), big: `${n} <span class="c">${esc(words || 'reached')}</span>`, sub: 'a new mark', door: !!d };
+    }
+    case 'cycle': return { badge: crewMcDisc(`CYCLE<br>${Number(p.n) || ''}`), big: `Cycle ${Number(p.n) || ''} <span class="c">done</span>`, sub: 'finished a cycle' };
+    case 'honour': {
+      const ym = String(p.month || '').slice(0, 7), words = CREW_HONOUR_WORDS[p.honour];
+      if (!words) return null;
+      return { badge: E.honour ? E.honour(p.honour, ym) : crewMcDisc('HONOUR'), big: `${esc(words)} <span class="c">${esc(crewMonth(p.month))}</span>`, sub: 'an honour from Amir' };
+    }
+    case 'joined': return { face: true, big: it.me ? 'Welcome to the crew' : `Welcome, ${esc(first)}`, sub: 'joined the crew' };
+  }
+  return null;
+}
+function crewMomentCardHTML(it) {
+  const lead = crewMomentLead(it);
+  if (!lead) return '';
+  const pp = crewPersonOf(it), who = it.me ? 'You' : (it.who || 'Someone'), first = it.me ? 'You' : String(it.who || 'them').split(/\s+/)[0];
+  let f = null;
+  try { f = crewMcFace(it, lead, first); } catch (e) { f = null; }   // an emblem that will not draw falls back to the slim row
+  if (!f) return '';
+  // the other moments of the day, in words, after who
+  const rest = (it.parts || []).map((p, i) => i === lead.i ? '' : crewPartText(p)).filter(Boolean).map(esc);
+  const badge = f.face
+    ? `<span class="cr-mcf">${crewFace(pp, 'tt')}<i class="cr-mcnew" aria-hidden="true">NEW</i></span>`
+    : (f.door ? `<button type="button" class="cr-mcb" onclick="openCrewAch('${esc(it.key)}', ${lead.i})" aria-label="What this is">${f.badge}</button>` : `<span class="cr-mcb" aria-hidden="true">${f.badge}</span>`);
+  const kw = crewKudosWords(it.kudos);
+  const canHello = !it.me && pp.ck && crewMe().can_post && lead.p.k === 'joined';
+  const right = canHello
+    ? `<button type="button" class="cr-sayhi cr-mchi" onclick="crewSayHello('${esc(pp.ck)}')" aria-label="Say hello to ${esc(first)}">Say hello</button>`
+    : `<span class="cr-react on-line${_crewOpenEm[it.key] ? ' is-menu' : ''}" data-row="${esc(it.key)}" data-mode="heart" data-count="1">${crewHeartHTML(it.key, it.kudos, it.me, true)}</span>`;
+  return `<div class="cr-line cr-mc cr-mc-${esc(lead.p.k)}" data-key="${esc(it.key)}" onclick="crewTwoTap(event, '${esc(it.key)}')">${badge}
+    <span class="cr-mct"><span class="cr-mcbig" dir="auto">${f.big}</span>
+      <span class="cr-mcsub">${crewNameHTML(pp, who)} · ${[f.sub].concat(rest).join(' · ')}</span>
+      <small data-kw="${esc(it.key)}">${esc(kw ? kw + ' · ' + crewWhen(it.at) : crewWhen(it.at))}</small></span>${right}</div>`;
+}
 function crewLineHTML(it) {
+  if (crewMcOn()) { const c = crewMomentCardHTML(it); if (c) return c; }   // a moment card (2026-11-20, direction A); the slim row below for anything else
   // An achievement or a mark in the line is a door to what it is (openCrewAch()); the rest of the line is words.
   const parts = (it.parts || []).map((p, i) => {
     const t = crewPartText(p);
@@ -16353,6 +16459,7 @@ function renderCrew() {
     if (d && d !== day) { closeLines(); day = d; feed += `<h3 class="cr-day">${esc(d)}</h3>`; }
     if (i.t === 'line') {
       const row = crewLineHTML(i);
+      if (row.indexOf('cr-mc ') > 0) { closeLines(); feed += row; return; }   // a moment card stands on its own (2026-11-20)
       if (row && !inLines) { feed += '<div class="cr-lines">'; inLines = true; }
       feed += row;
     } else feed += i.t === 'post' ? crewPostHTML(i) : crewSessHTML(i);
@@ -17764,7 +17871,7 @@ window.crewAnswer = crewAnswer;
 const CREW_KINDS = [
   ['session', 'A session finished', 'One line a day, naming whoever trained'],
   ['level', 'A new level'], ['week', 'A week held', 'And how many in a row'], ['mark', 'A mark', '8 weeks held, 50 sessions with Amir, 10 bests…'],
-  ['achievement', 'An achievement'], ['best', 'A personal best', 'The lift only, never the weight'], ['cycle', 'A cycle finished'],
+  ['achievement', 'An achievement'], ['best', 'A personal best', 'The lift and its weight'], ['cycle', 'A cycle finished'],
   ['honour', "The month's honours"], ['open', 'The Monthly Open']];
 // ── Reminders (stage84, 2026-10-19) ──────────────────────────────────────────────────────────────
 // Amir: "the push should be automatically on, unless they want to turn off in their app settings."

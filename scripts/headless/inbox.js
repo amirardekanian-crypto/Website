@@ -560,8 +560,8 @@ const lit = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); r
     // Say hello on a new face in the band and on a join line
     const { ctx, p } = await open(browser, { b: { joinLine: true } });
     await crewRoom(p);
-    const s = await p.evaluate(() => ({ band: [...document.querySelectorAll('.cr-week .cr-sayhi')].map(b => b.textContent), txt: (document.querySelector('.cr-week .cr-hi') || {}).textContent, line: [...document.querySelectorAll('#crew-body .cr-line .cr-sayhi')].map(b => b.getAttribute('aria-label')), h: document.querySelector('.cr-week .cr-sayhi').getBoundingClientRect().height }));
-    C.check('the band offers Say hello to the newest face (Leila) and a join line in the Bell has its own', s.band.join() === 'Say hello' && s.txt === 'Leila joined this week.' && s.line.join() === 'Say hello to Sara' && s.h >= 44, JSON.stringify(s));
+    const s = await p.evaluate(() => ({ band: [...document.querySelectorAll('.cr-week .cr-sayhi')].map(b => b.textContent), txt: (document.querySelector('.cr-week .cr-hi') || {}).textContent, line: [...document.querySelectorAll('#crew-body .cr-mc.cr-mc-joined .cr-mchi')].map(b => b.getAttribute('aria-label')), h: document.querySelector('.cr-week .cr-sayhi').getBoundingClientRect().height }));
+    C.check('the band offers Say hello to the newest face (Leila) and a join CARD in the Bell has its own (moment cards, 2026-11-20: the lounge fixture and emblems.js make it a card)', s.band.join() === 'Say hello' && s.txt === 'Leila joined this week.' && s.line.join() === 'Say hello to Sara' && s.h >= 44, JSON.stringify(s));
     await p.evaluate(() => document.querySelector('.cr-week .cr-sayhi').click()); await p.waitForTimeout(400);
     C.check('…the band\'s opens the composer with "Welcome to the crew, Leila."', await p.evaluate(() => document.querySelector('#hist-overlay .cr-txt').value) === 'Welcome to the crew, Leila.');
     await ctx.close();

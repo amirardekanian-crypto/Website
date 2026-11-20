@@ -497,18 +497,19 @@ async function player(browser, C, OUT) {
     C.check(`player: 320px${dark ? ' dark' : ''}: Trophies fit, no sideways scroll`, f.side <= 0 && f.right <= 320, JSON.stringify(f));
     await x.ctx.close();
   }
-  // the Bell (Amir, 2026-10-25: "every achievement that any one gets in crew should be clickable ... we dont need the medal of it on the crew screen"):
-  // no emblem on a line; the achievement or the mark in it is a button that opens what it is
+  // the Bell (Amir, 2026-10-25: "every achievement that any one gets in crew should be clickable"). Since 2026-11-20 (moment cards, direction A) a moment is a CARD with
+  // the cabinet's own emblem as its badge, so the 2026-10-25 line "we dont need the medal of it on the crew screen" no longer holds; the achievement's and the mark's
+  // badge is still the button that opens what it is, and a level card's badge is a picture with no button. (scripts/headless/crew.js, section 21, checks the cards in full.)
   const bl = await mk();
   await bl.p.waitForFunction(() => !!document.querySelector('#global-tabs .nav-item[data-tab="crew"]'), null, { timeout: 8000 }).catch(() => {});
   await bl.p.evaluate(() => goTo('crew')); await bl.p.waitForTimeout(800);
-  const b = await bl.p.evaluate(() => [...document.querySelectorAll('#crew-body .cr-line')].map(l => ({ t: l.querySelector('.cr-lw').textContent.replace(/\s+/g, ' ').trim().slice(0, 40), svg: !!l.querySelector('svg.aae'), link: (l.querySelector('.cr-ach') || {}).textContent || '' })));
-  C.check('crew: no emblem on any line; the achievement and the mark are buttons, a level line has none', b.length === 3 && b.every(x => !x.svg) && !!b[0].link && !!b[1].link && !b[2].link, JSON.stringify(b));
+  const b = await bl.p.evaluate(() => [...document.querySelectorAll('#crew-body .cr-line')].map(l => ({ t: (l.querySelector('.cr-mcbig') || {}).textContent || '', card: l.classList.contains('cr-mc'), svg: !!l.querySelector('.cr-mcb svg.aae'), link: !!l.querySelector('button.cr-mcb') })));
+  C.check('crew: every moment is a card with an emblem for its badge; the achievement and the mark badges are buttons, a level card\'s is not', b.length === 3 && b.every(x => x.card && x.svg) && b[0].link && b[1].link && !b[2].link, JSON.stringify(b));
   await bl.p.screenshot({ path: path.join(OUT, 'crew-line-390.png') }).catch(() => {});
   for (const [i, want] of [[0, 'an achievement'], [1, 'a mark']]) {
-    await bl.p.evaluate(n => document.querySelectorAll('#crew-body .cr-line')[n].querySelector('.cr-ach').click(), i); await bl.p.waitForTimeout(300);
+    await bl.p.evaluate(n => document.querySelectorAll('#crew-body .cr-line')[n].querySelector('button.cr-mcb').click(), i); await bl.p.waitForTimeout(300);
     const s = await bl.p.evaluate(() => { const m = document.querySelector('#hist-overlay .readiness-modal'); return { open: document.getElementById('hist-overlay').classList.contains('visible'), em: !!m.querySelector('.cab-sh-em svg'), t: (m.querySelector('.readiness-title') || {}).textContent || '', meta: (m.querySelector('.cab-meta') || {}).textContent || '' }; });
-    C.check(`crew: tapping ${want} on a line opens what it is, with its emblem, name and who won it`, s.open && s.em && !!s.t && (/^Won by /.test(s.meta) || /^Won /.test(s.meta)), JSON.stringify(s));
+    C.check(`crew: tapping ${want}'s badge on a card opens what it is, with its emblem, name and who won it`, s.open && s.em && !!s.t && (/^Won by /.test(s.meta) || /^Won /.test(s.meta)), JSON.stringify(s));
     await bl.p.evaluate(() => history.back()); await bl.p.waitForTimeout(300);
   }
   // the emblem's sheet offers Tell the crew (one plain line, sent on the tap) while the athlete can post

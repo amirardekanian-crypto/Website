@@ -9,7 +9,7 @@
 // photo made smaller on the phone to 1280 px JPEG, the limits); Tell the crew (a session only with a photo, Day N drafted); the switches
 // and the no; an athlete ticked under 13 reads only; the account sheet's door; the guide; Back closes the photo; never synced; 320 px and
 // dark mode. The Monthly Open's card (stage85): the challenge, the board and its order, your own row, the WhatsApp door, an empty board,
-// a long one, no card without the stage. Made-up people only. The stub answers the crew_* calls by name (stub.js).
+// a long one, no card without the stage. Moment cards (section 21, 2026-11-20): a card per kind, the lead by rank, the slim fallback. Made-up people only. The stub answers the crew_* calls by name (stub.js).
 // Serve the repo first (python -m http.server 8775 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
 const H = require('./lib');
@@ -1532,7 +1532,8 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     }
     // 112 · two taps on a line's words, a post's words or a post's photo like it, and never take a like back; a single tap on the photo still opens the viewer
     {
-      const { ctx, p } = await openFeed(mkBell({ people: null }));
+      // the SLIM row: it is only drawn with emblems absent (since 2026-11-20 stage96 + emblems.js make a card, section 21), so emblems.js is kept from loading
+      const { ctx, p } = await openFeed(mkBell({ people: null }), { opts: { init: H.NO_EMBLEMS } });
       const kd = async t => (await calls(p, 'crew_kudos')).filter(x => x.p_target === t);
       await dbl(p, '#crew-body .cr-line .cr-lw'); await p.waitForTimeout(500);
       C.check('two taps on a line\'s words like it (crew_kudos on, once), and the heart fills', (await kd(KEY)).length === 1 && (await kd(KEY))[0].p_on === true && await p.evaluate(() => !!document.querySelector('#crew-body .cr-line .cr-ht.is-on')));
@@ -1555,6 +1556,131 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
       await dbl(n.p, '.cr-post[data-id="' + AMIR + '"] .cr-body'); await n.p.waitForTimeout(400);
       C.check('not joined: two taps on a post\'s words offer to join, and write nothing', /Join the crew to like a post/.test(await toastOf(n.p) || '') && !(await calls(n.p, 'crew_kudos')).length, String(await toastOf(n.p)));
       await n.ctx.close();
+    }
+  }
+
+  // ── 21. MOMENT CARDS (2026-11-20, Amir: "go with your picks", direction A "Trophy Rows"; "i liked it") ───────────────────────────────────────────────
+  // With stage96 (`lounge: 1`) AND emblems.js loaded, a Bell moment (t:'line') is ONE card, not a slim row: a badge, one big fact, who and the day's other moments in words,
+  // the heart (Say hello instead on someone else's join, for a member). The slim row (round 10, Quiet Lines) is what is drawn without either. The checks above that look at
+  // a slim row run on a fixture with no `lounge` (this file's bell()) or with emblems.js kept out (H.NO_EMBLEMS: section 20's double-tap, lounge.js's open()). Made-up people only.
+  {
+    const CKM = 'aaaaaaaa-0000-4000-8000-0000000000aa', CKP = 'cccccccc-0000-4000-8000-000000000001', CKR = 'dddddddd-0000-4000-8000-000000000002';
+    const CKS = 'eeeeeeee-0000-4000-8000-000000000003', CKO = 'ffffffff-0000-4000-8000-000000000004', CKL = 'bbbbbbbb-0000-4000-8000-000000000005';
+    const who = { [CKP]: 'Mina S.', [CKR]: 'Reza K.', [CKS]: 'Sara T.', [CKO]: 'Omid P.', [CKL]: 'Leila M.', [CKM]: 'Alex R.' };
+    const K = n => 'mc-line-' + n;
+    const ln = (n, ck, parts, o = {}) => Object.assign({ t: 'line', key: K(n), who: who[ck], me: false, ck, fv: null, at: iso(now - (n + 1) * 600e3), kudos: { n: 0, mine: false, names: [] }, parts }, o);
+    const LINES = [
+      ln(1, CKP, [{ k: 'level', n: 14 }]),
+      ln(2, CKR, [{ k: 'best', lifts: ['Trap Bar Deadlift'], more: 0, bests: { 'Trap Bar Deadlift': { kg: 125, up: 5 } } }]),
+      ln(3, CKS, [{ k: 'best', lifts: ['Goblet Squat', 'Overhead Press'], more: 0, bests: { 'Goblet Squat': { kg: 40, up: 2 }, 'Overhead Press': { kg: 60, up: 5 } } }]),
+      ln(4, CKO, [{ k: 'best', lifts: ['Weighted Pull-Up'], more: 0, bests: { 'Weighted Pull-Up': { kg: 80, up: null } } }]),
+      ln(5, CKL, [{ k: 'week', run: 5 }]),
+      ln(6, CKP, [{ k: 'achievement', id: 'big_apple', name: 'Big Apple' }]),
+      ln(7, CKR, [{ k: 'mark', item: 'century', at: 100 }]),
+      ln(8, CKS, [{ k: 'cycle', n: 3 }]),
+      ln(9, CKO, [{ k: 'joined' }]),
+      ln(10, CKM, [{ k: 'joined' }], { me: true }),
+      ln(11, CKL, [{ k: 'level', n: 14 }, { k: 'best', lifts: ['Barbell Back Squat'], more: 0, bests: { 'Barbell Back Squat': { kg: 140, up: 3 } } }, { k: 'week', run: 5 }]),
+      ln(12, CKO, [{ k: 'open', text: 'entered the Monthly Open' }]),
+    ];
+    const mkCards = (o = {}) => {
+      const b = bell(Object.assign({ answer: 'yes', can_post: true, ck: CKM, fv: null }, o.me || {}));
+      b.lounge = 1;
+      b.week = { members: 6, sessions: 14, held: 3 };
+      b.crew = Object.keys(who).map(ck => ({ ck, who: who[ck], fv: null }));
+      b.items = LINES.map(l => JSON.parse(JSON.stringify(l)));
+      return b;
+    };
+    const openCards = async (o = {}, extra) => {
+      const x = await open(browser, Object.assign({ bell: mkCards(o) }, extra || {}));
+      await waitTab(x.p);
+      await x.p.evaluate(() => goTo('crew')); await x.p.waitForTimeout(800);
+      return x;
+    };
+    const cardOf = (p, n) => p.evaluate(k => {
+      const c = document.querySelector('#crew-body .cr-line[data-key="' + k + '"]');
+      if (!c) return null;
+      const q = s => c.querySelector(s), t = s => (q(s) ? q(s).textContent.replace(/\s+/g, ' ').trim() : '');
+      return { mc: c.classList.contains('cr-mc'), slim: c.classList.contains('cr-slim'), cls: c.className, big: t('.cr-mcbig'), sub: t('.cr-mcsub'), clay: [...c.querySelectorAll('.cr-mcbig .c')].map(x => x.textContent.trim()),
+        lift: q('.lift') ? q('.lift').getAttribute('translate') : null, btn: !!q('button.cr-mcb'), spanBadge: !!q('span.cr-mcb'), svg: !!q('.cr-mcb svg.aae'), disc: t('.cr-mcd'), face: !!q('.cr-mcf'), nw: t('.cr-mcf .cr-mcnew'),
+        kw: !!q('small[data-kw]'), heart: !!q('.cr-react[data-mode="heart"][data-count="1"] .cr-ht'), hi: t('button.cr-sayhi.cr-mchi'), hiLabel: q('button.cr-sayhi') ? q('button.cr-sayhi').getAttribute('aria-label') : null,
+        inLines: !!c.closest('.cr-lines'), kg: /kg/i.test(c.textContent) };
+    }, K(n));
+
+    {
+      const { ctx, p } = await openCards();
+      const c = {}; for (let n = 1; n <= 12; n++) c[n] = await cardOf(p, n);
+      const J = n => JSON.stringify(c[n]);
+      C.check('cards: with `lounge: 1` and emblems loaded, a moment is a card (div.cr-line.cr-mc.cr-mc-<kind>), never a slim row', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].every(n => c[n] && c[n].mc && !c[n].slim)
+        && c[1].cls.includes('cr-mc-level') && c[2].cls.includes('cr-mc-best') && c[5].cls.includes('cr-mc-week') && c[6].cls.includes('cr-mc-achievement') && c[7].cls.includes('cr-mc-mark')
+        && c[8].cls.includes('cr-mc-cycle') && c[9].cls.includes('cr-mc-joined'), [1, 2, 5, 6].map(J).join(' '));
+      C.check('card, level: "Level 14" with the number in clay, a picture badge (the emblem, no button), the heart and the "liked by / when" line', !!c[1] && c[1].big === 'Level 14' && c[1].clay.join() === '14' && c[1].spanBadge && c[1].svg && !c[1].btn
+        && c[1].heart && c[1].kw && /^Mina S\. · a new level/.test(c[1].sub), J(1));
+      C.check('card, best with a weight and a gain (`bests`): "125 kg +5" with the "+5" in clay, the lift in the small line (translate=no)', !!c[2] && /^125\s*kg \+5$/.test(c[2].big) && c[2].clay.join() === '+5' && /Trap Bar Deadlift/.test(c[2].sub) && c[2].lift === 'no' && c[2].heart, J(2));
+      C.check('card, best on several lifts: the lift with the biggest gain leads ("60 kg +5")', !!c[3] && /^60\s*kg \+5$/.test(c[3].big) && /Overhead Press/.test(c[3].sub), J(3));
+      C.check('card, a first best (`up: null`): the weight alone, "80 kg", no "+"', !!c[4] && /^80\s*kg$/.test(c[4].big) && !/\+/.test(c[4].big) && !c[4].clay.length && /Weighted Pull-Up/.test(c[4].sub), J(4));
+      C.check('card, week: "5 weeks in a row" with "in a row" in clay and an emblem badge', !!c[5] && c[5].big === '5 weeks in a row' && c[5].clay.join() === 'in a row' && c[5].svg && !c[5].btn, J(5));
+      C.check('card, achievement: its name big, its emblem as a BUTTON badge, "a new achievement" when the rule is not known', !!c[6] && c[6].big === 'Big Apple' && c[6].btn && c[6].svg && /· a new achievement$/.test(c[6].sub), J(6));
+      C.check('card, mark (century 100): "100 sessions with Amir", the tier\'s emblem as a button', !!c[7] && c[7].big === '100 sessions with Amir' && c[7].btn && c[7].svg && c[7].clay.join() === 'sessions with Amir', J(7));
+      C.check('card, cycle: "Cycle 3 done" with a CYCLE 3 disc', !!c[8] && c[8].big === 'Cycle 3 done' && /^CYCLE\s*3$/.test(c[8].disc) && !c[8].svg, J(8));
+      C.check('card, someone else\'s join (you are a member): a face with NEW, "Welcome, Omid", and Say hello in place of the heart', !!c[9] && c[9].cls.includes('cr-mc-joined') && c[9].face && c[9].nw === 'NEW' && c[9].big === 'Welcome, Omid'
+        && c[9].hi === 'Say hello' && c[9].hiLabel === 'Say hello to Omid' && !c[9].heart, J(9));
+      C.check('card, your own join: "Welcome to the crew" and the heart, no Say hello', !!c[10] && c[10].big === 'Welcome to the crew' && c[10].face && c[10].heart && !c[10].hi, J(10));
+      C.check('lead by rank: a line with a level, a best and a held week leads with the best and the others are words in the small line', !!c[11] && c[11].cls.includes('cr-mc-best') && /140\s*kg \+3/.test(c[11].big)
+        && /reached level 14/.test(c[11].sub) && /held a week, 5 in a row/.test(c[11].sub), J(11));
+      C.check('a line with only an `open` part stays a slim row, inside .cr-lines', !!c[12] && c[12].slim && !c[12].mc && c[12].inLines && c[12].heart, J(12));
+      const grp = await p.evaluate(() => ({ cardsInLines: document.querySelectorAll('.cr-lines .cr-mc').length, cards: document.querySelectorAll('#crew-body .cr-mc').length,
+        slimOutside: document.querySelectorAll('#crew-body .cr-slim').length - document.querySelectorAll('.cr-lines .cr-slim').length, lineKids: [...document.querySelectorAll('.cr-lines > *')].every(x => x.classList.contains('cr-slim')) }));
+      C.check('cards never sit inside .cr-lines (eleven cards outside it, the one slim row alone inside)', grp.cardsInLines === 0 && grp.cards === 11 && grp.slimOutside === 0 && grp.lineKids, JSON.stringify(grp));
+      // the achievement badge is a button: it opens the sheet of what it is
+      await p.evaluate(k => document.querySelector('#crew-body .cr-line[data-key="' + k + '"] button.cr-mcb').click(), K(6)); await p.waitForTimeout(350);
+      const sh = await p.evaluate(() => { const m = document.querySelector('#hist-overlay .readiness-modal'); return { open: document.getElementById('hist-overlay').classList.contains('visible'), em: !!m.querySelector('.cab-sh-em svg'), t: (m.querySelector('.readiness-title') || {}).textContent || '', meta: (m.querySelector('.cab-meta') || {}).textContent || '' }; });
+      C.check('the achievement badge button opens the sheet: its emblem, "Big Apple", "Won by Mina S."', sh.open && sh.em && sh.t === 'Big Apple' && /^Won by Mina S\./.test(sh.meta), JSON.stringify(sh));
+      await p.evaluate(() => history.back()); await p.waitForTimeout(300);
+      // the heart on a card is the same heart: it writes crew_kudos
+      await p.evaluate(k => document.querySelector('#crew-body .cr-line[data-key="' + k + '"] .cr-react .cr-ht').click(), K(1)); await p.waitForTimeout(450);
+      const kd = (await calls(p, 'crew_kudos')).filter(x => x.p_target === K(1));
+      C.check('the heart on a card writes crew_kudos (on) and fills', kd.length === 1 && kd[0].p_on === true && await p.evaluate(k => !!document.querySelector('#crew-body .cr-line[data-key="' + k + '"] .cr-ht.is-on'), K(1)), JSON.stringify(kd));
+      // two taps on the card's big words like it, as on a slim row
+      await p.evaluate(k => { const e = document.querySelector('#crew-body .cr-line[data-key="' + k + '"] .cr-mcbig'); e.click(); e.click(); }, K(5)); await p.waitForTimeout(450);
+      const kd5 = (await calls(p, 'crew_kudos')).filter(x => x.p_target === K(5));
+      C.check('two taps on a card\'s big words like it (crew_kudos on, once)', kd5.length === 1 && kd5[0].p_on === true, JSON.stringify(kd5));
+      C.check('cards: no page errors', !p.errs.length, p.errs.join(' | '));
+      await ctx.close();
+    }
+    // you cannot post (not a member): no Say hello on a join card, the heart stands there
+    {
+      const { ctx, p } = await openCards({ me: { can_post: false } });
+      const j = await cardOf(p, 9);
+      C.check('card, someone\'s join when you cannot post: the heart, no Say hello', !!j && j.mc && j.heart && !j.hi, JSON.stringify(j));
+      await ctx.close();
+    }
+    // an emblem that throws: that moment falls back to the slim row, the rest stay cards, nothing errors
+    {
+      const { ctx, p } = await openCards();
+      await p.evaluate(() => { window.AAEmblem.level = () => { throw new Error('no drawing'); }; renderCrew(); }); await p.waitForTimeout(300);
+      const a = await cardOf(p, 1), b = await cardOf(p, 2);
+      C.check('an emblem that throws: the level moment is a slim row again, the best is still a card, and nothing errors', !!a && a.slim && !a.mc && !!b && b.mc && !p.errs.length, JSON.stringify([a && a.cls, b && b.cls, p.errs.join(' | ')]));
+      await ctx.close();
+    }
+    // no AAEmblem (emblems.js never loaded): every line is a slim row, in .cr-lines, with the heart; a join keeps its (slim) Say hello
+    {
+      const { ctx, p } = await openCards({}, { opts: { init: H.NO_EMBLEMS } });
+      const s = await p.evaluate(() => ({ em: typeof window.AAEmblem, on: crewMcOn(), cards: document.querySelectorAll('#crew-body .cr-mc').length, slim: document.querySelectorAll('#crew-body .cr-line.cr-slim').length,
+        lines: document.querySelectorAll('#crew-body .cr-lines > .cr-slim').length, hearts: document.querySelectorAll('#crew-body .cr-slim .cr-react[data-mode="heart"] .cr-ht').length,
+        hi: [...document.querySelectorAll('#crew-body .cr-slim .cr-sayhi')].map(b => b.getAttribute('aria-label')), mchi: document.querySelectorAll('.cr-mchi').length }));
+      C.check('without AAEmblem the slim rows (Quiet Lines) are drawn as before: no card, twelve slim rows in .cr-lines, a heart on each, Say hello on the join', s.em === 'undefined' && !s.on && s.cards === 0 && s.slim === 12 && s.lines === 12 && s.hearts === 12
+        && s.hi.join() === 'Say hello to Omid' && s.mchi === 0, JSON.stringify(s));
+      C.check('…no page errors', !p.errs.length, p.errs.join(' | '));
+      await ctx.close();
+    }
+    // without stage96 (no `lounge`) the slim rows too, even with emblems loaded
+    {
+      const b = mkCards(); delete b.lounge;
+      const { ctx, p } = await openCards({}, { bell: b });
+      const s = await p.evaluate(() => ({ em: typeof window.AAEmblem, cards: document.querySelectorAll('#crew-body .cr-mc').length, slim: document.querySelectorAll('#crew-body .cr-line.cr-slim').length }));
+      C.check('without stage96 (no `lounge`) the slim rows are drawn even with emblems loaded', s.em === 'object' && s.cards === 0 && s.slim === 12, JSON.stringify(s));
+      await ctx.close();
     }
   }
 

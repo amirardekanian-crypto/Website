@@ -93,9 +93,12 @@ const board = (noPages) => [
   Object.assign({ pos: 3, who: 'Mina S.', points: 5100, level: 14, is_me: false }, noPages ? {} : { ck: CK.mina, fv: null }),
 ];
 
+// These checks are about faces, names and doors on a Bell LINE, which is the slim row (round 10, Quiet Lines). Since 2026-11-20 a moment is a CARD when stage96 is on
+// and emblems.js has loaded, so open() keeps emblems.js from setting window.AAEmblem (H.NO_EMBLEMS) unless a check passes { emblems: true } (it needs an emblem drawn,
+// e.g. a trophy's sheet). The cards are checked in crew.js, section 21.
 async function open(browser, o = {}) {
   const b = o.bell === null ? null : (o.bell || bell(o.b || {}));
-  return H.openProgram(browser, Object.assign({ w: 390, h: 844, stub: Object.assign({ crewBoard: board(o.b && o.b.noPages) }, b ? { bell: b } : {}, o.stub || {}), seed: o.seed || {} }, o.opts || {}));
+  return H.openProgram(browser, Object.assign({ w: 390, h: 844, stub: Object.assign({ crewBoard: board(o.b && o.b.noPages) }, b ? { bell: b } : {}, o.stub || {}), seed: o.seed || {} }, o.emblems ? {} : { init: H.NO_EMBLEMS }, o.opts || {}));   // slim rows by default (see below); { emblems: true } lets emblems.js load
 }
 const calls = (p, name) => p.evaluate(n => (window.__STUB.params || []).filter(x => x[0] === n).map(x => x[1]), name);
 const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-tabs .nav-item[data-tab="crew"]'), null, { timeout: 8000 }).then(() => true, () => false);
@@ -1422,7 +1425,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
   const detail = p => p.evaluate(() => { const m = document.querySelector('#hist-overlay .readiness-modal'); return { on: document.getElementById('hist-overlay').classList.contains('visible'), title: (m.querySelector('.readiness-title') || {}).textContent || '',
     em: !!m.querySelector('.cab-sh-em svg'), meta: (m.querySelector('.cab-meta') || {}).textContent || '', names: m.querySelectorAll('.pl-sgr').length, cheered: /Cheered by/.test(m.textContent) }; });
   if (on(18)) {
-    const a = await open(browser, { stub: { crewPages: { [CK.mina]: { achievements: ACH6 } } } });
+    const a = await open(browser, { emblems: true, stub: { crewPages: { [CK.mina]: { achievements: ACH6 } } } });
     await goCrew(a.p); await shown(a.p, CK.mina);
     const r = await achRows(a.p);
     C.check('trophies show no faces and no number of who cheered, even the ones with cheers; every trophy is a button',

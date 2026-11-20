@@ -7909,7 +7909,12 @@ begin
     select ru.athlete_id, ru.created_at, 'week', jsonb_build_object('k', 'week', 'run', ru.run)
       from runs ru where ru.kind = 'week_held' and ru.created_at >= v_from and ru.day >= current_date - 14
     union all
-    select f.athlete_id, f.created_at, 'best', jsonb_build_object('k', 'best', 'lift', f.value ->> 'lift')
+    select f.athlete_id, f.created_at, 'best', jsonb_build_object('k', 'best', 'lift', f.value ->> 'lift',
+             'pct', (select round(((f.value ->> 'kg')::numeric / nullif((pb.value ->> 'kg')::numeric, 0) - 1) * 100)::int   /* stage112: the gain, never the kg */
+                       from public.career_facts pb
+                      where pb.athlete_id = f.athlete_id and pb.kind = 'personal_best' and pb.void_at is null
+                        and pb.value ->> 'lift' = f.value ->> 'lift' and pb.created_at < f.created_at
+                      order by pb.created_at desc limit 1))
       from public.career_facts f
      where f.athlete_id in (select athlete_id from mem) and f.void_at is null and f.kind = 'personal_best'
        and f.day >= current_date - 14 and f.created_at >= v_from and nullif(btrim(f.value ->> 'lift'), '') is not null
@@ -7953,6 +7958,7 @@ begin
            max((k.p ->> 'n')::int) filter (where k.kind = 'level') as lvl,
            jsonb_agg(k.p order by k.at) filter (where k.kind in ('joined', 'mark', 'achievement', 'honour', 'open')) as rest,
            array_agg(distinct k.p ->> 'lift') filter (where k.kind = 'best') as lifts,
+           jsonb_object_agg(k.p ->> 'lift', (k.p ->> 'pct')::int) filter (where k.kind = 'best' and (k.p ->> 'pct')::int > 0) as gains,   -- stage112
            max((k.p ->> 'run')::int) filter (where k.kind = 'week' and not k.hw_mark) as run,
            max((k.p ->> 'n')::int) filter (where k.kind = 'cycle') as cyc
       from kept k group by k.athlete_id, k.d),
@@ -7963,7 +7969,8 @@ begin
              'parts', case when l.lvl is not null then jsonb_build_array(jsonb_build_object('k', 'level', 'n', l.lvl)) else '[]'::jsonb end
                       || coalesce(l.rest, '[]'::jsonb)
                       || case when l.lifts is not null then jsonb_build_array(jsonb_build_object('k', 'best', 'lifts', to_jsonb(l.lifts[1:3]),
-                                                                                                  'more', greatest(0, cardinality(l.lifts) - 3))) else '[]'::jsonb end
+                                                                                                  'more', greatest(0, cardinality(l.lifts) - 3))
+                                                                          || case when l.gains is null then '{}'::jsonb else jsonb_build_object('gains', l.gains) end) else '[]'::jsonb end
                       || case when l.run is not null then jsonb_build_array(jsonb_build_object('k', 'week', 'run', l.run)) else '[]'::jsonb end
                       || case when l.cyc is not null then jsonb_build_array(jsonb_build_object('k', 'cycle', 'n', l.cyc)) else '[]'::jsonb end,
              'kudos', public.crew_kudos_of(null, l.athlete_id, l.d, v_id), 'fv', public.crew_face_v(l.athlete_id)) as j

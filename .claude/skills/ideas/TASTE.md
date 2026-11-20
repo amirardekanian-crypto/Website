@@ -5,6 +5,11 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-11-20 · Moment cards: "Go with your picks".** All four calls taken at once: direction A (his own picture for every kind), the record's gain
+  as a percent instead of the kg his picture showed, a card for every level, a join shown as the new member's face with NEW and Say hello. What it
+  teaches (inferred): offered a privacy-safe number with the same punch, he took it over the weight; when a rule collides with a picture he likes,
+  pitch the version that keeps the rule and say what the other would change.
+
 - **2026-11-20 · The Trophy Lines card: "i liked it".** Mid-build of the feed pass, he sent a crop of the round-10 mockup's #115 card (green NEW
   BEST disc, "125 kg +5" big with the +5 in clay, "Reza · Trap Bar Deadlift · 4 weeks held in a row", a heart) and asked for the same treatment
   for levels, records, joining and other achievements, "in an interesting way". What it teaches: the parked #115 was parked for its numbers, not

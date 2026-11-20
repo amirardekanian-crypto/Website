@@ -301,6 +301,7 @@ STATUS = {
  70: ("Built and live 24 Oct", "https://claude.ai/artifact/X5L2WMkayoxx8eioc85SJV"),
  91: ("Picked 25 Oct, builds with the weekly crew", "https://claude.ai/artifact/Ap56d6pvqEfExFYsFN7P1T"),
  120: ("Built and live 20 Nov", "https://claude.ai/artifact/8kYKCuynCHXZFhhgBKoQkL"),
+ 121: ("Built and live 20 Nov", "https://claude.ai/artifact/7bydrN3KFDsDhEtZuyGv4w"),
 }
 
 def chips(i):

@@ -183,6 +183,11 @@ function checker() {
   };
 }
 
+// An init script (pass it as opts.init) that keeps assets/js/emblems.js from ever setting window.AAEmblem, as if the deferred script never loaded.
+// With stage96 on the Crew feed draws a Bell moment as a CARD only when AAEmblem is there (2026-11-20, moment cards); without it the slim row
+// (round 10, Quiet Lines) stands in. A check that is about the slim row opens the app with this.
+const NO_EMBLEMS = "try { Object.defineProperty(window, 'AAEmblem', { configurable: true, get: function () { return undefined; }, set: function () {} }); } catch (e) {}";
+
 // --out <dir>, or a folder in the system temp directory.
 function outDir() {
   const i = process.argv.indexOf('--out');
@@ -191,4 +196,4 @@ function outDir() {
   return dir;
 }
 
-module.exports = { BASE, ID, STUB, launch, fixture, SPINE, HISTORY, library, openProgram, openProof, card, checker, outDir, past };
+module.exports = { BASE, ID, STUB, launch, fixture, SPINE, HISTORY, library, openProgram, openProof, card, checker, outDir, past, NO_EMBLEMS };

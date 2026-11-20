@@ -41,3 +41,27 @@ points here. The build record, with the functions and the traps, is `docs/ref/pr
 - **Your own face comes first** when you trained. If a programme day was finished today and is not yet on the Bell as a session, it carries a **+** that opens Tell the crew for that
   day. A session still goes with a photo. Once the session is posted, the + is gone.
 - Nothing here pays XP (GAME-6), and none of it changes who sees what.
+
+## Moment cards (2026-11-20, direction A "Trophy Rows")
+
+Amir, 2026-11-20, *"go with your picks"* on https://claude.ai/artifact/7bydrN3KFDsDhEtZuyGv4w, direction A. He had sent the Trophy Lines card back with *"i liked it"* and a
+wish for the level, the records, a join and the other achievements to be shown in a more interesting way. The build record is `docs/ref/program-app/60-moment-cards.md`.
+
+- **A moment is one card.** With stage96 (`lounge: 1`) and the emblems loaded, a Bell moment line is a card, not a slim row. A badge on the left, one big fact with a clay part,
+  who it was and the day's other moments in words, then the heart on the right.
+- **The badge says the kind.** A level, a held week, an achievement and a mark wear the cabinet's own emblem (no new art). A new best and a finished cycle wear a green disc
+  (**NEW BEST**, **CYCLE 3**). A join wears the person's face with a small **NEW**. An honour wears its honour badge.
+- **The big fact is plain words** (COM-3). Level 14. The weight and its gain, 125 kg +5. 5 weeks in a row. The achievement's name. 100 sessions with Amir. Cycle 3 done. Most sessions
+  September. Welcome, Mina. The part that matters is in clay.
+- **One card per line, led by rank.** A day's line can hold several moments. The biggest leads the card, in this order: honour, mark, achievement, cycle, best, week, level,
+  joined. The others are words in the small line under the name.
+- **The heart, or Say hello.** The card carries the same one heart as a slim row, with the same five states, the same long-press and the same two taps. On someone else's join,
+  a member sees **Say hello** where the heart would be. Your own join has the heart.
+- **An achievement's and a mark's badge is a button** that opens what it is, as the slim row's name did. A level, a best and a cycle have no button.
+- **Cards stand on their own.** A card is never inside the white `.cr-lines` block. A line with only an `open` part, or one the card cannot draw, stays a slim row in that block.
+- **The slim row is the fallback, and it is unchanged.** Without stage96, or while the emblems have not loaded, or if an emblem will not draw, the round 10 Quiet Lines row is
+  drawn exactly as before. The emblems load after the page, so Crew repaints once they arrive.
+
+2026-11-20: the Bell now shows a best's weight and its gain in kg (Amir, asked directly: "The weight, like my picture"). The card reads "125 kg +5" with the "+5" in clay, and the
+small line is the name and the lift. A first best on a lift has no gain, so it reads "80 kg". The server sends `bests: { "<lift>": { "kg", "up" } }` (stage113), `up` being kg above
+the same athlete's previous best on that lift, null for a first. This REPLACES the stage81 line "a best names the lift and never a weight"; that old line stays where it was.
