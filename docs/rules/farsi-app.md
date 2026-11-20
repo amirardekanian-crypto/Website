@@ -36,8 +36,9 @@ written from: [`scripts/i18n/BRIEF.md`](../../scripts/i18n/BRIEF.md).
   available in farsi and everything should be written in both languages"*). Each item carries its Farsi as `fa`, a full
   copy where only the words differ (SCHEMA.md → *Library tab*); the app shows it on a Farsi phone. `/workout` writes it in
   the file (guard 30), `/article` publishes it from the `.fa.json`, and coach.html's Publish keeps a live item's Farsi when
-  a file has none. The current cycle of every Farsi athlete with a cycle running on 2026-11-20 was translated once,
-  words only (COM-1's one exception).
+  a file has none. The current cycle of every Farsi athlete with a cycle running on 2026-11-20, and the demo, carry both
+  languages: English in `<key>`, Farsi in `<key>_fa`, the phone's language shown (`faTwins()`; SCHEMA.md → *Programme
+  texts in two languages*; COM-1's one exception).
 - **The exercise texts come from the Spine's Farsi columns** (`get_exercises_fa()`, stage65): steps, cues, purpose and
   On court, where the entry has them (`spineFaOverlay()`); the rest stays English. `spinecache_fa` is a cache, never synced.
 - **Words are generated**: change a part in `scripts/i18n/fa/`, run `node scripts/build_i18n_fa.js`, bump `?v=` on the

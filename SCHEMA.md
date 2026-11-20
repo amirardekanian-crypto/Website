@@ -1185,6 +1185,17 @@ The system adapts to your programming — not the other way around.
 
 ---
 
+## Programme texts in two languages
+
+**`<key>_fa`** (2026-11-20, Amir: *"people with current cycle should have both languages"*). A text the athlete reads may
+carry its Farsi beside its English: `note_fa`, `why.text_fa`, a week note's `text_fa` / `title_fa`, the cycle message's
+`paragraphs_fa` / `outcomes_fa`, the teaser's `paragraphs_fa` / `subtitle_fa`, a cycle's `tagline_fa` / `focuses_fa` /
+`weeks_fa`, a day's `focusTag_fa` / `completionTitle_fa` / `completionMessage_fa`, `notes.greeting_fa` and each card's
+`title_fa` / `body_fa`. A string twins a string, a list twins a list of the same length. On a Farsi phone program.html's
+`faTwins()` puts each twin in its key's place before anything is drawn; an English phone reads `<key>`. Names, `exId`,
+`rx`, ids and numbers never have a twin. Today: the current cycles of the 13 Farsi athletes who had one on 2026-11-20,
+and the demo.
+
 ## Library tab — Train section (on-demand workouts)
 
 Separate from athlete programmes (`data/*.json`), the **Library tab → Train** section shows a
