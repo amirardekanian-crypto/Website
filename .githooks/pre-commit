@@ -641,4 +641,12 @@ if [ -n "$lib_fa" ]; then
   fi
 fi
 
+# -- 31. new English in program.html is told it has no Farsi yet (added 2026-11-20; a WARNING, never a block) ---------------
+# Why: the app in Farsi (assets/js/i18n.js) shows a text in Farsi only when scripts/i18n/fa/ has its words. A new screen
+# written in English needs nothing else to work, so nothing errors when its words are missing: a Farsi athlete just sees
+# English. scripts/i18n/check_new_words.js lists the added texts it cannot find, so they are added in the same run.
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^program[.]html$'; then
+  node scripts/i18n/check_new_words.js || true
+fi
+
 exit $failed

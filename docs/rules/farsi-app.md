@@ -45,6 +45,8 @@ written from: [`scripts/i18n/BRIEF.md`](../../scripts/i18n/BRIEF.md).
 - **Words are generated**: change a part in `scripts/i18n/fa/`, run `node scripts/build_i18n_fa.js`, bump `?v=` on the
   `data-fa` URL in program.html and the same URL in sw.js's SHELL, and the CACHE. Pre-commit guard 29 fails a stale build.
   An engine change is the same with `i18n.js?v=`.
+- **New English in program.html gets its Farsi in the same run.** Pre-commit guard 31 (`scripts/i18n/check_new_words.js`)
+  lists added texts with no Farsi words; it warns and never blocks, so read its list and add the words.
 - **Every Farsi word an athlete reads is a draft until Amir has read it** (COM-3 in his Farsi voice: spoken, warm,
   informal تو). The engine's `AAI18N.missing` lists every English string a Farsi screen met with no words: read it in
   the browser to find what is left.
