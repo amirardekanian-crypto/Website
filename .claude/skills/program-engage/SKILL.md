@@ -263,8 +263,10 @@ Farsi-speaking athletes, English otherwise (COM-2). It lives in chat + a scratch
 
 **It points into the app; it never rewrites it (COM-17, Amir 2026-10-11).** The cards, the Coach's Notes
 and the week notes hold everything in full. A line about something the app holds is a short gist in the
-athlete's language (what to do) plus where it is, by the app's own names. The app is in English, so keep
-its labels in English inside a Farsi message. Only what the app does not hold is written out: why, a date,
+athlete's language (what to do) plus where it is, by the app's own names **as the athlete's app shows them**:
+the app opens in `athlete.lang` (COM-1, `docs/rules/farsi-app.md`), so a Farsi message names Farsi labels, the words
+the app draws in Farsi (`scripts/i18n/fa/*.json`; the table below gives the English), and an English one the English.
+Exercise names stay in English letters in both. Only what the app does not hold is written out: why, a date,
 a question. If a line starts explaining HOW, it belongs in the app.
 
 **Where things are:**
