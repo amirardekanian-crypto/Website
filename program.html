@@ -6280,8 +6280,9 @@
   #screen-crew .cr-post { position: relative; touch-action: manipulation; }
   #screen-crew .cr-icons { display: flex; align-items: center; flex-wrap: wrap; gap: 0 2px; margin: 4px 0 0 -11px; }
   #screen-crew .cr-icons .cr-react.is-menu { flex-basis: 100%; order: 3; padding: 4px 0 2px 11px; }
-  #screen-crew .cr-icons-end { display: inline-flex; align-items: center; margin-left: auto; }
+  #screen-crew .cr-icons-end { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; }   /* Share and Delete a thumb apart */
   #screen-crew .cr-icons-end:empty { display: none; }
+  #screen-crew .cr-icons .cr-del { min-width: 44px; min-height: 44px; }   /* Delete kept its 44 px target when it moved into the icon row (2026-11-20) */
   #screen-crew .cr-post .cr-lb { display: block; margin: 0; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--ink); }
   #screen-crew .cr-post .cr-lb .nw { font-weight: 600; }
   #screen-crew .cr-post .cr-lb[hidden] { display: none; }
@@ -16773,7 +16774,7 @@ function plTrophies(p) {
   }).filter(Boolean).sort((x, y) => y.day.localeCompare(x.day) || x.order - y.order);
 }
 // One trophy: the emblem, its short name, its day; a tap opens what it is.
-function plTrophyCell(t, key) { return cabCell(t, { trophy: key }); }
+function plTrophyCell(t, key) { return cabE() ? cabCell(t, { trophy: key }) : ''; }   // emblems.js loads deferred: a page opened before it draws no trophies rather than throwing (2026-11-20)
 // A person's level medals (the decades they have reached, their own level on the one they are on).
 function plMedals(lv) {
   const E = cabE();

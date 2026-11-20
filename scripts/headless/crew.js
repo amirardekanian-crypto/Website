@@ -664,7 +664,7 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     }
     await stub('off');
     const mine = await row(true), theirs = await row(false);
-    C.check('cheers line, push off: one plain row on YOUR page, "Turn on notifications so the next cheer reaches you"', /Turn on notifications so the next cheer reaches you/.test(mine) && /playerCheersAsk\(\)/.test(mine) && /<h2 class="prog-sec">Cheers this week<\/h2>/.test(mine), mine.slice(0, 140));
+    C.check('cheers line, push off: one plain row on YOUR page, "Turn on notifications so the next cheer reaches you"', /Turn on notifications so the next cheer reaches you/.test(mine) && /playerCheersAsk\(\)/.test(mine) && /<h2 class="prog-sec"[^>]*>Cheers this week<\/h2>/.test(mine), mine.slice(0, 140));
     C.check('…and nothing on someone else\'s page', theirs === '');
     C.check('…drawing it asks nothing: no toast, the box shut', !(await toast()) && (await p.evaluate(() => window.__ASKS)).length === 0);
     await p.evaluate(() => playerCheersAsk());
@@ -1625,7 +1625,7 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
       C.check('card, cycle: "Cycle 3 done" with a CYCLE 3 disc', !!c[8] && c[8].big === 'Cycle 3 done' && /^CYCLE\s*3$/.test(c[8].disc) && !c[8].svg, J(8));
       C.check('card, someone else\'s join (you are a member): a face with NEW, "Welcome, Omid", and Say hello in place of the heart', !!c[9] && c[9].cls.includes('cr-mc-joined') && c[9].face && c[9].nw === 'NEW' && c[9].big === 'Welcome, Omid'
         && c[9].hi === 'Say hello' && c[9].hiLabel === 'Say hello to Omid' && !c[9].heart, J(9));
-      C.check('card, your own join: "Welcome to the crew" and the heart, no Say hello', !!c[10] && c[10].big === 'Welcome to the crew' && c[10].face && c[10].heart && !c[10].hi, J(10));
+      C.check('card, your own join: "Welcome to the crew", no heart (your own item never carries one, 2026-10-20) and no Say hello', !!c[10] && c[10].big === 'Welcome to the crew' && c[10].face && !c[10].heart && !c[10].hi, J(10));
       C.check('lead by rank: a line with a level, a best and a held week leads with the best and the others are words in the small line', !!c[11] && c[11].cls.includes('cr-mc-best') && /140\s*kg \+3/.test(c[11].big)
         && /reached level 14/.test(c[11].sub) && /held a week, 5 in a row/.test(c[11].sub), J(11));
       C.check('a line with only an `open` part stays a slim row, inside .cr-lines', !!c[12] && c[12].slim && !c[12].mc && c[12].inLines && c[12].heart, J(12));
@@ -1669,7 +1669,7 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
       const s = await p.evaluate(() => ({ em: typeof window.AAEmblem, on: crewMcOn(), cards: document.querySelectorAll('#crew-body .cr-mc').length, slim: document.querySelectorAll('#crew-body .cr-line.cr-slim').length,
         lines: document.querySelectorAll('#crew-body .cr-lines > .cr-slim').length, hearts: document.querySelectorAll('#crew-body .cr-slim .cr-react[data-mode="heart"] .cr-ht').length,
         hi: [...document.querySelectorAll('#crew-body .cr-slim .cr-sayhi')].map(b => b.getAttribute('aria-label')), mchi: document.querySelectorAll('.cr-mchi').length }));
-      C.check('without AAEmblem the slim rows (Quiet Lines) are drawn as before: no card, twelve slim rows in .cr-lines, a heart on each, Say hello on the join', s.em === 'undefined' && !s.on && s.cards === 0 && s.slim === 12 && s.lines === 12 && s.hearts === 12
+      C.check('without AAEmblem the slim rows (Quiet Lines) are drawn as before: no card, twelve slim rows in .cr-lines, a heart on each but your own, Say hello on the join', s.em === 'undefined' && !s.on && s.cards === 0 && s.slim === 12 && s.lines === 12 && s.hearts === 11
         && s.hi.join() === 'Say hello to Omid' && s.mchi === 0, JSON.stringify(s));
       C.check('…no page errors', !p.errs.length, p.errs.join(' | '));
       await ctx.close();

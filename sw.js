@@ -569,7 +569,9 @@
 // v255: program.html and i18n-fa.js (?v=8) changed (2026-11-20): Settings → Language no longer says the next cycle comes in the chosen
 // language; every cycle is written in both now (COM-1), so the choice is what the app and the coach's notes show.
 // v256: i18n-fa.js (?v=9) changed (2026-11-20): the green pill in the guide was a medicine pill (قرص); now برچسب.
-const CACHE = 'aap-v256';
+// v257: program.html changed (2026-11-20, the Crew tests run for the first time): Delete keeps its 44 px target in the icon row, Share and Delete
+// 8 px apart, and a player page opened before the emblems load draws no trophies instead of throwing.
+const CACHE = 'aap-v257';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

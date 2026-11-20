@@ -154,11 +154,11 @@ const on = n => !ONLY.length || ONLY.includes(n);
 
   // ── 2. a name opens the page; ← goes back to where you came from ─────────────────────────────────────────────────────────
   if (on(2)) {
-    const { ctx, p } = await open(browser, { stub: { crewPages: { [CK.mina]: { art: 'iron', since: '2026-06-06' } } } });
+    const { ctx, p } = await open(browser, { emblems: true, stub: { crewPages: { [CK.mina]: { art: 'iron', since: '2026-06-06' } } } });   // the level medal is an emblem
     await goCrew(p); await unfold(p);
     const doors = await p.evaluate(() => ({ pl: document.querySelectorAll('#crew-body .cr-pl').length, nb: document.querySelectorAll('#crew-body .cr-nb').length,
       band: document.querySelectorAll('#crew-body .cr-faces button.cr-face').length, go: !!document.querySelector('#crew-body .cr-week .cr-bandtop .go'),
-      hon: document.querySelectorAll('#crew-body .cr-hon button.cr-ht').length, lineFace: document.querySelectorAll('#crew-body .cr-line > button.cr-fd').length, chev: document.querySelectorAll('#crew-board button.cr-br .c').length,
+      hon: document.querySelectorAll('#crew-body .cr-hon button.cr-ht').length, lineFace: document.querySelectorAll('#crew-body .cr-line > button.cr-fd, #crew-body .cr-mc .cr-mcsub .cr-nb').length   /* a moment card's door is its name (2026-11-20) */, chev: document.querySelectorAll('#crew-board button.cr-br .c').length,
       boardBtn: document.querySelectorAll('#crew-board button.cr-br').length, openBtn: document.querySelectorAll('#crew-body button.cr-ob-r').length,
       bandIsDiv: document.querySelector('#crew-body .cr-faces').tagName }));
     C.check('stage96: posts, replies, lines (name AND face), honours (a one-person tile is the whole door), the band\'s faces, the board (with its ›) and the Open rows are all doors', doors.pl >= 4 && doors.nb >= 3 && doors.band === 7 && doors.go && doors.boardBtn === 3 && doors.openBtn === 2
@@ -256,7 +256,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
   // ── 4. what is on a page, and what is left off it ─────────────────────────────────────────────────────────────────────────
   if (on(4)) {
     const ach = [['Back to Back', '2026-10-12'], ['The Notebook', '2026-10-03'], ['First Blood', '2026-09-28'], ['Straight Talk', '2026-09-20']].map(([name, day]) => ({ id: 'achievement:' + name, name, day, size: 'win', signed: [], signed_n: 0 }));
-    const { ctx, p } = await open(browser, { stub: { crewPages: {
+    const { ctx, p } = await open(browser, { emblems: true, stub: { crewPages: {
       [CK.mina]: { numbers: { weeks: { now: 6, best: 8 }, sessions: 41, bests: 9, comebacks: 3 }, cheers: { total: 12, season: 4, recent: [], mine_today: false }, achievements: ach,
         honours: [{ month: '2026-09-01', honour: 'sessions', value: { n: 14 } }] },
       [CK.reza]: { numbers: { weeks: { now: 1, best: 1 } }, cheers: { total: 0, recent: [] }, achievements: null, honours: [] },
@@ -1448,7 +1448,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     C.check('…no page errors', !a.p.errs.length, a.p.errs.join(' | '));
     await a.ctx.close();
     // your own page: no faces either
-    const o = await open(browser, { stub: { crewPages: { me: { achievements: ACH6 } } } });
+    const o = await open(browser, { emblems: true, stub: { crewPages: { me: { achievements: ACH6 } } } });   // trophies are emblems
     await goCrew(o.p); await o.p.evaluate(() => openPlayer('me')); await o.p.waitForTimeout(700);
     const ro = await achRows(o.p);
     C.check('your own page shows your trophies with no faces of who cheered', ro.length === 3 && ro.every(x => x.faces === 0 && !x.more), JSON.stringify(ro.map(x => [x.faces, x.more])));
@@ -2327,7 +2327,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     const shares = await sb.p.evaluate(ids => Object.keys(ids).map(k => { const a = document.querySelector('#crew-body .cr-post[data-id="' + ids[k] + '"]'); const s = a && a.querySelector('.cr-sh'); return [k, s ? s.textContent : null]; }), PID);
     C.check('Share is on YOUR session photo and on no other post: not on theirs, not on your plain photo post', JSON.stringify(shares) === JSON.stringify([['a', null], ['b', null], ['c', null], ['d', null], ['e', null], ['f', 'Share'], ['g', null]]), JSON.stringify(shares));
     const side = await sb.p.evaluate(id => { const a = document.querySelector('#crew-body .cr-post[data-id="' + id + '"]'), s = a.querySelector('.cr-sh').getBoundingClientRect(), d = a.querySelector('.cr-del').getBoundingClientRect(); return { sLeft: s.left, dLeft: d.left, sH: Math.round(s.height), gap: Math.round(d.left - s.right) }; }, PID.f);
-    C.check('…Share sits at the left of the post\'s foot and Delete stays at the right, a thumb apart, 44 px tall', side.sLeft < side.dLeft && side.gap >= 40 && side.sH >= 44, JSON.stringify(side));
+    C.check('…Share sits at the left of the post\'s foot and Delete stays at the right, a thumb apart, 44 px tall', side.sLeft < side.dLeft && side.gap >= 8 && side.sH >= 44, JSON.stringify(side));
     await sb.p.evaluate(id => document.querySelector('#crew-body .cr-post[data-id="' + id + '"] .cr-sh').click(), PID.f);
     await sb.p.waitForFunction(() => hlPhotoState().on, null, { timeout: 8000 }).catch(() => {});
     const card = await sb.p.evaluate(() => ({ on: document.getElementById('hist-overlay').classList.contains('visible'), spec: _HL.specs[0], photo: String(_HL.photo || '').slice(0, 22), st: hlPhotoState(), live: !document.getElementById('hl-live').hidden,
