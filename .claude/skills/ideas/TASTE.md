@@ -5,6 +5,13 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-11-20 · Round 10 'Crew Feed Facelift': "Go with your picks".** He asked for the Crew tab to be *"clearer? better looking? more
+  interesting?"*, inspired by Instagram and TikTok, and took every recommendation at once: 112 + 113 + 114 as one visual pass of the feed
+  first (three directions before building), then 116, 117, 119; 118 and 115 after two weeks of numbers; double-tap likes lines and posts,
+  a face keeps the Cheer; the four reactions stay behind a long-press. He did not ask for the stories rail back. What it teaches
+  (inferred): a page that opens with the live numbers (here: the crew depends on him, 70% of cheers) and keeps his old cuts out lets him
+  answer in one line; he wants the tab to look like the social apps his athletes already use, without their mechanics.
+
 - **2026-11-03 · WhatsApp needs a VPN "but everyone has vpn"; some want SMS; cheap agents and ideas during the build.**
   *"Whatsapp needs vpn but everyone has vpn / Some prefer sms for reminders / Keep the sms panel idea i need to ask my fanily in
   iran / When building , make sure the easier jobs to eb done with cheaper agents / At the same time if you come up with new ideas

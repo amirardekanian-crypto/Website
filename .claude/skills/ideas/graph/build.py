@@ -253,6 +253,17 @@ IDEAS = [
   coach="Each answer is written once and keeps working, and with your yes it teaches the website chatbot too (/chat-facts).",
   mvp="The shelf, filled by the answer post.",
   adv="Search across it."),
+ dict(n=120, name="Add Yours", sub="Your own face leads Trained Today with a +, and a tap posts a photo from that session", layer="Grown along the way", grown="114",
+  grown_url="https://claude.ai/artifact/8kYKCuynCHXZFhhgBKoQkL",
+  stages=["Communication","Feedback"], needs=[], cost="None. Tell the crew already exists; this is a second door to it.",
+  chain=["A session finished","Trained Today row","Your face with +","Tell the crew, session filled in","A photo on the Bell"],
+  what="When you trained today, your own face is first in the Trained Today row (round 10's #114) with a small green +. A tap opens Tell the crew with that session already filled in. Grew out of the round 10 feed pass.",
+  problem="The crew posts about one photo a week, yet people do post when the app writes the words. Tell the crew shows on the finished card and with a moment, then it is gone.",
+  how="crewSessHTML() puts your face first when the line says me; the + calls the Tell the crew sheet with today's session. A session is still posted only with a photo.",
+  athlete="The door to share sits where they are already looking, for the rest of the day, like the + on your own avatar on Instagram.",
+  coach="More real photos from training on the Bell, at no cost in his time.",
+  mvp="The + on your face for the day you trained.",
+  adv="After a photo is posted, the + becomes a small photo mark that opens your post."),
 ]
 
 STAGES = ["Assessment","Decision making","Exercise selection","Programming","Execution","Feedback",

@@ -496,6 +496,41 @@ each, none built:
 | 110 | The Year's Calendar | Ship the official holidays and mourning days for 1405 and 1406 in `holidays` now, checked against the official calendar, instead of an empty table Amir fills by hand. Why: the money window and the mourning-day rule read that table, and with it empty money news could go out on Ashura. About half a day | — | pitched |
 | 111 | Lock-Screen Proof Sheet | One page that shows every draft notification and SMS line (about 60) as it would sit on an iPhone and an Android lock screen, with Persian digits and sample names, grouped by who gets it. Why: step ۱۶ asks Amir to read every Farsi line, and one page beats hunting through SQL; a wrong word is fixed before any coach sees it. About half a day, before step ۱۶ | — | pitched |
 
+## Round 10 · 2026-11-20 · "Crew Feed Facelift" (the Crew tab, inspired by Instagram, TikTok, Strava)
+
+Page: https://claude.ai/artifact/5gPzro3bCbP93CN4vysaGr. Brief: Amir, *"the crew tab in the app have neem busy, have look at it, the messages
+and other things hapening. how we can respond to things ... can it be improved? clearer? better looking? more interesting? get inspired by
+social medias like instagram and tiktok and others"*. Live numbers (19 Oct to 20 Nov): 17 members (10 on 25 Oct), 12 trained 32 sessions
+this week; Amir sent 86 of 123 cheers (70%), 26 of 31 likes this week, 59 of 96 achievement likes; members' own cheers per week 3, 12, 14,
+6, 2; 26 of 36 cheer pairs mutual; 2 of 123 cheers with a word; 0 member posts in their own words this week (all 3 used app drafts: a
+moment line, two welcomes); 1 photo (Amir's); 0 replies live, 0 @names, 0 Mailbag questions, 0 Open results; the Toss 4-6 votes a week
+(the members' most-used feature); 10 of 17 with no face. Today's tab rendered from program.html with a local stub (Playwright is not
+installed on this machine; the browser pane served a throwaway copy with stub.js injected, deleted after): every automatic line is as
+tall as a post, and session lines have no reaction at all.
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 112 | Quiet Lines | Automatic lines as slim rows (face, words, time, a heart with its count at the right end); same-day lines in one block; double-tap to like; the four emoji behind a long-press (Instagram) | — | **picked** 2026-11-20 ("go with your picks"), with 113 and 114 as one pass; three directions owed |
+| 113 | Post, Reshaped | Posts in the Instagram shape: full-width 4:5 photo with its stamp, line icons (heart, reply), "Liked by Mina and 3 others", the Reply box replaced by an icon, replies folded into "View 2 replies" (Instagram) | — | **picked** 2026-11-20, in the feed pass |
+| 114 | Trained Today | Session lines become a row of faces with a ring; double-tap a face = the Cheer (as 65), the ring turns clay once cheered; tap = page; today 32 sessions a week cannot be answered at all (Strava kudos) | — | **picked** 2026-11-20, in the feed pass; get_bell must send each trained person's ck and fv (today `names` only) |
+| 115 | Trophy Lines | A new best and an achievement get their own small card: emblem, the number big ("125 kg +5"); MVP achievements only; the load needs get_bell to send it and Amir's word (Strava PR card) | — | **parked** 2026-11-20 (after two weeks of numbers). The load conflicts with a standing rule (program-app-look.md: "a best names the lift and never a weight"), so only the emblem card is pitchable |
+| 116 | Vote to See | The Toss hides counts until you vote, then bars with % and faces; Monday's Bell line gives last week's result (Instagram poll sticker) | — | **picked** 2026-11-20, after the feed pass |
+| 117 | Caught Up | New since last visit gets a clay dot, "Today · 4 new", and a "You're all caught up" line; from crewSeenAt() (Instagram) | — | **picked** 2026-11-20, after the feed pass |
+| 118 | Pass It On | A cheer's sheet shows two crew mates who trained today and have no cheer yet, one tap each, so the room stops depending on Amir | 114 | **parked** 2026-11-20 until two weeks after 114 is live |
+| 119 | Show Your Face | The first cheer you receive asks for your face, once ("so the crew sees who they are cheering") (Instagram profile prompt) | — | **picked** 2026-11-20, after the feed pass |
+
+Ranking on the page: 112 + 113 + 114 as one visual pass (three directions owed before building, by his rule), then 116, 117, 119; 118 and
+115 after two weeks of numbers. Left out on purpose (already cut): stories rail, reply chips, GIFs, reactions on replies, followers, crew
+chat, post of the week, posting streak, Match Report; also a TikTok swipe feed (about 5 real posts a week, nothing to swipe).
+
+**Picks, 2026-11-20:** Amir, *"Go with your picks"*. Deep-dive with three directions for the feed pass (A Day Card, B The Feed =
+pick, C Player Rows), coach hat, build plan (stage110 adds `people` to get_bell's `sess` items), traps and four calls:
+https://claude.ai/artifact/8kYKCuynCHXZFhhgBKoQkL. Grown idea, also on The Coaching Graph:
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 120 | Add Yours | Your own face leads Trained Today with a green +; a tap opens Tell the crew with that session filled in (a photo still required); a second door to sharing where people already look, for the rest of the day (Instagram's + on your own avatar) | 114 | pitched 2026-11-20 (grown idea, the feed pass page) |
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |
