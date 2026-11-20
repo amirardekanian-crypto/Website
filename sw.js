@@ -557,7 +557,8 @@
 // choice of its own opens in the programme's athlete.lang (39 athletes Farsi, Lemuel, Juan and Dennis English).
 // v249: program.html and /assets/js/i18n-fa.js changed (i18n-fa ?v=4) (2026-11-20, the moment cards, Amir: "go with your picks"). Every Bell moment
 // is a card: its emblem, one big fact with a clay change, the heart; a new best shows its gain as a percent (stage112), never a weight.
-const CACHE = 'aap-v249';
+// v250: program.html and /assets/js/i18n-fa.js changed (i18n-fa ?v=5) (2026-11-20): Farsi for the join text that now says a new best shows its weight.
+const CACHE = 'aap-v250';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -598,7 +599,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=2',
-  '/assets/js/i18n-fa.js?v=4',
+  '/assets/js/i18n-fa.js?v=5',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).
