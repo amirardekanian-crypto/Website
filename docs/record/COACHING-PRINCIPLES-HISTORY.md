@@ -283,6 +283,8 @@ the principles (their *How to add*).
 - `TST-6` **A Rough e1RM is a trend, never a load.**
   - It lived in /program-design (*The Ceiling*) and /cycle-report.
   - Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
+- `TST-7` **Plan as if the test never comes back.**
+  - 2026-11-20, Amir, rewriting the first draft ("a test's number is captured where it cannot be missed"): "if you send a test for the athletes to do, they may never do it, so just do your programming by thinking they havent done it". The first draft had been saved on his "Yes, save it" (offered under PRC-25 because something broke). One athlete's first cycle asked for a calf count as a note on a 12-rep calf card and for a bike distance in a session note. He logged 12 reps "as you wrote" and no distance ever arrived, so none of the next cycle's gates had a baseline.
 
 ## Communication & in-app text
 

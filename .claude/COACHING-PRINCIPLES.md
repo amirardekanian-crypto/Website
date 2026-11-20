@@ -176,6 +176,7 @@ stale copy reached athletes.
 | TST-4 | A test that goes past the cycle's RPE ceiling is written as a stated exception to it. | design · engage | |
 | TST-5 | Flag two or three lifts a cycle for a retest (`test_flag`), never in a first cycle, in pain or with poor technique under load. | design | ✓ (a first cycle; more than 3; a value the app ignores) |
 | TST-6 | An e1RM graded Rough is a trend only: never set a starting load from a single Rough estimate. | design · report | |
+| TST-7 | Design as if a test the athlete does alone never arrives. Nothing waits on its number; a result that comes only refines the plan. | design · roadmap · report | |
 
 ### Communication & in-app text
 | ID | Rule | Stage | Check |
@@ -928,6 +929,12 @@ same ID. Read a rule's story and its history before changing it.
   later cycle (TST-5), when the athlete's technique and effort scale can be trusted.
 - `TST-5` **Two or three flagged retests a cycle, no more.** `test_flag: 5RM` makes the app chase a retest in the cycle's closing week, so it goes only on lifts the cycle is about, usually the primaries: a grinding bilateral or loaded unilateral lift, never a jump, a carry, a warm-up or anything timed. Never in a first cycle, in pain, or with poor technique under load. The nudge works by being rare.
 - `TST-6` **A Rough e1RM is a trend, never a load.** The Ceiling grades each estimate Sharp, Good or Rough (long sets, low RPE), and a single Rough estimate never sets a starting load.
+- `TST-7` **Plan as if the test never comes back.** Athletes train alone and a test they are asked to do (a calf count,
+  a bike distance, a rep-max, a film) often never arrives. So no cycle's design, dose or progression waits on one:
+  the next cycle is written from what the logs already hold, with the conservative default named. A result that
+  does arrive only refines it. Still ask for a test the plain way (its own card, or a film or photo sent to Amir),
+  never as a line on another card's sets, since a note on a 12-rep card comes back as 12. A safety screen is
+  different: what it unlocks stays locked until it is answered.
 
 ## Communication & in-app text
 - `COM-1` **In-app athlete text (message, outcomes, notes, completion) is ENGLISH.**
