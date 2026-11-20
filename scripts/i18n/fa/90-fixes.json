@@ -1,6 +1,10 @@
 {
   "area": "fixes found while testing the whole app in Farsi (read last, so they win)",
-  "exact": {},
+  "exact": {
+    "The app and your next cycle come in the language you choose.": "اپ و دورهٔ بعدیت به زبانی میاد که انتخاب می‌کنی.",
+    "Saved. Your next cycle will be in Farsi.": "ذخیره شد. دورهٔ بعدیت فارسی می‌شه.",
+    "Saved. Your next cycle will be in English.": "ذخیره شد. دورهٔ بعدیت انگلیسی می‌شه."
+  },
   "patterns": [
     ["Effort (\\d+(?:\\.\\d+)?) → (\\d+(?:\\.\\d+)?) today", "شدت $1 ← $2 امروز"],
     ["(.+) · Effort (\\d+(?:\\.\\d+)?) → (\\d+(?:\\.\\d+)?) today", "{t1} · شدت $2 ← $3 امروز"]

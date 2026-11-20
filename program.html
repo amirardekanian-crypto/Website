@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is hidden until the words are done (?fa=1 shows it on one phone). See the file's header. -->
-<script src="/assets/js/i18n.js?v=1" data-fa="/assets/js/i18n-fa.js?v=1"></script>
+<script src="/assets/js/i18n.js?v=1" data-fa="/assets/js/i18n-fa.js?v=2"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -8739,6 +8739,7 @@ setTimeout(() => bootStuck('nothing answered in ' + Math.round(BOOT_CEILING_MS /
   refreshHold();
   setTimeout(crewFirstLook, 2500);
   inboxBoot();   // the tray's count from the phone's own list at once, the server's Inbox behind it (Home Crowd step 2)
+  setTimeout(setMyLangPending, 1500);   // the language chosen with no signal goes now; the line after a language change
   setTimeout(pushRefreshQuiet, 4000);   // reminders made under an old key subscribe again, quietly (AAPush.refresh())
   // The Spine: cues and the ⓘ from the phone's copy now, then from the server.
   paintSpine();
@@ -9090,7 +9091,8 @@ function openAccount(e) {
         <span class="acct-seg acct-lang" role="group" aria-label="Language" translate="no">
           <button type="button" data-lang="en" aria-pressed="${!AAI18N.fa}">English</button>
           <button type="button" data-lang="fa" lang="fa" aria-pressed="${AAI18N.fa}">فارسی</button>
-        </span></div>` : ''}
+        </span></div>
+      <p class="acct-foot acct-lang-note">The app and your next cycle come in the language you choose.</p>` : ''}
       ${install}
       ${pushReady() ? door('acct-push', 'bell', 'Reminders') : ''}
       ${crewOn() && !pages && !u13 ? door('acct-crew', 'sees', 'What the crew sees') : ''}
@@ -9101,9 +9103,16 @@ function openAccount(e) {
   ov.querySelectorAll('.acct-seg button[data-theme]').forEach(b => b.addEventListener('click', () => {
     if ((b.dataset.theme === 'dark') !== document.body.hasAttribute('data-dark')) toggleDark();
   }));
-  // Language (2026-11-20): a reload in the other language. Hidden until AAI18N.beta (assets/js/i18n.js).
-  ov.querySelectorAll('.acct-lang button').forEach(b => b.addEventListener('click', () => {
-    if ((b.dataset.lang === 'fa') !== !!AAI18N.fa) AAI18N.setLang(b.dataset.lang);
+  // Language (2026-11-20): the athlete's own choice, for the app AND their next cycle (Amir: "let the client pick their language, and
+  // tell them that by choosing, their next cycle will be in their chosen language"). Saved to their programme (setMyLang()), then
+  // a reload in that language. Hidden until AAI18N.beta (assets/js/i18n.js).
+  ov.querySelectorAll('.acct-lang button').forEach(b => b.addEventListener('click', async () => {
+    const want = b.dataset.lang === 'fa' ? 'fa' : 'en';
+    if ((want === 'fa') === !!AAI18N.fa) return;
+    ov.querySelectorAll('.acct-lang button').forEach(x => { x.disabled = true; });
+    await setMyLang(want);
+    try { localStorage.setItem('aa_lang_said', want); } catch (e) {}
+    AAI18N.setLang(want);
   }));
   const ins = document.getElementById('acct-install');
   if (ins) ins.addEventListener('click', () => {
@@ -9477,7 +9486,7 @@ function roadIc(kind) {
 // not end it. Home's week note (weekNoteHTML()) keeps its own plain cut, the same regex without the two guards, and so does check_program.py (COM-16).
 function firstSentence(text) {
   const s = String(text == null ? '' : text).trim();
-  const re = /[.!?]\s+(?=[A-Z0-9"'(“])/g;
+  const re = /[.!?؟]\s+(?=[A-Z0-9"'(“\u0600-\u06FF])/g;   // a Farsi sentence ends at . ! ? or ؟ before a Farsi letter (Farsi notes, COM-1)
   let m;
   while ((m = re.exec(s))) {
     const first = s.slice(0, m.index + 1);
@@ -9710,7 +9719,7 @@ function weekNoteHTML(cycle) {
   const named = !!n.title || last;
   const text = effortWord(n.text).trim();
   // The first sentence: up to . ! or ? followed by a space and a capital, a digit or an opening quote.
-  const m = text.match(/^(.+?[.!?])\s+(?=[A-Z0-9"'(“])/);
+  const m = text.match(/^(.+?[.!?؟])\s+(?=[A-Z0-9"'(“\u0600-\u06FF])/);   // and a Farsi note's (COM-1)
   const first = m ? m[1] : text, rest = m ? text.slice(m[0].length) : '';
   const shape = (!named && !capOn && !setsOn && !dropOn) ? 'lead' : first.length > 100 ? 'name' : 'sentence';
   const WORD = { one: 1, two: 2, three: 3, four: 4, five: 5 };
@@ -17554,6 +17563,34 @@ function pushLang() {
 }
 // Once an open: a phone whose reminders were subscribed under a key that has since been replaced subscribes again, with its
 // settings, and no prompt (assets/js/push.js pushRefresh(); every other phone does nothing). An older push.js has no refresh.
+// The athlete's language on their programme (stage110 set_my_lang(): athlete.lang and their phones' reminder language). Amir writes
+// their next cycle in it. With no signal the choice waits on the phone (aa_lang_pending) and goes at the next open (setMyLangPending()).
+// The saved plan is told too, so the reload does not say "Your plan was updated" for the athlete's own tap. Never the demo or the preview.
+async function setMyLang(lang) {
+  if (window.IS_DEMO || window.IS_PREVIEW) return false;
+  try { localStorage.setItem('aa_lang_pending', lang); } catch (e) {}
+  try {
+    const sb = await _sbReady();
+    const res = sb ? await _withTimeout(sb.rpc('set_my_lang', { p_lang: lang }), 6000) : null;
+    if (!res || res.error) return false;
+    try { localStorage.removeItem('aa_lang_pending'); } catch (e) {}
+    if (DATA && DATA.athlete) DATA.athlete.lang = lang;
+    try {
+      const c = JSON.parse(localStorage.getItem(PLAN_COPY_KEY) || 'null');
+      if (c && c.data && c.data.athlete) { c.data.athlete.lang = lang; _lsRawSet(PLAN_COPY_KEY, JSON.stringify(c)); }
+    } catch (e) { /* the copy is only a cache */ }
+    return true;
+  } catch (e) { return false; }
+}
+function setMyLangPending() {
+  let p = null;
+  try { p = localStorage.getItem('aa_lang_pending'); } catch (e) {}
+  if (p === 'en' || p === 'fa') setMyLang(p);
+  // Said once, after the reload the choice made: where the athlete can read it, in the language they chose.
+  let said = null;
+  try { said = localStorage.getItem('aa_lang_said'); localStorage.removeItem('aa_lang_said'); } catch (e) {}
+  if (said) aaToast(said === 'fa' ? 'Saved. Your next cycle will be in Farsi.' : 'Saved. Your next cycle will be in English.');
+}
 function pushRefreshQuiet() {
   if (!pushReady() || AAPush.state() !== 'on' || typeof AAPush.refresh !== 'function') return;
   _sbReady().then(sb => sb && AAPush.refresh(sb, 'training', pushLang())).catch(() => {});
