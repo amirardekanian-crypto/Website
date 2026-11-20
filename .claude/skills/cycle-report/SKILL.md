@@ -72,7 +72,7 @@ fine, just not a *cycle* report).
 **First, complete the log.** Run the `athlete-brief` agent in **MODE=import**, in the foreground,
 with the window (`startDate − 3` to `endDate`). It adds any session that reached Amir's inbox as a
 Web3Forms report but not the database (Amir, 2026-09-26: the import is still needed), and returns
-one line. Put that line in the Debrief's Sources.
+one line. That line goes in the hand-over (Step 6), not the Debrief.
 
 **This report is the evidence for the next cycle** (2026-09-26): /program-design reads the Debrief
 as its brief and no longer builds a separate one, so a returning athlete's next cycle starts here.
@@ -123,6 +123,12 @@ Work through this list. Each line is a finding only if the data says so.
 
 Then look forward: `next_cycle.focuses` and `teaser` (the locked roadmap), the ledger's deferred
 exercises ("enters C2"), and anything Amir already promised the athlete.
+
+**The read is for Amir in chat and for the message, not for the log.** Most of the table above
+never reaches the Debrief. Typos, units, warm-ups typed into working rows, a back-off week not done,
+readiness, sleep, weigh-ins and Personal Records go in the Debrief only when they change a decision
+for the next cycle, and then as that decision ("take no starting load from his RPE", PRG-11), not
+as the finding. Step 5 says what stays in.
 
 ## Step 3 · Ask Amir, once
 
@@ -187,46 +193,67 @@ one-word answer works.
 said on a call (heart rate and fatigue → cardio base; left arm on backhands → medicine-ball
 throws; speed → cycle 3), the Force Bank plan with a broad-jump baseline, 4 asks (tick + RPE,
 working sets only with the whole bar, weekly weigh-in, a real back-off week), 3 questions.
-Its log section is the model for Step 5.
+Its log section was written in the long form, before 2026-11-20: Step 5's template is the model
+for the Debrief, not that section.
 
 ## Step 5 · Save the Debrief to the coaching log
 
-**Only what changes a coaching decision.** Not the message, not the wins for their own sake.
-English, coach-only. Template:
+**Only what changes a programming decision.** Every `/program-design` run reads this section
+again, so every line in it is read every cycle. Amir, 2026-11-20, after a 5.5k-character Debrief:
+*"never keep that much info in some ones log, im sure there are loads of information that needs to
+be read everytime and doesnt affect programming much."* That one was cut by hand to 1.3k and lost
+nothing design needed. The same day he said who it is for: a coach six months into working with
+an athlete, who needs *"the info that helps you write the next cycle, based on what he wants to do,
+based on his injuries, his equipment or any information that can affect programming … keep them
+how you would read fast and helps write a program fast, i never read them."* So write for the next
+design run, not for Amir: goals, injuries, kit, time and loads first.
+
+**About 1.5k characters. Four sections, one-line items.** English, coach-only. The test for every
+line: *without it, would the next design pick a different exercise, dose, load, time cap or test?*
+If not, leave it out.
 
 ```
 ---
 
-## Debrief — Cycle NN <Name> · <YYYY-MM-DD> · end of cycle, before C<NN+1> design
+## Debrief — Cycle NN <Name> · <YYYY-MM-DD> · before C<NN+1> design
 
-Coach-only. Only what changes a coaching decision. Sources: <n> session_history rows
-(<first>–<last>), Gmail import: <its line>, <film review / calls / messages>. Athlete message:
-<language>, <channel>.
+**Training** — <done> of <planned> sessions (a gap and its cause, in a few words) · real time
+×<ratio> the model, per day (D1 73 vs 51) · each primary's top set, first → last, flat lifts named
+· the Ceiling for a flagged lift: e1RM, grade, date (TST-6) · a data fault only as the decision it
+forces ("take no starting load from his RPE", PRG-11; "whole bar or per side unknown") · each
+promise or gate: met / partly / not yet, with its number · at most one short quote, only when it
+moves the dose.
 
-**Adherence & tolerance** — sessions, missed days, readiness, soreness, session RPE, time (logged
-minutes against the modelled ones, and the ratio real ÷ model, which the next design's time check
-uses), sleep. End with the read ("absorbed easily, room to push" / "hold").
+**Profile changes** — only what changed: an injury new or resolved, kit, gym, schedule, goal, a
+film verdict. "None" when nothing did.
 
-**Loads as logged (top set per week)** — one line per primary; flag typos; film gate verdict.
+**Into C<NN+1>** — each decision in a few words, its reason only when it isn't plain · a decision
+beyond the locked roadmap is marked **ROADMAP DEVIATION** with the data point that forced it ·
+new baselines (what, which week) · exercises in, out or still deferred · a start date that moved.
 
-**Data quality — read before writing any starting-load note** — units, warm-ups in working
-rows, RPE coverage, the share of sets logged at RPE 10, weigh-ins, Personal Records, back-off
-week. Say what the athlete was told.
-
-**The Ceiling** — one line per flagged or primary lift: estimate, grade, date, and relative
-strength if there's a weigh-in. The next design reads its e1RM here, nowhere else.
-
-**Profile changes** — only what changed: an injury new or resolved, kit, schedule, goal. "None"
-when nothing did.
-
-**The athlete's words** — what he said, and what Amir answered, in their words.
-
-**Decisions carried into C<NN+1>** — each one with its reason. A decision that goes beyond the
-locked roadmap is labelled **ROADMAP DEVIATION** with the data point that forced it. New
-baselines (what, which week). Exercises entering or staying deferred.
-
-**Open — answer at the C<NN+1> checkpoint** — numbered: the questions sent to the athlete,
+**Open** — numbered, one line each: the questions sent to the athlete (mark them "asked"),
 medical flags for Amir, anything the log couldn't settle.
+```
+
+**Stays out of the log** (it goes in chat at Step 6, or nowhere): the sources and the Gmail import
+line, the language and channel of the message, typos, app glitches, readiness and sleep that change
+nothing, a back-off week that wasn't done, weigh-ins and Personal Records that are missing, wins for
+their own sake, what the athlete was told, and long quotes from the athlete. What he said lives on
+as the decision it led to, or as an Open question.
+
+A made-up example of the size and the voice:
+
+```
+**Training** — 14 of 15 sessions (one missed in week 3, a tournament). Real time ×1.3 the model
+(D1 62 vs 48, D2 58 vs 45). Trap-bar deadlift 60 → 80 kg x5; split squat flat at 12 kg. Half his
+sets logged RPE 10: take no starting load from his RPE (PRG-11). Broad-jump baseline 2.10 m.
+
+**Profile changes** — new gym, has a cable stack · left knee settled, no pain since week 2.
+
+**Into C02** — split squat goes up · cable rows in, band rows out · knee allowed full-range lunges ·
+retest broad jump in week 5.
+
+**Open** — 1 any knee pain on stairs? (asked) · 2 match days this cycle? (asked).
 ```
 
 Write it with an append, never a retype, and prove nothing before it moved:
@@ -253,9 +280,10 @@ No row yet (a brand-new athlete whose first cycle wasn't logged)? Insert one wit
 
 In this order, in chat:
 1. **The message**, ready to paste, between two rules. Nothing else inside the rules.
-2. What was **left out on purpose** and why (a medical question for Amir to ask himself, a typo).
-3. **What was saved**: the log section's headings in one line each, its length before and after,
-   and that the prefix checksum matched.
+2. What was **left out on purpose** and why (a medical question for Amir to ask himself, a typo),
+   and the sources in one line: the sessions read, the Gmail import's line, film, calls.
+3. **What was saved**: the section's length (about 1.5k; say why if it is much longer), the log's
+   length before and after, and that the prefix checksum matched.
 4. The next step: `/program-design <name>` once the athlete answers. Paste the answers into that run:
    design records them in the new cycle's log entry, and when the Debrief's Open list still has a
    question with no recorded answer it asks Amir first, *wait or design now with stated defaults*.

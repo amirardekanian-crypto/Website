@@ -129,8 +129,9 @@ change before I build?"* before writing exercises.
      gives you into the read. `ctx.row.programme` holds the prescription.
      ⚠ **Never the old returning brief.** The `athlete-brief` agent's returning mode was retired on
      2026-09-26: it spent ~225k tokens and 10 minutes re-deriving what a Debrief says, with its own
-     e1RM formula. The e1RM this design uses is the Debrief's **The Ceiling** line (see *The
-     Ceiling* below for how it may be used).
+     e1RM formula. The e1RM this design uses is the Ceiling in the Debrief's **Training** section
+     (a **The Ceiling** line in a Debrief written before 2026-11-20; see *The Ceiling* below for how
+     it may be used).
    - NEW → use the ATHLETE BRIEF from /athlete-intake. In a new chat, the profile draft and the
      roadmap's read and rationale in `ctx.log` (saved when the roadmap locked, PRC-3) plus intake's one
      lookup (/athlete-intake Step 1) stand in for it. If neither exists, stop and ask Amir to run
@@ -169,9 +170,10 @@ change before I build?"* before writing exercises.
    current program), and the entry written for THIS cycle becomes the baseline the next cycle
    continues. The logic is captured the first time you design their next cycle.
    **A `## Debrief — Cycle NN …` section after the last cycle is the end-of-cycle review**, written
-   by **`/cycle-report`** in the closing week (since 2026-09-24): film verdicts, the athlete's own words from calls, data
-   problems in the log (units, warm-ups typed into working rows, missing RPE), decisions already
-   promised to the athlete, and an **Open** list. Read it in full: it is STEP 1A's evidence and the
+   by **`/cycle-report`** in the closing week (since 2026-09-24). Since 2026-11-20 it has four short
+   sections, **Training** (adherence, time ratio, loads, the Ceiling, any data fault as the decision it
+   forces), **Profile changes**, **Into C<NN>** (decisions already promised to the athlete) and an
+   **Open** list; an older one is longer and has the same parts under more headings. Read it in full: it is STEP 1A's evidence and the
    "check-in chat" STEP 1A says never to ignore. Every **Open** item gets an answer at the STEP 1
    checkpoint, and every promise in it (e.g. "cardio base from C2") is honoured or its change named.
    Also check the **Exercise Ledger** table at the top of the file, right after the header
@@ -197,7 +199,7 @@ coherent multi-cycle logic, not designing fresh. Progress and edit from the data
 *logic* only when a data point forces it — and when you do, name the why (it becomes this
 cycle's log entry).
 - **ADAPTATION RESPONSE** — strength/RPE trends, loads progressed, reps hit; the
-  **e1RM trend** per primary (the Debrief's The Ceiling, with each grade); where they
+  **e1RM trend** per primary (the Ceiling in the Debrief's Training section, with each grade); where they
   over/under-performed + the read.
 - **RECOVERY & LIFESTYLE INTEGRATION** *(required)* — sleep, stress, session-RPE trend AND
   the check-in chat. Separate training fatigue from life load. Close with a concrete
@@ -342,7 +344,7 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   PER-DAY LOAD DISTRIBUTION above), not leftover time.
   **RETURNING athlete: calibrate against reality first.** The model runs short: one athlete's
   Cycle 1 modelled ~48 min and ran 69 (×1.44), so a 55-minute design meant ~75 real. Take the ratio
-  from the last Debrief's time line (logged minutes against the modelled minutes that `--tables`
+  from the last Debrief's time ratio, in its Training section (logged minutes against the modelled minutes that `--tables`
   writes into each log entry since 2026-09-27); without one, set your estimate against
   `ctx.sessions.minutes_by_day`. Part A's check prints the exact ratio (last cycle's model against
   its logged minutes) and each new day's expected real length, and holds the soft cap against that
@@ -726,17 +728,29 @@ program and what /program-assemble appends verbatim to the coach-only, unpublish
 athlete's `public.coaching_logs` row (append-only; prior cycles are never touched). They go to chat +
 that log ONLY — never into the athlete app or the programme.
 
+**Only what changes a programming decision** (Amir, 2026-11-20: *"never keep that much info in
+some ones log, im sure there are loads of information that needs to be read everytime and doesnt
+affect programming much"*; and, the same day, *"keep them how you would read fast and helps write a
+program fast, i never read them"*). The reader is the next design run, not Amir: it needs what the
+athlete wants, their injuries, their kit and anything else that changes programming, fast. It reads
+this entry in full, and entries had grown to
+6–24k characters. Keep the words to **about 2k characters, the checker's tables apart**, in one-line
+items. Don't restate the programme: every set, rep and note is on the server. The test for a line:
+*without it, would the next design progress, swap, dose or test differently?* The full analysis
+stays in chat, where Amir read it at the checkpoint.
+
 ```
 ## Cycle <NN> — <Cycle Name> · <YYYY-MM-DD> · <NEW|RETURNING>
 
-**The read** — the Step 1 analysis that drove this cycle, condensed but complete: the key
-adaptation / recovery & lifestyle / injury / capacity / roadmap reads (returning), or the
-recovery-ceiling / priority-target / contraindication / structure reads (new). Keep the
-reasoning ("how we were thinking"); drop the throat-clearing.
+**The read** — only the reads that drove a decision, one line each with its data point:
+adaptation / recovery & lifestyle / injury / capacity / roadmap (returning), or recovery ceiling /
+priority target / contraindication / structure (new). The answer to each item on the Debrief's
+Open list, and each default assumed for a missing answer (STEP 0 → 4b). A read that changed
+nothing stays out.
 
-**Decisions** — the LOCKED LISTS verbatim (PROGRESS / REPLACE / ADD, or PRIMARY LIFT
-SELECTIONS), plus any fork Amir settled at the checkpoint and the call he made ("why we
-changed something").
+**Decisions** — the LOCKED LISTS (PROGRESS / REPLACE / ADD, or PRIMARY LIFT SELECTIONS), one line
+per exercise with its reason in a few words, plus any fork Amir settled at the checkpoint and the
+call he made.
 
 **Profile changes** — what changed in the athlete profile this cycle and why, one line each, or
 "none". The block itself is kept current at the top of the log; this line is its history.
@@ -754,7 +768,7 @@ build check (`check_program.py --tables`) counts every exercise from its Spine e
 the per-muscle totals against 10–20, and each day's cost-weighted load and minutes (modelled, and
 the expected real length once a ratio exists). /program-assemble pastes
 that file here as written. Leave the line `<the checker's tables>` in your draft, and write only
-what the numbers can't say, in a few lines: a time-limited under-dose framed as maintenance and
+what the numbers can't say, one line each, and only those that apply: a time-limited under-dose framed as maintenance and
 where to invest if time allows (VOL-1), a muscle under 10 by choice and why (VOL-9, the spec's
 `floor-except:`), an over flagged as loudly as an under (VOL-3), and each day's load identity
 (peak, moderate, low: VOL-2). A count that looks wrong for one exercise is fixed on its Spine
@@ -774,7 +788,8 @@ A goes straight on to **/program-engage** (PRC-4: no "do prompt 2"), and after A
 
 ## THE CEILING — the e1RM (a design input, never a prescription)
 
-For a RETURNING athlete it arrives as the Debrief's **The Ceiling** line: each primary's estimated
+For a RETURNING athlete it arrives in the Debrief's **Training** section (its own **The Ceiling**
+line before 2026-11-20): each primary's estimated
 1RM (from logged weight, reps and RPE), its grade and date, and relative strength (e1RM ÷ the latest
 body weight, the number that matters for tennis and padel). The app keeps the history on its
 Personal Records screen and adds a new best by itself. Body weight is weighed in on the programme
