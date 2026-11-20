@@ -1015,6 +1015,24 @@ for x in d['workouts']['days']: x['optional'] = True
 expect('every day optional fails: no week could ever be held', has(run(d, ctx=CTX), 'FAIL', 'every day is optional'))
 expect('no optional day: no optional line', not has(run(BASE, ctx=CTX), 'INFO', 'optional: Day'))
 
+# ── The words are in athlete.lang (COM-1, 2026-11-20: written once, in the athlete's language) ──
+def lang_case(lang, farsi_note):
+    d = copy.deepcopy(BASE)
+    d.setdefault('athlete', {})['lang'] = lang
+    ex = next(e for day in d['workouts']['days'] for b in day['blocks'] for e in b.get('exercises') or [] if e.get('type') != 'circuit')
+    ex['note'] = 'با ۴۰ کیلو شروع کن و بذار ست اول تصمیم بگیره.' if farsi_note else 'Start at 40 kg and let set 1 decide.'
+    return d, ex['name']
+def lang_warn(out, name):
+    return any(l.startswith('WARN') and 'COM-1' in l and f"{name} note" in l for l in out.splitlines())
+d, nm = lang_case('fa', False)
+expect('a Farsi athlete with an English note: COM-1 names it', lang_warn(run(d, ctx=CTX), nm))
+d, nm = lang_case('fa', True)
+expect('a Farsi athlete with a Farsi note: not named', not lang_warn(run(d, ctx=CTX), nm))
+d, nm = lang_case('en', True)
+expect('an English athlete with a Farsi note: COM-1 names it', lang_warn(run(d, ctx=CTX), nm))
+d, nm = lang_case('en', False)
+expect('an English athlete with an English note: not named', not lang_warn(run(d, ctx=CTX), nm))
+
 print(f"{sum(1 for _, ok in results if ok)}/{len(results)} passed" + ('' if HAVE_NODE else ' (node not found: the node-backed checks were skipped)'))
 for n, ok in results:
     if not ok: print('  failed:', n)
