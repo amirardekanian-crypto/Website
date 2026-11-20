@@ -98,14 +98,13 @@ Grouped into one round of questions, the genuine gaps to close:
   on conflict (athlete_id) do nothing;
   ```
   **`lang` is the athlete's language** (Amir, 2026-11-20: *"let the client pick their language"*): the
-  app's language, the language their notifications go out in, and the language Amir writes their
-  programme notes in. The intake form now asks it as **"App Language"** (`English` or `Farsi`, required,
+  app's language, the language their notifications go out in, and the language of the WhatsApp handoff
+  message (COM-2); the programme's own words are written in both languages for everyone (COM-1). The intake form now asks it as **"App Language"** (`English` or `Farsi`, required,
   on both forms). Map it: **`Farsi` → `fa`, `English` → `en`**. An older form with no answer: `fa` if it
   came from form-fa.html (the intake row's own `lang` is `fa`), else `en`. Set it here, at onboarding, so
   it is never a backfill again, and carry it into the brief's IDENTITY line and the profile's `language`.
   The athlete can change it later in the app (Settings → Language), which rewrites `athlete.lang`, so
-  read it again from the programme before each cycle; **Amir writes their notes in `athlete.lang`**
-  (exercise names and the plan are the same in both). The phone follows the programme within the hour
+  read it again from the programme before each cycle (exercise names and the plan are the same in both). The phone follows the programme within the hour
   (`push_lang_sync()`, stage88). **Leave it out and they get English.** (Every programme had its language set
   on 2026-11-20, on Amir's word: `en` for Lemuel, Juan and Dennis, `fa` for the rest.)
 

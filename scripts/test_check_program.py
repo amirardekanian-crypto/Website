@@ -138,7 +138,7 @@ out = run(with_notes({"1": W1, "3": TEST, "5": BACKOFF}), ctx=CTX)
 expect('a testing week on week 3 passes', not has(out, 'FAIL', 'week note') and not has(out, 'WARN', 'give week 3'), out)
 untitled = {k: v for k, v in TEST.items() if k != 'title'}
 expect('a note on a middle week without a title warns', has(run(with_notes({"3": untitled, "5": BACKOFF}), ctx=CTX), 'WARN', "give week 3's note a title"))
-expect('a taper needs no title (the app calls it the Back-off week)', not has(run(with_notes({"5": BACKOFF}), '--taper', 'County Open', ctx=CTX), 'WARN', 'title'))
+expect('a taper needs no title (the app calls it the Back-off week)', not any(l.startswith('WARN') and 'title' in l and '[COM-1]' not in l for l in run(with_notes({"5": BACKOFF}), '--taper', 'County Open', ctx=CTX).splitlines()))   # COM-1's twin list names card titles
 out = run(with_notes({"3": TEST}), '--taper', 'County Open', ctx=CTX)
 expect('a taper with only a middle week: the back-off is still missing', has(out, 'FAIL', 'no week note on the final week'), out)
 out = run(with_notes({"3": TEST}), ctx=CTX)
@@ -1015,23 +1015,36 @@ for x in d['workouts']['days']: x['optional'] = True
 expect('every day optional fails: no week could ever be held', has(run(d, ctx=CTX), 'FAIL', 'every day is optional'))
 expect('no optional day: no optional line', not has(run(BASE, ctx=CTX), 'INFO', 'optional: Day'))
 
-# ── The words are in athlete.lang (COM-1, 2026-11-20: written once, in the athlete's language) ──
-def lang_case(lang, farsi_note):
+# ── Every text in both languages (COM-1, 2026-11-20: English in the field, Farsi in <key>_fa, for every athlete) ──
+def twin_case(note=None, note_fa=None, lang='en', outcomes=None, outcomes_fa=None):
     d = copy.deepcopy(BASE)
     d.setdefault('athlete', {})['lang'] = lang
     ex = next(e for day in d['workouts']['days'] for b in day['blocks'] for e in b.get('exercises') or [] if e.get('type') != 'circuit')
-    ex['note'] = 'با ۴۰ کیلو شروع کن و بذار ست اول تصمیم بگیره.' if farsi_note else 'Start at 40 kg and let set 1 decide.'
+    for k, v in (('note', note), ('note_fa', note_fa)):
+        if v is None: ex.pop(k, None)
+        else: ex[k] = v
+    if outcomes is not None:
+        m = d['cycles'][d.get('currentCycleIndex') or 0].setdefault('message', {})
+        m['outcomes'] = outcomes
+        if outcomes_fa is not None: m['outcomes_fa'] = outcomes_fa
     return d, ex['name']
-def lang_warn(out, name):
-    return any(l.startswith('WARN') and 'COM-1' in l and f"{name} note" in l for l in out.splitlines())
-d, nm = lang_case('fa', False)
-expect('a Farsi athlete with an English note: COM-1 names it', lang_warn(run(d, ctx=CTX), nm))
-d, nm = lang_case('fa', True)
-expect('a Farsi athlete with a Farsi note: not named', not lang_warn(run(d, ctx=CTX), nm))
-d, nm = lang_case('en', True)
-expect('an English athlete with a Farsi note: COM-1 names it', lang_warn(run(d, ctx=CTX), nm))
-d, nm = lang_case('en', False)
-expect('an English athlete with an English note: not named', not lang_warn(run(d, ctx=CTX), nm))
+def twin_warn(out, frag):
+    return any(l.startswith('WARN') and 'COM-1' in l and frag in l for l in out.splitlines())
+EN, FA_ = 'Start at 40 kg and let set 1 decide.', 'با ۴۰ کیلو شروع کن و بذار ست اول تصمیم بگیره.'
+d, nm = twin_case(EN)
+expect('an English note with no twin warns, whatever athlete.lang (en)', twin_warn(run(d, ctx=CTX), f"{nm}.note"))
+d, nm = twin_case(EN, lang='fa')
+expect('and for a Farsi athlete too', twin_warn(run(d, ctx=CTX), f"{nm}.note"))
+d, nm = twin_case(EN, FA_)
+expect('a note with its Farsi twin: not named', not twin_warn(run(d, ctx=CTX), f"{nm}.note"))
+d, nm = twin_case(EN, 'Start at 40 kg.')
+expect('a twin with no Farsi letters warns', twin_warn(run(d, ctx=CTX), 'no Farsi letters'))
+d, nm = twin_case(FA_, FA_)
+expect('Farsi in the English field warns', twin_warn(run(d, ctx=CTX), 'Farsi in the English field'))
+d, nm = twin_case(None, FA_)
+expect('a twin with no English beside it warns', twin_warn(run(d, ctx=CTX), 'no English beside it'))
+d, nm = twin_case(EN, FA_, outcomes=['A', 'B'], outcomes_fa=['الف'])
+expect('a list twin of another length warns', twin_warn(run(d, ctx=CTX), 'a list twins a list of the same length'))
 
 print(f"{sum(1 for _, ok in results if ok)}/{len(results)} passed" + ('' if HAVE_NODE else ' (node not found: the node-backed checks were skipped)'))
 for n, ok in results:

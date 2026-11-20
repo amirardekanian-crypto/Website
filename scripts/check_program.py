@@ -229,41 +229,59 @@ def text_fields(data):
         yield f"card '{c.get('title')}'", c.get('title', '')
         yield f"card '{c.get('title')}'", re.sub(r'<[^>]+>', ' ', c.get('body', ''))
 
-def lang_texts(data):
-    """(label, text) for each text /program-engage writes this cycle: the message, its week notes, the next cycle's teaser,
-    the completion text, the Coach's Notes, the Becauses and the cards. COM-1 (2026-11-20): written once, in athlete.lang."""
+def twin_pairs(data):
+    """(label, English, its Farsi twin) for each text the pipeline writes this cycle, in both languages (COM-1, 2026-11-20;
+    SCHEMA.md → Programme texts in two languages): the current cycle (message, week notes, tagline, aims), the next one
+    (teaser, tagline, aims), each day (focusTag, completion text), each card's Coach's Note and Because, the notes cards."""
     cycles = data.get('cycles') or []
     i = data.get('currentCycleIndex') or 0
     cur = cycles[i] if i < len(cycles) and isinstance(cycles[i], dict) else {}
     nxt = cycles[i + 1] if i + 1 < len(cycles) and isinstance(cycles[i + 1], dict) else {}
-    for k in ('paragraphs', 'outcomes'):
-        for t in (cur.get('message') or {}).get(k) or []: yield f"cycle {cur.get('num')} message.{k}", t
-    for t in (nxt.get('teaser') or {}).get('paragraphs') or []: yield f"cycle {nxt.get('num')} teaser", t
+    def keys(o, ks, label):
+        for k in ks:
+            if isinstance(o, dict) and (o.get(k) or o.get(k + '_fa')): yield f"{label}.{k}", o.get(k), o.get(k + '_fa')
+    yield from keys(cur, ('tagline', 'focuses'), f"cycle {cur.get('num')}")
+    yield from keys(cur.get('message'), ('paragraphs', 'outcomes'), f"cycle {cur.get('num')} message")
     for _wk, (k, n) in week_notes(cur)[0].items():
-        if n.get('text'): yield f"cycle {cur.get('num')} weekNotes.{k}", n['text']
+        yield from keys(n, ('text', 'title'), f"cycle {cur.get('num')} weekNotes.{k}")
+    if nxt:
+        yield from keys(nxt, ('tagline', 'focuses'), f"cycle {nxt.get('num')}")
+        yield from keys(nxt.get('teaser'), ('paragraphs', 'subtitle'), f"cycle {nxt.get('num')} teaser")
     for d in (data.get('workouts') or {}).get('days') or []:
-        for k in ('completionTitle', 'completionMessage'):
-            if d.get(k): yield f"Day {d.get('id')} {k}", d[k]
+        yield from keys(d, ('focusTag', 'completionTitle', 'completionMessage'), f"Day {d.get('id')}")
     for d, b, ex, it in exercises(data):
         o = it or ex
-        if o.get('note'): yield f"Day {d.get('id')} {o.get('name')} note", o['note']
-        w = ex.get('why') if not it else None
-        if isinstance(w, dict) and w.get('text'): yield f"Day {d.get('id')} {ex.get('name')} why", w['text']
-    for c in (data.get('notes') or {}).get('cards') or []:
-        yield f"card '{c.get('title')}'", str(c.get('title', '')) + ' ' + re.sub(r'<[^>]+>', ' ', str(c.get('body', '')))
+        yield from keys(o, ('note',), f"Day {d.get('id')} {o.get('name')}")
+        if not it: yield from keys(ex.get('why'), ('text',), f"Day {d.get('id')} {ex.get('name')} why")
+    notes = data.get('notes') or {}
+    yield from keys(notes, ('greeting',), 'notes')
+    for c in notes.get('cards') or []:
+        yield from keys(c, ('title', 'body'), f"card '{c.get('title')}'")
 
 FA_LETTER = re.compile(r'[\u0600-\u06FF]')
 
 PERSIAN_DIGITS = str.maketrans('۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩', '01234567890123456789')
 
-def check_lang(data):
-    """The words are in the athlete's language (COM-1, 2026-11-20: "write their notes once in the language they have choosen"):
-    Farsi letters for athlete.lang 'fa', none for an English athlete. Exercise names stay English inside a Farsi text."""
-    fa = str((data.get('athlete') or {}).get('lang') or '').lower() == 'fa'
-    off = [w for w, t in lang_texts(data) if str(t).strip() and bool(FA_LETTER.search(str(t))) != fa]
-    if off:
-        warn(f"athlete.lang is '{'fa' if fa else 'en'}' and {len(off)} text(s) are not in {'Farsi' if fa else 'English'}: "
-             + '; '.join(off[:8]) + (' …' if len(off) > 8 else '') + " (read athlete.lang from the server at the run)", 'COM-1')
+def check_twins(data):
+    """Every text in both languages (COM-1, Amir 2026-11-20: "Yes, both always"): English in the field, Farsi in <key>_fa,
+    for every athlete. athlete.lang only picks the app's first language, the reminders and the WhatsApp message (COM-2)."""
+    has = lambda v: bool(v) and (any(str(x).strip() for x in v) if isinstance(v, list) else bool(str(v).strip()))
+    flat = lambda v: ' '.join(map(str, v)) if isinstance(v, list) else str(v or '')
+    missing = []
+    for w, en, tw in twin_pairs(data):
+        if has(en) and not has(tw): missing.append(w); continue
+        if has(tw) and not has(en):
+            warn(f"{w}_fa: a Farsi twin with no English beside it (an English phone, coach.html and the checks read the English)", 'COM-1'); continue
+        if has(en) and FA_LETTER.search(re.sub(r'<[^>]+>', ' ', flat(en))):
+            warn(f"{w}: Farsi in the English field; the Farsi goes in {w.rsplit('.', 1)[-1] if '.' in w else w}_fa", 'COM-1')
+        if isinstance(en, list) != isinstance(tw, list) or (isinstance(en, list) and len(en) != len(tw)):
+            warn(f"{w}_fa: not the English's shape ({len(en) if isinstance(en, list) else 'a string'} vs "
+                 f"{len(tw) if isinstance(tw, list) else 'a string'}): a list twins a list of the same length", 'COM-1')
+        if not FA_LETTER.search(flat(tw)): warn(f"{w}_fa: has no Farsi letters (an English copy?)", 'COM-1')
+        if '—' in flat(tw): warn(f"{w}_fa: an em-dash (not how Amir writes)", 'COM-3')
+    if missing:
+        warn(f"{len(missing)} text(s) have no Farsi twin, so a Farsi phone shows the English: " + '; '.join(missing[:8])
+             + (' …' if len(missing) > 8 else '') + " (SCHEMA.md → Programme texts in two languages)", 'COM-1')
 
 def sentences(s):
     return [x.strip() for x in re.split(r'(?<=[.!?؟])\s+|\n', s) if x.strip()]   # ؟ ends a Farsi sentence (COM-1)
@@ -1983,7 +2001,7 @@ def main():
     # there changes the programme while no note, Because or message has been written around it.
     if args.stage == 'final':
         check_text(data); check_cards(data); check_notes(data, ctx); check_whys(data, ctx)
-        check_obligations(data, args); check_placed(data, args); check_lang(data)
+        check_obligations(data, args); check_placed(data, args); check_twins(data)
     else:
         info('--stage build: the text checks (notes, Becauses, week-note words, RPE in text) run in the final pass')
         check_spec_whys(args)

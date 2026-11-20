@@ -181,7 +181,7 @@ stale copy reached athletes.
 ### Communication & in-app text
 | ID | Rule | Stage | Check |
 |---|---|---|---|
-| COM-1 | In-app athlete text is written once, in the athlete's language (`athlete.lang`, read from the server each run); exercise names and the prescription never change. | engage · assemble | warn (a text not in athlete.lang) |
+| COM-1 | Every in-app athlete text is written in both languages: English in its field, Farsi in `<key>_fa`, both in Amir's voice; names and numbers never twin. | engage · assemble · edit | warn (no twin, a twin with no Farsi, a list's length, Farsi in an English field) |
 | COM-2 | One WhatsApp handoff message ships with every programme, in the athlete's own language (Farsi: Persian numerals, Persian date first). | engage | |
 | COM-3 | Everything an athlete reads sounds like Amir typed it: plain words, short sentences; no em-dashes, semicolons, triads or brochure lines. | engage · report | warn (em-dash, a roadmap semicolon) |
 | COM-4 | 5–10 personal Becauses (`why`) a cycle, on exercises chosen for this athlete: the body part not the diagnosis, the next step not the failure. | engage | ✓ |
@@ -937,19 +937,18 @@ same ID. Read a rule's story and its history before changing it.
   different: what it unlocks stays locked until it is answered.
 
 ## Communication & in-app text
-- `COM-1` **In-app athlete text is written once, in the athlete's language.** Until 2026-11-20 it was English for
-  everyone. Now the app runs in Farsi too and the athlete picks their language (intake form *App Language*, then
-  Settings → Language, which writes `athlete.lang` on the server), so every word /program-engage writes (the message
-  and outcomes, the teaser, week notes, Coach's Notes, Becauses, completion text, the notes cards) is in that language:
-  Farsi in Amir's spoken voice (COM-3, informal تو, Persian digits in sentences) or English. Never both. Exercise
-  names, day names and the prescription stay as they are, and a week note's numbers are the same numbers. Read
-  `athlete.lang` from the server at the run (the athlete may have changed it); the pipeline never writes it. It starts
-  with each athlete's next cycle: nothing already written is translated (PRC-1), with one exception Amir made on
-  2026-11-20 (*"everything should be available in farsi for the athletes with a current cycle"*, then *"people with
-  current cycle should have both languages"*): the current cycle of every Farsi athlete carries BOTH, its English in
-  `<key>` and its Farsi beside it in `<key>_fa` (SCHEMA.md → *Programme texts in two languages*), and the app shows the
-  phone's language. The demo carries both too. `check_program.py` warns on a text
-  whose script does not match.
+- `COM-1` **Every in-app athlete text is written in BOTH languages, for every athlete.** Until 2026-11-20 it was
+  English only. Now the app runs in Farsi too, and Amir answered *"Yes, both always"*: every text /program-engage
+  writes (the message and outcomes, the teaser, week notes, Coach's Notes, Becauses, completion text, the notes cards,
+  and the Farsi of each day's `focusTag` and the cycle's tagline and aims) has its English in the field and its Farsi
+  beside it in `<key>_fa` (SCHEMA.md → *Programme texts in two languages*). A string twins a string, a list twins a
+  list of the same length, and the twin says the same thing, no more. Both are Amir's voice (COM-3); the Farsi is his
+  spoken Farsi (informal تو, Persian digits in sentences). Names, `exId`, `rx`, ids and every number never get a twin,
+  and a week note's numbers are the same in both. The app shows the phone's language (`faTwins()`), English when a
+  twin is missing. `athlete.lang` picks only the app's first language, the reminders and the WhatsApp message (COM-2).
+  It starts with each athlete's next cycle; the current cycles of the Farsi athletes and the demo were given their
+  Farsi on 2026-11-20 on Amir's word, and nothing older is translated (PRC-1). `check_program.py` warns on a missing
+  twin, a twin with no Farsi, a list twin of another length and Farsi in an English field.
 - `COM-2` **The WhatsApp handoff message is PIPELINE OUTPUT, and it is written in the ATHLETE'S OWN
   LANGUAGE — not English, and not on request.** Every finished programme ships with ONE message (two until
   2026-10-11): what changed and why, the week, this cycle's actions pointed into the app (COM-17), what they

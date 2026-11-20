@@ -53,7 +53,7 @@ off in their app settings"*. Two reminders, both opt-out once the phone allows t
 - **The language a notification goes out in is `programs.data.athlete.lang`** ('fa' or 'en'), set at
   intake from the athlete's own form (Amir, 2026-10-20: *"use the language from their intake form:
   put it on the programme and have the app pass it"*). Absent = English. Since 2026-11-20 it is the
-  athlete's language for everything: the athlete sets it (`set_my_lang()`, stage110) and Amir's words are written in it (COM-1).
+  athlete's language for everything: the athlete sets it (`set_my_lang()`, stage110); the programme's words are in both languages whatever it says (COM-1).
 - **⚠️ A whole half of this feature was unreachable for a day and no test noticed.** All three Farsi
   word tables existed, were read and were chosen — and every call site passed a hardcoded `'en'`, so
   `push_subs.lang` was 'en' for every phone ever subscribed. Found by reading the live rows, not by a

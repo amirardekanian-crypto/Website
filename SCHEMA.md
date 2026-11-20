@@ -271,7 +271,7 @@ card has something to open (see "Advancing to the Next Cycle").
 | `athlete.key` | string | ⚠️ **retired** | Dead field. Authorises nothing (`athlete_keys` is empty and every keyed path fails closed). Don't add it; drop it from old files. |
 | `athlete.tier` | string | optional | `"free"` = free Proof user (locks WORKOUT, swaps programme links for coaching CTAs). Absent or anything else = coached. |
 | `athlete.boardName` | string | optional | The name AA Proof puts them on the shared leaderboard under, once they have finished a workout (since 2026-09-12). They can rename it or leave in Crew. |
-| `athlete.lang` | string | optional | `"fa"` or `"en"`: the language their **notifications** go out in, set at intake from their form (stage88, 2026-10-20). Absent = English. Since 2026-11-20 it is **the athlete's language**: the app's starting language once the switch is revealed, their notifications, and the language **every word the pipeline writes for them** is in (COM-1: a Coach's Note, a Because, week notes, the message, outcomes and teaser, completion text, the notes cards are written once, in it; exercise names, `focusTag`, `rx` and every key stay as they are). The athlete changes it in the app (Settings → Language, `set_my_lang()`, stage110), so the pipeline reads it from the server at each run and never writes it. A phone's reminders follow it within the hour (`push_lang_sync()`). |
+| `athlete.lang` | string | optional | `"fa"` or `"en"`: the language their **notifications** go out in, set at intake from their form (stage88, 2026-10-20). Absent = English. Since 2026-11-20 it is **the athlete's language**: the app's starting language, their notifications and the WhatsApp handoff message (COM-2). It does NOT decide the programme's words: every text is written in both languages for every athlete (COM-1, *Programme texts in two languages* below). The athlete changes it in the app (Settings → Language, `set_my_lang()`, stage110), so the pipeline never writes it. A phone's reminders follow it within the hour (`push_lang_sync()`). |
 | `athlete.firstName` | string | ✅ | First name (white in hero) |
 | `athlete.lastName` | string | ✅ | Last name (yellow accent in hero) |
 | `athlete.avatar` | string | optional | URL or path to athlete's photo. Falls back to initials when missing. |
@@ -1193,8 +1193,11 @@ carry its Farsi beside its English: `note_fa`, `why.text_fa`, a week note's `tex
 `weeks_fa`, a day's `focusTag_fa` / `completionTitle_fa` / `completionMessage_fa`, `notes.greeting_fa` and each card's
 `title_fa` / `body_fa`. A string twins a string, a list twins a list of the same length. On a Farsi phone program.html's
 `faTwins()` puts each twin in its key's place before anything is drawn; an English phone reads `<key>`. Names, `exId`,
-`rx`, ids and numbers never have a twin. Today: the current cycles of the 13 Farsi athletes who had one on 2026-11-20,
-and the demo.
+`rx`, ids and numbers never have a twin.
+**Every cycle from 2026-11-20 on, for every athlete** (Amir: *"Yes, both always"*; COM-1): /program-engage writes both,
+/program-assemble places both (`place_words.py`), `check_program.py` warns on a missing or odd twin, and coach.html's
+exercise editor edits a note and its `note_fa` side by side. Already written before that day: the current cycles of the 13
+Farsi athletes and the demo, converted by hand; nothing older.
 
 ## Library tab — Train section (on-demand workouts)
 

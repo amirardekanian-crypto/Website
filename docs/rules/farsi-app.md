@@ -26,8 +26,9 @@ written from: [`scripts/i18n/BRIEF.md`](../../scripts/i18n/BRIEF.md).
   their form"*; *"i want to write their notes once in the language they have choosen, not in 2 different language.
   exercises and their plan is the same"*). Settings → Language saves `athlete.lang` through `set_my_lang()` (stage110,
   which also turns their reminders) and says the next cycle comes in it (`setMyLang()`; with no signal it waits as
-  `aa_lang_pending`). New clients answer *App Language* on the intake form. The pipeline writes a cycle's words ONCE, in
-  `athlete.lang`; exercise names and the prescription are the same in both. On 2026-11-20 every programme was set
+  `aa_lang_pending`). New clients answer *App Language* on the intake form. The pipeline writes every cycle's words in BOTH
+  languages for every athlete since the same day (*"Yes, both always"*; COM-1); exercise names and the prescription are
+  the same in both. On 2026-11-20 every programme was set
   `fa` except Lemuel, Juan and Dennis (`en`), on Amir's word.
 - **The switch is for every athlete** since 2026-11-20 (`REVEALED = true` in `i18n.js`; Amir: *"Yes, show it"*). A phone
   with no choice of its own opens in the programme's `athlete.lang` (read from the saved plan in the `<head>`, or adopted
@@ -38,7 +39,7 @@ written from: [`scripts/i18n/BRIEF.md`](../../scripts/i18n/BRIEF.md).
   the file (guard 30), `/article` publishes it from the `.fa.json`, and coach.html's Publish keeps a live item's Farsi when
   a file has none. The current cycle of every Farsi athlete with a cycle running on 2026-11-20, and the demo, carry both
   languages: English in `<key>`, Farsi in `<key>_fa`, the phone's language shown (`faTwins()`; SCHEMA.md → *Programme
-  texts in two languages*; COM-1's one exception).
+  texts in two languages*; COM-1). Every cycle written from then on carries both.
 - **The exercise texts come from the Spine's Farsi columns** (`get_exercises_fa()`, stage65): steps, cues, purpose and
   On court, where the entry has them (`spineFaOverlay()`); the rest stays English. `spinecache_fa` is a cache, never synced.
 - **Words are generated**: change a part in `scripts/i18n/fa/`, run `node scripts/build_i18n_fa.js`, bump `?v=` on the

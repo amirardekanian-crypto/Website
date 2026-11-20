@@ -3246,6 +3246,34 @@ S['version-diff'] = async (b) => {
   return r;
 };
 
+S['note-farsi-twin'] = async (b) => {
+  const r = { id: 'note-farsi-twin', title: 'The note editor edits the Farsi twin (note_fa) beside the English, so an edit never leaves a stale twin (COM-1)', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  const ex = async () => (await L.db(page)).programs.find(p => p.athlete_id === 'ava_test').data.workouts.days[0].blocks[1].exercises[0];
+  const FA = 'دو تکرار تو مخزن نگه دار.';
+  let ed = await openEditor(page, 'Goblet Squat');
+  check(r, 'the editor shows a Farsi note box, right to left', (await ed.locator('[id^="exNoteFa-"]').count()) === 1 && (await ed.locator('[id^="exNoteFa-"]').getAttribute('dir')) === 'rtl', '');
+  await setField(ed, 'exNote', 'Two in the tank.'); await setField(ed, 'exNoteFa', FA);
+  await ed.locator('.exed-acts button', { hasText: 'Save' }).click(); await L.settle(page, 700);
+  let e = await ex();
+  check(r, 'Save writes the note and its note_fa', e.note === 'Two in the tank.' && e.note_fa === FA, { note: e.note, note_fa: e.note_fa });
+  ed = await openEditor(page, 'Goblet Squat');
+  check(r, 'reopened, the Farsi box holds the saved twin', (await ed.locator('[id^="exNoteFa-"]').inputValue()) === FA, await ed.locator('[id^="exNoteFa-"]').inputValue());
+  await setField(ed, 'exNote', '');
+  await ed.locator('.exed-acts button', { hasText: 'Save' }).click(); await L.settle(page, 700);
+  e = await ex();
+  check(r, 'a Farsi note with no English is refused and nothing changes', e.note === 'Two in the tank.' && e.note_fa === FA, { note: e.note, note_fa: e.note_fa });
+  await page.evaluate(() => failDismissAll());
+  check(r, 'the editor stays open with what was typed', (await ed.isVisible()) && (await ed.locator('[id^="exNoteFa-"]').inputValue()) === FA, '');
+  await setField(ed, 'exNote', ''); await setField(ed, 'exNoteFa', '');
+  await ed.locator('.exed-acts button', { hasText: 'Save' }).click(); await L.settle(page, 700);
+  e = await ex();
+  check(r, 'clearing both removes the note and its twin', !('note' in e) && !('note_fa' in e), { note: e.note, note_fa: e.note_fa });
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 // ── Phone and reading polish (audit BROWSER-4, ROSTER-11, ROSTER-15, FLOW-7, FLOW-13, SPINE-7; 2026-10-11, pile B10) ───────────────────────────
 S['back-keeps-place'] = async (b) => {
   const r = { id: 'back-keeps-place', title: 'Back to a screen you left lands where you were on it; a new screen starts at the top', checks: [] };

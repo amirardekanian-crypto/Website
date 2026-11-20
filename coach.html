@@ -5143,7 +5143,7 @@ function asSentence(t) {
 const _exDrafts = {};
 function exDraftFields(eid) {
   const out = {};
-  ['exSets', 'exKind', 'exDose', 'exRpe', 'exTempo', 'exRest', 'exNote'].forEach(k => {
+  ['exSets', 'exKind', 'exDose', 'exRpe', 'exTempo', 'exRest', 'exNote', 'exNoteFa'].forEach(k => {
     const el = document.getElementById(k + '-' + eid); if (el) out[k] = el.value;
   });
   const side = document.getElementById('exSide-' + eid); if (side) out.exSide = side.checked;
@@ -5164,7 +5164,7 @@ function restoreExDrafts() {
   });
 }
 document.addEventListener('input', ev => {
-  const m = ev.target && ev.target.id && ev.target.id.match(/^ex(Sets|Kind|Dose|Rpe|Tempo|Rest|Note|Side)-(.+)$/);
+  const m = ev.target && ev.target.id && ev.target.id.match(/^ex(Sets|Kind|Dose|Rpe|Tempo|Rest|Note|NoteFa|Side)-(.+)$/);
   if (m && _exDrafts[m[2]]) _exDrafts[m[2]].fields = exDraftFields(m[2]);
   if (m && (m[1] === 'Rpe' || m[1] === 'Tempo') && _exDrafts[m[2]]) paintPills(m[2]);   // the hold and pace warnings read them
 });
@@ -5288,7 +5288,10 @@ function openExEditor(athleteId, dayId, blockIdx, exIdx, eid, expectName, reopen
     restSec: r.rest || '',
     // NO SETUP BOX (Amir, 2026-09-25: "i dont like floating text", then "yes remove the setup box").
     // An old grey line is shown at the start of the note instead, and moves there on save.
-    note:  [asSentence(r.setup), found.ex.note].filter(Boolean).join(' ')
+    note:  [asSentence(r.setup), found.ex.note].filter(Boolean).join(' '),
+    // Its Farsi twin (COM-1, SCHEMA.md → Programme texts in two languages): a Farsi phone shows note_fa (program.html
+    // faTwins()), so it is edited beside the English, or a changed note would leave the old Farsi on their screen.
+    noteFa: typeof found.ex.note_fa === 'string' ? found.ex.note_fa : ''
   };
   const problems = Chips.audit(found.ex).concat(Chips.auditRx(found.ex));
   const f = (id, label, val, ph, w) =>
@@ -5322,6 +5325,9 @@ function openExEditor(athleteId, dayId, blockIdx, exIdx, eid, expectName, reopen
       <div class="pillpick" id="exPills-${eid}">${pillPickHtml(eid)}</div></div>
     <label class="exf exf-wide"><span>Your note to them · about this athlete: start weight, limit, kit, fallback</span>
       <textarea id="exNote-${eid}" rows="2" placeholder="Optional. One to three short sentences, the point first">${esc(st.note)}</textarea>
+    </label>
+    <label class="exf exf-wide"><span>The same note in Farsi · what a Farsi phone shows · change it with the English</span>
+      <textarea id="exNoteFa-${eid}" rows="2" dir="rtl" lang="fa" placeholder="Empty = a Farsi phone shows the English">${esc(st.noteFa)}</textarea>
     </label>
     ${r.setup ? `<div class="exed-mods">Its old grey line is now the start of your note, and moves there when you save.</div>` : ''}
     ${r.extras.length ? `<div class="exed-mods">Old chips on this card:
@@ -5366,8 +5372,9 @@ function readExEditor(eid) {
   const dr = _exDrafts[eid];
   if (dr && Array.isArray(dr.pills)) patch.intent = Chips.pillJoin(dr.pills);
   patch[kind] = kind === 'reps' ? num(dose) : dose;   // clears the other three doses
-  const note = val('exNote');
-  return { patch, kind, note };
+  const note = val('exNote'), noteFa = val('exNoteFa');
+  if (noteFa && !note) return { error: 'The Farsi note has no English note beside it. Write the English too, or clear the Farsi.' };
+  return { patch, kind, note, noteFa };
 }
 function withEditedEx(ex, form) {
   // Saving an exercise that still carries chips[] also CONVERTS it: toRx() folds the old labels
@@ -5377,6 +5384,7 @@ function withEditedEx(ex, form) {
   delete updated.setup;   // no floating text: openExEditor() put any old grey line in the note box
   if (form.kind !== (Chips.rxOf(ex).dose || {}).kind && updated.rx) delete updated.rx.label;
   if (form.note) updated.note = form.note; else delete updated.note;
+  if (form.note && form.noteFa) updated.note_fa = form.noteFa; else delete updated.note_fa;   // COM-1: the twin moves with it
   return updated;
 }
 
@@ -5452,7 +5460,7 @@ function programCards(p) {
       const r = window.Chips.rxOf(ex), dz = r.dose;
       out.push({ key: [d.id, bi, ex.name, n].join('|'), day: d.id, name: ex.name || '(no name)', raw: JSON.stringify(ex),
         view: { sets: r.sets, dose: dz ? { kind: dz.kind, value: dz.value, side: !!dz.side } : null, rpe: r.rpe, tempo: r.tempo, rest: r.rest, rounds: r.rounds,
-                intent: r.intent, note: ex.note ? String(ex.note) : '', items: (ex.items || []).map(i => i && i.name).join(' · ') } });
+                intent: r.intent, note: ex.note ? String(ex.note) : '', noteFa: ex.note_fa ? String(ex.note_fa) : '', items: (ex.items || []).map(i => i && i.name).join(' · ') } });
     });
   }));
   return out;
@@ -5473,6 +5481,7 @@ function cardChange(a, b) {
   one('RPE', va.rpe, vb.rpe); one('tempo', va.tempo, vb.tempo); one('rest', va.rest, vb.rest, ' s'); one('rounds', va.rounds, vb.rounds);
   if ((va.intent || '') !== (vb.intent || '')) out.push(vb.intent ? (va.intent ? 'grip or intent changed' : 'grip or intent added') : 'grip or intent removed');
   if (va.note !== vb.note) out.push(!va.note ? 'Coach\u2019s Note added' : !vb.note ? 'Coach\u2019s Note removed' : 'Coach\u2019s Note changed');
+  if ((va.noteFa || '') !== (vb.noteFa || '')) out.push(!va.noteFa ? 'Farsi note added' : !vb.noteFa ? 'Farsi note removed' : 'Farsi note changed');
   if (va.items !== vb.items) out.push('the circuit\u2019s exercises changed');
   if (!out.length && a.raw !== b.raw) out.push('details changed (not the dose)');
   return out;

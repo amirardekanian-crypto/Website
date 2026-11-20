@@ -1,6 +1,6 @@
 ---
 name: program-engage
-description: Wrap the engagement layer around a designed program — current-cycle message + outcomes, next-cycle teaser, coaching notes, and per-day completion messages. Runs straight after /program-assemble Part A when the build passes (the programme is built and checked before any words are written), or when Amir says "do prompt 2", "write her notes/message". Reads the locked roadmap, the program spec, and COACHING-PRINCIPLES.md; changes no programming. All in-app text is written once, in the athlete's language (athlete.lang, COM-1).
+description: Wrap the engagement layer around a designed program — current-cycle message + outcomes, next-cycle teaser, coaching notes, and per-day completion messages. Runs straight after /program-assemble Part A when the build passes (the programme is built and checked before any words are written), or when Amir says "do prompt 2", "write her notes/message". Reads the locked roadmap, the program spec, and COACHING-PRINCIPLES.md; changes no programming. Every in-app text is written in both languages, English plus its Farsi twin (COM-1).
 ---
 
 > **How a run is carried out:** `.claude/skills/PIPELINE-RUN.md` (PRC-29): the main conversation talks to Amir and
@@ -33,12 +33,9 @@ the conversation from design (data, loads, readiness, injuries, the check-in cha
 engage is run standalone without that context, read the spec and the athlete's coaching log
 (the latest Debrief and cycle entry) first; there is no separate brief to pull any more.
 
-All athlete-facing **in-app** text is written **once, in the athlete's language** (COM-1): read
-`athlete.lang` from their programme on the server at this run (`fa` or `en`; the athlete can change it
-in the app, so never trust last cycle's). Farsi is Amir's spoken Farsi (COM-3: informal تو, short
-sentences, Persian digits in sentences, "effort" is شدت); exercise names stay in English letters, as
-the app shows them, and a week note's numbers are the same numbers. Every rule below holds in either
-language. Tone: direct, confident, coach-to-athlete, no filler.
+All athlete-facing **in-app** text is written in **both languages, for every athlete** (COM-1): PARTS 1–4 in
+English, then PART 6 gives each its Farsi twin. `athlete.lang` decides only PART 5's language (COM-2). Every rule
+below holds in both. Tone: direct, confident, coach-to-athlete, no filler.
 
 > This is **Prompt 2**. Its PARTs below are the message / teaser / notes / completion
 > messages; the roadmap (the old PART 1) is /program-roadmap and is already locked.
@@ -256,7 +253,7 @@ Per day: `DAY [n] — [focus]` · `Title:` (2–4 words) · `Message:` (1–2 se
 
 ## PART 5 — THE WHATSAPP HANDOFF MESSAGE (always produced, in the ATHLETE'S OWN LANGUAGE)
 *(Amir, 2026-08-08: "this actually should be part of our program writing pipeline.")* The in-app
-text is in `athlete.lang` (PART 1–4, COM-1). This one message is what Amir pastes into WhatsApp to hand the
+text is in both languages (PART 1–4 and PART 6, COM-1). This one message is what Amir pastes into WhatsApp to hand the
 programme over, so it is written in **the athlete's own language** — Farsi for Iran-based /
 Farsi-speaking athletes, English otherwise (COM-2). It lives in chat + a scratch file, **never** in
 `data/<id>.json`.
@@ -335,6 +332,22 @@ what a line covers and where it points, never how to word it. Warm, direct, simp
 numerals**, and give any date in the **Persian calendar first** with the Gregorian in brackets —
 that's the calendar the athlete actually lives by.
 
+## PART 6 — THE FARSI TWINS (every athlete, COM-1)
+After the English of PARTS 1–4 is final, write the Farsi of **every** text, for every athlete whatever their
+`athlete.lang`: the message paragraphs and outcomes, the teaser (paragraphs, subtitle when there is one), each week
+note's text and title, each Coach's Note, each Because, each day's completion title and message, each notes card's
+title and body (HTML, the same tags as the English) and the greeting, plus the Farsi of each day's `focusTag` and of
+the current and next cycle's tagline and aims (the roadmap's English stays as locked; only its Farsi is added).
+SCHEMA.md → *Programme texts in two languages* has the keys.
+- **The same text, not more.** One twin per English text, item for item (three paragraphs, three twins). When the
+  English changes, the twin changes with it.
+- **Amir's spoken Farsi** (COM-3): warm, informal تو, short sentences, everyday words, no em-dash or semicolon.
+  Persian digits in sentences (۷). Exercise names stay in English letters, as the app shows them. "effort" is شدت.
+- **A week note's numbers never change** (`rpeCap`, `setsDrop`, `rpeDrop`): the twin says the same number, and its
+  first sentence is the rule, under 100 characters (COM-16), as in English.
+- Hand each twin over straight under its English line, marked `FA:`, so Amir reads both in one pass, and in the
+  words file under the `_fa` keys `place_words.py`'s docstring lists.
+
 Hand off to **/program-assemble Part B**, which places the words, runs the full check and publishes.
 
 ## Plain words (Amir, 2026-10-25)
@@ -350,7 +363,7 @@ Amir approved these for everything an athlete reads in a new cycle. They change 
 ## Don'ts
 - Don't alter exercises, sets, reps, tempo, or RPE.
 - Don't regenerate the roadmap.
-- Don't write in any language but `athlete.lang`, and never both (COM-1). Don't translate an earlier cycle's words.
+- Don't put Farsi in an English field, and don't leave a text without its Farsi twin (COM-1). Don't translate an earlier cycle's words.
 - Don't invent results or numbers — use the real review.
 - Don't write any line implying the coach assigns/calculates a specific weight for the
   athlete — they self-select load via RPE; see PART 1.

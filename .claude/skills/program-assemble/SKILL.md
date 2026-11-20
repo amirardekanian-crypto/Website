@@ -263,9 +263,11 @@ count and what landed on the cards differ, which is how a dropped or invented on
 - **Becauses** (PART 3b) as `"why": { "src", "part"?, "text" }` on that exercise (standard or
   simple, never a circuit). Verbatim, and never invent one. **Write `why` fresh every cycle:
   never carry a previous cycle's `why` over**, because a reason from Cycle 1 is stale by Cycle 3.
-- **The words are in `athlete.lang`** (COM-1, 2026-11-20): Farsi or English, once. Place them as they are; never
-  write or change `athlete.lang` (the athlete sets it). The full check warns on a text whose script does not
-  match it: send that back to engage.
+- **Every text in both languages** (COM-1, 2026-11-20): engage's PART 6 `FA:` lines go beside their English as
+  `<key>_fa` (`note_fa`, `why.text_fa`, a week note's `text_fa` / `title_fa`, `completionTitle_fa` /
+  `completionMessage_fa`, `focusTag_fa`, the cycles' `tagline_fa` / `focuses_fa`, and the `_fa` keys inside the
+  message, teaser and notes), for every athlete; `place_words.py` places them. Never write or change `athlete.lang`
+  (the athlete sets it). The full check warns on a missing or odd twin: send it back to engage.
   Then run the full check (Step 3) and fix everything it flags.
 
 ## Step 3 — Check: `--stage build` in Part A, the full run in Part B (do not skip)
