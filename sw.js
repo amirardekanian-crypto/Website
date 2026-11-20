@@ -561,7 +561,8 @@
 // v251: program.html, i18n-fa.js (?v=6), rally.js and between-sets.js changed (2026-11-20, Amir: "the libraries and playbook should be
 // available in farsi and everything should be written in both languages"). A Library item's Farsi copy (data.fa) on a Farsi phone; the
 // Career Mode names, Library shelves, pills and block titles in Farsi; the rest games' words, canvas included, through the translator.
-const CACHE = 'aap-v251';
+// v252: program.html changed (2026-11-20, Amir: "fix heart overlap how you think is best"): the Love it reaction is a face with heart eyes; the heart is the Like alone.
+const CACHE = 'aap-v252';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

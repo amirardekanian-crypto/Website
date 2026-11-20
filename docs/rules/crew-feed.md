@@ -25,6 +25,8 @@ points here. The build record, with the functions and the traps, is `docs/ref/pr
 - **The photo viewer keeps its own row** (the Like, the four, the ＋ after a choice) on the dark ground. It is not a heart.
 - **A known overlap, for Amir to decide:** the Like heart and the **Love it** reaction icon are both hearts. A chosen Love it looks like a green heart beside a clay Like heart.
   Both are kept until he says which gives way.
+- **Settled 2026-11-20 (Amir: "fix heart overlap how you think is best"):** the heart is the Like alone. **Love it** is drawn as a smiling face with
+  heart eyes, the 😍 it is stored as. The stored value and the word are unchanged.
 
 ## Replies fold
 
