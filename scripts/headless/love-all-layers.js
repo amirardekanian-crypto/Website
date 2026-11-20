@@ -215,7 +215,7 @@ async function b28(browser) {
   await p.waitForFunction(() => !!document.querySelector('#global-tabs .nav-item[data-tab="crew"]'), null, { timeout: 8000 }).catch(() => {});
   await p.evaluate(() => goTo('crew')); await p.waitForTimeout(600);
   const type = async (idx, text) => {
-    await p.evaluate(i => document.querySelectorAll('#crew-body .cr-post .cr-rep-add')[i].click(), idx);
+    await p.evaluate(i => document.querySelectorAll('#crew-body .cr-post .cr-icons .cr-rp')[i].click(), idx);
     await p.waitForTimeout(300);
     if (text != null) await p.evaluate(x => { const ta = document.querySelector('#hist-overlay .cr-rtxt'); ta.value = x; ta.dispatchEvent(new Event('input')); }, text);
   };

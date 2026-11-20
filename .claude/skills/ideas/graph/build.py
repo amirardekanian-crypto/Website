@@ -264,6 +264,17 @@ IDEAS = [
   coach="More real photos from training on the Bell, at no cost in his time.",
   mvp="The + on your face for the day you trained.",
   adv="After a photo is posted, the + becomes a small photo mark that opens your post."),
+ dict(n=121, name="Moment Cards", sub="Every win on the Bell as a card: its badge, one big fact, a clay change", layer="Grown along the way", grown="115",
+  grown_url="https://claude.ai/artifact/7bydrN3KFDsDhEtZuyGv4w",
+  stages=["Feedback","Communication"], needs=[], cost="None. The badges are the cabinet's own emblems; the moments already reach the Bell.",
+  chain=["A moment (level, best, held weeks, achievement, mark, cycle, join)","Its emblem","One big fact","The heart, or Say hello"],
+  what="Round 10's Trophy Lines card (#115) as a family: a level shows its medal and Level 14 +1, an achievement its emblem and name, a mark its emblem and 100 sessions, a new member their face with NEW and Say hello. Grew out of #115 when Amir sent its card back: \"i liked it\".",
+  problem="A win and a level read as the same sentence in a slim row; the biggest moments of an athlete's month look like a notification.",
+  how="crewLineHTML() draws each moment kind as a card with the emblem from emblems.js (AAEmblem.level, .ach, .mark), the big line in Barlow Condensed with a clay part, and the heart at the right end.",
+  athlete="Their win looks like a win, in the art their cabinet already uses.",
+  coach="The crew sees the programme's results; the cards are a step towards share cards, which he treats as brand.",
+  mvp="Direction A (Trophy Rows) for every kind, the record card with the lift only.",
+  adv="The record's gain as a percent (a server change), with Amir's word on the never-a-weight rule."),
 ]
 
 STAGES = ["Assessment","Decision making","Exercise selection","Programming","Execution","Feedback",
@@ -289,6 +300,7 @@ STATUS = {
  12: ("Built 24 Sep as /cycle-report", "https://claude.ai/artifact/JY1eG1RNYHTLvYpFCwcHBx"),
  70: ("Built and live 24 Oct", "https://claude.ai/artifact/X5L2WMkayoxx8eioc85SJV"),
  91: ("Picked 25 Oct, builds with the weekly crew", "https://claude.ai/artifact/Ap56d6pvqEfExFYsFN7P1T"),
+ 120: ("Built and live 20 Nov", "https://claude.ai/artifact/8kYKCuynCHXZFhhgBKoQkL"),
 }
 
 def chips(i):

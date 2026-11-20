@@ -510,9 +510,9 @@ tall as a post, and session lines have no reaction at all.
 
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
-| 112 | Quiet Lines | Automatic lines as slim rows (face, words, time, a heart with its count at the right end); same-day lines in one block; double-tap to like; the four emoji behind a long-press (Instagram) | — | **picked** 2026-11-20 ("go with your picks"), with 113 and 114 as one pass; three directions owed |
-| 113 | Post, Reshaped | Posts in the Instagram shape: full-width 4:5 photo with its stamp, line icons (heart, reply), "Liked by Mina and 3 others", the Reply box replaced by an icon, replies folded into "View 2 replies" (Instagram) | — | **picked** 2026-11-20, in the feed pass |
-| 114 | Trained Today | Session lines become a row of faces with a ring; double-tap a face = the Cheer (as 65), the ring turns clay once cheered; tap = page; today 32 sessions a week cannot be answered at all (Strava kudos) | — | **picked** 2026-11-20, in the feed pass; get_bell must send each trained person's ck and fv (today `names` only) |
+| 112 | Quiet Lines | Automatic lines as slim rows (face, words, time, a heart with its count at the right end); same-day lines in one block; double-tap to like; the four emoji behind a long-press (Instagram) | — | **built** 2026-11-20, direction B ("go with your picks"), with 113, 114 and 120 |
+| 113 | Post, Reshaped | Posts in the Instagram shape: full-width 4:5 photo with its stamp, line icons (heart, reply), "Liked by Mina and 3 others", the Reply box replaced by an icon, replies folded into "View 2 replies" (Instagram) | — | **built** 2026-11-20 in the feed pass |
+| 114 | Trained Today | Session lines become a row of faces with a ring; double-tap a face = the Cheer (as 65), the ring turns clay once cheered; tap = page; today 32 sessions a week cannot be answered at all (Strava kudos) | — | **built** 2026-11-20 in the feed pass (stage111 adds `people` to get_bell's `sess` items) |
 | 115 | Trophy Lines | A new best and an achievement get their own small card: emblem, the number big ("125 kg +5"); MVP achievements only; the load needs get_bell to send it and Amir's word (Strava PR card) | — | **parked** 2026-11-20 (after two weeks of numbers). The load conflicts with a standing rule (program-app-look.md: "a best names the lift and never a weight"), so only the emblem card is pitchable |
 | 116 | Vote to See | The Toss hides counts until you vote, then bars with % and faces; Monday's Bell line gives last week's result (Instagram poll sticker) | — | **picked** 2026-11-20, after the feed pass |
 | 117 | Caught Up | New since last visit gets a clay dot, "Today · 4 new", and a "You're all caught up" line; from crewSeenAt() (Instagram) | — | **picked** 2026-11-20, after the feed pass |
@@ -524,12 +524,21 @@ Ranking on the page: 112 + 113 + 114 as one visual pass (three directions owed b
 chat, post of the week, posting streak, Match Report; also a TikTok swipe feed (about 5 real posts a week, nothing to swipe).
 
 **Picks, 2026-11-20:** Amir, *"Go with your picks"*. Deep-dive with three directions for the feed pass (A Day Card, B The Feed =
-pick, C Player Rows), coach hat, build plan (stage110 adds `people` to get_bell's `sess` items), traps and four calls:
+pick, C Player Rows), coach hat, build plan (stage111 adds `people` to get_bell's `sess` items), traps and four calls:
 https://claude.ai/artifact/8kYKCuynCHXZFhhgBKoQkL. Grown idea, also on The Coaching Graph:
 
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
-| 120 | Add Yours | Your own face leads Trained Today with a green +; a tap opens Tell the crew with that session filled in (a photo still required); a second door to sharing where people already look, for the rest of the day (Instagram's + on your own avatar) | 114 | pitched 2026-11-20 (grown idea, the feed pass page) |
+| 120 | Add Yours | Your own face leads Trained Today with a green +; a tap opens Tell the crew with that session filled in (a photo still required); a second door to sharing where people already look, for the rest of the day (Instagram's + on your own avatar) | 114 | **built** 2026-11-20 with the feed pass |
+
+**Moment cards, 2026-11-20.** Mid-build Amir sent the #115 card from the round 10 page (*"design somethings that are anounced similar to this
+image , i liked it / like for their level, in an interesting way, even their records in a more interesting way, or joining or other
+achievements"*). Page with three directions (A Trophy Rows = pick, B Win Wall, C Big Moment), every kind worked out with the cabinet's own
+emblems, the record card's three options and four calls: https://claude.ai/artifact/7bydrN3KFDsDhEtZuyGv4w
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 121 | Moment Cards | #115 Trophy Lines grown into a family: every Bell moment (level, best, held weeks, achievement, mark, cycle, joined) as a card with its badge (the level medal, the achievement's emblem, the mark's emblem, a NEW BEST or CYCLE disc, the new member's face), one big fact with a clay change, who and the detail, the heart (Say hello on a join). The record's number is Amir's call: the lift only, the gain as a percent (pick, a server change), or the weight (changes the never-a-weight rule) | 112, 115 | pitched 2026-11-20, three directions |
 
 ## Grown out of deep-dives
 

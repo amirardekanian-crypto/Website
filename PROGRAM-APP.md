@@ -72,7 +72,8 @@ athlete ids replaced by plain descriptions (the repo is public).
 | 56 | [🏅 The cabinet: Achievements as emblems, a medal every ten levels, Trophies on a Player Page (the Emblem Cabinet, 2026-10-25)](docs/ref/program-app/56-the-cabinet.md) | 10 KB |
 | 57 | [🏠 Home Crowd (round 7 step 1, 2026-10-25): line icons for the reactions, a smaller band, one name for the settings, tap cues, asking where they finish, Amir's Pick as a card, Land on It](docs/ref/program-app/57-home-crowd.md) | 14 KB |
 | 58 | [📬 Home Crowd steps 2-4 (2026-10-25): the Inbox, the weekly Toss and photo, the Mailbag and the Answer Book, a reply line, a hello, Proof becomes Crew](docs/ref/program-app/58-home-crowd-steps-2-4.md) | 8 KB |
+| 59 | [🫶 The feed pass (round 10, 2026-11-20): one heart per post and line, a post in the Instagram order, replies that fold, Trained Today's faces, Add Yours](docs/ref/program-app/59-the-feed-pass.md) | 7 KB |
 
 ---
 
-*57 sections. The first 50 were split out of this file on 2026-10-19, every word where it was; only the file changed. A reference written "`PROGRAM-APP.md` → *Section*" is the row with that name.*
+*59 sections. The first 50 were split out of this file on 2026-10-19, every word where it was; only the file changed. A reference written "`PROGRAM-APP.md` → *Section*" is the row with that name.*

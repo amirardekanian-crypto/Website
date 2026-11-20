@@ -110,6 +110,7 @@ Reference, section by section: [`PROGRAM-APP.md`](../../PROGRAM-APP.md).
   out on a post and the Like with whatever has been used and the rest behind a **＋** on a moment line. Nothing on this row is ever a disabled
   button, the keyboard stays on the chip it pressed, and what the app lets an athlete tap is the server's own gate (`can_post`), so a former
   athlete is never offered a reaction that will be refused.
+  *Replaced, round 10, 2026-11-20 (Amir: go with your picks): that row and the Reply… line are now one heart and a reply bubble. See [`crew-feed.md`](crew-feed.md).*
   **Amir's Pick is a card on Crew for 7 days** from the pick (stage100, 2026-10-25), with his reason in his words, drawn only for a crew member; the one clay thing on it is Cheer (`PROGRAM-APP.md` → *Home Crowd*).
   **The week comes first, and nothing on Crew is ranked by two ladders** (stage91, 2026-10-20, direction B of the audit *The Empty Room*): the top of
   the tab is the crew's own week (sessions and weeks held over the Bell's same 7 days) and it is never empty; **a finished session rings as ONE line a

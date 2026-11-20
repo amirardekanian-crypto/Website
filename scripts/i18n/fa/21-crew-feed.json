@@ -1,0 +1,29 @@
+{
+  "area": "Crew, round 10 the feed pass (2026-11-20): Trained today faces, the heart, Liked by, folded replies, Add Yours. Drafts until Amir has read them.",
+  "exact": {
+    "Trained today": "امروز تمرین کردن",
+    "Trained yesterday": "دیروز تمرین کردن",
+    "Double-tap a face to cheer. Tap for their page.": "دو بار بزن روی عکس تا تشویقش کنی. یه بار بزن تا صفحه‌اش باز شه.",
+    "Liked by": "لایک از طرف",
+    "Add a photo from today's session": "یه عکس از تمرین امروز بذار",
+    "You": "تو"
+  },
+  "patterns": [
+    [
+      "Trained on (\\w+)",
+      "روز {d1} تمرین کردن"
+    ],
+    [
+      "View all (\\d+) replies",
+      "دیدن همهٔ {n1} جواب"
+    ],
+    [
+      "(.+), their page\\. Double-tap to cheer",
+      "صفحهٔ $1. دو بار بزن تا تشویقش کنی"
+    ],
+    [
+      "(.+), their page\\. You cheered them today",
+      "صفحهٔ $1. امروز تشویقش کردی"
+    ]
+  ]
+}

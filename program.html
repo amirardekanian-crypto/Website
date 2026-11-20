@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is hidden until the words are done (?fa=1 shows it on one phone). See the file's header. -->
-<script src="/assets/js/i18n.js?v=1" data-fa="/assets/js/i18n-fa.js?v=2"></script>
+<script src="/assets/js/i18n.js?v=1" data-fa="/assets/js/i18n-fa.js?v=3"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -6250,6 +6250,69 @@
   #screen-crew .cr-burst i svg { width: 18px; height: 18px; display: block; }
   @keyframes crBurst { 0% { opacity: 0; transform: translate(0, 6px) scale(.6); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx, 0), -34px) scale(1.25); } }
   @media (prefers-reduced-motion: reduce) { #screen-crew .cr-burst { display: none; } }
+
+  /* ── ROUND 10 · THE FEED PASS (2026-11-20; Amir, "go with your picks"; direction B, The Feed) ─────────────────────────────────────────
+     112 Quiet Lines: the day's moments as slim rows in one white block, the heart with its count at the right end. 113 Post Reshaped: the photo,
+     a row of line icons, "Liked by", the words. 114 Trained Today: the day's people as 44 px faces, a mint ring, clay with a clap once you cheered.
+     120 Add Yours: your own face first, with a green + when today's session is not on the Bell yet. A double-tap likes; touch-action stops the zoom. */
+  #screen-crew .cr-lines { margin: 0 var(--g) 10px; padding: 0 12px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); }
+  #screen-crew .cr-lines .cr-line.cr-slim { position: relative; flex-wrap: wrap; align-items: flex-start; margin: 0; padding: 9px 0; border-top: 1px solid var(--hair); border-radius: 0; background: none;
+    touch-action: manipulation; }
+  #screen-crew .cr-lines .cr-line.cr-slim:first-child { border-top: 0; }
+  #screen-crew .cr-line.cr-slim .cr-lw { align-self: center; font-weight: 400; }
+  #screen-crew .cr-line.cr-slim .cr-lw .cr-nb, #screen-crew .cr-line.cr-slim .cr-lw .cr-ach { font-weight: 600; }
+  #screen-crew .cr-line.cr-slim .cr-fl { margin-top: 3px; }
+  #screen-crew .cr-line.cr-slim .cr-react { flex: none; margin: -6px -8px -6px 0; }
+  #screen-crew .cr-line.cr-slim .cr-react.is-menu { flex-basis: 100%; margin: 6px 0 0 34px; }
+  #screen-crew .cr-line.cr-slim .cr-sayhi { margin-top: 6px; }
+  .cr-ht { flex: none; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; min-width: 44px; min-height: 44px; padding: 0; border: 0;
+    background: none; color: var(--ink); font: 600 var(--fs-label)/1 'Barlow', sans-serif; cursor: pointer; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+  .cr-ht .hs { display: block; width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
+  .cr-ht b { font-weight: 600; color: var(--grey); font-variant-numeric: tabular-nums; }
+  .cr-ht.is-on { color: var(--clay); }
+  .cr-ht.is-on .hs { fill: currentColor; }
+  .cr-ht.is-em { color: var(--green-ink); }
+  .cr-ht i { display: inline-flex; font-style: normal; }
+  .cr-ht i svg { display: block; width: 22px; height: 22px; }
+  .cr-ht.is-tally { cursor: default; color: var(--grey); }
+  .cr-ht:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; border-radius: 8px; }
+  #screen-crew .cr-line.cr-slim .cr-ht .hs, #screen-crew .cr-line.cr-slim .cr-ht i svg { width: 20px; height: 20px; }
+  #screen-crew .cr-post { position: relative; touch-action: manipulation; }
+  #screen-crew .cr-icons { display: flex; align-items: center; flex-wrap: wrap; gap: 0 2px; margin: 4px 0 0 -11px; }
+  #screen-crew .cr-icons .cr-react.is-menu { flex-basis: 100%; order: 3; padding: 4px 0 2px 11px; }
+  #screen-crew .cr-icons-end { display: inline-flex; align-items: center; margin-left: auto; }
+  #screen-crew .cr-icons-end:empty { display: none; }
+  #screen-crew .cr-post .cr-lb { display: block; margin: 0; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--ink); }
+  #screen-crew .cr-post .cr-lb .nw { font-weight: 600; }
+  #screen-crew .cr-post .cr-lb[hidden] { display: none; }
+  #screen-crew .cr-post .cr-cap { margin-top: 4px; }
+  #screen-crew .cr-post .cr-cap b { font-weight: 700; }
+  #screen-crew .cr-post .cr-ph { touch-action: manipulation; }
+  #screen-crew .cr-rep-more { justify-self: start; min-height: 36px; padding: 0; border: 0; background: none; color: var(--grey); font: 600 var(--fs-small)/1 'Barlow', sans-serif; cursor: pointer; }
+  #screen-crew .cr-rep-more:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; border-radius: 6px; }
+  .cr-hburst { position: absolute; left: 50%; top: 50%; z-index: 3; width: 76px; height: 76px; margin: -38px 0 0 -38px; color: var(--clay); pointer-events: none; animation: crHeart .85s ease-out forwards; }
+  .cr-hburst .hs { display: block; width: 100%; height: 100%; fill: currentColor; stroke: #fff; stroke-width: 1; }
+  #screen-crew .cr-line.cr-slim .cr-hburst { width: 44px; height: 44px; margin: -22px 0 0 -22px; }
+  @keyframes crHeart { 0% { transform: scale(.3); opacity: 0; } 18% { transform: scale(1.15); opacity: .95; } 32% { transform: scale(1); } 75% { opacity: .95; } 100% { transform: scale(1.08); opacity: 0; } }
+  #screen-crew .cr-tt { margin: 0 var(--g) 10px; padding: 12px 12px 10px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); }
+  #screen-crew .cr-tthd { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  #screen-crew .cr-tthd span { font: 700 var(--fs-body)/1.2 'Barlow', sans-serif; color: var(--ink); }
+  #screen-crew .cr-tthd small { flex: none; font: 400 var(--fs-small)/1.2 'Barlow', sans-serif; color: var(--grey); }
+  #screen-crew .cr-ttf-row { display: flex; gap: 10px; margin: 8px -12px 0; padding: 2px 12px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; touch-action: manipulation; }
+  #screen-crew .cr-ttf-row::-webkit-scrollbar { display: none; }
+  #screen-crew .cr-ttp.cr-fc { flex: none; width: 54px; min-width: 54px; gap: 4px; scroll-snap-align: start; }
+  #screen-crew .cr-ttb { position: relative; display: block; width: 54px; height: 54px; border-radius: 50%; }
+  .cr-ttf { position: relative; display: grid; place-items: center; width: 44px; height: 44px; margin: 5px; border-radius: 50%; background: var(--tint); color: var(--green-ink);
+    font: 700 var(--fs-small)/1 'Barlow', sans-serif; box-shadow: 0 0 0 2px var(--row), 0 0 0 4px var(--mint); }
+  #screen-crew .cr-ttp.is-cheered .cr-ttf { box-shadow: 0 0 0 2px var(--row), 0 0 0 4px var(--clay); }
+  #screen-crew .cr-ttp.is-me .cr-ttf { box-shadow: 0 0 0 2px var(--row), 0 0 0 4px var(--hair); }
+  .cr-ttc, .cr-ttplus { position: absolute; right: 0; bottom: 0; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; box-shadow: 0 0 0 2px var(--row); font-style: normal; }
+  .cr-ttc { background: var(--clay); color: #fff; }
+  .cr-ttc svg { display: block; width: 12px; height: 12px; }
+  .cr-ttplus { background: var(--btn); color: var(--on-accent); font: 700 var(--fs-body)/1 'Barlow', sans-serif; }
+  #screen-crew .cr-ttn { max-width: 54px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 var(--fs-label)/1.2 'Barlow', sans-serif; color: var(--grey); }
+  #screen-crew .cr-tth { margin: 8px 0 0; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  @media (prefers-reduced-motion: reduce) { .cr-hburst { display: none; } }
   /* PLAYERS' LOUNGE · THE CYCLE BARS, PLAYER FACTS AND THE FACE STACK (steps 4 to 6, 2026-10-24). Week Bars, with the extra sessions as small round dots after the bar
      (Amir: "the workouts can be anything other than their cycles, they can do extra, it needs to show that as well"); Player Facts for every racket sport and for people
      who play none (Amir: "applicable to all racket sports, and general people as well"); the Face Stack on an achievement ("i like face stack a bit more"). Colours are the
@@ -15391,6 +15454,7 @@ function crewFace(p, size, door) {
   if (size === 'xl') return `<span class="pl-face"${dat} aria-hidden="true">${ini}${pic}</span>`;
   if (size === 'tile') return `<span class="cr-tf"${dat} aria-hidden="true">${ini}${pic}</span>`;   // the Open wall's tiles (46 px)
   if (size === 'pick') return `<span class="cr-fk"${dat} aria-hidden="true">${ini}${pic}</span>`;   // the Pick card's (44 px, a mint ring; round 7, 2026-10-25, idea 92)
+  if (size === 'tt') return `<span class="cr-ttf"${dat} aria-hidden="true">${ini}${pic}</span>`;   // Trained today's (44 px, a mint ring, clay once you cheered; round 10, 2026-11-20, idea 114)
   return `<span class="cr-ini${p.amir ? ' am' : ''}"${dat} aria-hidden="true">${ini}${pic}</span>`;
 }
 function crewScreenNow() { const s = document.querySelector('.screen.active'); return s ? s.id.replace('screen-', '') : 'home'; }
@@ -15548,6 +15612,85 @@ function crewReactRow(target, k, own, folded) {
   if (_crewOpenEm[target] && all.length) h += `<button type="button" class="cr-fold" data-kd="${t}" data-em="+" onclick="crewFold('${esc(target)}')" aria-label="Close">✕</button>`;
   return h;
 }
+// ── THE HEART (round 10, 2026-11-20, ideas 112 Quiet Lines and 113 Post Reshaped; Amir: "go with your picks") ───────────────────────────────
+// A moment line and a post carry ONE heart where the Like and its four reactions sat, as on Instagram; the four wait behind a long-press (or the
+// phone's context menu, or a right click). It is a new DRAWING of the same five states crewReactRow() keeps (2026-10-20, his corrections), never new rules:
+//   own item → nothing (the names line under it still says who liked it) · under 13 → a receipt, a span · not joined → the heart offers to join ·
+//   chosen → only your pick (a clay heart for the Like, the reaction's own icon in green for one of the four), and a tap takes it back ·
+//   not chosen → an empty heart, a tap likes. A long-press opens crewReactRow()'s whole menu in place, yours marked and the ✕ at its end.
+// A double-tap on a post, its photo or a line's words also likes it (never takes a like back), with a small heart over it.
+const CREW_HEART_SVG = '<svg class="hs" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3s-7.6-4.6-9.6-9.4A5.3 5.3 0 0 1 12 5.7a5.3 5.3 0 0 1 9.6 5.2c-2 4.8-9.6 9.4-9.6 9.4z"/></svg>';
+const CREW_REPLY_SVG = '<svg class="hs" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 19.2V6.5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v7.6a2 2 0 0 1-2 2H8z"/></svg>';
+function crewHeartHTML(target, k, own, count) {
+  const me = crewMe(), kk = k || {}, t = esc(target), n = Number(kk.n) || 0;
+  if (own) return '';
+  const num = count && n ? `<b>${n}</b>` : '';
+  if (me.under13) return n ? `<span class="cr-ht is-tally" role="img" aria-label="${n} liked">${CREW_HEART_SVG}${count ? `<b>${n}</b>` : ''}</span>` : '';
+  if (_crewOpenEm[target] && crewEmoji().length && crewCanLike()) return crewReactRow(target, kk, own, false);
+  const tail = n ? `. ${n} liked` : '';
+  if (!crewCanLike()) return `<button type="button" class="cr-ht" data-kd="${t}" data-em="" onclick="crewLikeAsk()" aria-label="Join the crew to like this${tail}">${CREW_HEART_SVG}${num}</button>`;
+  const more = crewEmoji().length > 0;
+  const lp = more ? ` oncontextmenu="return crewHeartMenu(event, '${t}')" onpointerdown="crewHeartPress(event, '${t}')"` : '';
+  if (kk.mine) {
+    const em = kk.emoji || null;
+    const lbl = (em ? crewEmojiWord(em) + ' sent. Tap to take it back' : 'Liked. Tap to take it back') + tail;
+    return `<button type="button" class="cr-ht is-on${em ? ' is-em' : ''}" data-kd="${t}" data-em="${esc(em || '')}" aria-pressed="true" onclick="crewHeartTap(this, ${em ? `'${esc(em)}'` : 'null'})"${lp} aria-label="${esc(lbl)}">${em ? `<i aria-hidden="true">${crewEmojiIcon(em)}</i>` : CREW_HEART_SVG}${num}</button>`;
+  }
+  return `<button type="button" class="cr-ht" data-kd="${t}" data-em="" aria-pressed="false" onclick="crewHeartTap(this, null)"${lp} aria-label="Like this${tail}">${CREW_HEART_SVG}${num}</button>`;
+}
+var _crewLPT = null, _crewLPFired = false;
+function crewHeartTap(btn, em) {
+  if (_crewLPFired) { _crewLPFired = false; return; }   // the click that ends a long-press is not a like
+  crewLike(btn, em || undefined);
+}
+function crewHeartPress(ev, key) {
+  if (!ev || ev.pointerType === 'mouse') return;   // a mouse has its right click (oncontextmenu)
+  clearTimeout(_crewLPT); _crewLPFired = false;
+  const el = ev.currentTarget, stop = () => { clearTimeout(_crewLPT); ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => el.removeEventListener(t, stop)); };
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => el.addEventListener(t, stop));
+  _crewLPT = setTimeout(() => { _crewLPFired = true; setTimeout(() => { _crewLPFired = false; }, 700); crewUnfold(key); }, 480);
+}
+function crewHeartMenu(ev, key) { if (ev) ev.preventDefault(); clearTimeout(_crewLPT); crewUnfold(key); return false; }
+window.crewHeartTap = crewHeartTap;
+window.crewHeartPress = crewHeartPress;
+window.crewHeartMenu = crewHeartMenu;
+// Two taps on a post's or a line's plain words: a like. A name, a face, a button keep their own tap (they are skipped), and a like already given stays.
+var _crewTwo = { k: null, t: 0 };
+function crewTwoTap(ev, key) {
+  if (ev && ev.target && ev.target.closest && ev.target.closest('button, a, input, textarea, label, .cr-reps')) return;
+  const now = Date.now();
+  if (_crewTwo.k === key && now - _crewTwo.t < 320) { _crewTwo = { k: null, t: 0 }; crewDoubleLike(key, ev && ev.currentTarget); return; }
+  _crewTwo = { k: key, t: now };
+}
+// The photo is a button that opens the viewer: one tap waits a quarter of a second for a second one, which likes instead.
+var _crewPhT = null;
+function crewPhotoTap(ev, id) {
+  const host = ev && ev.currentTarget;
+  if (_crewPhT && _crewPhT.id === id) { clearTimeout(_crewPhT.t); _crewPhT = null; crewDoubleLike(id, host); return; }
+  if (_crewPhT) clearTimeout(_crewPhT.t);
+  _crewPhT = { id, t: setTimeout(() => { _crewPhT = null; openCrewPhoto(id); }, 260) };
+}
+function crewDoubleLike(key, host) {
+  const it = crewItem(key);
+  if (!it || it.me) return;
+  if (!crewCanLike()) { if (!crewMe().under13) crewLikeAsk(); return; }
+  crewHeartBurst(host);
+  if (!(it.kudos && it.kudos.mine)) crewLike({ dataset: { kd: key } });
+}
+function crewHeartBurst(host) {
+  if (!host || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+  const b = document.createElement('span');
+  b.className = 'cr-hburst'; b.setAttribute('aria-hidden', 'true'); b.innerHTML = CREW_HEART_SVG;
+  host.appendChild(b);
+  setTimeout(() => b.remove(), 900);
+}
+window.crewTwoTap = crewTwoTap;
+window.crewPhotoTap = crewPhotoTap;
+// "Liked by" and who, on a post (113): the words in their own node, so the Farsi words for "You, Sara and 2 others" still find them.
+function crewLikedByHTML(it) {
+  const kw = crewKudosWords(it.kudos);
+  return `<small class="cr-names cr-lb" data-kw="${esc(it.id)}" data-lb="1" aria-live="polite"${kw ? '' : ' hidden'}><span>Liked by</span> <b class="nw">${esc(kw)}</b></small>`;
+}
 function crewItem(key) { return ((BELL && BELL.items) || []).find(i => i && (i.id === key || i.key === key)) || null; }
 
 // ── the screen ──
@@ -15669,18 +15812,24 @@ function crewPostHTML(it) {
   const person = crewPersonOf(it);
   const sub = it.amir ? '<small>to the crew</small>' : (it.kind === 'session' ? `<small>${it.session && it.session.day ? 'Day ' + Number(it.session.day) + ' done' : 'A session done'}</small>` : '');
   const top = it.pinned ? `<span class="cr-pin${_crewFreshPin === it.id ? ' is-new' : ''}">Pinned</span>` : `<span class="cr-when">${esc(crewWhen(it.at))}</span>`;
-  const ph = it.photo ? `<button type="button" class="cr-ph" data-ph="${esc(it.id)}" onclick="openCrewPhoto('${esc(it.id)}')" aria-label="Open ${esc(it.amir ? "Amir's" : it.me ? 'your' : (it.who || 'their') + "'s")} photo"><img alt=""><span class="cr-ph-wait">Photo</span>${crewStampHTML(it)}</button>` : '';
+  const ph = it.photo ? `<button type="button" class="cr-ph" data-ph="${esc(it.id)}" onclick="crewPhotoTap(event, '${esc(it.id)}')" aria-label="Open ${esc(it.amir ? "Amir's" : it.me ? 'your' : (it.who || 'their') + "'s")} photo"><img alt=""><span class="cr-ph-wait">Photo</span>${crewStampHTML(it)}</button>` : '';
   // The post's own Delete now sits in the REACTION foot, beside what the post got (2026-10-20). It used to sit on the
   // names line, directly above the replies, where it read as the thread's heading — and on his own post with his own
   // reply there were two identical Deletes in the same column. Its armed words name what it takes with it.
   const del = it.me ? `<button type="button" class="cr-del" onclick="armedTap(this, 'Tap again to delete the post', () => crewDelete('${esc(it.id)}'))">Delete</button>` : '';
   // Share (Players' Lounge, step 10): ONLY on your own session photo, never on anyone else's. It opens the session card for Instagram with this very photo as its ground.
   const shr = it.me && it.kind === 'session' && it.photo && crewPagesOn() && !window.IS_PREVIEW ? `<button type="button" class="cr-sh" onclick="crewShareCard('${esc(it.id)}')">Share</button>` : '';
-  return `<article class="cr-post${it.amir ? ' amir' : ''}" data-id="${esc(it.id)}">
+  // Post, Reshaped (round 10, 2026-11-20, idea 113, direction B): the Instagram order. A photo comes first, then the row of icons (the heart, the
+  // reply bubble, Share and Delete on your own), "Liked by", and the words under it with the name in bold. A post with no photo keeps its words on
+  // top. The Reply… box that sat under every post is gone: the bubble opens the same half sheet (81 A), and replies fold (crewRepsHTML()).
+  const words = it.body ? (it.photo ? `<p class="cr-body cr-cap" dir="auto"><b>${esc(name)}</b> ${esc(it.body)}</p>` : `<p class="cr-body" dir="auto">${esc(it.body)}</p>`) : '';
+  const rep = crewMe().can_post && Array.isArray(it.replies)
+    ? `<button type="button" class="cr-ht cr-rp" onclick="openCrewReply('${esc(it.id)}')" aria-label="Reply to ${esc(it.amir ? 'Amir' : it.me ? 'your post' : (it.who || 'this post'))}">${CREW_REPLY_SVG}</button>` : '';
+  return `<article class="cr-post${it.amir ? ' amir' : ''}" data-id="${esc(it.id)}" onclick="crewTwoTap(event, '${esc(it.id)}')">
     <div class="cr-who">${crewDoor(person, 'cr-pl', `${crewFace(person)}<span class="cr-nm">${esc(name)}${sub}</span>`) || `${crewFace(person)}<span class="cr-nm">${esc(name)}${sub}</span>`}${top}</div>
-    ${crewAskQHTML(it)}${it.body ? `<p class="cr-body" dir="auto">${esc(it.body)}</p>` : ''}${ph}
-    <div class="cr-foot"><span class="cr-react" data-row="${esc(it.id)}">${crewReactRow(it.id, it.kudos, it.me)}</span>${shr}${del}</div>
-    <div class="cr-foot"><small class="cr-names" data-kw="${esc(it.id)}" aria-live="polite">${esc(crewKudosWords(it.kudos))}</small></div>
+    ${crewAskQHTML(it)}${it.photo ? ph : words}
+    <div class="cr-icons"><span class="cr-react" data-row="${esc(it.id)}" data-mode="heart">${crewHeartHTML(it.id, it.kudos, it.me, false)}</span>${rep}<span class="cr-icons-end">${shr}${del}</span></div>
+    ${crewLikedByHTML(it)}${it.photo ? words : ''}
     <div class="cr-reps" data-rep="${esc(it.id)}">${crewRepsHTML(it)}</div>
   </article>`;
 }
@@ -15701,13 +15850,28 @@ function crewRepsHTML(it) {
     const pp = crewPersonOf(r);
     return `<div class="cr-rep" data-rid="${esc(r.id)}">${crewDoor(pp, 'cr-rf', crewFace(pp), crewDoorLabel(pp)) || crewFace(pp)}`
       + `<span class="cr-rb" dir="auto"><b>${crewNameHTML(pp, who)}</b> ${crewMentionsHTML(r)}</span>${x}</div>`;
-  }).join('');
+  });
   const can = !!me.can_post, ask = !me.under13 && !can;
-  // 81 A (Home Crowd step 4a): a member gets ONE slim line, an input's look, right under the post's action row; a tap opens the reply sheet at half height with the keyboard up. Someone who has not
-  // joined keeps the plain offer to join after the replies (Amir's rule of 2019-10-19: never a dead tap); under 13 reads only.
-  const line = can ? `<button type="button" class="cr-rep-add cr-rep-line" onclick="openCrewReply('${esc(it.id)}')" aria-label="Reply to ${esc(it.amir ? 'Amir' : it.me ? 'your post' : (it.who || 'this post'))}">Reply…</button>` : '';
+  // 81 A's "Reply…" line is gone (round 10, 2026-11-20, idea 113): the reply bubble in the post's icon row opens the same half sheet. Someone who has
+  // not joined keeps the plain offer to join after the replies (Amir's rule of 2026-10-19: never a dead tap); under 13 reads only.
+  // Replies fold, as on Instagram: the newest shows, and "View all N replies" opens the rest for this visit (a reply you were sent to always shows: crewLandAimed() opens it).
   const join = ask ? `<button type="button" class="cr-rep-add" onclick="crewLikeAsk()">Join the crew to reply</button>` : '';
-  return line + rows + join;
+  if (rows.length > 1 && !_crewRepOpen[it.id] && !_crewRepOpen['*']) {
+    return `<button type="button" class="cr-rep-more" onclick="crewRepsOpen('${esc(it.id)}')">View all ${rows.length} replies</button>${rows[rows.length - 1]}${join}`;
+  }
+  return rows.join('') + join;
+}
+var _crewRepOpen = {};
+function crewRepsOpen(id) {
+  _crewRepOpen[id] = true;
+  const it = crewItem(id), box = document.querySelector(`#screen-crew .cr-reps[data-rep="${CSS.escape(String(id))}"]`);
+  if (it && box) { box.innerHTML = crewRepsHTML(it); crewWireFaces(box); }
+}
+window.crewRepsOpen = crewRepsOpen;
+// A reply someone is sent to (a push, the Inbox) is never hidden in a fold: its thread opens first.
+function crewUnfoldReply(rid) {
+  const it = ((BELL && BELL.items) || []).find(x => x && x.t === 'post' && Array.isArray(x.replies) && x.replies.some(r => r && String(r.id) === String(rid)));
+  if (it && !_crewRepOpen[it.id]) crewRepsOpen(it.id);
 }
 // The sheet: 140 characters. What was typed and not sent comes back, per post, as a post's does (crewKeepKey()), and goes when the reply is sent.
 function crewRepKeepKey(postId) { return ATHLETE_ID + '_crewrep_' + postId; }
@@ -16001,8 +16165,54 @@ function crewSessHTML(it) {
   if (!all.length) return '';
   const when = crewDayWord(it.day), n = Number(it.n) || all.length;
   const tail = when === 'Today' ? 'today' : when === 'Yesterday' ? 'yesterday' : 'on ' + when;
+  // Trained Today (round 10, 2026-11-20, idea 114, direction B): the day's people as faces, once the server sends them (stage111's `people`).
+  // A double-tap on a face is the Cheer and a tap opens their page, exactly as in the week band (crewBandTap()). This line had no reactions on
+  // purpose (2026-10-20: "nothing here to congratulate"); Amir picked 114 on 2026-11-20, so turning up is now something the crew can cheer.
+  if (Array.isArray(it.people) && crewPagesOn()) return crewTrainedHTML(it, when, tail, n);
   return `<div class="cr-line cr-sess" data-key="${esc(it.key)}"><span class="cr-bell-ic">${CREW_TICK_SVG}</span>
     <span class="cr-lw">${esc(crewList(all))} trained ${esc(tail)}<small>${n} session${n === 1 ? '' : 's'}</small></span></div>`;
+}
+function crewTrainedHTML(it, when, tail, n) {
+  const today = when === 'Today', canCheer = crewCanLike();
+  const faces = it.people.filter(p => p && p.ck).map(p => {
+    const pp = crewPersonOf({ ck: p.ck, fv: p.fv, who: p.who });
+    if (p.cheered) _cheered[pp.ck] = utcDay();   // the server's word on today's cheer, so a double-tap here says "Come back tomorrow" on every phone
+    const done = today && crewCheeredToday(pp.ck), first = String(p.who || '').split(/\s+/)[0];
+    return `<span class="cr-fc cr-ttp${done ? ' is-cheered' : ''}" data-ck="${esc(pp.ck)}"><button type="button" class="cr-bt cr-ttb" onclick="crewBandTap(event, '${esc(pp.ck)}')"`
+      + ` aria-label="${esc(crewDoorLabel(pp) + (canCheer && today ? (done ? '. You cheered them today' : '. Double-tap to cheer') : ''))}">${crewFace(pp, 'tt')}`
+      + `${done ? `<i class="cr-ttc" aria-hidden="true">${CLAP_SVG}</i>` : ''}</button><span class="cr-ttn" dir="auto">${esc(first)}</span></span>`;
+  }).join('');
+  // You first, when you trained. On today's row, with a session from today not yet on the Bell, your face carries a + that opens Tell the crew for it
+  // (idea 120 Add Yours, grown from 114): the same door as the finished card, where people already look. A session still goes with a photo.
+  let mine = '';
+  if (it.me) {
+    const me = crewPersonOf({ me: true }), day = today ? crewAddYoursDay() : null;
+    mine = day ? `<span class="cr-fc cr-ttp is-me"><button type="button" class="cr-bt cr-ttb" onclick="openCrewPost('session', '${esc(day)}')" aria-label="Add a photo from today's session">${crewFace(me, 'tt')}<i class="cr-ttplus" aria-hidden="true">+</i></button><span class="cr-ttn">You</span></span>`
+      : `<span class="cr-fc cr-ttp is-me"><button type="button" class="cr-bt cr-ttb" onclick="openPlayer('me')" aria-label="Your page">${crewFace(me, 'tt')}</button><span class="cr-ttn">You</span></span>`;
+  }
+  const hint = today && canCheer && faces && crewCheerHintWanted() ? '<p class="cr-tth cr-hint">Double-tap a face to cheer. Tap for their page.</p>' : '';
+  return `<div class="cr-tt" data-key="${esc(it.key)}"><div class="cr-tthd"><span>Trained ${esc(tail)}</span><small>${n} session${n === 1 ? '' : 's'}</small></div>
+    <div class="cr-ttf-row">${mine}${faces}</div>${hint}</div>`;
+}
+// The band's hint counter, read without counting a showing (crewCheerHint() counts the band's own three showings).
+function crewCheerHintWanted() {
+  let v = null;
+  try { v = localStorage.getItem(crewHintKey()); } catch (e) { return false; }
+  return v !== 'done' && (Number(v) || 0) < 3;
+}
+// Today's programme day that is finished and not yet told to the crew with a photo, or null (Add Yours, 120).
+function crewAddYoursDay() {
+  if (!crewCanTell() || (Number(crewMe().photos_left) || 0) <= 0) return null;
+  const today = ymdLocal(new Date()), days = (DATA && DATA.workouts && DATA.workouts.days) || [];
+  const told = new Set(((BELL && BELL.items) || []).filter(i => i && i.t === 'post' && i.me && i.kind === 'session' && i.session && i.session.day != null
+    && i.at && ymdLocal(new Date(i.at)) === today).map(i => String(i.session.day)));
+  let best = null;
+  days.forEach(d => {
+    let on = null;
+    try { const v = localStorage.getItem(ATHLETE_ID + '_completed_d' + d.id); on = completedHere(v) ? completedDate(v) : null; } catch (e) { on = null; }
+    if (on && ymdLocal(new Date(on)) === today && !told.has(String(d.id))) best = d.id;
+  });
+  return best;
 }
 // Today, Yesterday, then the day's own name — for a day heading in the feed and for the attendance sentence.
 function crewDayWord(iso) {
@@ -16032,9 +16242,13 @@ function crewLineHTML(it) {
   // With stage96 a person's moment wears their face where the bell was; without it, the bell as always
   // (round 7, 2026-10-25, "80": the face is a door to the page like the name beside it; it was the one part of the line that looked tappable and was not)
   const lead = crewPagesOn() && (pp.ck || pp.me) ? crewFace(pp, 'line', true) : `<span class="cr-bell-ic">${CREW_BELL_SVG}</span>`;
-  return `<div class="cr-line" data-key="${esc(it.key)}">${lead}
-    <span class="cr-lw">${txt}<small data-kw="${esc(it.key)}">${esc(kw ? kw + ' · ' + crewWhen(it.at) : crewWhen(it.at))}</small>
-      <span class="cr-react on-line" data-row="${esc(it.key)}">${crewReactRow(it.key, it.kudos, it.me, true)}</span>${hello}</span></div>`;
+  // Quiet Lines (round 10, 2026-11-20, idea 112, direction B): one slim row, the words in full, who liked it and when under them, and the heart with its
+  // count at the right end where a row of 44 px chips sat underneath. Same-day rows sit together in one white block (renderCrew()). A long-press on the
+  // heart opens the four reactions under the row; two taps on the words like it.
+  const open = _crewOpenEm[it.key] ? ' is-menu' : '';
+  return `<div class="cr-line cr-slim" data-key="${esc(it.key)}" onclick="crewTwoTap(event, '${esc(it.key)}')">${lead}
+    <span class="cr-lw">${txt}<small data-kw="${esc(it.key)}">${esc(kw ? kw + ' · ' + crewWhen(it.at) : crewWhen(it.at))}</small>${hello}</span>
+    <span class="cr-react on-line${open}" data-row="${esc(it.key)}" data-mode="heart" data-count="1">${crewHeartHTML(it.key, it.kudos, it.me, true)}</span></div>`;
 }
 // An achievement or a mark someone won, opened from Crew or from their trophies: the emblem, its kind and step, what it asks for, and who won it when.
 // No Share and no Tell the crew: those are the winner's own, in their cabinet. The part names the catalogue id (`id`, or `name` in an old answer); a mark
@@ -16126,16 +16340,24 @@ function renderCrew() {
   else if (me.answer === 'no') h += `<p class="cr-quiet">You keep your moments to yourself, so the crew does not see you here.</p><button type="button" class="cr-go cr-join" onclick="crewAnswer('yes', this)">Join the crew</button>`;
   // The feed, under day headings (2026-10-20): Today, Yesterday, then each day by name. Amir's pinned post stays above them
   // all, where the server puts it, because it is pinned to the top and not to a day.
-  let day = null, feed = '';
+  // Same-day moment rows sit together in one white block (Quiet Lines, round 10, 112): a post, the day's faces or a new day closes the block.
+  let day = null, feed = '', inLines = false;
+  const closeLines = () => { if (inLines) { feed += '</div>'; inLines = false; } };
   items.forEach(i => {
+    if (i.t !== 'line') closeLines();
     if (i.t === 'post' && i.pinned) { feed += crewPostHTML(i); return; }
     // A post is filed under the athlete's own day, as a session is: its stamp's UTC date put a post made at 00:30 in Tehran under "Yesterday".
     // (Only a stamp with a time: a bare date read by new Date() is UTC midnight, the evening before west of Greenwich.)
     const raw = String(i.at || ''), at = /\d[T ]\d/.test(raw) ? new Date(raw) : null;
     const d = crewDayWord(i.t === 'sess' ? i.day : (at && !isNaN(at) ? ymdLocal(at) : raw.slice(0, 10)));
-    if (d && d !== day) { day = d; feed += `<h3 class="cr-day">${esc(d)}</h3>`; }
-    feed += i.t === 'post' ? crewPostHTML(i) : i.t === 'sess' ? crewSessHTML(i) : crewLineHTML(i);
+    if (d && d !== day) { closeLines(); day = d; feed += `<h3 class="cr-day">${esc(d)}</h3>`; }
+    if (i.t === 'line') {
+      const row = crewLineHTML(i);
+      if (row && !inLines) { feed += '<div class="cr-lines">'; inLines = true; }
+      feed += row;
+    } else feed += i.t === 'post' ? crewPostHTML(i) : crewSessHTML(i);
   });
+  closeLines();
   h += feed || `<p class="cr-quiet">Quiet so far this week.${me.can_post ? ' Share a photo from training and get it going.' : ''}</p>`;
   // (the foot row "What the crew sees of you ›" that sat here is gone, round 7, 2026-10-25, "78 One door, one name": the Profile group in your initials is its one place)
   // The board is a DOOR now, not 440 px of tail: the top five, then the page (2026-10-20).
@@ -17220,7 +17442,17 @@ async function crewQuickCheer(ck, el) {
   crewHintDone();
   const r = await crewCheerSend(ck, null);
   if (r.busy) return;
-  if (r.ok) crewCheerSentToast(nm); else crewCheerFail(ck, r, nm);
+  if (r.ok) { crewCheerSentToast(nm); crewMarkCheered(ck); } else crewCheerFail(ck, r, nm);
+}
+// Trained Today's face turns clay with a small clap once you cheered it (114), wherever it is on the tab, without repainting the feed.
+function crewMarkCheered(ck) {
+  document.querySelectorAll(`#crew-body .cr-ttp[data-ck="${CSS.escape(String(ck))}"]`).forEach(f => {
+    if (f.classList.contains('is-cheered')) return;
+    f.classList.add('is-cheered');
+    const b = f.querySelector('.cr-ttb');
+    if (b && !b.querySelector('.cr-ttc')) b.insertAdjacentHTML('beforeend', `<i class="cr-ttc" aria-hidden="true">${CLAP_SVG}</i>`);
+    if (b) b.setAttribute('aria-label', String(b.getAttribute('aria-label') || '').replace('. Double-tap to cheer', '. You cheered them today'));
+  });
 }
 // Step 10 · "Share my card" on YOUR page opens the player card you already have (Progress → Share your card): the same sheet and the same card, nothing new in it.
 // It is only there when the card can be made (Career Mode on, a level known), and never in the coach's preview, as on Progress.
@@ -17422,7 +17654,10 @@ function paintKudos(key) {
   // the whole row at once: a tap can move the Like's count, an emoji's, and which one is pressed
   document.querySelectorAll('.cr-react').forEach(row => {
     if (row.dataset.row !== key) return;
-    const h = crewReactRow(key, it.kudos, it.me, it.t === 'line');   // a slim line keeps its menu small; the fold after a choice is the row's own
+    // the heart (round 10, 112/113) where the row says so; everywhere else (a Player Page's posts) the row as it was
+    const h = row.dataset.mode === 'heart' ? crewHeartHTML(key, it.kudos, it.me, row.dataset.count === '1')
+      : crewReactRow(key, it.kudos, it.me, it.t === 'line');   // a slim line keeps its menu small; the fold after a choice is the row's own
+    row.classList.toggle('is-menu', !!_crewOpenEm[key]);
     if (row.innerHTML === h) return;
     // Where the keyboard was, before the row is replaced under it (2026-10-20). Replacing innerHTML drops focus to the
     // top of the page, so a keyboard athlete who liked the fourth post had to tab back past the band, the faces and
@@ -17437,6 +17672,7 @@ function paintKudos(key) {
   document.querySelectorAll('[data-kw]').forEach(s => {
     if (s.dataset.kw !== key) return;
     const kw = crewKudosWords(it.kudos);
+    if (s.dataset.lb) { const nw = s.querySelector('.nw'); if (nw) nw.textContent = kw; s.hidden = !kw; return; }   // "Liked by …" on a post (113)
     s.textContent = it.t === 'line' ? (kw ? kw + ' · ' + crewWhen(it.at) : crewWhen(it.at)) : kw;
   });
 }
@@ -27598,6 +27834,7 @@ async function crewLandAimed(since) {
     });
   });
   const row = best ? `#crew-body .cr-rep[data-rid="${CSS.escape(String(best.id))}"]` : '';
+  if (best) crewUnfoldReply(best.id);   // a folded thread opens first (round 10, 113)
   if (row && document.querySelector(row)) { crewLight(row); return; }
   // 2. a cheer from someone else on my page, dated on or after the day of my last visit (the server's day is UTC): open my page at Cheers this week
   if (!mine || !crewPagesOn()) return;
@@ -27816,7 +28053,7 @@ function inboxGo(i) {
     case 'cheer': crewShowMyCheers('inbox'); break;
     case 'reply': case 'mention': {
       goTo('crew');
-      if (r.reply) inboxLight(`#crew-body .cr-rep[data-rid="${CSS.escape(String(r.reply))}"]`);
+      if (r.reply) { crewUnfoldReply(r.reply); inboxLight(`#crew-body .cr-rep[data-rid="${CSS.escape(String(r.reply))}"]`); }
       else if (r.post) inboxLight(`#crew-body .cr-post[data-id="${CSS.escape(String(r.post))}"]`);
       break;
     }

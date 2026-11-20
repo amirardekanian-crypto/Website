@@ -551,7 +551,9 @@
 // version of my app"). The app in Farsi: Settings → Language, right to left, Shamsi dates, the words from i18n-fa.js; hidden until ?fa=1.
 // v246: program.html and i18n-fa.js changed (2026-11-20, Amir: "let the client pick their language, and tell them that by choosing, their next
 // cycle will be in their chosen language"). Settings → Language saves to the athlete's programme (stage110 set_my_lang()) and says so.
-const CACHE = 'aap-v246';
+// v247: program.html and /assets/js/i18n-fa.js changed (i18n-fa ?v=3) (2026-11-20, round 10 the feed pass, Amir: "go with your picks"). Crew: the heart on posts
+// and moment rows (the four reactions behind a long-press), Instagram-shaped posts, folded replies, Trained today faces to cheer (stage111), Add Yours.
+const CACHE = 'aap-v247';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -592,7 +594,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=1',
-  '/assets/js/i18n-fa.js?v=2',
+  '/assets/js/i18n-fa.js?v=3',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).

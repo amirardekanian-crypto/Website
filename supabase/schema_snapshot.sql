@@ -7971,7 +7971,7 @@ begin
   -- the week's attendance, ONE item a day for the whole crew, never one line each. Grouped on the session's own `day`, from
   -- the day the athlete joined, so the 17 October back-pay cannot announce 39 sessions in an afternoon.
   sess as (
-    select f.day as d, m.athlete_id, m.name, count(*) as n
+    select f.day as d, m.athlete_id, m.name, m.crew_key, count(*) as n   /* stage110: crew_key for the day's faces */
       from public.career_facts f
       join mem m on m.athlete_id = f.athlete_id
      where f.void_at is null
@@ -7979,14 +7979,18 @@ begin
        and f.day >= (current_date - 7) and f.day <= current_date
        and f.day >= coalesce((m.yes_since at time zone 'UTC')::date, f.day)
        and exists (select 1 from on_kind o where o.athlete_id = m.athlete_id and o.kind = 'session')
-     group by f.day, m.athlete_id, m.name),
+     group by f.day, m.athlete_id, m.name, m.crew_key),
   sess_items as (
     select least(now(), ((s.d + 1)::timestamptz)) as at,
            jsonb_build_object(
              't', 'sess', 'key', 'sess:' || s.d::text, 'day', s.d,
              'n', sum(s.n),
              'names', coalesce(jsonb_agg(s.name order by lower(s.name)) filter (where s.athlete_id is distinct from v_id), '[]'::jsonb),
-             'me', bool_or(s.athlete_id is not distinct from v_id)) as j
+             'me', bool_or(s.athlete_id is not distinct from v_id),
+             'people', coalesce(jsonb_agg(jsonb_build_object('ck', s.crew_key, 'fv', public.crew_face_v(s.athlete_id), 'who', s.name,
+                         'cheered', exists (select 1 from public.crew_cheers c where c.athlete_id = v_id and c.to_athlete = s.athlete_id
+                                                                         and c.day = (now() at time zone 'UTC')::date))
+                       order by lower(s.name)) filter (where s.athlete_id is distinct from v_id), '[]'::jsonb)) as j   -- stage110
       from sess s group by s.d),
   post_items as (
     select p.created_at as at, (p.athlete_id = public.coach_note_id() and p.created_at >= now() - interval '24 hours') as pinned,

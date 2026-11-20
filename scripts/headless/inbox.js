@@ -492,19 +492,22 @@ const lit = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); r
     await e.ctx.close();
   }
 
-  // ── 10. the Reply line ──────────────────────────────────────────────────────────────────────────────────────────────────────────
+  // ── 10. the reply bubble (was the Reply line) ───────────────────────────────────────────────────────────────────────────────────
+  // Round 10, 2026-11-20, 113 Post Reshaped (Amir: "go with your picks"): the slim "Reply…" line under every post is gone. A reply bubble sits in the post's
+  // icon row beside the heart and opens the same half-height sheet. Someone who has not joined keeps the plain offer to join, after the replies.
   {
     const { ctx, p } = await open(browser);
     await crewRoom(p);
     const s = await p.evaluate(() => {
-      const posts = [...document.querySelectorAll('#crew-body .cr-post')], lines = posts.map(x => x.querySelector('.cr-rep-line')), l = lines[0], c = getComputedStyle(l), r = l.getBoundingClientRect();
-      const act = posts[0].querySelector('.cr-names') || posts[0].querySelector('.cr-foot');
-      return { all: lines.every(Boolean), n: lines.length, txt: l.textContent, h: Math.round(r.height), w: Math.round(r.width), radius: c.borderTopLeftRadius, border: c.borderTopWidth, under: !!(act.compareDocumentPosition(l) & Node.DOCUMENT_POSITION_FOLLOWING) };
+      const posts = [...document.querySelectorAll('#crew-body .cr-post')], bub = posts.map(x => x.querySelector('.cr-icons .cr-rp')), l = bub[0], r = l.getBoundingClientRect();
+      const row = posts[0].querySelector('.cr-icons'), heart = row.querySelector('.cr-react');
+      return { all: bub.every(Boolean), n: bub.length, label: l.getAttribute('aria-label'), h: Math.round(r.height), w: Math.round(r.width), oldLine: !!document.querySelector('#crew-body .cr-rep-line'), joinLine: !!document.querySelector('#crew-body .cr-rep-add'),
+        beside: !!(heart.compareDocumentPosition(l) & Node.DOCUMENT_POSITION_FOLLOWING), svg: !!l.querySelector('svg') };
     });
-    C.check('every post has a slim "Reply…" line, 44 px tall, an input\'s look, under its action row', s.all && s.n === 3 && s.txt === 'Reply…' && s.h >= 44 && s.border === '1px' && parseFloat(s.radius) >= 20 && s.under, JSON.stringify(s));
-    await p.evaluate(() => document.querySelector('#crew-body .cr-post[data-id="' + 'cccccccc-0000-4000-8000-000000000001' + '"] .cr-rep-line').click()); await p.waitForTimeout(500);
+    C.check('every post has a reply bubble in its icon row, 44 px square at least, after the heart; the old "Reply…" line and the join line are gone for a member', s.all && s.n === 3 && /^Reply to /.test(s.label) && s.h >= 44 && s.w >= 44 && s.beside && s.svg && !s.oldLine && !s.joinLine, JSON.stringify(s));
+    await p.evaluate(() => document.querySelector('#crew-body .cr-post[data-id="' + 'cccccccc-0000-4000-8000-000000000001' + '"] .cr-icons .cr-rp').click()); await p.waitForTimeout(500);
     const o = await p.evaluate(() => { const m = document.querySelector('#hist-overlay .readiness-modal'); return { on: document.getElementById('hist-overlay').classList.contains('visible'), half: m.classList.contains('cr-half'), h: m.getBoundingClientRect().height / innerHeight, focus: document.activeElement && document.activeElement.classList.contains('cr-rtxt'), title: m.querySelector('.readiness-title').textContent }; });
-    C.check('a tap opens the existing reply sheet at half height with the keyboard on the box', o.on && o.half && o.h <= 0.6 && o.focus && o.title === 'To your post', JSON.stringify(o));
+    C.check('a tap on the bubble opens the existing reply sheet at half height with the keyboard on the box', o.on && o.half && o.h <= 0.6 && o.focus && o.title === 'To your post', JSON.stringify(o));
     await p.screenshot({ path: path.join(OUT, 'reply-half.png') });
     await p.evaluate(() => closeHistorySheet());
     await p.evaluate(() => openCrewAsk());
@@ -513,11 +516,11 @@ const lit = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); r
     await ctx.close();
     const n = await open(browser, { bell: bell({ me: { answer: null, can_post: false } }) });
     await crewRoom(n.p);
-    C.check('someone who has not joined has no Reply… line (only the offer to join)', !(await n.p.$('#crew-body .cr-rep-line')) && !!(await n.p.$('#crew-body .cr-rep-add')));
+    C.check('someone who has not joined has no reply bubble and no Reply… line (only the offer to join)', !(await n.p.$('#crew-body .cr-rp')) && !(await n.p.$('#crew-body .cr-rep-line')) && !!(await n.p.$('#crew-body .cr-rep-add')));
     await n.ctx.close();
     const k = await open(browser, { bell: bell({ me: { under13: true, can_post: false } }) });
     await crewRoom(k.p);
-    C.check('under 13 has neither', !(await k.p.$('#crew-body .cr-rep-add')));
+    C.check('under 13 has neither', !(await k.p.$('#crew-body .cr-rep-add')) && !(await k.p.$('#crew-body .cr-rp')));
     await k.ctx.close();
   }
 

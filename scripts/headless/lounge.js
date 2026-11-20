@@ -110,6 +110,8 @@ const tiles = p => p.evaluate(() => [...document.querySelectorAll('#crewplayer-b
 const secs = p => p.evaluate(() => [...document.querySelectorAll('#crewplayer-body .prog-sec')].map(d => d.textContent.trim()));
 const toast = p => p.evaluate(() => { const el = document.getElementById('aaToast'); return !el || el.hidden ? null : { text: (el.querySelector('.aa-toast-t') || {}).textContent, action: (el.querySelector('.aa-toast-go') || {}).textContent }; });
 const shown = async (p, ckey) => { await p.evaluate(k => openPlayer(k), ckey); await p.waitForTimeout(500); };
+// Replies fold since round 10 (2026-11-20, 113): with two or more only the newest shows, under "View all N replies". A check that wants every reply open taps that line first.
+const unfold = async (p, post) => { await p.evaluate(id => { document.querySelectorAll((id ? '.cr-post[data-id="' + id + '"] ' : '') + '.cr-rep-more').forEach(b => b.click()); }, post || null); await p.waitForTimeout(200); };
 
 // --only=14,15 runs just those numbered sections (every block after a "// ── N." line is wrapped in on(N)); no flag runs everything.
 const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean).map(Number);
@@ -150,7 +152,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
   // ── 2. a name opens the page; ← goes back to where you came from ─────────────────────────────────────────────────────────
   if (on(2)) {
     const { ctx, p } = await open(browser, { stub: { crewPages: { [CK.mina]: { art: 'iron', since: '2026-06-06' } } } });
-    await goCrew(p);
+    await goCrew(p); await unfold(p);
     const doors = await p.evaluate(() => ({ pl: document.querySelectorAll('#crew-body .cr-pl').length, nb: document.querySelectorAll('#crew-body .cr-nb').length,
       band: document.querySelectorAll('#crew-body .cr-faces button.cr-face').length, go: !!document.querySelector('#crew-body .cr-week .cr-bandtop .go'),
       hon: document.querySelectorAll('#crew-body .cr-hon button.cr-ht').length, lineFace: document.querySelectorAll('#crew-body .cr-line > button.cr-fd').length, chev: document.querySelectorAll('#crew-board button.cr-br .c').length,
@@ -188,7 +190,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
   // ── 3. every door, and where its ← goes ───────────────────────────────────────────────────────────────────────────────────
   if (on(3)) {
     const { ctx, p } = await open(browser);
-    await goCrew(p);
+    await goCrew(p); await unfold(p);
     const doors = [
       ['a post\'s face and name', '[data-id="' + P_ALI + '"] .cr-pl', CK.ali1],
       ['a reply\'s face', '.cr-rep .cr-rf', CK.mina],
@@ -678,7 +680,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
     const brd = board().map(r => (r.ck in fvs ? { ...r, fv: fvs[r.ck] } : r));
     const a = await open(browser, { stub: { bell: withFaces(fvs), crewBoard: brd } });
     await putFaces(a.p, [[CK.alex, '#C7552F', 1001], [CK.mina, '#2E7D5B', 1002], [CK.reza, '#2A5C8A', 1003], [CK.ali1, '#6B4A8C', 1004], [CK.leila, '#8A8A8A', 1005]]);
-    await goCrew(a.p); await a.p.waitForTimeout(1400);
+    await goCrew(a.p); await unfold(a.p); await a.p.waitForTimeout(1400);
     const f = await a.p.evaluate(() => {
       const has = s => { const e = document.querySelector(s); return !!(e && e.querySelector(':scope > img.fc-img')); };
       return {
@@ -1690,7 +1692,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
       Object.assign({ id: 'rt1', who: 'Reza K.', me: false, amir: false, body: 'Good one ' + MN('Sara T.', CK.sara) + ' and ' + MN('Omid P.', CK.omid) + ', come on', at: iso(now - 300e3), mentions: [{ ck: CK.sara, who: 'Sara T.', fv: null }] }, { ck: CK.reza, fv: null }),
       Object.assign({ id: 'rt2', who: 'Leila M.', me: false, amir: false, body: 'You ' + MN('Alex R.', CK.alex) + ' <b>x</b> @[nope|X]', at: iso(now - 200e3), mentions: [{ ck: CK.alex, who: 'Alex R.', fv: null }] }, { ck: CK.leila, fv: null })];
     const r = await open(browser, { bell: withReplies(P_MINA, reps) });
-    await goCrew(r.p);
+    await goCrew(r.p); await unfold(r.p, P_MINA);   // two replies fold to the newest; this check reads both
     const th = await r.p.evaluate(id => [...document.querySelectorAll('.cr-post[data-id="' + id + '"] .cr-rep .cr-rb')].map(rb => ({ text: rb.textContent.replace(/\s+/g, ' ').trim(), btns: [...rb.querySelectorAll('button.cr-mn')].map(b => b.textContent), html: rb.innerHTML })), P_MINA);
     C.check('a member named in a reply is a button "@Sara T."; someone who is not in the row\'s `mentions` is plain "@Omid P."; the token itself is never on the screen', th[0].btns.join() === '@Sara T.' && /Good one @Sara T\. and @Omid P\., come on/.test(th[0].text) && !/@\[/.test(th[0].text) && !/<button[^>]*>@Omid/.test(th[0].html), JSON.stringify(th[0]));
     C.check('…you named yourself: a button to YOUR page; text that only looks like a tag or a broken token stays words, safely', th[1].btns.join() === '@Alex R.' && /@\[nope\|X\]/.test(th[1].text) && /&lt;b&gt;x&lt;\/b&gt;/.test(th[1].html) && !/<b>x<\/b>/.test(th[1].html), JSON.stringify(th[1]));
@@ -1715,7 +1717,7 @@ const on = n => !ONLY.length || ONLY.includes(n);
 
     // an athlete under 13 reads only: the words, no doors; and a server without stage96 has no row and sends the words as typed
     const u = await open(browser, { bell: withReplies(P_MINA, reps, { me: { under13: true, can_post: false } }) });
-    await goCrew(u.p);
+    await goCrew(u.p); await unfold(u.p, P_MINA);
     const tu = await u.p.evaluate(id => ({ btns: document.querySelectorAll('.cr-post[data-id="' + id + '"] .cr-rep .cr-mn').length, text: document.querySelector('.cr-post[data-id="' + id + '"] .cr-rep .cr-rb').textContent.replace(/\s+/g, ' ').trim() }), P_MINA);
     C.check('under 13: a name in a reply is the words and no door', tu.btns === 0 && /Good one @Sara T\. and @Omid P\./.test(tu.text), JSON.stringify(tu));
     await u.ctx.close();
@@ -2987,9 +2989,10 @@ const on = n => !ONLY.length || ONLY.includes(n);
       const sz = n => { const e = document.querySelector(n); if (!e) return null; const b = e.getBoundingClientRect(); return { w: Math.round(b.width * 10) / 10, h: Math.round(b.height * 10) / 10 }; };
       const faces = [...document.querySelectorAll('#crew-body .cr-fcs button.cr-face')].map(f => { const r = f.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, h = (x, y) => { const e = document.elementFromPoint(x, y); return !!e && e.closest('button.cr-face') === f; };
         return { drawn: Math.round(r.width), l: h(cx - 21.5, cy), r: h(cx + 21.5, cy) }; });
-      return { reply: sz('#crew-body .cr-rep-add'), del: sz('#crew-body .cr-post .cr-foot .cr-del'), faces };
+      return { reply: sz('#crew-body .cr-post .cr-icons .cr-rp'), del: sz('#crew-body .cr-post .cr-icons .cr-del'), faces };
     });
-    C.check('"Reply" is at least 44 x 44, and "Delete" on your own post is at least 44 x 44', !!hit.reply && !!hit.del && hit.reply.w >= 44 && hit.reply.h >= 44 && hit.del.w >= 44 && hit.del.h >= 44, JSON.stringify([hit.reply, hit.del]));
+    // round 10 (2026-11-20, 113): the "Reply…" line is gone; the reply bubble in the icon row is the reply door
+    C.check('the reply bubble is at least 44 x 44, and "Delete" on your own post is at least 44 x 44', !!hit.reply && !!hit.del && hit.reply.w >= 44 && hit.reply.h >= 44 && hit.del.w >= 44 && hit.del.h >= 44, JSON.stringify([hit.reply, hit.del]));
     C.check('the band\'s faces: drawn at 40 px, with a hit area at least 44 px wide (a tap 21.5 px either side of the centre still lands on the face)', hit.faces.length === 7 && hit.faces.slice(0, 6).every(f => f.drawn >= 38 && f.drawn <= 40) && hit.faces.every(f => f.l && f.r), JSON.stringify(hit.faces));
     C.check('no page errors', !a.p.errs.length, a.p.errs.join(' | '));
     await a.ctx.close();

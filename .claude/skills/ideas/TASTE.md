@@ -5,6 +5,12 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-11-20 · The Trophy Lines card: "i liked it".** Mid-build of the feed pass, he sent a crop of the round-10 mockup's #115 card (green NEW
+  BEST disc, "125 kg +5" big with the +5 in clay, "Reza · Trap Bar Deadlift · 4 weeks held in a row", a heart) and asked for the same treatment
+  for levels, records, joining and other achievements, "in an interesting way". What it teaches: the parked #115 was parked for its numbers, not
+  its look; he likes a moment shown as a badge plus one big fact plus a clay change, and wants it as a family across every kind of win. The load
+  in his crop collides with "a best names the lift and never a weight", so that went to him as a call, not a quiet change.
+
 - **2026-11-20 · Round 10 'Crew Feed Facelift': "Go with your picks".** He asked for the Crew tab to be *"clearer? better looking? more
   interesting?"*, inspired by Instagram and TikTok, and took every recommendation at once: 112 + 113 + 114 as one visual pass of the feed
   first (three directions before building), then 116, 117, 119; 118 and 115 after two weeks of numbers; double-tap likes lines and posts,
