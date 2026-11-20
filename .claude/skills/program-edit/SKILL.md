@@ -68,17 +68,13 @@ reasoning stays in her log on the server; only the transferable process is here.
    the `athlete` block is unchanged after every write. The version trigger snapshots the prior state into
    `program_versions` on its own; do not hand-roll a backup.
 
-7. **Log it — and mind what append-only means for a recommendation that is now WRONG.** The
-   Exercise Ledger is mutated in place; cycle sections are append-only. So when an existing
-   section carries a forward plan the new information invalidates — it has happened: one athlete's
-   C4 entry recommended a specific exercise for the C5 build in two separate places, and a later
-   finding inverted it — you do **not** edit it out. Three moves instead: set that exercise's **ledger status** so the next
-   design cannot pick it up, write an explicit **override** in the new entry naming what it
-   overrides and where, and leave the original reasoning untouched on the record. A ban that
-   lives only in prose gets missed; a ban that lives only in the ledger loses the why.
-   **Heading convention:** follow whatever the athlete's log already uses — existing files carry
-   both `## In-cycle edits — Cycle N` and
-   `## Cycle NN — MID-CYCLE ADJUSTMENT · <date> · <reason>`.
+7. **Log it, and take out a recommendation that is now WRONG.** Since 2026-11-20 the log is
+   trimmed after every write (Amir: *"trim it so its updated"*; `program-design/LOG.md`). When an
+   existing entry carries a forward plan the new information invalidates (it has happened: one
+   athlete's C4 entry recommended a specific exercise for the C5 build in two places, and a later
+   finding inverted it), set that exercise's **ledger status and Note** so the next design cannot
+   pick it up, then take the plan out of the entry. The old text stays in `coaching_log_versions`.
+   A ban that lives only in prose gets missed; the ledger Note keeps the why.
 
 ## Step 1 — Apply the structural checklist
 
@@ -253,23 +249,20 @@ schedule), update the `## Athlete profile` block at the top of their coaching lo
 in `.claude/skills/program-design/PROFILE.md`) and say why in the in-cycle note below, or the next
 cycle's checks run on the old facts.
 
-**Then log the change.** Append a dated in-cycle note under an `## In-cycle edits — Cycle N`
-heading — what changed + why (e.g. *In-cycle edit (2026-06-28): Bulgarian Split Squat → Split
-Squat — R-knee pain on BSS*). This keeps the coaching log the complete running record (design
-rationale + in-cycle adaptations) that the next /program-design reads, so a swap-for-pain isn't
-silently reversed next cycle. **Append-only** — never edit a prior cycle's section. The one
-living exception is the **Exercise Ledger** at the top: an exercise you added or removed must
-have its row updated (status, last cycle, and *why*), or the next cycle's design reads a roster
-that no longer exists.
+**Then log the change, folded into the current cycle's entry** (no new section): the entry says
+what is true now, plus one dated line, what changed and why (e.g. *Changed 2026-06-28: Bulgarian
+Split Squat → Split Squat, R-knee pain on BSS*), so a swap-for-pain isn't silently reversed next
+cycle. An exercise you added or removed gets its **Exercise Ledger** row updated (status, last
+cycle and *why*), or the next design reads a roster that no longer exists. Write the whole log in
+one update by [`../program-design/LOG.md`](../program-design/LOG.md) → *How*, which trims it in
+the same pass and proves the old text was saved.
 
 ⚠️ **The log is `public.coaching_logs`, not a file** — see the banner at the top of this skill.
-Append the section to the row (`body = body || $L$…$L$`) and check `length(body)` grew by exactly
-what you added. The row is the only copy: there is no local log file to keep in step, and the old
-`.claude/coaching-log/` folder is gone for good.
+The row is the only live copy (`coaching_log_versions` keeps the earlier texts): there is no local
+log file to keep in step, and the old `.claude/coaching-log/` folder is gone for good.
 
-**⚖️ If the edit changed ANY set count, the new tables go in the log** — both of them,
-per-exercise and per-muscle, per Rule 4a. Amir asked for this explicitly (2026-09-08: *"i want
-her set count table in her coaching log … whenever you calculate the sets, add that table to the
-athlete coaching log so i can see"*). A tally that only ever appears in chat is gone by the next
-session, and the next /program-design then re-derives it from scratch — which is exactly how a
-wrong counting convention survived three cycles.
+**⚖️ If the edit changed ANY set count, the new per-muscle table replaces the entry's old one**
+(VOL-10: the per-exercise table is shown in chat, never the log, since 2026-11-20). A tally that
+only ever appears in chat is gone by the next session, and the next /program-design then
+re-derives it from scratch — which is exactly how a wrong counting convention survived three
+cycles.

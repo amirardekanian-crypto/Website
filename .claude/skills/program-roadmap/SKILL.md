@@ -117,7 +117,7 @@ update public.programs
  where athlete_id = '<id>' and coalesce(jsonb_array_length(data->'cycles'), 0) = 0;
 insert into public.coaching_logs (athlete_id, body) values ('<id>', $L$# Coaching Log — <First Last> (<id>)
 
-Coach-only: never shown in the app. The why behind every cycle; each cycle is appended, never edited.
+Coach-only: never shown in the app. Written for the next design run and trimmed after every write.
 
 ## Athlete profile
 ```profile

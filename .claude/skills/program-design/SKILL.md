@@ -163,8 +163,11 @@ change before I build?"* before writing exercises.
    This is the *why* behind the last cycle — why each primary was chosen, what changed
    mid-cycle and why — and it is the thread you continue. The next
    cycle progresses/edits the SAME logic from the data; it does NOT re-derive a fresh program.
-   Read the most recent entry in full, skim older ones for context, and never reintroduce
-   something a prior entry flagged as causing pain/regression without a stated reason. If the
+   Read the most recent entry in full and the **History** lines for the cycles before it (a log is
+   trimmed after every write since 2026-11-20: `LOG.md` in this folder), and never reintroduce
+   something a prior entry flagged as causing pain/regression without a stated reason. An older
+   section a trimmed log no longer holds is in `coaching_log_versions` (`LOG.md` → *Getting an old
+   section back*). If the
    log is **empty or missing** (an athlete from before the log existed), that's expected — no
    back-fill, no separate seeding step: just design from the info you have (brief, roadmap,
    current program), and the entry written for THIS cycle becomes the baseline the next cycle
@@ -725,7 +728,8 @@ spec itself, then hand it over:
 These reports are the durable record of WHY this cycle looks the way it does. Emit them as ONE
 self-contained **COACHING LOG ENTRY** block — this is both what you print for Amir AFTER the
 program and what /program-assemble appends verbatim to the coach-only, unpublished
-athlete's `public.coaching_logs` row (append-only; prior cycles are never touched). They go to chat +
+athlete's `public.coaching_logs` row, which it then trims (`LOG.md`: this entry stays whole while
+its cycle is the current one, and becomes one History line after). They go to chat +
 that log ONLY — never into the athlete app or the programme.
 
 **Only what changes a programming decision** (Amir, 2026-11-20: *"never keep that much info in

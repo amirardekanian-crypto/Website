@@ -51,7 +51,8 @@ Files here: **`queries.sql`** (four read-only queries, tested on real rows) · *
    outside the app. **Never with switches on a page**: a page's controls don't reach Claude
    (learned 2026-09-24, when Amir answered on the page and nothing arrived).
 9. **Short lists.** At most **4** things in "what I need from you" and **3** questions.
-10. **Append, never edit.** The log's earlier sections are never touched (see Step 5).
+10. **Append, then trim.** The Debrief goes on the end, then the whole log is trimmed
+    (`program-design/LOG.md`, Step 5). The old text is kept in `coaching_log_versions` by itself.
 
 ---
 
@@ -256,7 +257,8 @@ retest broad jump in week 5.
 **Open** — 1 any knee pain on stairs? (asked) · 2 match days this cycle? (asked).
 ```
 
-Write it with an append, never a retype, and prove nothing before it moved:
+Write it with an append, never a retype, and prove nothing before it moved, then **trim the log**
+(below):
 
 ```sql
 -- before: note md5(body) and length(body)
@@ -276,14 +278,19 @@ returning md5(substring(body from 1 for <old length>)) as prefix_md5, length(bod
 No row yet (a brand-new athlete whose first cycle wasn't logged)? Insert one with the log header
 (`# Coaching Log — <First Last> (<id>)` and the coach-only note) and the section, and say so.
 
+**Then trim the log** (Amir, 2026-11-20: *"trim it so its updated"*), by
+[`../program-design/LOG.md`](../program-design/LOG.md) → *How*: anything older than the cycle
+this Debrief reports on becomes one History line, and the facts still live move to the profile and
+the ledger first.
+
 ## Step 6 · Hand over
 
 In this order, in chat:
 1. **The message**, ready to paste, between two rules. Nothing else inside the rules.
 2. What was **left out on purpose** and why (a medical question for Amir to ask himself, a typo),
    and the sources in one line: the sessions read, the Gmail import's line, film, calls.
-3. **What was saved**: the section's length (about 1.5k; say why if it is much longer), the log's
-   length before and after, and that the prefix checksum matched.
+3. **What was saved**: the section's length (about 1.5k; say why if it is much longer), that the
+   prefix checksum matched, and the trim's line: the log's length before → after, old text saved.
 4. The next step: `/program-design <name>` once the athlete answers. Paste the answers into that run:
    design records them in the new cycle's log entry, and when the Debrief's Open list still has a
    question with no recorded answer it asks Amir first, *wait or design now with stated defaults*.
@@ -294,7 +301,8 @@ In this order, in chat:
 
 - Don't build a page, a file or an artifact for the report. Text in chat.
 - Don't write to `programs` (the athlete app reads it) or to `program_versions`.
-- Don't edit, reorder or delete any earlier section of the coaching log.
+- Don't cut a section of the coaching log before its live facts are in the profile or the ledger
+  (LOG.md, step 2).
 - Don't send the message. Amir sends it.
 - Don't let the report design the next cycle: it names decisions Amir already made, what the
   roadmap already locks and what the data forces. The exercises, sets and doses belong to

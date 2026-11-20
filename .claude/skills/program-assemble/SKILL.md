@@ -378,7 +378,7 @@ before publishing (Step 6a): *"approve these N so their cards show cues and step
 An exercise whose entry has no video (design's Q4 row says `has_video` false) is fine to ship: it
 goes on the handoff's film list.
 
-## Step 5 — Archive the cycle rationale (coach-only, append-only) + update the profile and the Exercise Ledger
+## Step 5 — Log the cycle (coach-only) + update the profile and the Exercise Ledger, then trim the log
 Persist the **COACHING LOG ENTRY** from /program-design — the coach-only record of WHY this
 cycle looks the way it does (the read, decisions, ledger changes, the volume tables, the special
 weeks).
@@ -392,11 +392,12 @@ git. The athlete app never reads the log. The entry template is /program-design'
   empty Exercise Ledger and `## Roadmap — <date>` with the exit tests and rationale), so their first
   entry goes in exactly like a returning athlete's. Only a new athlete whose roadmap locked before
   2026-09-27 may have no row: then `p_log_new` carries the whole first log (Step 7).
-- **Append** the new `## Cycle NN — …` section to the end. **Never edit, reorder, or delete any
-  existing cycle section** — this archive is append-only, so a cycle's original reasoning survives
-  even after the program is later changed (it grows in lockstep with `programHistory` /
-  `currentCycleIndex`). A `## Debrief — Cycle NN …` section (the end-of-cycle review) may sit between
-  two cycle sections: it is not a cycle section, never edit or move it, and the new cycle goes after it.
+- **Append** the new `## Cycle NN — …` section to the end (`publish_cycle()` does it), **then trim
+  the log** once Step 7's publish has landed (Amir, 2026-11-20: *"trim it so its updated"*), by
+  [`../program-design/LOG.md`](../program-design/LOG.md) → *How*: the cycle just finished, its
+  in-cycle edits and its Debrief become one History line, their live facts move to the profile and
+  the ledger first, and the new entry stays. Every earlier text is kept in `coaching_log_versions`.
+  The trim is its own update after the publish, never part of the `publish_cycle()` call.
 - Heading: use the cycle number + name from `cycles[currentCycleIndex]` and today's date.
 - **`Checks:` — one line in the entry** (2026-09-26, from the audit): the rule IDs the check runs
   failed on and were fixed, and the WARNs left standing, e.g. `Checks: fixed VOL-8, SEL-7 · left
@@ -570,9 +571,13 @@ fails closed and the MCP connection is neither an athlete session nor a signed-i
 It reads `public.programs`, so a verified row IS what the app serves. Confirm the row, not
 the RPC.
 
+**Then trim the log** (Step 5; [`../program-design/LOG.md`](../program-design/LOG.md) → *How*), in
+its own update once the publish is verified.
+
 - Summarise the diff (cycle advanced N→N+1, days, swaps) and confirm both the programme row
-  and the coaching-log row verified.
-- Node 24 is on Amir's PC, so the checker's own node calls (the app's `chips.js`) run as they are.
+  and the coaching-log row verified, with the trim's line (log length before → after, old text
+  saved).
+- Node is on Amir's PC (v26 since 2026-11-20), so the checker's own node calls (the app's `chips.js`) run as they are.
 - Commit + push **only if Amir asks**. `data/` is gitignored; there is normally nothing to commit.
 
 ## Step 8 — Spine upkeep, what's left (every programme, the last thing you do)

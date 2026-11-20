@@ -65,9 +65,14 @@ from (select body,
       from public.coaching_logs where athlete_id = '<id>') lg;
 
 -- ─── Q3 · one older section, by its heading (ctx.log_index lists them) ───────────────────────
--- Read it up to the next "## " heading.
+-- Read it up to the next "## " heading. A log is trimmed after every write since 2026-11-20 (LOG.md):
+-- a section it no longer holds comes from coaching_log_versions, the newest text that has it.
 select substring(body from position('<the ## heading>' in body) for 15000)
 from public.coaching_logs where athlete_id = '<id>';
+select saved_at, substring(body from position('<the ## heading>' in body) for 15000)
+  from public.coaching_log_versions
+ where athlete_id = '<id>' and position('<the ## heading>' in body) > 0
+ order by id desc limit 1;
 
 -- ─── Q4 · THE MATCH: what the Spine holds for the movements design CHOSE (after choosing, never before) ──
 -- The ids come from the names check (SKILL.md → STEP 3 → THE SPINE: the checker's own resolver, run on a

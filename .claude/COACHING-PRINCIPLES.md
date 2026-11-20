@@ -240,7 +240,7 @@ stale copy reached athletes.
 | PRC-15 | A week note belongs to one week, shows on Home, and its number covers every lift: design sets numbers, engage the words. | design · engage · assemble | ✓ (warn: a scoped number) |
 | PRC-16 | One current athlete profile heads the coaching log: intake drafts it, every run keeps it current, and the checker reads it. | intake · design · edit | warn (missing) |
 | PRC-17 | The roadmap is written once and locked. A change goes through design's `roadmap_amend:` line at the checkpoint, never a quiet rewrite. | roadmap · design | warn (with PRC-28) |
-| PRC-18 | Every cycle's rationale is appended to the coach-only coaching log and never overwritten. | assemble | |
+| PRC-18 | Every run that writes the coaching log leaves it trimmed to what the next design needs; coaching_log_versions keeps every earlier text. | assemble · report · edit | |
 | PRC-19 | An athlete whose cycle ends without a renewal keeps the app and gets no coaching until Amir says so. | every stage | |
 | PRC-20 | Cycles continue, they don't reset: read the log and the roadmap, progress the same logic; the latest rationale is the operative one. | design | |
 | PRC-21 | No menstrual-cycle phasing. A period-week fallback is used when confirmed with the athlete that cycle, never carried forward on its own. | design · engage | oblig `period` |
@@ -970,8 +970,8 @@ same ID. Read a rule's story and its history before changing it.
   a callout when it is open) so the athlete pays attention. The cycle notes cards carry only
   program-wide guidance. See SCHEMA.md → "Exercise coach's note".
 - `COM-7` **Coach-facing reports** (the volume tables) print in chat for Amir — never in the
-  athlete app or the programme. They are also archived per athlete in the coach-only
-  `public.coaching_logs` row, append-only (it was `.claude/coaching-log/<id>.md` until 2026-09-07,
+  athlete app or the programme. They are also kept per athlete in the coach-only
+  `public.coaching_logs` row, trimmed after every write (PRC-18; it was `.claude/coaching-log/<id>.md` until 2026-09-07,
   in a public repo; that folder is gitignored now and never comes back).
 - `COM-8` **Personal note bodies (`notes.cards[].body`) render as real HTML, not one paragraph.**
   The app used to escape this field to plain text — it now renders `<p>`, `<ul><li>`,
@@ -1409,11 +1409,15 @@ same ID. Read a rule's story and its history before changing it.
   shown to Amir at the checkpoint and written by assemble. Beyond that, a run touches only this
   cycle's message, `weekNotes` and a gate line in its focuses (PRC-12), and the next cycle's
   teaser.
-- `PRC-18` **Every cycle's design rationale is archived.** /program-assemble appends the design read +
-  locked decisions + ledger changes + the per-muscle volume table (VOL-10) to the coach-only
-  `public.coaching_logs` row as its last step: append-only, never the programme. Prior cycles are
-  never overwritten, so months later you can see how a cycle was thought through and why
-  something changed.
+- `PRC-18` **The coaching log is the athlete today, trimmed after every write.** /program-assemble
+  writes the design read + locked decisions + ledger changes + the per-muscle volume table (VOL-10)
+  to the coach-only `public.coaching_logs` row as its last step, never the programme; /cycle-report
+  adds the Debrief, /program-edit folds a change into the current entry. Each then trims the log:
+  the profile, the ledger, the roadmap's exit tests, one History line per finished cycle, and the
+  current cycle in full (`.claude/skills/program-design/LOG.md`). Until 2026-11-20 the log was
+  append-only, so months later you could read how a cycle was thought through; logs reached 73k
+  characters and every design re-read them. Amir, 2026-11-20: *"trim it so its updated"*. The
+  history is not lost: `coaching_log_versions` (stage47) saves every earlier text by itself.
 - `PRC-19` **An athlete whose cycle ends without a renewal keeps the app, and gets no coaching.** They can
   keep training the programme they have; no new cycle, report or edit is written for them until
   Amir says so.
