@@ -9373,20 +9373,25 @@ window.spineStepsHint = spineStepsHint;
 // shown, and /spine drops it. Amir's Save is the approval: the same coach_save_spine() call writes the entry and takes every
 // draft he decided (kept, edited or discarded) off the list. Closing without saving leaves the drafts waiting.
 // On court too (2026-10-11): the backfill cleans an entry's purpose and On court line beside its steps, so Amir reads it once.
-const SPINE_DRAFT_FIELDS = ['steps', 'cues', 'purpose', 'tennis'];
-const SPINE_DRAFT_BOX = { steps: ['sf:steps'], cues: ['sf:good', 'sf:bad'], purpose: ['sf:purpose'], tennis: ['sf:tennis'] };
+// 2026-11-20: the four Farsi columns (stage65) ride the same list, so /spine's Farsi drafts pre-fill the Farsi boxes.
+const SPINE_DRAFT_FIELDS = ['steps', 'cues', 'purpose', 'tennis', 'steps_fa', 'cues_fa', 'purpose_fa', 'tennis_fa'];
+const spineDraftBase = f => f.replace(/_fa$/, '');   // a Farsi draft has the shape of its English field
+const SPINE_DRAFT_BOX = { steps: ['sf:steps'], cues: ['sf:good', 'sf:bad'], purpose: ['sf:purpose'], tennis: ['sf:tennis'],
+  steps_fa: ['sf:steps_fa'], cues_fa: ['sf:good_fa', 'sf:bad_fa'], purpose_fa: ['sf:purpose_fa'], tennis_fa: ['sf:tennis_fa'] };
 let _spineDisc = { id: null, fields: {} };   // drafts discarded in the open editor: they leave the list on Save
 let _spinePF = { id: null, state: {} };      // what the pre-fill put in the open editor's boxes, to tell it from typing
 function spineDiscOf(id) { return id && _spineDisc.id === id ? _spineDisc.fields : {}; }
 function spineDiscReset() { _spineDisc = { id: null, fields: {} }; }
 // A value as the drafts compare it: no steps is [], no cues and no purpose are null.
 function spineDraftNorm(field, v) {
+  field = spineDraftBase(field);
   if (field === 'steps') return Array.isArray(v) ? v : [];
   if (field === 'cues') return v && typeof v === 'object' && !Array.isArray(v) ? v : null;
   return v == null || v === '' ? null : String(v);
 }
 // A draft the editor can show: steps a list of text, cues {good:[…], bad:[…]}, purpose some text.
 function spineDraftUsable(field, v) {
+  field = spineDraftBase(field);
   if (field === 'steps') return Array.isArray(v) && v.length > 0 && v.every(x => typeof x === 'string');
   if (field === 'cues') return !!v && typeof v === 'object' && !Array.isArray(v) &&
     ['good', 'bad'].every(k => v[k] == null || (Array.isArray(v[k]) && v[k].every(x => typeof x === 'string')));
@@ -9408,10 +9413,11 @@ function spinePending(e, k) {
 function spineHasDraft(e) { const p = spinePending(e, S.spine.coach[e.id]); return SPINE_DRAFT_FIELDS.some(f => p[f] && p[f].fresh.length > 0); }
 // The boxes a draft fills, as the form holds them.
 function spineDraftForm(field, v) {
-  if (field === 'steps') return { 'sf:steps': v.join('\n') };
-  if (field === 'cues') return { 'sf:good': (v.good || []).join('\n'), 'sf:bad': (v.bad || []).join('\n') };
-  if (field === 'tennis') return { 'sf:tennis': v };
-  return { 'sf:purpose': v };
+  const fa = /_fa$/.test(field) ? '_fa' : '', b = spineDraftBase(field);
+  if (b === 'steps') return { ['sf:steps' + fa]: v.join('\n') };
+  if (b === 'cues') return { ['sf:good' + fa]: (v.good || []).join('\n'), ['sf:bad' + fa]: (v.bad || []).join('\n') };
+  if (b === 'tennis') return { ['sf:tennis' + fa]: v };
+  return { ['sf:purpose' + fa]: v };
 }
 // What the pre-fill puts in the open editor: the newest fresh draft of each field the coach has not discarded.
 function spinePrefill(e) {
@@ -9466,8 +9472,8 @@ function spineWho(by) { return by === COACH_EMAIL ? 'you' : by === 'sql' ? 'Clau
 function spineValFull(k, v) {
   if (v == null || v === '' || (Array.isArray(v) && !v.length) || (typeof v === 'object' && !Array.isArray(v) && !Object.keys(v).length)) return '(empty)';
   if (k === 'credits' || k === 'muscles') return spineCreditsText(v) || '(empty)';
-  if (k === 'cues') return [(v.good || []).join(' / '), (v.bad || []).length ? 'don’t: ' + v.bad.join(' / ') : ''].filter(Boolean).join(' · ') || '(empty)';
-  if (k === 'steps' && Array.isArray(v)) return v.map((x, i) => (i + 1) + '. ' + x).join(' ');
+  if (k === 'cues' || k === 'cues_fa') return [(v.good || []).join(' / '), (v.bad || []).length ? 'don’t: ' + v.bad.join(' / ') : ''].filter(Boolean).join(' · ') || '(empty)';
+  if ((k === 'steps' || k === 'steps_fa') && Array.isArray(v)) return v.map((x, i) => (i + 1) + '. ' + x).join(' ');
   return Array.isArray(v) ? v.join(', ') : typeof v === 'object' ? JSON.stringify(v) : String(v);
 }
 // Two values side by side, for History and the Undo confirm. Long text is cut to the same window in both, starting
@@ -10045,12 +10051,13 @@ function renderExercises() {
       ${lbl('What the athlete sees · redraws as you type, saved when you save')}
       <div id="spineMap">${spineMapHtml(k.credits, e.muscles, e.loads)}</div>
       </details>
-      <details class="spsec"${secOpen('fa', false)} ontoggle="spineSecToggle('fa', this)"><summary>Farsi · what the course app shows${
+      <details class="spsec"${secOpen('fa', ['steps_fa', 'cues_fa', 'purpose_fa', 'tennis_fa'].some(f => { const p = spinePending(e, k)[f]; return p && p.fresh.length; }))} ontoggle="spineSecToggle('fa', this)"><summary>Farsi · what the course app shows${
         (e.steps_fa || []).length ? '' : ' · <b class="t-clay">none yet</b>'}</summary>
         <p class="sp-hint" style="margin:8px 0 2px">The course (/tennis/app/) reads these live. Change them with the English, in the same save.</p>
-        ${lbl('Why it’s here (Farsi)')}<textarea data-sf="purpose_fa" rows="2" dir="rtl" class="fld">${esc(e.purpose_fa || '')}</textarea>
-        ${lbl('On court (Farsi)')}<input data-sf="tennis_fa" dir="rtl" value="${esc(e.tennis_fa || '')}" class="fld">
-        ${lbl('How to do it (Farsi) · one step per line')}<textarea data-sf="steps_fa" rows="6" dir="rtl" class="fld">${esc((e.steps_fa || []).join('\n'))}</textarea>
+        ${lbl('Why it’s here (Farsi)')}${spineDraftNote(e, 'purpose_fa')}<textarea data-sf="purpose_fa" rows="2" dir="rtl" class="fld">${esc(e.purpose_fa || '')}</textarea>
+        ${lbl('On court (Farsi)')}${spineDraftNote(e, 'tennis_fa')}<input data-sf="tennis_fa" dir="rtl" value="${esc(e.tennis_fa || '')}" class="fld">
+        ${lbl('How to do it (Farsi) · one step per line')}${spineDraftNote(e, 'steps_fa')}<textarea data-sf="steps_fa" rows="6" dir="rtl" class="fld">${esc((e.steps_fa || []).join('\n'))}</textarea>
+        ${spineDraftNote(e, 'cues_fa')}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 16px">
           <div>${lbl('Cues (Farsi)')}<textarea data-sf="good_fa" rows="3" dir="rtl" class="fld">${esc(((e.cues_fa || {}).good || []).join('\n'))}</textarea></div>
           <div>${lbl('Don’t (Farsi)')}<textarea data-sf="bad_fa" rows="3" dir="rtl" class="fld">${esc(((e.cues_fa || {}).bad || []).join('\n'))}</textarea></div>
