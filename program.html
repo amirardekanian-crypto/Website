@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=3" data-fa="/assets/js/i18n-fa.js?v=9"></script>
+<script src="/assets/js/i18n.js?v=3" data-fa="/assets/js/i18n-fa.js?v=10"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -5864,6 +5864,17 @@
   #screen-crew .cr-half.is-mine { border-color: var(--clay); background: var(--ice-dim); box-shadow: inset 0 0 0 1px var(--clay); }
   #screen-crew .cr-half.is-win { border-color: var(--green-ink); background: var(--tint); }
   #screen-crew .cr-toss .ft { margin: 10px 0 0; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }
+  /* Vote to See (116, 2026-11-20): before your vote a half is its words alone, centred; after it a bar fills to that side's share, behind the words */
+  #screen-crew .cr-half { position: relative; overflow: hidden; }
+  #screen-crew .cr-half.is-hidden { align-content: center; justify-items: center; text-align: center; }
+  #screen-crew .cr-half .bar { position: absolute; inset: 0 auto 0 0; width: var(--p, 0%); background: var(--tint); animation: crBar .6s ease-out both; pointer-events: none; }
+  #screen-crew .cr-half.is-mine .bar { background: rgba(199, 85, 47, .14); }
+  #screen-crew .cr-half .l, #screen-crew .cr-half .f { position: relative; }
+  @keyframes crBar { from { width: 0; } to { width: var(--p, 0%); } }
+  @media (prefers-reduced-motion: reduce) { #screen-crew .cr-half .bar { animation: none; } }
+  #screen-crew .cr-tosslast { margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--hair); font: 400 var(--fs-small)/1.4 'Barlow', sans-serif; color: var(--grey); }
+  #screen-crew .cr-tosslast .k2 { font-weight: 700; color: var(--ink); }
+  #screen-crew .cr-tosslast b { font-weight: 600; color: var(--ink); white-space: nowrap; }
   #screen-crew .cr-theme { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--hair); }
   #screen-crew .cr-toss > .cr-theme:first-of-type { margin-top: 8px; }
   #screen-crew .cr-theme p { flex: 1; min-width: 0; margin: 0; font: 400 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; }
@@ -5911,6 +5922,21 @@
      names a subject; this only says when. */
   #screen-crew .cr-day { margin: 16px var(--g) 8px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
   #screen-crew .cr-day:first-child { margin-top: 2px; }
+  /* Caught Up (117, 2026-11-20): a small clay dot on what is new since your last visit, the count on its day, one quiet line where the new part ends */
+  #screen-crew .cr-newdot { display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--clay); vertical-align: 1px; }
+  #screen-crew .cr-dayn { color: var(--clay-ink); }
+  #screen-crew .cr-post.is-new::before, #screen-crew .cr-line.is-new::before { content: ''; position: absolute; left: 4px; top: 14px; width: 7px; height: 7px; border-radius: 50%; background: var(--clay); z-index: 2; }
+  #screen-crew .cr-lines .cr-slim.is-new::before { left: -8px; }
+  #screen-crew .cr-caught { display: flex; align-items: center; gap: 10px; margin: 14px var(--g) 12px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--grey); }
+  #screen-crew .cr-caught::before, #screen-crew .cr-caught::after { content: ''; flex: 1; height: 1px; background: var(--hair); }
+  /* Show Your Face (119, 2026-11-20): one plain card in the Inbox and on your own page, your two letters, the sentence, Add your face and Not now */
+  .cr-faceask { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px 12px; align-items: center; margin: 0 var(--g) 12px; padding: 12px; border: 1px solid var(--hair);
+    border-radius: 12px; background: var(--row); }
+  .cr-faceask .fa-t { margin: 0; font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--ink); }
+  .cr-faceask .fa-t b { font-weight: 700; }
+  .cr-faceask .fa-acts { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; }
+  #inbox-body .cr-faceask { margin-top: 14px; }
   /* The Monthly Open (stage85; Amir's pick A on the Crew and Open page): one card under the honours, above the Bell. The challenge in his words,
      the board ranked by the result, your own row marked, and one door to WhatsApp: he confirms every result from the clip, so the app never takes
      one. Green and grey, like the rest of Crew; the clay is only on the door, the one thing that asks for something (DS-01). */
@@ -15370,7 +15396,14 @@ function setCrewTab() {
   else if (!want && dot) dot.remove();
   b.setAttribute('aria-label', want ? 'Crew, a new post from Amir' : 'Crew');
 }
+var _crewVisitFrom = 0;   // when Crew was last on the screen before this visit (117 Caught Up); 0 = never, so nothing is marked new on a first visit
+function crewIsNew(i) {
+  if (!_crewVisitFrom || !i || i.me || i.t === 'sess') return false;
+  const t = Date.parse(i.at);
+  return !!t && t > _crewVisitFrom;
+}
 function openCrew() {
+  _crewVisitFrom = crewSeenAt();   // read before renderCrew() writes the time of this visit
   _crewOpenEm = {};   // a menu the ＋ opened lasts for this visit only (it used to last until the app was reloaded)
   _introVisit = false;   // and "Your page is here" is one visit's card (crewIntroHTML())
   _hintSeen = false;   // and so is the band's hint: a visit is one sighting of it (crewCheerHint())
@@ -16471,20 +16504,31 @@ function renderCrew() {
   // Same-day moment rows sit together in one white block (Quiet Lines, round 10, 112): a post, the day's faces or a new day closes the block.
   let day = null, feed = '', inLines = false;
   const closeLines = () => { if (inLines) { feed += '</div>'; inLines = false; } };
+  // Caught Up (idea 117, round 10; Amir 2026-11-20: "build 116, 117 and 119"): what reached the Bell since this visit's start (crewSeenAt() read in
+  // openCrew(), before this render writes the new time) wears a small clay dot, the day heading says how many, and one quiet line marks where the new part
+  // ends: "You're all caught up". Your own posts and moments are never new to you; the day's "trained" line has no time of its own and is left out.
+  const dayOf = i => { const raw = String(i.at || ''), at = /\d[T ]\d/.test(raw) ? new Date(raw) : null; return crewDayWord(i.t === 'sess' ? i.day : (at && !isNaN(at) ? ymdLocal(at) : raw.slice(0, 10))); };
+  const newPerDay = {};
+  items.forEach(i => { if (!(i.t === 'post' && i.pinned) && crewIsNew(i)) { const d = dayOf(i); newPerDay[d] = (newPerDay[d] || 0) + 1; } });
+  let sawNew = false, caught = false;
   items.forEach(i => {
     if (i.t !== 'line') closeLines();
     if (i.t === 'post' && i.pinned) { feed += crewPostHTML(i); return; }
+    const fresh = crewIsNew(i);
+    if (fresh) sawNew = true;
+    else if (sawNew && !caught && i.t !== 'sess') { closeLines(); feed += `<p class="cr-caught" role="status">You're all caught up</p>`; caught = true; }
     // A post is filed under the athlete's own day, as a session is: its stamp's UTC date put a post made at 00:30 in Tehran under "Yesterday".
     // (Only a stamp with a time: a bare date read by new Date() is UTC midnight, the evening before west of Greenwich.)
     const raw = String(i.at || ''), at = /\d[T ]\d/.test(raw) ? new Date(raw) : null;
     const d = crewDayWord(i.t === 'sess' ? i.day : (at && !isNaN(at) ? ymdLocal(at) : raw.slice(0, 10)));
-    if (d && d !== day) { closeLines(); day = d; feed += `<h3 class="cr-day">${esc(d)}</h3>`; }
+    if (d && d !== day) { closeLines(); day = d; const nn = newPerDay[d] || 0; feed += `<h3 class="cr-day">${nn ? '<span class="cr-newdot" aria-hidden="true"></span>' : ''}${esc(d)}${nn ? `<span class="cr-dayn"> · ${nn} new</span>` : ''}</h3>`; }
+    const mark = html => fresh && html ? html.replace(/^(\s*<[a-z]+ class=")/, '$1is-new ') : html;
     if (i.t === 'line') {
-      const row = crewLineHTML(i);
+      const row = mark(crewLineHTML(i));
       if (row.indexOf('cr-mc ') > 0) { closeLines(); feed += row; return; }   // a moment card stands on its own (2026-11-20)
       if (row && !inLines) { feed += '<div class="cr-lines">'; inLines = true; }
       feed += row;
-    } else feed += i.t === 'post' ? crewPostHTML(i) : crewSessHTML(i);
+    } else feed += i.t === 'post' ? mark(crewPostHTML(i)) : crewSessHTML(i);
   });
   closeLines();
   h += feed || `<p class="cr-quiet">Quiet so far this week.${me.can_post ? ' Share a photo from training and get it going.' : ''}</p>`;
@@ -17621,10 +17665,33 @@ function playerCheersAsk() {
   pushAsk('cheers', 'Turn your phone on and the next cheer reaches you.', true);
 }
 window.playerCheersAsk = playerCheersAsk;
+// Show Your Face (idea 119, round 10; Amir 2026-11-20: "build 116, 117 and 119"): 10 of the crew's 17 were two grey letters. The ask comes at the moment it
+// matters, when someone has cheered you: "Mina cheered you. Add your face so the crew sees who they are cheering." It shows in the Inbox and under Cheers this week
+// on your own page, only while you have no face, and "Not now" puts it away for good (<id>_faceask, this phone's own, never synced). Add your face opens the same
+// photo sheet as your page (openFacePhoto()); once a face is saved the ask is gone by itself.
+function crewFaceAskKey() { return ATHLETE_ID + '_faceask'; }
+function crewFaceAskWanted() {
+  try { if (localStorage.getItem(crewFaceAskKey()) === 'done') return false; } catch (e) { return false; }
+  const me = crewMe();
+  return crewPagesOn() && crewCanLike() && !me.under13 && crewPersonOf({ me: true }).fv == null;
+}
+function crewFaceAskHTML(who) {
+  if (!who || !crewFaceAskWanted()) return '';
+  const first = String(who).split(/\s+/)[0];
+  return `<div class="cr-faceask" role="note">${crewFace(crewPersonOf({ me: true }))}<p class="fa-t"><b dir="auto">${esc(first)} cheered you.</b> Add your face so the crew sees who they are cheering.</p>`
+    + `<div class="fa-acts"><button type="button" class="ib-act" onclick="openFacePhoto()">Add your face</button><button type="button" class="ib-act is-quiet" onclick="crewFaceAskNo()">Not now</button></div></div>`;
+}
+function crewFaceAskNo() {
+  try { _lsRawSet(crewFaceAskKey(), 'done'); } catch (e) { /* the card goes for this visit anyway */ }
+  document.querySelectorAll('.cr-faceask').forEach(e => e.remove());
+}
+window.crewFaceAskNo = crewFaceAskNo;
 function playerCheersHTML(p, own) {
   const ch = p.cheers || {}, rows = Array.isArray(ch.recent) ? ch.recent : [], ask = own ? playerCheersAskHTML() : '';
   if (!rows.length && !ask) return '';
-  return `<h2 class="prog-sec" data-sec="cheers">Cheers this week</h2><div class="pl-list">${rows.map(r => playerCheerRow(r, own)).join('')}${ask}</div>`;
+  const cheerer = own ? rows.find(r => r && !(r.me)) : null;   // the newest cheer from someone else (119)
+  const face = cheerer ? crewFaceAskHTML(cheerer.amir ? 'Amir' : (cheerer.who || '')) : '';
+  return `<h2 class="prog-sec" data-sec="cheers">Cheers this week</h2>${face}<div class="pl-list">${rows.map(r => playerCheerRow(r, own)).join('')}${ask}</div>`;
 }
 // The sheet "Cheer Sara": a word if you like, 100 characters, and Send.
 function openCheer(key) {
@@ -28156,17 +28223,18 @@ function renderInbox() {
     if (onInbox()) inboxMark();
     return;
   }
-  let h = '', day = '';
+  const cheer = rows.find(r => r && r.k === 'cheer');
+  let h = cheer ? crewFaceAskHTML(cheer.amir ? 'Amir' : (cheer.who || '')) : '', day = '';   // Show Your Face (119), above the rows
   rows.forEach((r, i) => {
     const s = inboxSpec(r, i);
     if (!s) return;
     const d = inboxDayHead(r.at);
-    if (d !== day) { day = d; h += `${h ? '</div>' : ''}<h2 class="ib-day">${esc(d)}</h2><div class="ib-list">`; }
+    if (d !== day) { h += `${day ? '</div>' : ''}<h2 class="ib-day">${esc(d)}</h2><div class="ib-list">`; day = d; }
     const fresh = Date.parse(r.at) > _inboxPrev;
     h += `<div class="ib-row${fresh ? ' is-new' : ''}" data-k="${esc(r.k)}"><button type="button" class="ib-go" onclick="inboxGo(${i})">${s.face}`
       + `<span class="ib-tx"><span class="ib-t">${s.t}</span>${s.q ? `<span class="ib-q" dir="auto">${esc(s.q)}</span>` : ''}</span><span class="ib-time">${esc(inboxClock(r.at))}</span></button>${s.act}</div>`;
   });
-  el.innerHTML = h + (h ? '</div>' : '');
+  el.innerHTML = h + (day ? '</div>' : '');
   crewWireFaces(el);
   if (onInbox()) inboxMark();
 }
@@ -28277,25 +28345,37 @@ function crewClosesWord(w) {
 // The Toss card, "Two Halves" (85 A): the question big, two halves side by side (the side's words, up to four faces stacked, the count), the half you chose outlined in clay.
 // Closed with a question: the result, nothing to tap, "Closed". A non-member can see the counts and is asked to join when they tap. Under 13: counts only, no tap, no faces.
 // The photo theme row (87 C) sits at the foot, or alone when the week has only a theme.
+// Vote to See (idea 116, round 10; Amir 2026-11-20: "build 116, 117 and 119"): until you vote, the halves show only their words, as an Instagram poll does,
+// so the tap is how you find out what the crew thinks. After your vote (or once the week closes, or for an account that cannot vote) each half fills as a bar with its
+// percent and the faces. Last week's question shows its result at the foot (stage114 `last`).
 function crewTossHTML() {
   const w = crewWeekly();
   if (!w) return '';
   const me = crewMe(), kid = !!me.under13, open = w.open !== false;
   let h = '';
   if (w.q) {
-    const v = w.votes && typeof w.votes === 'object' ? w.votes : {}, na = Number(v.a) || 0, nb = Number(v.b) || 0;
+    const v = w.votes && typeof w.votes === 'object' ? w.votes : {}, na = Number(v.a) || 0, nb = Number(v.b) || 0, tot = na + nb;
+    const hidden = open && !kid && !w.mine;   // the answer waits for your vote
     const half = s => {
       const label = String(w[s] || ''), n = s === 'a' ? na : nb, mine = w.mine === s, win = !open && n > (s === 'a' ? nb : na);
-      const faces = kid ? '' : (Array.isArray(v['f' + s]) ? v['f' + s] : []).slice(0, 4).map(f => crewFace(crewPersonOf({ ck: f.ck, fv: f.fv, who: f.who, me: !!f.me }), 'line')).join('');
-      const inner = `<span class="l" dir="auto">${esc(label)}</span><span class="f"><span class="stk">${faces}</span><span class="n">${n}</span></span>`;
-      const cls = 'cr-half' + (mine ? ' is-mine' : '') + (win ? ' is-win' : '');
-      const say = `${label}. ${n} ${n === 1 ? 'vote' : 'votes'}`;
+      const pct = tot ? Math.round(n / tot * 100) : 0;
+      const faces = kid || hidden ? '' : (Array.isArray(v['f' + s]) ? v['f' + s] : []).slice(0, 3).map(f => crewFace(crewPersonOf({ ck: f.ck, fv: f.fv, who: f.who, me: !!f.me }), 'line')).join('');
+      const inner = hidden ? `<span class="l" dir="auto">${esc(label)}</span>`
+        : `<span class="bar" style="--p:${pct}%" aria-hidden="true"></span><span class="l" dir="auto">${esc(label)}</span><span class="f"><span class="stk">${faces}</span><span class="n">${pct}%</span></span>`;
+      const cls = 'cr-half' + (mine ? ' is-mine' : '') + (win ? ' is-win' : '') + (hidden ? ' is-hidden' : ' is-shown');
+      const say = hidden ? label : `${label}. ${n} ${n === 1 ? 'vote' : 'votes'}, ${pct}%`;
       if (!open || kid) return `<div class="${cls}" role="group" aria-label="${esc(say)}${mine ? '. Your vote' : ''}">${inner}</div>`;
-      return `<button type="button" class="${cls}" data-side="${s}" aria-pressed="${mine}" aria-label="${esc(say + (mine ? '. Your vote' : '. Tap to vote'))}" onclick="crewVote('${s}')">${inner}</button>`;
+      return `<button type="button" class="${cls}" data-side="${s}" aria-pressed="${mine}" aria-label="${esc(say + (mine ? '. Your vote' : hidden ? '. Tap to vote and see the answers' : '. Tap to vote'))}" onclick="crewVote('${s}')">${inner}</button>`;
     };
-    h += `<p class="k">This week</p><h3 class="q" dir="auto">${esc(w.q)}</h3><div class="cr-halves">${half('a')}${half('b')}</div>`
-      + `<p class="ft">${open ? `Amir's question. Closes ${esc(crewClosesWord(w))}.` : 'Closed'}</p>`;
+    const foot = !open ? 'Closed' : hidden ? `Amir's question. Vote to see the answers. Closes ${esc(crewClosesWord(w))}.`
+      : `${tot} ${tot === 1 ? 'vote' : 'votes'}. Closes ${esc(crewClosesWord(w))}.`;
+    h += `<p class="k">This week</p><h3 class="q" dir="auto">${esc(w.q)}</h3><div class="cr-halves">${half('a')}${half('b')}</div><p class="ft">${foot}</p>`;
   } else h += '<p class="k">This week</p>';
+  const L = w.last && typeof w.last === 'object' && w.last.q ? w.last : null;
+  if (L) {
+    const la = Number(L.na) || 0, lb = Number(L.nb) || 0;
+    h += `<p class="cr-tosslast"><span class="k2">Last week</span> <span dir="auto">${esc(L.q)}</span> <b dir="auto">${esc(L.a)} ${la}</b> · <b dir="auto">${esc(L.b)} ${lb}</b></p>`;
+  }
   if (w.theme && open) {
     const can = !!me.can_post, ask = !kid && !can;
     h += `<div class="cr-theme"><p>This week's photo: <b dir="auto">${esc(w.theme)}</b></p>`

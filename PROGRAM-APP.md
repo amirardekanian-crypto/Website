@@ -74,7 +74,8 @@ athlete ids replaced by plain descriptions (the repo is public).
 | 58 | [📬 Home Crowd steps 2-4 (2026-10-25): the Inbox, the weekly Toss and photo, the Mailbag and the Answer Book, a reply line, a hello, Proof becomes Crew](docs/ref/program-app/58-home-crowd-steps-2-4.md) | 8 KB |
 | 59 | [🫶 The feed pass (round 10, 2026-11-20): one heart per post and line, a post in the Instagram order, replies that fold, Trained Today's faces, Add Yours](docs/ref/program-app/59-the-feed-pass.md) | 7 KB |
 | 60 | [🏆 Moment cards (2026-11-20): every Bell moment is one card, a badge, one big fact and the heart](docs/ref/program-app/60-moment-cards.md) | 5 KB |
+| 61 | [🗳️ Vote to See, Caught Up, Show Your Face (2026-11-20): the Toss waits for your vote, the feed says what is new, a cheer asks for your face](docs/ref/program-app/61-vote-caught-up-face.md) | 4 KB |
 
 ---
 
-*60 sections. The first 50 were split out of this file on 2026-10-19, every word where it was; only the file changed. A reference written "`PROGRAM-APP.md` → *Section*" is the row with that name.*
+*61 sections. The first 50 were split out of this file on 2026-10-19, every word where it was; only the file changed. A reference written "`PROGRAM-APP.md` → *Section*" is the row with that name.*

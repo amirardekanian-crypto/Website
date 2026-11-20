@@ -314,19 +314,19 @@ const lit = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); r
     const s = await p.evaluate(() => {
       const t = document.querySelector('#crew-body .cr-toss'), kids = [...document.getElementById('crew-body').children].map(c => c.className.split(' ')[0]);
       const h = [...t.querySelectorAll('.cr-half')];
-      return { t: !!t, order: kids.slice(0, 5).join(','), k: t.querySelector('.k').textContent, q: t.querySelector('.q').textContent, labels: h.map(x => x.querySelector('.l').textContent), counts: h.map(x => x.querySelector('.n').textContent),
+      return { t: !!t, order: kids.slice(0, 5).join(','), k: t.querySelector('.k').textContent, q: t.querySelector('.q').textContent, labels: h.map(x => x.querySelector('.l').textContent), counts: h.map(x => (x.querySelector('.n') || {}).textContent || ''),
         faces: h.map(x => x.querySelectorAll('.cr-fl').length), btn: h.map(x => x.tagName).join(), ft: t.querySelector('.ft').textContent, theme: t.querySelector('.cr-theme p').textContent, post: (t.querySelector('.cr-theme button') || {}).textContent,
         h: h.map(x => Math.round(x.getBoundingClientRect().height)), w: h.map(x => Math.round(x.getBoundingClientRect().width)) };
     });
     C.check('the Toss card sits right under the green band, before the honours', s.t && /(^|,)cr-week,cr-toss(,|$)/.test(s.order), s.order);
-    C.check('…"This week", the question, two halves with their words and counts 5 and 2', s.k === 'This week' && s.q === 'Pull-ups or chin-ups?' && s.labels.join() === 'Pull-ups,Chin-ups' && s.counts.join() === '5,2', JSON.stringify(s));
-    C.check('…up to four faces stacked in a half (five voted, four drawn), one in the other', s.faces.join() === '4,1', s.faces.join());
+    C.check('…"This week", the question, two halves with their words, the numbers waiting for the vote (Vote to See, 116)', s.k === 'This week' && s.q === 'Pull-ups or chin-ups?' && s.labels.join() === 'Pull-ups,Chin-ups' && s.counts.join() === ',', JSON.stringify(s));
+    C.check('…no faces before the vote', s.faces.join() === '0,0', s.faces.join());
     C.check('…two buttons side by side', s.btn === 'BUTTON,BUTTON' && Math.abs(s.w[0] - s.w[1]) <= 2, s.btn + ' ' + s.w);
-    C.check('…the foot: "Amir\'s question. Closes Sunday."', s.ft === "Amir's question. Closes Sunday.", s.ft);
+    C.check('…the foot: "Amir\'s question. Vote to see the answers. Closes Sunday."', s.ft === "Amir's question. Vote to see the answers. Closes Sunday.", s.ft);
     C.check('…and the theme row: "This week\'s photo: Your gym corner" with Post one', s.theme === "This week's photo: Your gym corner" && s.post === 'Post one', s.theme + ' / ' + s.post);
     // vote, optimistic
     const r = await p.evaluate(() => { document.querySelector('.cr-half[data-side="b"]').click(); const b = document.querySelector('.cr-half[data-side="b"]'); return { mine: b.classList.contains('is-mine'), n: b.querySelector('.n').textContent, pressed: b.getAttribute('aria-pressed') }; });
-    C.check('a tap on a half is optimistic: it is yours and counted at once', r.mine && r.n === '3' && r.pressed === 'true', JSON.stringify(r));
+    C.check('a tap on a half is optimistic: it is yours and counted at once', r.mine && r.n === '38%' && r.pressed === 'true', JSON.stringify(r));
     await p.waitForTimeout(600);
     const v1 = await calls(p, 'crew_vote');
     const css = await p.evaluate(() => { const b = document.querySelector('.cr-half[data-side="b"]'), c = getComputedStyle(b); return { bc: c.borderTopColor, bg: c.backgroundColor, ids: b.querySelectorAll('.cr-fl').length, a: document.querySelector('.cr-half[data-side="a"]').classList.contains('is-mine') }; });
@@ -335,14 +335,14 @@ const lit = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); r
     await p.screenshot({ path: path.join(OUT, 'toss-voted.png') });
     await p.evaluate(() => document.querySelector('.cr-half[data-side="a"]').click()); await p.waitForTimeout(600);
     const s2 = await p.evaluate(() => ({ a: document.querySelector('.cr-half[data-side="a"] .n').textContent, b: document.querySelector('.cr-half[data-side="b"] .n').textContent, mineA: document.querySelector('.cr-half[data-side="a"]').classList.contains('is-mine'), mineB: document.querySelector('.cr-half[data-side="b"]').classList.contains('is-mine') }));
-    C.check('tapping the other half changes the vote: 6 and 2, the clay moves', s2.a === '6' && s2.b === '2' && s2.mineA && !s2.mineB && (await calls(p, 'crew_vote')).length === 2, JSON.stringify(s2));
+    C.check('tapping the other half changes the vote: 6 and 2 votes, so 75% and 25%, the clay moves', s2.a === '75%' && s2.b === '25%' && s2.mineA && !s2.mineB && (await calls(p, 'crew_vote')).length === 2, JSON.stringify(s2));
     C.check('…tapping the half you already chose sends nothing', await p.evaluate(async () => { document.querySelector('.cr-half[data-side="a"]').click(); await new Promise(r => setTimeout(r, 300)); return window.__STUB.params.filter(x => x[0] === 'crew_vote').length === 2; }));
     C.check('…the chosen vote is on the phone\'s copy of the Bell', await p.evaluate(id => JSON.parse(localStorage.getItem(id + '_crewcache')).weekly.mine, H_ID()) === 'a');
     // a vote the server refuses because the week closed
     await p.evaluate(() => { window.__STUB.bell.weekly.open = false; });
     await p.evaluate(() => document.querySelector('.cr-half[data-side="b"]').click()); await p.waitForTimeout(600);
     const t = await toast(p);
-    C.check('a vote on a week that closed meanwhile says so, keeps the vote it had, and the card reads Closed', t && /Voting has closed/.test(t.text) && await p.evaluate(() => { const m = document.querySelector('.cr-half.is-mine'); return !!m && m.querySelector('.l').textContent === 'Pull-ups' && m.querySelector('.n').textContent === '6' && document.querySelector('.cr-toss .ft').textContent === 'Closed'; }), JSON.stringify(t));
+    C.check('a vote on a week that closed meanwhile says so, keeps the vote it had, and the card reads Closed', t && /Voting has closed/.test(t.text) && await p.evaluate(() => { const m = document.querySelector('.cr-half.is-mine'); return !!m && m.querySelector('.l').textContent === 'Pull-ups' && m.querySelector('.n').textContent === '75%' && document.querySelector('.cr-toss .ft').textContent === 'Closed'; }), JSON.stringify(t));
     await ctx.close();
   }
   {
@@ -358,8 +358,8 @@ const lit = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); r
   {
     const { ctx, p } = await open(browser, { bell: bell({ me: { answer: null, can_post: false } }) });
     await crewRoom(p);
-    const s = await p.evaluate(() => ({ btn: document.querySelectorAll('.cr-toss button.cr-half').length, counts: [...document.querySelectorAll('.cr-half .n')].map(x => x.textContent).join(), post: [...document.querySelectorAll('.cr-theme button')].map(b => b.textContent).join() }));
-    C.check('a non-member sees the counts and a Join the crew button in place of Post one', s.btn === 2 && s.counts === '5,2' && s.post === 'Join the crew', JSON.stringify(s));
+    const s = await p.evaluate(() => ({ btn: document.querySelectorAll('.cr-toss button.cr-half').length, counts: [...document.querySelectorAll('.cr-half .n')].map(x => x.textContent).join(), hidden: document.querySelectorAll('.cr-half.is-hidden').length, post: [...document.querySelectorAll('.cr-theme button')].map(b => b.textContent).join() }));
+    C.check('a non-member sees the halves hidden (no counts) and a Join the crew button in place of Post one', s.btn === 2 && s.counts === '' && s.hidden === 2 && s.post === 'Join the crew', JSON.stringify(s));
     await p.evaluate(() => document.querySelector('.cr-half[data-side="a"]').click()); await p.waitForTimeout(300);
     const t = await toast(p);
     C.check('…tapping a half says to join, with the Join the crew button, and sends no vote', t && t.text === 'Join the crew to vote.' && t.action === 'Join the crew' && !(await calls(p, 'crew_vote')).length, JSON.stringify(t));
@@ -369,7 +369,7 @@ const lit = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); r
     const { ctx, p } = await open(browser, { bell: bell({ me: { under13: true, can_post: false } }) });
     await crewRoom(p);
     const s = await p.evaluate(() => ({ btn: document.querySelectorAll('.cr-toss button').length, faces: document.querySelectorAll('.cr-toss .cr-fl').length, counts: [...document.querySelectorAll('.cr-half .n')].map(x => x.textContent).join(), act: document.querySelectorAll('.cr-theme button').length }));
-    C.check('under 13: counts only, no tap, no faces, no Post one', s.btn === 0 && s.faces === 0 && s.counts === '5,2' && s.act === 0, JSON.stringify(s));
+    C.check('under 13: counts only, no tap, no faces (the shares, 5 and 2 of 7), no Post one', s.btn === 0 && s.faces === 0 && s.counts === '71%,29%' && s.act === 0, JSON.stringify(s));
     await ctx.close();
   }
   {
@@ -586,6 +586,98 @@ const lit = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); r
     C.check('dark mode: the Inbox text reads light', c === 'rgb(237, 237, 237)', c);
     C.check('…no page errors', !dk.p.errs.length, dk.p.errs.join(' | '));
     await dk.ctx.close();
+  }
+
+  // ── 13. Show Your Face (idea 119, round 10; Amir 2026-11-20 "build 116, 117 and 119") ───────────────────────────────────────────
+  // Someone cheered you and you have no face: one card at the top of the Inbox and one under "Cheers this week" on your own page. Only for a member who is not under 13 and whose
+  // face is not set; "Not now" puts it away for good on this phone (<id>_faceask).
+  {
+    const faceAsk = p => p.evaluate(() => [...document.querySelectorAll('.cr-faceask')].map(e => ({ t: e.querySelector('.fa-t').textContent.replace(/\s+/g, ' ').trim(), b: [...e.querySelectorAll('button')].map(x => x.textContent.trim()).join('|'), inInbox: !!e.closest('#inbox-body'), first: !!e.parentElement && e.parentElement.firstElementChild === e })));
+    const ASK = 'Mina cheered you. Add your face so the crew sees who they are cheering.';
+    const rowsN = p => p.evaluate(() => document.querySelectorAll('#inbox-body .ib-row').length);
+    {
+      const { ctx, p } = await open(browser);
+      await waitTab(p); await p.waitForTimeout(700); await openInboxFrom(p, 'home');
+      const a = await faceAsk(p);
+      C.check('face ask: in the Inbox, with a cheer row and no face, one card at the top with the newest cheerer\'s first name and its two buttons', a.length === 1 && a[0].inInbox && a[0].first && a[0].t === ASK && a[0].b === 'Add your face|Not now', JSON.stringify(a));
+      C.check('…it sits above the first day heading', await p.evaluate(() => { const c = document.querySelector('#inbox-body .cr-faceask'), h = document.querySelector('#inbox-body .ib-day'); return !!c && !!h && !!(c.compareDocumentPosition(h) & Node.DOCUMENT_POSITION_FOLLOWING); }));
+      await p.evaluate(() => crewFaceAskNo()); await p.waitForTimeout(200);
+      C.check('…Not now takes the card away and keeps the rest of the Inbox', (await faceAsk(p)).length === 0 && (await rowsN(p)) > 3);
+      C.check('…and writes <id>_faceask = done on this phone', (await p.evaluate(id => localStorage.getItem(id + '_faceask'), H.ID)) === 'done');
+      await p.evaluate(() => renderInbox()); await p.waitForTimeout(150);
+      C.check('…and after a new render it stays gone', (await faceAsk(p)).length === 0);
+      C.check('…no page errors', !p.errs.length, p.errs.join(' | '));
+      await ctx.close();
+    }
+    {
+      const { ctx, p } = await open(browser);
+      await waitTab(p); await p.waitForTimeout(700); await openInboxFrom(p, 'home');
+      await p.evaluate(() => { document.querySelector('#inbox-body .cr-faceask .fa-acts button').click(); }); await p.waitForTimeout(500);
+      const on = await p.evaluate(() => ({ sheet: !!document.querySelector('#hist-overlay.visible'), screen: (document.querySelector('.screen.active') || {}).id, txt: ((document.querySelector('#hist-overlay .readiness-modal') || {}).textContent || '').slice(0, 80) }));
+      C.check('…Add your face opens the same photo sheet as your page does (no crash, a sheet or the page)', on.sheet || on.screen !== 'screen-inbox', JSON.stringify(on));
+      await ctx.close();
+    }
+    {
+      const { ctx, p } = await open(browser, { b: { me: { fv: 3 } } });
+      await waitTab(p); await p.waitForTimeout(700); await openInboxFrom(p, 'home');
+      C.check('face ask: none when you already have a face (me.fv set)', (await faceAsk(p)).length === 0 && (await rowsN(p)) > 3);
+      await ctx.close();
+    }
+    {
+      const rows = SERVER_ROWS().filter(r => r.k !== 'cheer');
+      const { ctx, p } = await open(browser, { inbox: rows });
+      await waitTab(p); await p.waitForTimeout(700); await openInboxFrom(p, 'home');
+      C.check('face ask: none when the Inbox has no cheer row', (await faceAsk(p)).length === 0 && (await rowsN(p)) > 3);
+      await ctx.close();
+    }
+    {
+      const { ctx, p } = await open(browser, { b: { me: { under13: true, can_post: false } } });
+      await waitTab(p); await p.waitForTimeout(700); await openInboxFrom(p, 'home');
+      C.check('face ask: none for someone under 13', (await faceAsk(p)).length === 0);
+      await ctx.close();
+    }
+    {
+      const { ctx, p } = await open(browser, { b: { me: { answer: null, can_post: false } } });
+      await waitTab(p); await p.waitForTimeout(700); await openInboxFrom(p, 'home');
+      C.check('face ask: none for someone who has not joined the crew', (await faceAsk(p)).length === 0);
+      await ctx.close();
+    }
+    {
+      const rows = SERVER_ROWS().filter(r => !(r.k === 'cheer' && !r.amir));
+      const { ctx, p } = await open(browser, { inbox: rows });
+      await waitTab(p); await p.waitForTimeout(700); await openInboxFrom(p, 'home');
+      const a = await faceAsk(p);
+      C.check('face ask: when the newest cheer is Amir\'s it reads "Amir cheered you."', a.length === 1 && /^Amir cheered you\./.test(a[0].t), JSON.stringify(a));
+      await ctx.close();
+    }
+    {
+      // your own page: under "Cheers this week", from the newest cheer from someone else
+      const pageMe = { cheers: { total: 3, season: 2, recent: [{ ck: CK.reza, who: 'Reza K.', fv: null, coach: false, word: 'Go', day: today }, { ck: CK.mina, who: 'Mina S.', fv: null, coach: false, word: null, day: today }] } };
+      const minaPage = { cheers: { total: 1, season: 1, recent: [{ ck: CK.reza, who: 'Reza K.', fv: null, coach: false, word: 'x', day: today }] } };
+      const { ctx, p } = await open(browser, { stub: { crewPages: { me: pageMe, [CK.mina]: minaPage } } });
+      await waitTab(p); await p.waitForTimeout(800);
+      await p.evaluate(() => openPlayer('me')); await p.waitForTimeout(900);
+      const own = await p.evaluate(() => { const c = document.querySelector('#crewplayer-body .cr-faceask'), h = document.querySelector('#crewplayer-body h2[data-sec="cheers"]'); return { n: document.querySelectorAll('#crewplayer-body .cr-faceask').length, t: c ? c.querySelector('.fa-t').textContent.replace(/\s+/g, ' ').trim() : '', after: !!(c && h && h.nextElementSibling === c) }; });
+      C.check('face ask: on your own page, one card right under "Cheers this week" naming the newest cheerer (Reza)', own.n === 1 && own.after && own.t === 'Reza cheered you. Add your face so the crew sees who they are cheering.', JSON.stringify(own));
+      await p.evaluate(() => crewFaceAskNo()); await p.waitForTimeout(150);
+      C.check('…Not now removes it there too, and it stays gone on a new render of the page', await p.evaluate(() => { const gone = !document.querySelector('.cr-faceask'); renderPlayerPage(); return gone && !document.querySelector('#crewplayer-body .cr-faceask'); }));
+      await ctx.close();
+      const o = await open(browser, { stub: { crewPages: { me: pageMe, [CK.mina]: minaPage } } });
+      await waitTab(o.p); await o.p.waitForTimeout(700);
+      await o.p.evaluate(k => openPlayer(k), CK.mina); await o.p.waitForTimeout(800);
+      C.check('face ask: someone else\'s page, even with a cheer on it and no face of yours, never has the card', !(await o.p.$('#crewplayer-body .cr-faceask')) && !!(await o.p.$('#crewplayer-body .pl-ch')));
+      await o.ctx.close();
+      const f = await open(browser, { b: { me: { fv: 2 } }, stub: { crewPages: { me: pageMe } } });
+      await waitTab(f.p); await f.p.waitForTimeout(700);
+      await f.p.evaluate(() => openPlayer('me')); await f.p.waitForTimeout(900);
+      C.check('face ask: your own page with a face set has no card', !(await f.p.$('#crewplayer-body .cr-faceask')) && !!(await f.p.$('#crewplayer-body .pl-ch')));
+      await f.ctx.close();
+      const e = await open(browser, { stub: { crewPages: { me: { cheers: { total: 0, season: 0, recent: [] } } } } });
+      await waitTab(e.p); await e.p.waitForTimeout(700);
+      await e.p.evaluate(() => openPlayer('me')); await e.p.waitForTimeout(900);
+      C.check('face ask: your own page with no cheers has no card', !(await e.p.$('#crewplayer-body .cr-faceask')));
+      await e.ctx.close();
+    }
   }
 
   await browser.close();

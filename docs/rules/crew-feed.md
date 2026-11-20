@@ -67,3 +67,17 @@ wish for the level, the records, a join and the other achievements to be shown i
 2026-11-20: the Bell now shows a best's weight and its gain in kg (Amir, asked directly: "The weight, like my picture"). The card reads "125 kg +5" with the "+5" in clay, and the
 small line is the name and the lift. A first best on a lift has no gain, so it reads "80 kg". The server sends `bests: { "<lift>": { "kg", "up" } }` (stage113), `up` being kg above
 the same athlete's previous best on that lift, null for a first. This REPLACES the stage81 line "a best names the lift and never a weight"; that old line stays where it was.
+
+## Vote to See, Caught Up and Show Your Face (2026-11-20, ideas 116, 117, 119)
+
+Amir, 2026-11-20, "build 116, 117 and 119". The build record is `docs/ref/program-app/61-vote-caught-up-face.md`. Nothing here pays XP (GAME-6).
+
+- **Vote to See (116).** While the week is open, a member who is not under 13 sees only the words of the two halves until they vote. No faces, no number, no bar. The foot says
+  "Amir's question. Vote to see the answers. Closes Sunday." After a vote, once the week has closed, or for anyone under 13, the halves show the bar, up to three faces and the
+  percent, and the foot says how many votes. A non-member sees the hidden halves too, and a tap offers to join.
+- **Last week's answer.** One line under the card, "Last week <question> <side> <n> · <side> <n>". The server sends it as `weekly.last` (stage114). No `last`, no line.
+- **Caught Up (117).** What reached the Bell since the last time Crew was on this screen wears a small clay dot. The day heading says how many ("· 2 new"). One line, "You're all
+  caught up", marks where the new part ends. Your own posts and moments are never new to you. A first visit has nothing new.
+- **Show Your Face (119).** When someone has cheered you and you have no face yet, a card asks for it: "<First> cheered you. Add your face so the crew sees who they are cheering."
+  It sits at the top of the Inbox and under "Cheers this week" on your own page. Add your face opens the photo sheet. Not now puts it away for good on that phone. Members only,
+  never under 13, and it goes by itself once a face is saved.

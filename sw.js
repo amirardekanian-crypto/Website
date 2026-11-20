@@ -571,7 +571,9 @@
 // v256: i18n-fa.js (?v=9) changed (2026-11-20): the green pill in the guide was a medicine pill (قرص); now برچسب.
 // v257: program.html changed (2026-11-20, the Crew tests run for the first time): Delete keeps its 44 px target in the icon row, Share and Delete
 // 8 px apart, and a player page opened before the emblems load draws no trophies instead of throwing.
-const CACHE = 'aap-v257';
+// v258: program.html and i18n-fa.js (?v=10) changed (2026-11-20, Amir: "build 116, 117 and 119"): the Toss hides its answers until you vote and shows
+// last week's (stage114), what is new since your last visit has a dot and "You're all caught up", and a first cheer asks for your face.
+const CACHE = 'aap-v258';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -612,7 +614,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=3',
-  '/assets/js/i18n-fa.js?v=9',
+  '/assets/js/i18n-fa.js?v=10',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).

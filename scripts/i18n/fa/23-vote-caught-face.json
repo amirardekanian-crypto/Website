@@ -1,0 +1,18 @@
+{
+  "area": "Crew 116 Vote to See, 117 Caught Up, 119 Show Your Face (2026-11-20). Drafts until Amir has read them.",
+  "exact": {
+    "Last week": "هفتهٔ پیش",
+    "Amir's question. Vote to see the answers. Closes Sunday.": "سؤال امیر. رأی بده تا جواب‌ها رو ببینی. یکشنبه بسته می‌شه.",
+    "You're all caught up": "همه‌چی رو دیدی",
+    "Add your face so the crew sees who they are cheering.": "عکست رو بذار تا تیم ببینه داره کی رو تشویق می‌کنه.",
+    "Add your face": "عکست رو بذار"
+  },
+  "patterns": [
+    ["· (\\d+) new", "· {n1} تازه"],
+    ["(.+) cheered you\\.", "$1 تشویقت کرد."],
+    ["Amir's question\\. Vote to see the answers\\. Closes (\\w+)\\.", "سؤال امیر. رأی بده تا جواب‌ها رو ببینی. {d1} بسته می‌شه."],
+    ["(\\d+) votes?\\. Closes (\\w+)\\.", "{n1} رأی. {d2} بسته می‌شه."],
+    ["(.+)\\. (\\d+) votes?, (\\d+)%", "$1. {n2} رأی، {n3}٪"],
+    ["(.+)\\. Tap to vote and see the answers", "$1. بزن تا رأی بدی و جواب‌ها رو ببینی"]
+  ]
+}

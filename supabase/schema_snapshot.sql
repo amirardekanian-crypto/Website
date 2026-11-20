@@ -7297,7 +7297,14 @@ begin
   return jsonb_build_object('week', w.week_start, 'q', w.toss_q, 'a', w.toss_a, 'b', w.toss_b, 'theme', w.theme,
                             'open', w.toss_q is not null and w.closed_at is null, 'closes', w.week_start + 6,
                             'mine', (select t.side from public.crew_toss_votes t where t.week_start = w.week_start and t.athlete_id = p_viewer),
-                            'votes', v);
+                            'votes', v,
+                            'last', (select jsonb_build_object('q', lw.toss_q, 'a', lw.toss_a, 'b', lw.toss_b,   -- stage114: last week's answer
+                                       'na', (select count(*) from public.crew_toss_votes t join public.crew_members() m on m.athlete_id = t.athlete_id
+                                               where t.week_start = lw.week_start and t.side = 'a'),
+                                       'nb', (select count(*) from public.crew_toss_votes t join public.crew_members() m on m.athlete_id = t.athlete_id
+                                               where t.week_start = lw.week_start and t.side = 'b'),
+                                       'mine', (select t.side from public.crew_toss_votes t where t.week_start = lw.week_start and t.athlete_id = p_viewer))
+                                       from public.crew_weeks lw where lw.week_start = w.week_start - 7 and lw.toss_q is not null));
 end $function$;
 
 CREATE OR REPLACE FUNCTION public.crew_who()

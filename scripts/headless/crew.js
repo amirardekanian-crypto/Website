@@ -9,7 +9,7 @@
 // photo made smaller on the phone to 1280 px JPEG, the limits); Tell the crew (a session only with a photo, Day N drafted); the switches
 // and the no; an athlete ticked under 13 reads only; the account sheet's door; the guide; Back closes the photo; never synced; 320 px and
 // dark mode. The Monthly Open's card (stage85): the challenge, the board and its order, your own row, the WhatsApp door, an empty board,
-// a long one, no card without the stage. Moment cards (section 21, 2026-11-20): a card per kind, the lead by rank, the slim fallback. Made-up people only. The stub answers the crew_* calls by name (stub.js).
+// a long one, no card without the stage. Moment cards (section 21, 2026-11-20): a card per kind, the lead by rank, the slim fallback. Section 22 (2026-11-20, ideas 116, 117, 119): Vote to See, Caught Up, Show Your Face on your page. Made-up people only. The stub answers the crew_* calls by name (stub.js).
 // Serve the repo first (python -m http.server 8775 --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
 const H = require('./lib');
@@ -1681,6 +1681,182 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
       const s = await p.evaluate(() => ({ em: typeof window.AAEmblem, cards: document.querySelectorAll('#crew-body .cr-mc').length, slim: document.querySelectorAll('#crew-body .cr-line.cr-slim').length }));
       C.check('without stage96 (no `lounge`) the slim rows are drawn even with emblems loaded', s.em === 'object' && s.cards === 0 && s.slim === 12, JSON.stringify(s));
       await ctx.close();
+    }
+  }
+
+  // ── 22. VOTE TO SEE, CAUGHT UP, SHOW YOUR FACE (ideas 116, 117, 119; Amir 2026-11-20 "build 116, 117 and 119") ───────────────────────────────────────
+  // 116: while the week is open and you have not voted, the Toss halves show only their words (no faces, no number, `is-hidden`); a vote, a closed week or an age under 13 shows
+  // the bars, up to three faces and the percent (`is-shown`). Last week's answer is one line under it (stage114, `weekly.last`).
+  // 117: what reached the Bell since this visit began (`<id>_crewseen_at`, read in openCrew() before the render writes it) wears `is-new`, the day heading counts them and one
+  // "You're all caught up" line marks the end of the new part. 119: the face ask on your own page (the Inbox half is in inbox.js section 13). Made-up people only.
+  {
+    const nextSun = () => { const d = new Date(); d.setDate(d.getDate() + ((7 - d.getDay()) % 7 || 7)); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+    const T1 = 'a1111111-0000-4000-8000-000000000001', T2 = 'a1111111-0000-4000-8000-000000000002', T3 = 'a1111111-0000-4000-8000-000000000003', T4 = 'a1111111-0000-4000-8000-000000000004';
+    const fk = n => ({ ck: 'b1111111-0000-4000-8000-00000000000' + n, fv: null, who: ['Mina S.', 'Reza K.', 'Sara T.', 'Omid P.', 'Leila M.'][n - 1] });
+    const WK = (o = {}) => Object.assign({ week: '2026-W47', q: 'Pull-ups or chin-ups?', a: 'Pull-ups', b: 'Chin-ups', open: true, closes: nextSun(), mine: null,
+      votes: { a: 3, b: 1, fa: [fk(1), fk(2), fk(3), fk(4)], fb: [fk(5)] } }, o);
+    const tossBell = (w, me) => { const b = bell(Object.assign({ answer: 'yes', can_post: true }, me || {})); if (w !== undefined) b.weekly = w; return b; };
+    const openToss = async (w, me, extra) => {
+      const x = await open(browser, Object.assign({ bell: tossBell(w, me) }, extra || {}));
+      await waitTab(x.p); await x.p.evaluate(() => goTo('crew')); await x.p.waitForTimeout(700);
+      return x;
+    };
+    const toss = p => p.evaluate(() => {
+      const t = document.querySelector('#crew-body .cr-toss');
+      if (!t) return null;
+      const h = [...t.querySelectorAll('.cr-half')];
+      return { tags: h.map(x => x.tagName).join(), cls: h.map(x => x.classList.contains('is-hidden') ? 'hidden' : x.classList.contains('is-shown') ? 'shown' : '?').join(), labels: h.map(x => x.querySelector('.l').textContent).join('|'),
+        n: h.map(x => (x.querySelector('.n') || {}).textContent || '').join('|'), p: h.map(x => { const b = x.querySelector('.bar'); return b ? b.getAttribute('style') : ''; }).join('|'),
+        faces: h.map(x => x.querySelectorAll('.cr-fl').length).join(), bars: h.map(x => x.querySelectorAll('.bar').length).join(), aria: h.map(x => x.getAttribute('aria-label')).join(' // '),
+        ft: t.querySelector('.ft').textContent, last: t.querySelector('.cr-tosslast') ? t.querySelector('.cr-tosslast').textContent.replace(/\s+/g, ' ').trim() : null };
+    });
+    const toastOf = p => p.evaluate(() => { const t = document.getElementById('aaToast'); return !t || t.hidden ? null : t.innerText.replace(/\s+/g, ' ').trim(); });
+    // 116, before a vote: words only
+    {
+      const { ctx, p } = await openToss(WK());
+      const s = await toss(p);
+      C.check('vote to see: before a vote the halves show their words only (is-hidden: no number, no face, no bar)', !!s && s.cls === 'hidden,hidden' && s.labels === 'Pull-ups|Chin-ups' && s.n === '|' && s.faces === '0,0' && s.bars === '0,0' && s.tags === 'BUTTON,BUTTON', JSON.stringify(s));
+      C.check('…the foot says "Amir\'s question. Vote to see the answers. Closes Sunday."', !!s && s.ft === "Amir's question. Vote to see the answers. Closes Sunday.", s && s.ft);
+      C.check('…and a half\'s label names only the words and "Tap to vote and see the answers", never a number', !!s && /Pull-ups\. Tap to vote and see the answers/.test(s.aria) && !/\d+ votes?|%/.test(s.aria), s && s.aria);
+      // a vote reveals
+      await p.evaluate(() => document.querySelector('.cr-half[data-side="b"]').click()); await p.waitForTimeout(700);
+      const v = await toss(p);
+      const votes = await calls(p, 'crew_vote');
+      C.check('a vote reveals the bars: Pull-ups 60% and Chin-ups 40% (3 and 2 of 5), the numbers and faces back', !!v && v.cls === 'shown,shown' && v.n === '60%|40%' && /--p:\s*60%/.test(v.p.split('|')[0]) && /--p:\s*40%/.test(v.p.split('|')[1]) && v.bars === '1,1' && v.faces === '3,2', JSON.stringify(v));
+      C.check('…the foot reads "5 votes. Closes Sunday." and the half you chose says so', !!v && v.ft === '5 votes. Closes Sunday.' && /Chin-ups\. 2 votes, 40%\. Your vote/.test(v.aria) && /Pull-ups\. 3 votes, 60%/.test(v.aria), v && (v.ft + ' ' + v.aria));
+      C.check('…crew_vote went once with side b', votes.length === 1 && votes[0].p_side === 'b', JSON.stringify(votes));
+      C.check('…it stays shown on the next render (the vote is on the phone\'s copy)', await p.evaluate(() => { renderCrew(); return document.querySelectorAll('.cr-half.is-shown').length === 2 && !document.querySelector('.cr-half.is-hidden'); }));
+      C.check('vote to see: no page errors', !p.errs.length, p.errs.join(' | '));
+      await ctx.close();
+    }
+    // already voted when the page opens: percents are rounded shares
+    {
+      const { ctx, p } = await openToss(WK({ mine: 'b', votes: { a: 1, b: 2, fa: [fk(1)], fb: [fk(2), fk(3)] } }));
+      const s = await toss(p);
+      C.check('voted before the page opened: shown at once, shares rounded (1 of 3 is 33%, 2 of 3 is 67%), foot "3 votes. Closes Sunday."', !!s && s.cls === 'shown,shown' && s.n === '33%|67%' && s.ft === '3 votes. Closes Sunday.', JSON.stringify(s));
+      await ctx.close();
+    }
+    // a closed week
+    {
+      const { ctx, p } = await openToss(WK({ open: false }));
+      const s = await toss(p);
+      C.check('a closed week shows the numbers without a vote (75% and 25%, three faces in the big half), nothing to tap, the foot "Closed"', !!s && s.cls === 'shown,shown' && s.n === '75%|25%' && s.faces === '3,1' && s.tags === 'DIV,DIV' && s.ft === 'Closed', JSON.stringify(s));
+      await ctx.close();
+    }
+    // under 13
+    {
+      const { ctx, p } = await openToss(WK(), { under13: true, can_post: false, answer: null });
+      const s = await toss(p);
+      await p.evaluate(() => { const h = document.querySelector('.cr-half'); h.click(); });
+      await p.waitForTimeout(300);
+      C.check('under 13: the numbers show (75% and 25%), no faces, nothing to tap, and a tap sends no vote', !!s && s.cls === 'shown,shown' && s.n === '75%|25%' && s.faces === '0,0' && s.tags === 'DIV,DIV' && !(await calls(p, 'crew_vote')).length, JSON.stringify(s));
+      await ctx.close();
+    }
+    // a non-member
+    {
+      const { ctx, p } = await openToss(WK(), { answer: null, can_post: false });
+      const s = await toss(p);
+      C.check('a non-member sees hidden halves too (the number waits for a vote that needs a join)', !!s && s.cls === 'hidden,hidden' && s.n === '|' && s.faces === '0,0' && s.tags === 'BUTTON,BUTTON', JSON.stringify(s));
+      await p.evaluate(() => document.querySelector('.cr-half[data-side="a"]').click()); await p.waitForTimeout(350);
+      const t = await toastOf(p), act = await p.evaluate(() => (document.querySelector('#aaToast .aa-toast-go') || {}).textContent || '');
+      C.check('…a tap offers to join ("Join the crew to vote." with the Join the crew button) and sends no vote', /Join the crew to vote\./.test(t || '') && act === 'Join the crew' && !(await calls(p, 'crew_vote')).length, JSON.stringify([t, act]));
+      await ctx.close();
+    }
+    // last week's answer (stage114)
+    {
+      const last = { q: 'Squat or deadlift?', a: 'Squat', b: 'Deadlift', na: 7, nb: 4, mine: null };
+      const { ctx, p } = await openToss(WK({ last }));
+      const s = await toss(p);
+      C.check('last week: one line under the card, "Last week Squat or deadlift? Squat 7 · Deadlift 4"', !!s && s.last === 'Last week Squat or deadlift? Squat 7 · Deadlift 4', s && s.last);
+      C.check('…it shows before a vote too, and the halves above it are still hidden', !!s && s.cls === 'hidden,hidden');
+      await ctx.close();
+      const n = await openToss(WK());
+      C.check('no `last` in the answer: no last-week line', (await toss(n.p)).last === null);
+      await n.ctx.close();
+      const e = await openToss(WK({ last: {} }));
+      C.check('…and an empty `last` draws none', (await toss(e.p)).last === null);
+      await e.ctx.close();
+    }
+
+    // 117 Caught Up
+    const hrs = h => iso(now - h * 3600e3);
+    const cuBell = () => {
+      const b = bell({ answer: 'yes', can_post: true });
+      b.items = [
+        { t: 'post', id: AMIR, who: 'Amir', me: false, amir: true, kind: 'post', body: 'A pinned word.', photo: false, at: hrs(1), pinned: true, left: 7, kudos: { n: 0, mine: false, names: [] } },
+        { t: 'post', id: T1, who: 'Ali B.', me: false, amir: false, kind: 'post', body: 'Back at it.', photo: false, at: hrs(1), pinned: false, left: 7, kudos: { n: 0, mine: false, names: [] } },
+        { t: 'line', key: 'b1111111-0000-4000-8000-000000000003:' + iso(now).slice(0, 10), who: 'Sara T.', me: false, at: hrs(2), kudos: { n: 0, mine: false, names: [] }, parts: [{ k: 'week', run: 5 }] },
+        { t: 'post', id: T2, who: 'Alex R.', me: true, amir: false, kind: 'post', body: 'My own post.', photo: false, at: hrs(2.5), pinned: false, left: 7, kudos: { n: 0, mine: false, names: [] } },
+        { t: 'post', id: T3, who: 'Reza K.', me: false, amir: false, kind: 'post', body: 'Older than your last visit.', photo: false, at: hrs(6), pinned: false, left: 7, kudos: { n: 0, mine: false, names: [] } },
+      ];
+      return b;
+    };
+    const feed = p => p.evaluate(() => ({
+      news: [...document.querySelectorAll('#crew-body .cr-post.is-new, #crew-body .cr-line.is-new')].map(e => e.dataset.id || e.dataset.key || e.className),
+      newPost: !!document.querySelector('#crew-body .cr-post.is-new'), newLine: !!document.querySelector('#crew-body .cr-line.is-new'),
+      caught: [...document.querySelectorAll('#crew-body .cr-caught')].map(e => e.textContent), caughtN: document.querySelectorAll('#crew-body .cr-caught').length,
+      nextOfCaught: (() => { const c = document.querySelector('#crew-body .cr-caught'); return c && c.nextElementSibling ? (c.nextElementSibling.dataset.id || c.nextElementSibling.className) : null; })(),
+      prevOfCaught: (() => { const c = document.querySelector('#crew-body .cr-caught'); const q = c && c.previousElementSibling; return q ? (q.dataset.id || q.className) : null; })(),
+      dayn: [...document.querySelectorAll('#crew-body .cr-dayn')].map(e => e.textContent.trim()), dots: document.querySelectorAll('#crew-body .cr-day .cr-newdot').length,
+      ownNew: !!document.querySelector('#crew-body .cr-post[data-id="a2222222-0000-4000-8000-000000000002"].is-new'), pinNew: !!document.querySelector('#crew-body .cr-post.amir.is-new'),
+      dotCss: (() => { const e = document.querySelector('#crew-body .cr-post.is-new'); return e ? getComputedStyle(e, '::before').content : null; })() }));
+    {
+      const { ctx, p } = await open(browser, { bell: cuBell(), seed: { _crewseen_at: String(now - 4 * 3600e3) } });
+      await waitTab(p); await p.evaluate(() => goTo('crew')); await p.waitForTimeout(700);
+      const f = await feed(p);
+      const days = new Set([now - 1 * 3600e3, now - 2 * 3600e3].map(m => new Date(m).toDateString())).size;
+      C.check('caught up: with a visit 4 hours ago, the two items from someone else since then are is-new (a post and a moment)', f.newPost && f.newLine && f.news.length === 2, JSON.stringify(f.news));
+      C.check('…your own post, an older post and Amir\'s pinned post are not new', !f.ownNew && !f.pinNew && !f.news.includes(T2) && !f.news.includes(T3));
+      C.check('…the day heading says how many: "N new" counts add up to 2, with a clay dot on the heading', f.dayn.length === days && f.dayn.every(x => /^· \d+ new$/.test(x)) && f.dayn.reduce((a, x) => a + Number(/\d+/.exec(x)[0]), 0) === 2 && f.dots === days, JSON.stringify([f.dayn, f.dots, days]));
+      C.check('…exactly one "You\'re all caught up" line, right before the first post that is not new (your own), after both new ones', f.caughtN === 1 && f.caught[0] === "You're all caught up" && f.nextOfCaught === T2, JSON.stringify([f.caught, f.nextOfCaught, f.prevOfCaught]));
+      C.check('…the clay dot is drawn on a new item (::before)', f.dotCss !== null && f.dotCss !== 'none' && f.dotCss !== 'normal', String(f.dotCss));
+      const w1 = await p.evaluate(id => Number(localStorage.getItem(id + '_crewseen_at')), H.ID);
+      C.check('…and this visit wrote the new seen time (just now)', w1 > now - 60e3 && w1 >= now, String(w1 - now));
+      // the same visit renders again: the same baseline, the same marks
+      await p.evaluate(() => renderCrew()); await p.waitForTimeout(200);
+      const f2 = await feed(p);
+      C.check('a second render in the same visit marks the same two items and keeps the one line (the baseline is the visit\'s start)', f2.news.length === 2 && f2.caughtN === 1 && f2.nextOfCaught === T2, JSON.stringify(f2.news));
+      // a later visit: seen time is now, nothing is new
+      await p.evaluate(() => goTo('home')); await p.waitForTimeout(250);
+      await p.evaluate(() => goTo('crew')); await p.waitForTimeout(500);
+      const f3 = await feed(p);
+      C.check('the next visit starts from the time this one wrote: nothing is new and there is no line', f3.news.length === 0 && f3.caughtN === 0 && f3.dayn.length === 0 && f3.dots === 0, JSON.stringify(f3));
+      C.check('caught up: no page errors', !p.errs.length, p.errs.join(' | '));
+      await ctx.close();
+    }
+    {
+      const { ctx, p } = await open(browser, { bell: cuBell() });
+      await waitTab(p); await p.evaluate(() => goTo('crew')); await p.waitForTimeout(700);
+      const f = await feed(p);
+      C.check('a first visit (no seen time, 0): nothing is new, no heading count, no caught-up line', f.news.length === 0 && f.caughtN === 0 && f.dayn.length === 0 && f.dots === 0, JSON.stringify(f));
+      await ctx.close();
+    }
+    {
+      // nothing newer than the visit: no line (the line only follows at least one new item)
+      const { ctx, p } = await open(browser, { bell: cuBell(), seed: { _crewseen_at: String(now - 30 * 60e3) } });
+      await waitTab(p); await p.evaluate(() => goTo('crew')); await p.waitForTimeout(700);
+      const f = await feed(p);
+      C.check('everything older than the last visit: nothing is new and no caught-up line', f.news.length === 0 && f.caughtN === 0 && f.dayn.length === 0, JSON.stringify(f));
+      await ctx.close();
+    }
+
+    // 119 on your own page (the Inbox half is inbox.js section 13)
+    {
+      const CKP = 'cccccccc-0000-4000-8000-000000000001';
+      const pg = (fv) => ({ me: { cheers: { total: 2, season: 2, recent: [{ ck: CKP, who: 'Mina S.', fv: null, coach: false, word: 'Strong', day: iso(now).slice(0, 10) }] } } });
+      const b = tossBell(undefined); b.lounge = 1;
+      const { ctx, p } = await open(browser, { bell: b, stub: { crewPages: pg() } });
+      await waitTab(p); await p.evaluate(() => openPlayer('me')); await p.waitForTimeout(900);
+      const a = await p.evaluate(() => ({ n: document.querySelectorAll('#crewplayer-body .cr-faceask').length, t: (document.querySelector('#crewplayer-body .cr-faceask .fa-t') || {}).textContent || '', b: [...document.querySelectorAll('#crewplayer-body .cr-faceask button')].map(x => x.textContent.trim()).join('|') }));
+      C.check('show your face: on your own page, under Cheers this week, with a recent cheer and no face of yours: the card with her name and both buttons', a.n === 1 && a.t === 'Mina cheered you. Add your face so the crew sees who they are cheering.' && a.b === 'Add your face|Not now', JSON.stringify(a));
+      await p.evaluate(() => document.querySelector('#crewplayer-body .cr-faceask .is-quiet').click()); await p.waitForTimeout(250);
+      C.check('…Not now removes it, writes <id>_faceask = done, and it is not drawn again', await p.evaluate(id => !document.querySelector('.cr-faceask') && localStorage.getItem(id + '_faceask') === 'done' && (renderPlayerPage(), !document.querySelector('.cr-faceask')), H.ID));
+      await ctx.close();
+      // another person's page with a cheer on it: never
+      const o = await open(browser, { bell: b, stub: { crewPages: { me: pg().me, [CKP]: { cheers: { total: 1, season: 1, recent: [{ ck: 'dddddddd-0000-4000-8000-000000000002', who: 'Reza K.', fv: null, coach: false, word: null, day: iso(now).slice(0, 10) }] } } } } });
+      await waitTab(o.p); await o.p.evaluate(k => openPlayer(k), CKP); await o.p.waitForTimeout(900);
+      C.check('…and none on someone else\'s page', !(await o.p.$('#crewplayer-body .cr-faceask')));
+      await o.ctx.close();
     }
   }
 
