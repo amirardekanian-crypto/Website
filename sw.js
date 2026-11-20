@@ -553,7 +553,9 @@
 // cycle will be in their chosen language"). Settings → Language saves to the athlete's programme (stage110 set_my_lang()) and says so.
 // v247: program.html and /assets/js/i18n-fa.js changed (i18n-fa ?v=3) (2026-11-20, round 10 the feed pass, Amir: "go with your picks"). Crew: the heart on posts
 // and moment rows (the four reactions behind a long-press), Instagram-shaped posts, folded replies, Trained today faces to cheer (stage111), Add Yours.
-const CACHE = 'aap-v247';
+// v248: program.html and i18n.js changed (2026-11-20, Amir: "Yes, show it"). Settings → Language is for every athlete, and a phone with no
+// choice of its own opens in the programme's athlete.lang (39 athletes Farsi, Lemuel, Juan and Dennis English).
+const CACHE = 'aap-v248';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -593,7 +595,7 @@ const SHELL = [
   '/assets/js/between-sets.js',
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
-  '/assets/js/i18n.js?v=1',
+  '/assets/js/i18n.js?v=2',
   '/assets/js/i18n-fa.js?v=3',
 ];
 

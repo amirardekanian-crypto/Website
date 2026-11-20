@@ -14,15 +14,15 @@
 
    THE CHOICES (Amir, 2026-11-20, "use your picks"): Shamsi dates; Persian digits (۱۲) in sentences, while a training
    number standing alone (a weight, reps, RPE, a clock) stays Latin, as the athlete types it; Settings → Language,
-   stored on this phone (aa_lang, no athlete prefix, so _snapshot() never syncs it). THE SWITCH IS HIDDEN until the
-   words are done: it shows only on a phone opened once with ?fa=1 (aa_lang_beta). ?fa=0 turns both off.
-   When REVEALED is true, a phone with no choice of its own follows the programme's athlete.lang (from the intake form).
+   stored on this phone (aa_lang, no athlete prefix, so _snapshot() never syncs it) and on the programme (set_my_lang()).
+   The switch is for everyone since 2026-11-20 (REVEALED; Amir: "Yes, show it"): a phone with no choice of its own follows
+   the programme's athlete.lang (the intake form's App Language, or the athlete's own pick). ?fa=0 clears this phone's choice.
 
    A change here ships with a ?v= bump on its <script> in program.html, the same URL in sw.js's SHELL and a CACHE bump.
    A change of words is a ?v= bump on data-fa (the dictionary's URL) and the same three. */
 (function () {
   'use strict';
-  var REVEALED = false;                       // the switch is for everyone, and athlete.lang picks the default
+  var REVEALED = true;                        // the switch is for everyone, and athlete.lang picks the default (Amir, 2026-11-20: "Yes, show it")
   var LS = 'aa_lang', BETA = 'aa_lang_beta';
   function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function put(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
@@ -53,7 +53,8 @@
     // everyone, only on a phone that never chose, and only once. `reload` only where nothing can be under way (the first
     // open with no saved plan); otherwise the athlete's language waits for the next open.
     adopt: function (l, reload) {
-      if (!REVEALED || get(LS)) return;
+      // Never the demo or the coach's preview: they are not this phone's athlete, and Amir's own phone keeps its language.
+      if (!REVEALED || get(LS) || window.IS_DEMO || window.IS_PREVIEW) return;
       var want = String(l || '').toLowerCase() === 'fa' ? 'fa' : 'en';
       put(LS, want);
       if (reload && want !== lang) location.reload();
