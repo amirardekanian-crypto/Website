@@ -269,6 +269,12 @@
       <input type="text" id="contact" name="Contact (Instagram/WhatsApp)" required dir="ltr" autocomplete="tel" autocapitalize="none" spellcheck="false" placeholder="@sara_tennis  /  09121234567"></div>
     <div class="f"><label for="em">ایمیل <span class="hint">اختیاری</span></label><input type="email" id="em" name="Email" dir="ltr" autocomplete="email" autocapitalize="none" spellcheck="false" placeholder="you@email.com"></div>
     <div class="f"><label for="age">سنِ ورزشکار <span class="hint">زیر ۱۸ سال؟ پدر یا مادر باید این فرم رو پر کنه.</span></label><input type="text" id="age" name="Age" inputmode="numeric" pattern="(1[0-9]|[2-7][0-9]|80)" maxlength="2" autocomplete="off" required placeholder="مثلاً ۲۸"></div>
+    <div class="f"><label id="qglang">زبانِ اپ و برنامه‌ات <span class="hint">اپ، یادداشت‌های مربی و هر دوره‌ی برنامه به همین زبان برات میاد. بعداً هم می‌تونی از تنظیماتِ اپ عوضش کنی.</span></label>
+      <div class="rcards" role="radiogroup" aria-labelledby="qglang">
+        <div class="rcard"><input type="radio" id="lg1" name="App Language" value="English" required><label for="lg1"><span class="ic" aria-hidden="true">EN</span>انگلیسی</label></div>
+        <div class="rcard"><input type="radio" id="lg2" name="App Language" value="Farsi" checked><label for="lg2"><span class="ic" aria-hidden="true">فا</span>فارسی</label></div>
+      </div>
+    </div>
   </section>
 
   <!-- 2 · ACTIVITY -->

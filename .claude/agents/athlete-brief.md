@@ -48,7 +48,8 @@ without reaching the database.
    any reported pain, and whether the stated days/week + session length can support the goal.
 
 ### OUTPUT for MODE=new — the ATHLETE BRIEF (plain text, about one page, no preamble)
-- **IDENTITY** — id, name, sex, age, athlete type, goals in order, days/week, session length, equipment
+- **IDENTITY** — id, name, sex, age, athlete type, goals in order, days/week, session length, equipment,
+  **app language** (the form's "App Language": Farsi or English; none on an older form)
 - **RECOVERY & LIFE** — sleep, stress, nutrition, weekly life-load
 - **INJURY / MOVEMENT** — history (past injuries / surgeries / recurring pain) and each current item
   with stage (active / resolving / resolved); flag any red flag needing referral; anything the

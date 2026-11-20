@@ -20,8 +20,16 @@ written from: [`scripts/i18n/BRIEF.md`](../../scripts/i18n/BRIEF.md).
 - **Never compare displayed text in code** (`el.textContent === 'Dismiss'`): in Farsi it is not English any more.
   Compare a class, a `data-*` or the state. The word lists' `readback` items are the known cases.
 - **Amir's picks, 2026-11-20 ("use your picks"):** Shamsi dates (the engine converts the app's English dates);
-  Persian digits in sentences, a training number standing alone stays Latin; his per-athlete words get a Farsi copy
-  for Farsi athletes from their next cycle; the switch stays hidden until the words are done.
+  Persian digits in sentences, a training number standing alone stays Latin; the switch stays hidden until the words
+  are done.
+- **The athlete picks their language, and it is the programme's** (Amir, 2026-11-20: *"let the client pick their
+  language, and tell them that by choosing, their next cycle will be in their chosen language, for new clients, put it in
+  their form"*; *"i want to write their notes once in the language they have choosen, not in 2 different language.
+  exercises and their plan is the same"*). Settings → Language saves `athlete.lang` through `set_my_lang()` (stage110,
+  which also turns their reminders) and says the next cycle comes in it (`setMyLang()`; with no signal it waits as
+  `aa_lang_pending`). New clients answer *App Language* on the intake form. The pipeline writes a cycle's words ONCE, in
+  `athlete.lang`; exercise names and the prescription are the same in both. On 2026-11-20 every programme was set
+  `fa` except Lemuel, Juan and Dennis (`en`), on Amir's word.
 - **The switch is hidden** (`REVEALED = false` in `i18n.js`): only a phone opened once with `?fa=1` shows it (`?fa=0`
   turns it off). Revealing it is Amir's call; then a phone with no choice follows the programme's `athlete.lang`
   (`AAI18N.adopt()`, from `savePlanCopy()`'s callers).
