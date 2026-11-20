@@ -13,8 +13,10 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
 
   python3 scripts/check_program.py data/<id>.json [options]
 
-  --tables FILE   write the two volume tables and the per-day load (markdown) to FILE: they are the
-                  coaching log's Volume & Dose section, pasted as written. Counted from each
+  --tables FILE   write the per-muscle volume table and the per-day load (markdown) to FILE: they are
+                  the coaching log's Volume & Dose section, pasted as written.
+  --exercises FILE  write the per-exercise table (day, exercise, sets, what it counts toward) to FILE,
+                  for chat when a count is in question; never pasted into the log (VOL-10, 2026-11-20). Counted from each
                   exercise's Spine credits and cost (stage39), so it needs --spine. The volume
                   checks themselves (floors, over 20, per-session, flat week, back-to-back) run
                   whenever --spine is given. (--log, the hand-typed table this replaced, is retired.)
@@ -1223,19 +1225,27 @@ def check_volume(data, args, spine, timing=None):
     if args.tables:
         open(args.tables, 'w', encoding='utf-8').write(volume_tables(v, excused, timing))
         info(f"volume tables written to {args.tables}: paste them into the log's Volume & Dose section as they are")
+    if args.exercises:
+        open(args.exercises, 'w', encoding='utf-8').write(exercise_table(v))
+        info(f"per-exercise table written to {args.exercises}: for chat, never the log (VOL-10)")
     return v['day']
 
 def day_order(d): return (0, int(d)) if str(d).isdigit() else (1, str(d))
 
-def volume_tables(v, excused, timing=None):
-    """VOL-10's two tables and VOL-2's day loads (with each day's minutes), as markdown for the coaching log."""
+def exercise_table(v):
+    """VOL-10's per-exercise table (the working behind each muscle's total), as markdown for chat.
+    It left the coaching log on 2026-11-20 (Amir: "i never read them"); --exercises writes it."""
     def cells(sets, parts):
         return ' · '.join(f"{m.title()} {sets * w:g}" + ('' if w == 1 else f" (×{w:g})")
                           for m, w in sorted(parts.items(), key=lambda kv: (-kv[1], MUSCLES.index(kv[0]) if kv[0] in MUSCLES else 99)))
     L = ['| Day | Exercise | Sets | Counts toward |', '|---|---|---|---|']
     for day, prep, name, sets, parts in v['rows']:
         L.append(f"| D{day}{' prep' if prep else ''} | {name} | {sets:g} | {cells(sets, parts)} |")
-    L += ['', '| Muscle | Sets/week | Range | Verdict |', '|---|---|---|---|']
+    return '\n'.join(L) + '\n'
+
+def volume_tables(v, excused, timing=None):
+    """VOL-10's per-muscle table and VOL-2's day loads (with each day's minutes), as markdown for the coaching log."""
+    L = ['| Muscle | Sets/week | Range | Verdict |', '|---|---|---|---|']
     order = lambda k: (-v['total'].get(k, 0), MUSCLES.index(k) if k in MUSCLES else 99)
     for m in sorted(set(v['total']) | set(MAJOR), key=order):
         n = v['total'].get(m, 0)
@@ -1879,7 +1889,7 @@ def fingerprint(data, athlete_id):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('program')
-    ap.add_argument('--tables'); ap.add_argument('--new', action='store_true'); ap.add_argument('--reentry', action='store_true')
+    ap.add_argument('--tables'); ap.add_argument('--exercises'); ap.add_argument('--new', action='store_true'); ap.add_argument('--reentry', action='store_true')
     ap.add_argument('--log', help=argparse.SUPPRESS)  # retired 2026-09-26: the tables are counted, not typed
     ap.add_argument('--floor', action='store_true'); ap.add_argument('--floor-except')
     ap.add_argument('--proven', action='store_true'); ap.add_argument('--taper')

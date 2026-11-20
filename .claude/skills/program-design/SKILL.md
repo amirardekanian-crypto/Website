@@ -764,9 +764,10 @@ say so in one line rather than omitting the section.
 
 **Volume & Dose** — **the checker writes the tables; nobody types them** (2026-09-26). Part A's
 build check (`check_program.py --tables`) counts every exercise from its Spine entry's credits
-(VOL-10: 1 prime mover, 0.5 helper; warm-ups count only core) and writes the per-exercise table,
-the per-muscle totals against 10–20, and each day's cost-weighted load and minutes (modelled, and
-the expected real length once a ratio exists). /program-assemble pastes
+(VOL-10: 1 prime mover, 0.5 helper; warm-ups count only core) and writes the per-muscle totals
+against 10–20 and each day's cost-weighted load and minutes (modelled, and the expected real length
+once a ratio exists). The per-exercise table (`--exercises`) is for chat when a count is in
+question, never the log (VOL-10, 2026-11-20). /program-assemble pastes
 that file here as written. Leave the line `<the checker's tables>` in your draft, and write only
 what the numbers can't say, one line each, and only those that apply: a time-limited under-dose framed as maintenance and
 where to invest if time allows (VOL-1), a muscle under 10 by choice and why (VOL-9, the spec's

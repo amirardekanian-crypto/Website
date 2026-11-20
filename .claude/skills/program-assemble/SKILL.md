@@ -283,8 +283,9 @@ count and what landed on the cards differ, which is how a dropped or invented on
   The one query also resolves every card NAME on the server (exact name, else a loose
   match) for Step 4, and brings last cycle's modelled and logged minutes for the time check. Save
   only this result: never a copy of the whole catalogue (2026-09-27).
-  `--tables` writes the log's Volume & Dose tables (per exercise, per muscle, per-day load); Step 5
-  pastes the file from the LAST run. A count that looks wrong is its Spine entry's (fix it via /spine
+  `--tables` writes the log's Volume & Dose tables (per muscle, per-day load); Step 5 pastes the
+  file from the LAST run. To see which exercises make a muscle's count, add `--exercises <file>`
+  and show that table in chat; it never goes in the log (VOL-10). A count that looks wrong is its Spine entry's (fix it via /spine
   Upkeep, a proposal on an approved entry), never a hand edit of the table.
   **The spec sets the flags**: its athlete profile turns on `--floor` (aim: strength-muscle),
   `--proven`, the bans, `floor-except` and the cap; its `week:` line turns on the back-to-back
@@ -401,9 +402,9 @@ git. The athlete app never reads the log. The entry template is /program-design'
   failed on and were fixed, and the WARNs left standing, e.g. `Checks: fixed VOL-8, SEL-7 · left
   PRC-24 (reported), SES-7 (72 min, soft cap)`. After eight cycles it shows which checks earn
   their place.
-- **⚖️ The Volume & Dose section carries BOTH set-count tables and the day loads with their
-  minutes** — standing order from Amir (2026-09-08): *"whenever you calculate the sets, add that
-  table to the athlete coaching log so i can see."* They are the file Step 3's last run wrote with
+- **⚖️ The Volume & Dose section carries the per-muscle table and the day loads with their
+  minutes** (VOL-10). The per-exercise table left the log on 2026-11-20 (Amir: *"i never read
+  them"*); it is shown in chat when a count is in question. They are the file Step 3's last run wrote with
   `--tables`: replace the design's `<the checker's tables>` line with it, as written, above the
   design's framing lines. Counting convention: VOL-10.
 - **⚖️ The athlete profile — write this cycle's, in place (2026-09-26).** The spec opens with the

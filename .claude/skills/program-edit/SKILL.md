@@ -154,10 +154,10 @@ of this): both before touching any numbers, and both shown to Amir for sign-off.
 counts them; never tally by hand** (2026-09-26): save the live row to `<scratch>/<id>.json`, run
 `python scripts/check_program.py <scratch>/<id>.json --spine-sql`, run the query it prints and save
 the result exactly as returned, then `python scripts/check_program.py <scratch>/<id>.json --stage build
---spine <result> --tables <scratch>/volume_<id>.md` (`python` on Amir's PC; `python3` in a cloud
-session). The file is the audit's VOLUME section: the per-exercise table (each exercise counted from
-its Spine entry's credits, VOL-10), the weekly total per muscle against 10–20, and each day's
-cost-weighted load and minutes (VOL-2). Run it again on the edited programme so Amir sees before and
+--spine <result> --tables <scratch>/volume_<id>.md --exercises <scratch>/exercises_<id>.md`
+(`python` on Amir's PC; `python3` in a cloud session). The two files are the audit's VOLUME section:
+the per-exercise table (each exercise counted from its Spine entry's credits, VOL-10), the weekly
+total per muscle against 10–20, and each day's cost-weighted load and minutes (VOL-2). Run it again on the edited programme so Amir sees before and
 after. **A FAIL or WARN on a part you are not changing is reported to Amir, never fixed on the side**
 (PRC-2): a live programme from before a rule can break it.
 

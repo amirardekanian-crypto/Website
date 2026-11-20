@@ -162,7 +162,7 @@ stale copy reached athletes.
 | VOL-7 | The shoulder is one group on 10–20 sets: press, side and rear delt together. Scapular retraction counts as back. | design | warn (under 10) |
 | VOL-8 | Never more than 4 working sets on one exercise until our own logs prove more; add an exercise instead. | design | ✓ |
 | VOL-9 | A rounded-shoulder or forward-head client keeps chest volume low, as a stated exception, never loaded to reach a range. | design | |
-| VOL-10 | Count every exercise that loads a muscle (1, 0.5 or 0) from its Spine credits; warm-ups count only core. Both tables go in the log. | design · assemble | ✓ (counted from the Spine) |
+| VOL-10 | Count every exercise that loads a muscle (1, 0.5 or 0) from its Spine credits; warm-ups count only core. The log gets the per-muscle table. | design · assemble | ✓ (counted from the Spine) |
 | VOL-11 | A new athlete's first cycle, or a first cycle back after 3+ weeks off, has no weighted exercise under 8 reps. Any retest is 8RM. | design | ✓ |
 | VOL-12 | Small muscles (biceps, triceps) take 6–12 sets a week in a foundation cycle, more in later cycles. | design · edit | |
 | VOL-13 | A missing machine never bends the programme: clear the 10-set floor with what the gym has. | design · edit | |
@@ -865,14 +865,20 @@ same ID. Read a rule's story and its history before changing it.
   Warm-up and activation circuits do **not** count — they are priming, not dose. The one exception
   is **core, which counts wherever it sits**, activation rounds included.
 
-  **Every volume tally is published as TWO tables in the athlete's coaching log**: a per-exercise
-  table (day · exercise · sets · what it counts toward, fractions shown) and the per-muscle total
-  against its goal range. Amir reads the working, not just the verdict — a bare "hamstrings 11"
-  hides which exercises produced it and whether the number is real.
+  **The coaching log gets the per-muscle totals, not the working** (Amir, 2026-11-20). The log's
+  Volume & Dose section holds the per-muscle total against its goal range and each day's load and
+  minutes. The per-exercise table (day · exercise · sets · what it counts toward, fractions shown)
+  is shown in chat whenever a count is in question, and is no longer pasted into the log. It went in
+  from 2026-09-08 (*"add that table to the athlete coaching log so i can see"*) on the reasoning
+  that a bare "hamstrings 11" hides which exercises produced it. Two things changed: the count
+  comes from the Spine credits, not a hand tally, and the log's reader is the next design run, not
+  Amir: *"keep them how you would read fast and helps write a program fast, i never read them."*
+  The programme itself, on the server, says which exercises are in it.
 
   **The weights live on the exercise, not in each log**. Each
   Spine entry carries its `credits` (muscle → 1 or 0.5) and its VOL-2 `cost` (coach-only, stage39),
-  and `scripts/check_program.py --tables` writes both tables and the per-day load from them. They
+  and `scripts/check_program.py` counts from them: `--tables` writes the per-muscle table and the
+  per-day load for the log, `--exercises` the per-exercise table for chat. They
   had been typed by hand every cycle, and the logs disagreed with each other: an RDL's glutes at 1
   in one and 0.5 in another, a face pull under back, shoulder or both. The 220 entries started from
   the counts the logs already used, one answer per movement whatever the kit. A count that looks
@@ -963,7 +969,7 @@ same ID. Read a rule's story and its history before changing it.
   app renders as a highlighted clay "Coach's Note" (a clay dot after the name on the closed card,
   a callout when it is open) so the athlete pays attention. The cycle notes cards carry only
   program-wide guidance. See SCHEMA.md → "Exercise coach's note".
-- `COM-7` **Coach-facing reports** (the two volume tables) print in chat for Amir — never in the
+- `COM-7` **Coach-facing reports** (the volume tables) print in chat for Amir — never in the
   athlete app or the programme. They are also archived per athlete in the coach-only
   `public.coaching_logs` row, append-only (it was `.claude/coaching-log/<id>.md` until 2026-09-07,
   in a public repo; that folder is gitignored now and never comes back).
@@ -1404,7 +1410,7 @@ same ID. Read a rule's story and its history before changing it.
   cycle's message, `weekNotes` and a gate line in its focuses (PRC-12), and the next cycle's
   teaser.
 - `PRC-18` **Every cycle's design rationale is archived.** /program-assemble appends the design read +
-  locked decisions + ledger changes + the two volume tables to the coach-only
+  locked decisions + ledger changes + the per-muscle volume table (VOL-10) to the coach-only
   `public.coaching_logs` row as its last step: append-only, never the programme. Prior cycles are
   never overwritten, so months later you can see how a cycle was thought through and why
   something changed.

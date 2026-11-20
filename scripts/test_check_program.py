@@ -533,29 +533,32 @@ expect('nine notes cards warn (soft cap 8)', has(run(d), 'WARN', 'over the soft 
 d['notes']['cards'] = d['notes']['cards'][:8]
 expect('eight notes cards pass', not has(run(d), 'WARN', 'soft cap'))
 # ── 7. the volume count from the Spine's credits (stage39, 2026-09-26) ──────
-TAB = os.path.join(TMP, 'volume.md')
+TAB = os.path.join(TMP, 'volume.md'); EXT = os.path.join(TMP, 'exercises.md')
 def tables(data, *flags, spec=None, ctx=CTX):
-    if os.path.exists(TAB): os.remove(TAB)
-    out = run(data, '--tables', TAB, *flags, spec=spec, ctx=ctx)
-    return out, (open(TAB, encoding='utf-8').read() if os.path.exists(TAB) else '')
-out, tab = tables(BASE)
+    for f in (TAB, EXT):
+        if os.path.exists(f): os.remove(f)
+    out = run(data, '--tables', TAB, '--exercises', EXT, *flags, spec=spec, ctx=ctx)
+    read = lambda f: open(f, encoding='utf-8').read() if os.path.exists(f) else ''
+    return out, read(TAB), read(EXT)
+out, tab, exs = tables(BASE)
 expect('volume: no traceback', 'Traceback' not in out, out)
-expect('volume: the squat row, fractions shown', '| D1 | Barbell Back Squat | 4 | Quads 4 · Glutes 2 (×0.5) |' in tab, tab)
-expect('volume: the pulldown row', '| D2 | Lat Pulldown | 4 | Back 4 · Biceps 2 (×0.5) |' in tab, tab)
-expect('volume: a ride in the warm-up counts toward nothing', 'Stationary Bike' not in tab, tab)
+expect('volume: the squat row, fractions shown', '| D1 | Barbell Back Squat | 4 | Quads 4 · Glutes 2 (×0.5) |' in exs, exs)
+expect('volume: the pulldown row', '| D2 | Lat Pulldown | 4 | Back 4 · Biceps 2 (×0.5) |' in exs, exs)
+expect('volume: the log tables carry no per-exercise rows (VOL-10, 2026-11-20)', 'Barbell Back Squat' not in tab and '| Exercise |' not in tab and tab.startswith('| Muscle |'), tab)
+expect('volume: a ride in the warm-up counts toward nothing', 'Stationary Bike' not in exs, exs)
 expect('volume: the muscle total and its verdict', '| Quads | 4 | 10–20 | under 10 |' in tab, tab)
 expect('volume: a major muscle with nothing on it is listed', '| Chest | 0 | 10–20 | under 10 |' in tab, tab)
 expect('volume: day load = working sets x cost', '| D1 | 7 | 7.5 |' in tab and '| D2 | 4 | 4 |' in tab, tab)
 d = copy.deepcopy(BASE)
 d['workouts']['days'][0]['blocks'][0]['exercises'] += [ex("Dead Bug", "dead-bug", sets=2, reps=8, side=True),
                                                        ex("Glute Bridge", "glute-bridge", sets=2, reps=10)]
-out, tab = tables(d)
-expect('volume: core in the warm-up counts', '| D1 prep | Dead Bug | 2 | Core 2 |' in tab, tab)
-expect('volume: anything else in the warm-up does not', 'Glute Bridge' not in tab and '| D1 | 7 | 7.5 |' in tab, tab)
+out, tab, exs = tables(d)
+expect('volume: core in the warm-up counts', '| D1 prep | Dead Bug | 2 | Core 2 |' in exs, exs)
+expect('volume: anything else in the warm-up does not', 'Glute Bridge' not in exs and '| D1 | 7 | 7.5 |' in tab, exs + tab)
 d = copy.deepcopy(BASE); d['workouts']['days'][1]['blocks'].append({"title": "Conditioning", "exercises": [
     {"type": "circuit", "name": "Old Engine", "rounds": "×3 Rounds", "items": [{"name": "Kettlebell Swing", "exId": "kettlebell-swing", "detail": "×12"}]}]})
-out, tab = tables(d)
-expect('volume: a legacy "×3 Rounds" circuit counts three rounds', '| D2 | Kettlebell Swing | 3 | Glutes 3 · Hamstrings 1.5 (×0.5) |' in tab, tab)
+out, tab, exs = tables(d)
+expect('volume: a legacy "×3 Rounds" circuit counts three rounds', '| D2 | Kettlebell Swing | 3 | Glutes 3 · Hamstrings 1.5 (×0.5) |' in exs, exs)
 nocred = [{"spine": SB.replace('|back:1,biceps:0.5|moderate', '||'), "prev": None, "ledger": None}]
 out = run(BASE, ctx=nocred)
 expect('volume: an entry with no credits fails', has(out, 'FAIL', '[VOL-10] no muscle credits on the Spine entry lat-pulldown'), out)
@@ -677,7 +680,7 @@ out = run(BASE, ctx=[bad_copy])
 expect('checksum: a mistyped copy stops the run', 'STOP' in out and "the saved 'spine' is not what the server sent" in out, out)
 PREV_T = {"cci": 0, "days": [{"id": 1, "blocks": [{"t": "Primary", "r": 120, "x": [{"n": "Barbell Back Squat", "type": "standard", "rx": {"sets": 4, "reps": 6, "rpe": 7}}]}]},
                              {"id": 2, "blocks": [{"t": "Primary", "r": 90, "x": [{"n": "Lat Pulldown", "type": "standard", "rx": {"sets": 4, "reps": 8, "rpe": 8}}]}]}]}
-out, tab = tables(BASE, ctx=[{"spine": SB, "prev": PREV_T, "ledger": None, "minutes": {"1": 15, "2": 12}, "prev_n": 2}])
+out, tab, exs = tables(BASE, ctx=[{"spine": SB, "prev": PREV_T, "ledger": None, "minutes": {"1": 15, "2": 12}, "prev_n": 2}])
 expect('minutes: last cycle modelled vs logged gives a ratio', has(out, 'INFO', 'modelled → logged minutes') and 'real ≈ ×' in out, out)
 expect('minutes: this cycle gets an expected real length', has(out, 'INFO', "real at last cycle's ×") or has(out, 'WARN', "real at last cycle's ×"), out)
 expect('minutes: the day table carries them', '| Minutes (model) |' in tab and 'real)' in tab, tab)
