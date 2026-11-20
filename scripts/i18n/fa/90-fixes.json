@@ -3,10 +3,15 @@
   "exact": {
     "The app and your next cycle come in the language you choose.": "اپ و دورهٔ بعدیت به زبانی میاد که انتخاب می‌کنی.",
     "Saved. Your next cycle will be in Farsi.": "ذخیره شد. دورهٔ بعدیت فارسی می‌شه.",
-    "Saved. Your next cycle will be in English.": "ذخیره شد. دورهٔ بعدیت انگلیسی می‌شه."
+    "Saved. Your next cycle will be in English.": "ذخیره شد. دورهٔ بعدیت انگلیسی می‌شه.",
+    "One": "اول", "Two": "دوم", "Three": "سوم", "Four": "چهارم", "Five": "پنجم", "Six": "ششم"
   },
   "patterns": [
     ["Effort (\\d+(?:\\.\\d+)?) → (\\d+(?:\\.\\d+)?) today", "شدت $1 ← $2 امروز"],
-    ["(.+) · Effort (\\d+(?:\\.\\d+)?) → (\\d+(?:\\.\\d+)?) today", "{t1} · شدت $2 ← $3 امروز"]
+    ["(.+) · Effort (\\d+(?:\\.\\d+)?) → (\\d+(?:\\.\\d+)?) today", "{t1} · شدت $2 ← $3 امروز"],
+    ["Weeks (\\d+)[–-](\\d+)", "هفته‌های {n1} تا {n2}"],
+    ["(\\d+)×(\\d+)/side", "$1×$2 هر طرف"],
+    ["(.+) I, II and III", "{t1} I، II و III"],
+    ["Month (One|Two|Three|Four|Five|Six) · (.+)", "ماه {t1} · $2"]
   ]
 }

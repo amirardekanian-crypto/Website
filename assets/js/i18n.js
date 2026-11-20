@@ -166,8 +166,9 @@
   function faNum(s) { return String(s).replace(/\d/g, function (d) { return PD[d]; }).replace(/(\d|[۰-۹])\.(?=[۰-۹])/g, '$1٫'); }
   var MON = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
   var WD = { sun: 'یکشنبه', mon: 'دوشنبه', tue: 'سه‌شنبه', wed: 'چهارشنبه', thu: 'پنجشنبه', fri: 'جمعه', sat: 'شنبه' };
-  var fmtDM, fmtDMY;
+  var fmtDM, fmtDMY, fmtMY;
   try {
+    fmtMY = new Intl.DateTimeFormat('fa-IR-u-ca-persian', { month: 'long', year: 'numeric' });
     fmtDM = new Intl.DateTimeFormat('fa-IR-u-ca-persian', { day: 'numeric', month: 'long' });
     fmtDMY = new Intl.DateTimeFormat('fa-IR-u-ca-persian', { day: 'numeric', month: 'long', year: 'numeric' });
   } catch (e) {}
@@ -193,6 +194,13 @@
     [new RegExp('^(\\d{1,2}) ' + M + '(?:,? (\\d{4}))?$', 'i'), function (m) { return shamsi(m[1], monOf(m[2]), m[3]); }],
     [new RegExp('^' + M + ' (\\d{1,2})(?:,? (\\d{4}))?$', 'i'), function (m) { return shamsi(m[2], monOf(m[1]), m[3]); }],
     [new RegExp('^' + W + '$', 'i'), function (m) { return WD[m[1].slice(0, 3).toLowerCase()]; }],
+    // "October 2026" (an article's date): the Shamsi month and year it mostly falls in (the 15th).
+    [new RegExp('^' + M + ' (\\d{4})$', 'i'), function (m) {
+      if (!fmtMY || monOf(m[1]) < 0) return null;
+      var parts = fmtMY.formatToParts(new Date(+m[2], monOf(m[1]), 15)), mo = '', yr = '';
+      parts.forEach(function (p) { if (p.type === 'month') mo = p.value; if (p.type === 'year') yr = p.value; });
+      return mo && yr ? mo + ' ' + yr : null;   // "مهر ۱۴۰۵"
+    }],
   ];
   function dateOf(s) {
     for (var i = 0; i < DATE_PATTERNS.length; i++) {

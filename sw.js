@@ -562,7 +562,9 @@
 // available in farsi and everything should be written in both languages"). A Library item's Farsi copy (data.fa) on a Farsi phone; the
 // Career Mode names, Library shelves, pills and block titles in Farsi; the rest games' words, canvas included, through the translator.
 // v252: program.html changed (2026-11-20, Amir: "fix heart overlap how you think is best"): the Love it reaction is a face with heart eyes; the heart is the Like alone.
-const CACHE = 'aap-v252';
+// v253: i18n.js (?v=3) and i18n-fa.js (?v=7) changed (2026-11-20): an article's date ("October 2026") in Shamsi, and the last English
+// patterns found walking every screen in Farsi (Weeks 1–5, 3×15/side, Month One).
+const CACHE = 'aap-v253';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -602,8 +604,8 @@ const SHELL = [
   '/assets/js/between-sets.js',
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
-  '/assets/js/i18n.js?v=2',
-  '/assets/js/i18n-fa.js?v=6',
+  '/assets/js/i18n.js?v=3',
+  '/assets/js/i18n-fa.js?v=7',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).
