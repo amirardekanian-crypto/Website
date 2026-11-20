@@ -1,9 +1,9 @@
 {
   "area": "fixes found while testing the whole app in Farsi (read last, so they win)",
   "exact": {
-    "The app and your next cycle come in the language you choose.": "اپ و دورهٔ بعدیت به زبانی میاد که انتخاب می‌کنی.",
-    "Saved. Your next cycle will be in Farsi.": "ذخیره شد. دورهٔ بعدیت فارسی می‌شه.",
-    "Saved. Your next cycle will be in English.": "ذخیره شد. دورهٔ بعدیت انگلیسی می‌شه.",
+    "The app and your coach's notes show in the language you choose. Every cycle is written in both.": "اپ و نکته‌های مربی به زبانی که انتخاب می‌کنی نشون داده می‌شن. هر دوره به هر دو زبان نوشته می‌شه.",
+    "Saved. The app is in Farsi now.": "ذخیره شد. اپ الان فارسیه.",
+    "Saved. The app is in English now.": "ذخیره شد. اپ الان انگلیسیه.",
     "One": "اول", "Two": "دوم", "Three": "سوم", "Four": "چهارم", "Five": "پنجم", "Six": "ششم"
   },
   "patterns": [

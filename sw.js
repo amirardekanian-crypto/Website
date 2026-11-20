@@ -566,7 +566,9 @@
 // patterns found walking every screen in Farsi (Weeks 1–5, 3×15/side, Month One).
 // v254: program.html changed (2026-11-20, Amir: "people with current cycle should have both languages"). A programme text can hold its
 // Farsi beside its English (<key>_fa); a Farsi phone shows the Farsi (faTwins()), an English phone the English.
-const CACHE = 'aap-v254';
+// v255: program.html and i18n-fa.js (?v=8) changed (2026-11-20): Settings → Language no longer says the next cycle comes in the chosen
+// language; every cycle is written in both now (COM-1), so the choice is what the app and the coach's notes show.
+const CACHE = 'aap-v255';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -607,7 +609,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=3',
-  '/assets/js/i18n-fa.js?v=7',
+  '/assets/js/i18n-fa.js?v=8',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).

@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=3" data-fa="/assets/js/i18n-fa.js?v=7"></script>
+<script src="/assets/js/i18n.js?v=3" data-fa="/assets/js/i18n-fa.js?v=8"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -9201,7 +9201,7 @@ function openAccount(e) {
           <button type="button" data-lang="en" aria-pressed="${!AAI18N.fa}">English</button>
           <button type="button" data-lang="fa" lang="fa" aria-pressed="${AAI18N.fa}">فارسی</button>
         </span></div>
-      <p class="acct-foot acct-lang-note">The app and your next cycle come in the language you choose.</p>` : ''}
+      <p class="acct-foot acct-lang-note">The app and your coach's notes show in the language you choose. Every cycle is written in both.</p>` : ''}
       ${install}
       ${pushReady() ? door('acct-push', 'bell', 'Reminders') : ''}
       ${crewOn() && !pages && !u13 ? door('acct-crew', 'sees', 'What the crew sees') : ''}
@@ -17953,7 +17953,7 @@ function setMyLangPending() {
   // Said once, after the reload the choice made: where the athlete can read it, in the language they chose.
   let said = null;
   try { said = localStorage.getItem('aa_lang_said'); localStorage.removeItem('aa_lang_said'); } catch (e) {}
-  if (said) aaToast(said === 'fa' ? 'Saved. Your next cycle will be in Farsi.' : 'Saved. Your next cycle will be in English.');
+  if (said) aaToast(said === 'fa' ? 'Saved. The app is in Farsi now.' : 'Saved. The app is in English now.');
 }
 function pushRefreshQuiet() {
   if (!pushReady() || AAPush.state() !== 'on' || typeof AAPush.refresh !== 'function') return;
