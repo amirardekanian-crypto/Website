@@ -116,7 +116,11 @@ def md_files(root=None):
 
 
 def size(p):
-    return os.path.getsize(os.path.join(REPO, p))
+    """bytes as git stores the file: a Windows checkout's CRLF counts as LF (2026-11-20: an untouched
+    rules file of 20,468 bytes read as 20,587 on disk and blocked every doc commit there)"""
+    with open(os.path.join(REPO, p), 'rb') as f:
+        b = f.read()
+    return len(b) - b.count(b'\r\n')
 
 
 def rules_files():
@@ -295,7 +299,7 @@ def update_baseline():
 def selftest():
     """Build a decoy tree and prove each fault is caught. No git, no network."""
     import tempfile, shutil
-    global problems
+    global problems, REPO
     ok = True
     for name, build in FAULTS.items():
         d = tempfile.mkdtemp(prefix='checkdocs-')
@@ -323,6 +327,22 @@ def selftest():
                 ok = False
         finally:
             shutil.rmtree(d, ignore_errors=True)
+    # and no false alarm: a rules file under the ceiling stays under it with Windows line endings
+    d = tempfile.mkdtemp(prefix='checkdocs-')
+    try:
+        os.makedirs(os.path.join(d, 'docs', 'rules'))
+        line = 'x' * 99 + '\n'
+        with open(os.path.join(d, 'docs', 'rules', 'one.md'), 'w', encoding='utf-8', newline='\r\n') as f:
+            f.write(line * (RULES_MAX // len(line)))
+        was, REPO = REPO, d
+        try:
+            crlf_ok = size('docs/rules/one.md') <= RULES_MAX < os.path.getsize(os.path.join(d, 'docs', 'rules', 'one.md'))
+        finally:
+            REPO = was
+        print(f'  {"ok  " if crlf_ok else "FAIL"} CRLF line endings: counted as git stores them')
+        ok = ok and crlf_ok
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
     problems = []
     return 0 if ok else 1
 
