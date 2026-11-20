@@ -564,7 +564,9 @@
 // v252: program.html changed (2026-11-20, Amir: "fix heart overlap how you think is best"): the Love it reaction is a face with heart eyes; the heart is the Like alone.
 // v253: i18n.js (?v=3) and i18n-fa.js (?v=7) changed (2026-11-20): an article's date ("October 2026") in Shamsi, and the last English
 // patterns found walking every screen in Farsi (Weeks 1–5, 3×15/side, Month One).
-const CACHE = 'aap-v253';
+// v254: program.html changed (2026-11-20, Amir: "people with current cycle should have both languages"). A programme text can hold its
+// Farsi beside its English (<key>_fa); a Farsi phone shows the Farsi (faTwins()), an English phone the English.
+const CACHE = 'aap-v254';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

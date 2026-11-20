@@ -8241,6 +8241,20 @@ function readPlanCopy(id) {
   } catch (e) { /* unreadable: as good as none */ }
   return null;
 }
+// A programme's Farsi twins (`<key>_fa` beside `<key>`, a string or a list of strings) take their key's place: boot() calls it
+// on a Farsi phone only. An empty twin leaves the English. Names, rx and numbers never have a twin.
+function faTwins(d) {
+  if (Array.isArray(d)) { d.forEach(faTwins); return d; }
+  if (!d || typeof d !== 'object') return d;
+  Object.keys(d).forEach(k => {
+    if (/_fa$/.test(k)) return;
+    const t = d[k + '_fa'];
+    const ok = typeof t === 'string' ? t.trim() !== '' : Array.isArray(t) && t.some(x => typeof x === 'string' && x.trim());
+    if (ok) d[k] = t;
+    else if (d[k] && typeof d[k] === 'object') faTwins(d[k]);
+  });
+  return d;
+}
 function savePlanCopy(id, data) {
   if (!id || window.IS_DEMO || window.IS_PREVIEW || !data || typeof data !== 'object') return;
   // Raw write: a cache, never an edit (no lastEditAt stamp, no push).
@@ -8716,6 +8730,13 @@ setTimeout(() => bootStuck('nothing answered in ' + Math.round(BOOT_CEILING_MS /
       }
     }
   }
+
+  // Amir's words in both languages (2026-11-20, Amir: "people with current cycle should have both languages"): a text the
+  // programme carries twice holds its English in `<key>` and its Farsi in `<key>_fa` (a note, a Because, a week note, the
+  // cycle message, the teaser, the day's last words, the Coach tab's cards). On a Farsi phone each `_fa` takes its key's place
+  // here, once, before anything is drawn, so every screen reads it with no change of its own; an English phone never looks.
+  // After the plan copy and PLAN_OFFLINE.raw are taken above, so the phone's copy and the "plan updated" check stay the server's.
+  if (DATA && window.AAI18N && AAI18N.fa) faTwins(DATA);
 
   // Two real causes, each with its own words (REL-01). It used to blame a link for both.
   if (!DATA) {
