@@ -1,0 +1,597 @@
+{
+  "area": "lines 19000-21500: Library sessions and Playbook panes, First Serve, article and workout reader, Done button, finish card, session timer, readiness check-in, today's targets, report send status",
+  "exact": {
+    "Couldn't load sessions. Check your connection and try again.": "جلسه‌ها بارگذاری نشدن. اینترنتت رو چک کن و دوباره امتحان کن.",
+    "No sessions yet. Check back soon.": "هنوز جلسه‌ای نیست. به‌زودی سر بزن.",
+    "Show fewer ‹": "کمتر نشون بده ‹",
+    "Sore today": "امروز بدنت کوفته‌ست",
+    "keep moving, tonight or tomorrow": "تکون بخور، امشب یا فردا",
+    "Week done ✓ · something extra": "هفته تموم شد ✓ · یه چیز اضافه",
+    "a daily whole-body flow": "یه حرکت روزانهٔ کل بدن",
+    "The crew": "تیم",
+    "The crew is open": "تیم بازه",
+    "See what the crew has been doing": "ببین تیم چیکار کرده",
+    "Train together, or keep it to yourself": "با هم تمرین کنید، یا فقط برای خودت نگهش دار",
+    "Finish your first session": "اولین جلسه‌ت رو تموم کن",
+    "Add the app to your Home Screen": "اپ رو به صفحهٔ اصلی گوشی اضافه کن",
+    "Turn on notifications": "اعلان‌ها رو روشن کن",
+    "Turn on notifications (after step 2)": "اعلان‌ها رو روشن کن (بعد از قدم ۲)",
+    "Join the crew": "به تیم بپیوند",
+    "Add your photo": "عکس خودت رو بذار",
+    "Next: finish your first session": "بعدی: اولین جلسه‌ت رو تموم کن",
+    "Next: add the app to your Home Screen": "بعدی: اپ رو به صفحهٔ اصلی گوشی اضافه کن",
+    "Next: turn on notifications": "بعدی: اعلان‌ها رو روشن کن",
+    "Next: join the crew": "بعدی: به تیم بپیوند",
+    "Next: add your photo": "بعدی: عکس خودت رو بذار",
+    "First serve": "First Serve",
+    "Your first week": "هفتهٔ اول تو",
+    "Your phone said no. You can change that in its settings.": "گوشیت اجازه نداد. می‌تونی از تنظیمات خودش عوضش کنی.",
+    "Home shows you one at a time. It goes when you have done them all, or after your first two weeks.": "خانه هر بار یکی رو نشونت می‌ده. وقتی همه رو انجام دادی یا بعد از دو هفتهٔ اول، دیگه نمی‌آد.",
+    "Reminders for your training and your habits, and the crew when something happens.": "یادآور برای تمرین و عادت‌هات، و برای وقتی که توی تیم اتفاقی می‌افته.",
+    "Couldn't load the Playbook. Check your connection and try again.": "راهنمای بازی بارگذاری نشد. اینترنتت رو چک کن و دوباره امتحان کن.",
+    "Your coach is adding the Playbook. Check back soon.": "مربیت داره راهنمای بازی رو آماده می‌کنه. به‌زودی سر بزن.",
+    "Articles from me": "مقاله‌هایی از من",
+    "Loading…": "دارم بارگذاری می‌کنم…",
+    "Couldn't load this article. Try again.": "این مقاله بارگذاری نشد. دوباره امتحان کن.",
+    "Train": "تمرین",
+    "Rule": "قانون",
+    "Workout": "تمرین",
+    "Why this session": "چرا این جلسه",
+    "Couldn't load workout": "تمرین بارگذاری نشد",
+    "Please check your connection and try again.": "اینترنتت رو چک کن و دوباره امتحان کن.",
+    "This workout has no exercises yet.": "این تمرین هنوز حرکتی نداره.",
+    "Mobility": "تحرک",
+    "Breathe": "تنفس",
+    "Done today ✓": "امروز تمام شد ✓",
+    "Mark as done": "تمام شد",
+    "Done. I'll see it.": "تمام. من می‌بینمش.",
+    "Tap when you finish. Your coach can see you did it.": "وقتی تموم کردی بزن. مربیت می‌بینه که انجامش دادی.",
+    "Could not save that. Check your connection and tap again.": "ذخیره نشد. اینترنتت رو چک کن و دوباره بزن.",
+    "Saving…": "دارم ذخیره می‌کنم…",
+    "In progress": "در حال انجام",
+    "Still to log": "هنوز ثبت نشده",
+    "Not ticked": "تیک نخورده",
+    "No effort on it": "شدت ثبت نشده",
+    "Out of time": "وقت نداشتم",
+    "Pain": "درد",
+    "Too tired": "خیلی خسته بودم",
+    "No kit": "وسیله نداشتم",
+    "What stopped you?": "چی جلوتو گرفت؟",
+    "Tell me about it": "برام بگو",
+    "On WhatsApp, with your note and the day.": "تو واتس‌اپ، با یادداشتت و اسم روز.",
+    "Done · send to coach ✓": "تمام · برای مربی بفرست ✓",
+    "Stop here": "همین‌جا تموم کن",
+    "Tap again to stop here": "برای تموم کردن دوباره بزن",
+    "done": "انجام شد",
+    "Session duration": "مدت جلسه",
+    "Pause": "مکث",
+    "Paused": "مکث شده",
+    "Ready when you are": "هر وقت آماده بودی",
+    "Ask Amir about this session": "دربارهٔ این جلسه از امیر بپرس",
+    "How well did you sleep last night?": "دیشب چقدر خوب خوابیدی؟",
+    "How are your energy levels right now?": "الان انرژیت چطوره؟",
+    "How sore are your muscles today?": "امروز عضلاتت چقدر کوفته‌ست؟",
+    "How's your stress / mood today?": "امروز استرس و حالت چطوره؟",
+    "Overall, how ready do you feel?": "در کل چقدر آماده‌ای؟",
+    "Very poor": "خیلی بد",
+    "Poor": "ضعیف",
+    "Good": "خوب",
+    "Excellent": "عالی",
+    "Exhausted": "داغون",
+    "Tired": "خسته",
+    "Very fresh": "خیلی سرحال",
+    "Very sore": "خیلی کوفته",
+    "Sore": "کوفته",
+    "Mild": "کم",
+    "Slight": "خیلی کم",
+    "None": "هیچ",
+    "Very stressed": "خیلی پراسترس",
+    "Stressed": "پراسترس",
+    "Neutral": "معمولی",
+    "Great": "عالی",
+    "Not ready": "آماده نیستم",
+    "Bit off": "یه‌کم بد",
+    "Fully ready": "کاملاً آماده",
+    "Begin session ▶": "شروع جلسه ▶",
+    "Short day": "روز کوتاه",
+    "Lower day": "روز سبک",
+    "Training as written": "طبق برنامه تمرین می‌کنی",
+    "Your check-in suggested a short day. Your call, and I'll see it with the session.": "چک‌این امروزت یه روز کوتاه پیشنهاد داد. انتخاب با خودته، و من همراه جلسه می‌بینمش.",
+    "Your check-in suggested a lower day. Your call, and I'll see it with the session.": "چک‌این امروزت یه روز سبک پیشنهاد داد. انتخاب با خودته، و من همراه جلسه می‌بینمش.",
+    "Your check-in said you were sore today. Your call, and I'll see it with the session.": "چک‌این امروزت می‌گه بدنت کوفته‌ست. انتخاب با خودته، و من همراه جلسه می‌بینمش.",
+    "Use today's targets": "از هدف‌های امروز استفاده کن",
+    "Train as written": "طبق برنامه تمرین کن",
+    "Skip today · sore": "امروز رد کن · کوفتگی",
+    "Skip today": "امروز رد کن",
+    "Every other round": "یه راند در میون",
+    "Optional today": "امروز اختیاری",
+    "Rate the session first: 1 to 10.": "اول به جلسه نمره بده: ۱ تا ۱۰.",
+    "Your phone is full. Free some space, then tap Done again.": "حافظهٔ گوشیت پره. یه‌کم جا باز کن، بعد دوباره تمام رو بزن.",
+    "That didn't save. Tap Done again.": "ذخیره نشد. دوباره تمام رو بزن.",
+    "That ticks the first of today's five, on the card at the bottom of": "این اولین عادت از پنج‌تای امروزته، روی کارتِ پایین صفحهٔ",
+    ". Sleep, steps, water and protein are the other four.": ". خواب، قدم، آب و پروتئین چهارتای دیگه‌ن.",
+    "Not rated · No note": "نمره داده نشده · بدون یادداشت",
+    "Demo only: in the real app this goes straight to your coach.": "فقط نمایشیه: توی اپ واقعی این مستقیم می‌ره برای مربیت.",
+    "Apply to get yours →": "برای گرفتن اپ خودت درخواست بده ←",
+    "Coach preview: nothing is sent or saved.": "پیش‌نمایش مربی: هیچی فرستاده یا ذخیره نمی‌شه.",
+    "Sending to your coach…": "دارم برای مربیت می‌فرستم…",
+    "Saved on your phone. It didn't reach your coach yet.": "روی گوشیت ذخیره شد. هنوز به مربیت نرسیده.",
+    "Try again": "دوباره امتحان کن",
+    "Saved on your phone. It goes to your coach when you have signal.": "روی گوشیت ذخیره شد. وقتی اینترنت داشتی برای مربیت می‌ره.",
+    "✓ With your coach": "✓ رسید به مربی",
+    "Not rated · Note: \"": "نمره داده نشده · یادداشت: \""
+  },
+  "patterns": [
+    [
+      "(\\d+) · Train",
+      "{n1} · تمرین"
+    ],
+    [
+      "All (\\d+) ›",
+      "همهٔ {n1} ›"
+    ],
+    [
+      "(.+): all (\\d+) sessions",
+      "$1: هر {n2} جلسه"
+    ],
+    [
+      "Your coach is adding (.+) sessions\\. Check back soon\\.",
+      "مربیت داره جلسه‌های $1 رو آماده می‌کنه. به‌زودی سر بزن."
+    ],
+    [
+      ": keep moving, tonight or tomorrow\\.",
+      ": تکون بخور، امشب یا فردا."
+    ],
+    [
+      ": keep moving, tonight or tomorrow\\. (\\d+) min, no kit, ticks (.+)\\.",
+      ": تکون بخور، امشب یا فردا. {n1} دقیقه، بدون وسیله، عادت «{t2}» رو تیک می‌زنه."
+    ],
+    [
+      ": keep moving, tonight or tomorrow\\. (\\d+) min, no kit\\.",
+      ": تکون بخور، امشب یا فردا. {n1} دقیقه، بدون وسیله."
+    ],
+    [
+      ": keep moving, tonight or tomorrow\\. (\\d+) min, (.+)\\.",
+      ": تکون بخور، امشب یا فردا. {n1} دقیقه، $2."
+    ],
+    [
+      ": a daily whole-body flow\\.",
+      ": یه حرکت روزانهٔ کل بدن."
+    ],
+    [
+      ": a daily whole-body flow\\. (\\d+) min, no kit, ticks (.+)\\.",
+      ": یه حرکت روزانهٔ کل بدن. {n1} دقیقه، بدون وسیله، عادت «{t2}» رو تیک می‌زنه."
+    ],
+    [
+      ": a daily whole-body flow\\. (\\d+) min, no kit\\.",
+      ": یه حرکت روزانهٔ کل بدن. {n1} دقیقه، بدون وسیله."
+    ],
+    [
+      ": a daily whole-body flow\\. (\\d+) min, (.+)\\.",
+      ": یه حرکت روزانهٔ کل بدن. {n1} دقیقه، $2."
+    ],
+    [
+      "(\\d+) min, no kit, ticks (.+)",
+      "{n1} دقیقه، بدون وسیله، عادت «{t2}» رو تیک می‌زنه"
+    ],
+    [
+      ": See what the crew has been doing\\. (\\d+) (?:is|are) in\\.",
+      ": ببین تیم چیکار کرده. {n1} نفر عضوند."
+    ],
+    [
+      ": Train together, or keep it to yourself\\. (\\d+) (?:is|are) in\\.",
+      ": با هم تمرین کنید، یا فقط برای خودت نگهش دار. {n1} نفر عضوند."
+    ],
+    [
+      "First Serve, (\\d+) of (\\d+) done\\. Tap to see every step\\.",
+      "First Serve، {n1} از {n2} قدم انجام شده. بزن تا همه قدم‌ها رو ببینی."
+    ],
+    [
+      "All (\\d+) done",
+      "هر {n1} قدم انجام شد"
+    ],
+    [
+      "(\\d+) of (\\d+) done",
+      "{n1} از {n2} قدم انجام شد"
+    ],
+    [
+      "Latest · (.+)",
+      "تازه‌ترین · $1"
+    ],
+    [
+      "(\\d+) min read",
+      "{n1} دقیقه مطالعه"
+    ],
+    [
+      "(\\d+) reads?",
+      "{n1} مقاله"
+    ],
+    [
+      "(\\d+) min read · (.+)",
+      "{n1} دقیقه مطالعه · {d2}"
+    ],
+    [
+      "(\\d+) things?",
+      "{n1} مورد"
+    ],
+    [
+      "Rest (\\d+) min",
+      "استراحت {n1} دقیقه"
+    ],
+    [
+      "Rest (\\d+) s",
+      "استراحت {n1} ثانیه"
+    ],
+    [
+      "Rest (\\d+) min (\\d+) s",
+      "استراحت {n1} دقیقه و {n2} ثانیه"
+    ],
+    [
+      "✓ (.+)",
+      "✓ {t1}"
+    ],
+    [
+      "Tap when you finish\\. It ticks your (.+) habit\\.",
+      "وقتی تموم کردی بزن. عادت «{t1}» تیک می‌خوره."
+    ],
+    [
+      "Track (.+) from today",
+      "«{t1}» رو از امروز دنبال کن"
+    ],
+    [
+      "(.+) is on, from today\\.",
+      "«{t1}» از امروز روشنه."
+    ],
+    [
+      "All done with Day (.+)",
+      "هر کارِ روز {n1} تموم شد"
+    ],
+    [
+      "Stopping Day (.+) here",
+      "روز {n1} رو همین‌جا تموم می‌کنی"
+    ],
+    [
+      "(\\d+) of (\\d+) sets",
+      "{n1} از {n2} ست"
+    ],
+    [
+      "(\\d+) of (\\d+) sets, warm-up left",
+      "{n1} از {n2} ست، گرم کردن مونده"
+    ],
+    [
+      "(.+) · done",
+      "$1 · انجام شد"
+    ],
+    [
+      "(.+) · Effort ([\\d ]+)",
+      "$1 · شدت $2"
+    ],
+    [
+      "Effort ([\\d ]+)",
+      "شدت $1"
+    ],
+    [
+      "Ask Amir about (.+)",
+      "دربارهٔ $1 از امیر بپرس"
+    ],
+    [
+      "(\\d+) of (\\d+) answered",
+      "{n1} از {n2} جواب داده شد"
+    ],
+    [
+      "(Short day|Lower day|Sore today) · today's targets",
+      "{t1} · هدف‌های امروز"
+    ],
+    [
+      "(\\d+) of (\\d+) sets today",
+      "{n1} از {n2} ست امروز"
+    ],
+    [
+      "Effort (\\d+(?:\\.\\d+)?) → (\\S+) today",
+      "شدت {n1} ← {n2} امروز"
+    ],
+    [
+      "(\\d+) of 10 · No note",
+      "{n1} از ۱۰ · بدون یادداشت"
+    ],
+    [
+      "(\\d+) of 10 · Note:",
+      "{n1} از ۱۰ · یادداشت:"
+    ],
+    [
+      "✓ With your coach · (.+)",
+      "✓ رسید به مربی · $1"
+    ],
+    [
+      "(d+) of 10 · Note: \"",
+      "{n1} از ۱۰ · یادداشت: \""
+    ],
+    [
+      "Set (d+) not ticked",
+      "ست {n1} تیک نخورده"
+    ],
+    [
+      "Sets (d+) and (d+) not ticked",
+      "ست‌های {n1} و {n2} تیک نخورده"
+    ],
+    [
+      "Sets (d+), (d+) and (d+) not ticked",
+      "ست‌های {n1}، {n2} و {n3} تیک نخورده"
+    ],
+    [
+      "Sets (d+), (d+), (d+) and (d+) not ticked",
+      "ست‌های {n1}، {n2}، {n3} و {n4} تیک نخورده"
+    ],
+    [
+      "Sets (d+), (d+), (d+), (d+) and (d+) not ticked",
+      "ست‌های {n1}، {n2}، {n3}، {n4} و {n5} تیک نخورده"
+    ],
+    [
+      "Sets (d+), (d+), (d+), (d+), (d+) and (d+) not ticked",
+      "ست‌های {n1}، {n2}، {n3}، {n4}، {n5} و {n6} تیک نخورده"
+    ],
+    [
+      "Sets (d+), (d+), (d+), (d+), (d+), (d+) and (d+) not ticked",
+      "ست‌های {n1}، {n2}، {n3}، {n4}، {n5}، {n6} و {n7} تیک نخورده"
+    ],
+    [
+      "Sets (d+), (d+), (d+), (d+), (d+), (d+), (d+) and (d+) not ticked",
+      "ست‌های {n1}، {n2}، {n3}، {n4}، {n5}، {n6}، {n7} و {n8} تیک نخورده"
+    ],
+    [
+      "Round (d+) not ticked",
+      "راند {n1} تیک نخورده"
+    ],
+    [
+      "Rounds (d+) and (d+) not ticked",
+      "راندهای {n1} و {n2} تیک نخورده"
+    ],
+    [
+      "Rounds (d+), (d+) and (d+) not ticked",
+      "راندهای {n1}، {n2} و {n3} تیک نخورده"
+    ],
+    [
+      "Rounds (d+), (d+), (d+) and (d+) not ticked",
+      "راندهای {n1}، {n2}، {n3} و {n4} تیک نخورده"
+    ],
+    [
+      "Rounds (d+), (d+), (d+), (d+) and (d+) not ticked",
+      "راندهای {n1}، {n2}، {n3}، {n4} و {n5} تیک نخورده"
+    ],
+    [
+      "Rounds (d+), (d+), (d+), (d+), (d+) and (d+) not ticked",
+      "راندهای {n1}، {n2}، {n3}، {n4}، {n5} و {n6} تیک نخورده"
+    ],
+    [
+      "Rounds (d+), (d+), (d+), (d+), (d+), (d+) and (d+) not ticked",
+      "راندهای {n1}، {n2}، {n3}، {n4}، {n5}، {n6} و {n7} تیک نخورده"
+    ],
+    [
+      "Rounds (d+), (d+), (d+), (d+), (d+), (d+), (d+) and (d+) not ticked",
+      "راندهای {n1}، {n2}، {n3}، {n4}، {n5}، {n6}، {n7} و {n8} تیک نخورده"
+    ],
+    [
+      "No weight on set (d+)",
+      "وزنه برای ست {n1} ثبت نشده"
+    ],
+    [
+      "No weight on sets (d+) and (d+)",
+      "وزنه برای ست‌های {n1} و {n2} ثبت نشده"
+    ],
+    [
+      "No weight on sets (d+), (d+) and (d+)",
+      "وزنه برای ست‌های {n1}، {n2} و {n3} ثبت نشده"
+    ],
+    [
+      "No weight on sets (d+), (d+), (d+) and (d+)",
+      "وزنه برای ست‌های {n1}، {n2}، {n3} و {n4} ثبت نشده"
+    ],
+    [
+      "No weight on sets (d+), (d+), (d+), (d+) and (d+)",
+      "وزنه برای ست‌های {n1}، {n2}، {n3}، {n4} و {n5} ثبت نشده"
+    ],
+    [
+      "No weight on sets (d+), (d+), (d+), (d+), (d+) and (d+)",
+      "وزنه برای ست‌های {n1}، {n2}، {n3}، {n4}، {n5} و {n6} ثبت نشده"
+    ],
+    [
+      "No weight on sets (d+), (d+), (d+), (d+), (d+), (d+) and (d+)",
+      "وزنه برای ست‌های {n1}، {n2}، {n3}، {n4}، {n5}، {n6} و {n7} ثبت نشده"
+    ],
+    [
+      "No weight on sets (d+), (d+), (d+), (d+), (d+), (d+), (d+) and (d+)",
+      "وزنه برای ست‌های {n1}، {n2}، {n3}، {n4}، {n5}، {n6}، {n7} و {n8} ثبت نشده"
+    ],
+    [
+      "No effort on set (d+)",
+      "شدت برای ست {n1} ثبت نشده"
+    ],
+    [
+      "No effort on sets (d+) and (d+)",
+      "شدت برای ست‌های {n1} و {n2} ثبت نشده"
+    ],
+    [
+      "No effort on sets (d+), (d+) and (d+)",
+      "شدت برای ست‌های {n1}، {n2} و {n3} ثبت نشده"
+    ],
+    [
+      "No effort on sets (d+), (d+), (d+) and (d+)",
+      "شدت برای ست‌های {n1}، {n2}، {n3} و {n4} ثبت نشده"
+    ],
+    [
+      "No effort on sets (d+), (d+), (d+), (d+) and (d+)",
+      "شدت برای ست‌های {n1}، {n2}، {n3}، {n4} و {n5} ثبت نشده"
+    ],
+    [
+      "No effort on sets (d+), (d+), (d+), (d+), (d+) and (d+)",
+      "شدت برای ست‌های {n1}، {n2}، {n3}، {n4}، {n5} و {n6} ثبت نشده"
+    ],
+    [
+      "No effort on sets (d+), (d+), (d+), (d+), (d+), (d+) and (d+)",
+      "شدت برای ست‌های {n1}، {n2}، {n3}، {n4}، {n5}، {n6} و {n7} ثبت نشده"
+    ],
+    [
+      "No effort on sets (d+), (d+), (d+), (d+), (d+), (d+), (d+) and (d+)",
+      "شدت برای ست‌های {n1}، {n2}، {n3}، {n4}، {n5}، {n6}، {n7} و {n8} ثبت نشده"
+    ],
+    [
+      "No effort on round (d+)",
+      "شدت برای راند {n1} ثبت نشده"
+    ],
+    [
+      "No effort on rounds (d+) and (d+)",
+      "شدت برای راندهای {n1} و {n2} ثبت نشده"
+    ],
+    [
+      "No effort on rounds (d+), (d+) and (d+)",
+      "شدت برای راندهای {n1}، {n2} و {n3} ثبت نشده"
+    ],
+    [
+      "No effort on rounds (d+), (d+), (d+) and (d+)",
+      "شدت برای راندهای {n1}، {n2}، {n3} و {n4} ثبت نشده"
+    ],
+    [
+      "No effort on rounds (d+), (d+), (d+), (d+) and (d+)",
+      "شدت برای راندهای {n1}، {n2}، {n3}، {n4} و {n5} ثبت نشده"
+    ],
+    [
+      "No effort on rounds (d+), (d+), (d+), (d+), (d+) and (d+)",
+      "شدت برای راندهای {n1}، {n2}، {n3}، {n4}، {n5} و {n6} ثبت نشده"
+    ],
+    [
+      "No effort on rounds (d+), (d+), (d+), (d+), (d+), (d+) and (d+)",
+      "شدت برای راندهای {n1}، {n2}، {n3}، {n4}، {n5}، {n6} و {n7} ثبت نشده"
+    ],
+    [
+      "No effort on rounds (d+), (d+), (d+), (d+), (d+), (d+), (d+) and (d+)",
+      "شدت برای راندهای {n1}، {n2}، {n3}، {n4}، {n5}، {n6}، {n7} و {n8} ثبت نشده"
+    ],
+    [
+      "Effort 1 lower today.",
+      "شدت امروز یه پله پایین‌تره."
+    ],
+    [
+      "Effort 1 lower today. The session is the warm-up, (.+) and (.+). The rest is optional: drop it from the end.",
+      "شدت امروز یه پله پایین‌تره. جلسه امروز می‌شه گرم کردن، $1 و $2. بقیه اختیاریه: از آخر حذفش کن."
+    ],
+    [
+      "Effort 1 lower today. The session is the warm-up, (.+). The rest is optional: drop it from the end.",
+      "شدت امروز یه پله پایین‌تره. جلسه امروز می‌شه گرم کردن و $1. بقیه اختیاریه: از آخر حذفش کن."
+    ],
+    [
+      "Effort 1 lower today. The session is the warm-up and the first block. The rest is optional: drop it from the end.",
+      "شدت امروز یه پله پایین‌تره. جلسه امروز می‌شه گرم کردن و بلوک اول. بقیه اختیاریه: از آخر حذفش کن."
+    ],
+    [
+      "Effort 1 lower today. The session is the warm-up and the block that starts with (.+). The rest is optional: drop it from the end.",
+      "شدت امروز یه پله پایین‌تره. جلسه امروز می‌شه گرم کردن و بلوکی که با $1 شروع می‌شه. بقیه اختیاریه: از آخر حذفش کن."
+    ],
+    [
+      "Effort 1 lower today. Sore: jumps and landings at half the sets. Lifts unchanged.",
+      "شدت امروز یه پله پایین‌تره. کوفتگی: پرش و فرود با نصف ست. حرکت‌های وزنه‌ای بدون تغییر."
+    ],
+    [
+      "Effort 1 lower today. The session is the warm-up, (.+) and (.+). The rest is optional: drop it from the end. Sore: jumps and landings at half the sets. Lifts unchanged.",
+      "شدت امروز یه پله پایین‌تره. جلسه امروز می‌شه گرم کردن، $1 و $2. بقیه اختیاریه: از آخر حذفش کن. کوفتگی: پرش و فرود با نصف ست. حرکت‌های وزنه‌ای بدون تغییر."
+    ],
+    [
+      "Effort 1 lower today. The session is the warm-up, (.+). The rest is optional: drop it from the end. Sore: jumps and landings at half the sets. Lifts unchanged.",
+      "شدت امروز یه پله پایین‌تره. جلسه امروز می‌شه گرم کردن و $1. بقیه اختیاریه: از آخر حذفش کن. کوفتگی: پرش و فرود با نصف ست. حرکت‌های وزنه‌ای بدون تغییر."
+    ],
+    [
+      "Effort 1 lower today. The session is the warm-up and the first block. The rest is optional: drop it from the end. Sore: jumps and landings at half the sets. Lifts unchanged.",
+      "شدت امروز یه پله پایین‌تره. جلسه امروز می‌شه گرم کردن و بلوک اول. بقیه اختیاریه: از آخر حذفش کن. کوفتگی: پرش و فرود با نصف ست. حرکت‌های وزنه‌ای بدون تغییر."
+    ],
+    [
+      "Effort 1 lower today. The session is the warm-up and the block that starts with (.+). The rest is optional: drop it from the end. Sore: jumps and landings at half the sets. Lifts unchanged.",
+      "شدت امروز یه پله پایین‌تره. جلسه امروز می‌شه گرم کردن و بلوکی که با $1 شروع می‌شه. بقیه اختیاریه: از آخر حذفش کن. کوفتگی: پرش و فرود با نصف ست. حرکت‌های وزنه‌ای بدون تغییر."
+    ],
+    [
+      "Effort 1 lower today. Sore: no jumps or landings today. Lifts unchanged.",
+      "شدت امروز یه پله پایین‌تره. کوفتگی: امروز پرش و فرود نداری. حرکت‌های وزنه‌ای بدون تغییر."
+    ],
+    [
+      "Effort 1 lower today. The session is the warm-up, (.+) and (.+). The rest is optional: drop it from the end. Sore: no jumps or landings today. Lifts unchanged.",
+      "شدت امروز یه پله پایین‌تره. جلسه امروز می‌شه گرم کردن، $1 و $2. بقیه اختیاریه: از آخر حذفش کن. کوفتگی: امروز پرش و فرود نداری. حرکت‌های وزنه‌ای بدون تغییر."
+    ],
+    [
+      "Effort 1 lower today. The session is the warm-up, (.+). The rest is optional: drop it from the end. Sore: no jumps or landings today. Lifts unchanged.",
+      "شدت امروز یه پله پایین‌تره. جلسه امروز می‌شه گرم کردن و $1. بقیه اختیاریه: از آخر حذفش کن. کوفتگی: امروز پرش و فرود نداری. حرکت‌های وزنه‌ای بدون تغییر."
+    ],
+    [
+      "Effort 1 lower today. The session is the warm-up and the first block. The rest is optional: drop it from the end. Sore: no jumps or landings today. Lifts unchanged.",
+      "شدت امروز یه پله پایین‌تره. جلسه امروز می‌شه گرم کردن و بلوک اول. بقیه اختیاریه: از آخر حذفش کن. کوفتگی: امروز پرش و فرود نداری. حرکت‌های وزنه‌ای بدون تغییر."
+    ],
+    [
+      "Effort 1 lower today. The session is the warm-up and the block that starts with (.+). The rest is optional: drop it from the end. Sore: no jumps or landings today. Lifts unchanged.",
+      "شدت امروز یه پله پایین‌تره. جلسه امروز می‌شه گرم کردن و بلوکی که با $1 شروع می‌شه. بقیه اختیاریه: از آخر حذفش کن. کوفتگی: امروز پرش و فرود نداری. حرکت‌های وزنه‌ای بدون تغییر."
+    ],
+    [
+      "Sore: jumps and landings at half the sets. Lifts unchanged.",
+      "کوفتگی: پرش و فرود با نصف ست. حرکت‌های وزنه‌ای بدون تغییر."
+    ],
+    [
+      "Sore: no jumps or landings today. Lifts unchanged.",
+      "کوفتگی: امروز پرش و فرود نداری. حرکت‌های وزنه‌ای بدون تغییر."
+    ]
+  ],
+  "split": [
+    {
+      "line": 19206,
+      "text": "<b>The crew is open</b>: ${say}. ${n} is/are in.",
+      "note": "the sentence is split by the bold title; the pieces are given and read fine together"
+    },
+    {
+      "line": 19147,
+      "text": "<b>${title}</b>: ${say}.${tail}, where tail = '10 min, no kit, ticks Mobility'",
+      "note": "the tail is built from a duration, the kit (English, lowercased from the server) and a habit name: only the common 'N min, no kit, ticks X' forms are translated, other kits stay English"
+    },
+    {
+      "line": 20855,
+      "text": "Banner lines: 'Effort 1 lower today. The session is the warm-up, <exercise> and <exercise>. The rest is optional...'",
+      "note": "several sentences join into one text node in many combinations; the 17 combinations are written as patterns, an exercise name inside stays English"
+    },
+    {
+      "line": 21098,
+      "text": "That ticks the first of today's five, on the card at the bottom of <b>Home</b>. Sleep, steps, water and protein are the other four.",
+      "note": "the bold word splits the sentence in three nodes"
+    },
+    {
+      "line": 21311,
+      "text": "Saved on your phone. It didn't reach your coach yet. <button>Try again</button>",
+      "note": "button splits the sentence"
+    },
+    {
+      "line": 21292,
+      "text": "Demo only: ... coach. <a>Apply to get yours →</a>",
+      "note": "link splits the sentence"
+    },
+    {
+      "line": 21161,
+      "text": "7 of 10 · Note: \"<bdi>note</bdi>\"",
+      "note": "the athlete's note sits between two nodes; only the first node is translated"
+    }
+  ],
+  "readback": [
+    {
+      "line": 20923,
+      "text": "det.textContent.replace('Effort ' + ir + '/10', ...)",
+      "note": "a circuit round's detail line is searched for the English 'Effort 8/10'; if the translator has already translated that line the replace finds nothing and a lower day's 'Effort 8 → 7 today' is not shown on circuit rounds in Farsi"
+    },
+    {
+      "line": 20256,
+      "text": "if (el.textContent !== txt) el.textContent = txt;",
+      "note": "paintDoneLines compares the shown (translated) line with the English; in Farsi they always differ so the line is rewritten each paint, harmless but a repaint every time"
+    },
+    {
+      "line": 21157,
+      "text": "if (el.textContent === txt) return;",
+      "note": "paintRateFold: same comparison, repaints every time in Farsi, harmless"
+    },
+    {
+      "line": 20511,
+      "text": "row.outerHTML !== lim",
+      "note": "renderTimer compares the week-limits row's HTML with the English it would draw; in Farsi the row is removed and redrawn on every renderTimer, harmless but flickers"
+    }
+  ]
+}

@@ -35,6 +35,7 @@ The layers, the rules-file list and the house rules for writing them are in [`do
 | [`docs/rules/coach-dashboard.md`](docs/rules/coach-dashboard.md) | the coach dashboard |
 | [`docs/rules/career.md`](docs/rules/career.md) | Career Mode |
 | [`docs/rules/push.md`](docs/rules/push.md) | reminders on a phone |
+| [`docs/rules/farsi-app.md`](docs/rules/farsi-app.md) | the athlete app in Farsi: the language switch, the words, right to left |
 | [`docs/rules/site.md`](docs/rules/site.md) | the public site, the Farsi products, the chatbot |
 | [`docs/rules/seo.md`](docs/rules/seo.md) | article pages, SEO, content parity |
 | [`docs/rules/design.md`](docs/rules/design.md) | design work |

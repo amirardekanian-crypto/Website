@@ -615,4 +615,16 @@ if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(program[.]html|
   fi
 fi
 
+# -- 29. the app's Farsi words are built from their parts (added 2026-11-20) ----------------------------------------------
+# Why: assets/js/i18n-fa.js is GENERATED from scripts/i18n/fa/*.json by scripts/build_i18n_fa.js (the app in Farsi,
+# assets/js/i18n.js). A part changed without a rebuild never reaches a phone; a hand edit of the built file is lost at the
+# next rebuild. Either way nothing errors, so this fails the commit, and a part with a regex that does not compile.
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(assets/js/i18n-fa[.]js|scripts/i18n/fa/.+[.]json|scripts/build_i18n_fa[.]js)$'; then
+  if ! fa_out=$(node scripts/build_i18n_fa.js --check 2>&1); then
+    echo "$fa_out"
+    echo "pre-commit: BLOCKED -- the Farsi words are stale. Run: node scripts/build_i18n_fa.js"
+    failed=1
+  fi
+fi
+
 exit $failed

@@ -547,7 +547,9 @@
 // covers the day next week; a third pays only its log; every session moves Century and Sessions with Amir, as the server counts them since 2026-10-26.
 // v244: program.html changed (2026-11-18, an optional day, stage109): a day with "optional": true says Optional on Home and its cover, is never Next up,
 // and the week is counted, held and closed on the plan days alone, so skipping it is never a miss.
-const CACHE = 'aap-v244';
+// v245: program.html changed and /assets/js/i18n.js and /assets/js/i18n-fa.js join the shell (2026-11-20, Amir: "i want to make a farsi
+// version of my app"). The app in Farsi: Settings → Language, right to left, Shamsi dates, the words from i18n-fa.js; hidden until ?fa=1.
+const CACHE = 'aap-v245';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -585,6 +587,10 @@ const SHELL = [
   '/assets/js/splitstep.js',
   // Between Sets, the third rest game (v166): same loading and the same rule.
   '/assets/js/between-sets.js',
+  // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
+  // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
+  '/assets/js/i18n.js?v=1',
+  '/assets/js/i18n-fa.js?v=1',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).

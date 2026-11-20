@@ -1,0 +1,624 @@
+{
+  "area": "lines 24500-end: Guided mode and rest log, Last time and History sheet, the Spine About sheet, Because, Quality Map, Exercises library, Highlight Reel share sheet and moment, Inbox, weekly crew Toss, Mailbag and Answer Book",
+  "exact": {
+    "That did not load. Check your signal and try again.": "لود نشد. آنتنت رو چک کن و دوباره امتحان کن.",
+    "Air hockey against me · one match": "ایر هاکی با من · یه مچ",
+    "Sound on": "صدا روشن",
+    "Sound off": "صدا خاموش",
+    "Orange means above my target. That's fine. I see it.": "نارنجی یعنی بالاتر از هدف من. اشکالی نداره. من می‌بینمش.",
+    "Got it": "فهمیدم",
+    "No weight saved on that set. Type it in the weight box.": "برای اون ست وزنه‌ای ذخیره نشد. توی کادر وزنه بنویسش.",
+    "No weight": "بدون وزنه",
+    "The session clock isn't running.": "ساعت جلسه روشن نیست.",
+    "Session clock": "ساعت جلسه",
+    "How to log": "چطور ثبت کنی",
+    "Tick each one as you do it, or tap Done when you've done them all.": "هر کدوم رو که انجام دادی تیک بزن، یا وقتی همه رو انجام دادی «تمام» رو بزن.",
+    "Finish session ✓": "پایان جلسه ✓",
+    "Next →": "بعدی ←",
+    "Done ✓": "تمام ✓",
+    "Done · Start Rest ✓": "تمام · شروع استراحت ✓",
+    "‹ Prev": "› قبلی",
+    "About this exercise": "درباره این حرکت",
+    "After the last exercise": "بعد از آخرین حرکت",
+    "1 item": "۱ مورد",
+    "Guided session": "جلسهٔ هدایت‌شده",
+    "Complete": "کامل",
+    "Every set logged.": "همهٔ ست‌ها ثبت شد.",
+    "Everything logged.": "همه‌چی ثبت شد.",
+    "Finish the session to rate it and send it to your coach.": "جلسه رو تموم کن تا نمره‌ش بدی و برای مربیت بره.",
+    "Exit": "خروج",
+    "Plates": "پلیت",
+    "Kg / hand": "کیلو / هر دست",
+    "Lb / hand": "پوند / هر دست",
+    "Same as last": "مثل دفعهٔ قبل",
+    "One rep fewer": "یه تکرار کمتر",
+    "One rep more": "یه تکرار بیشتر",
+    "Next:": "بعدی:",
+    "History ›": "تاریخچه ›",
+    "low-readiness day": "روز آمادگی پایین",
+    "First time": "بار اول",
+    "Today sets your baseline.": "امروز سطح پایهٔ تو مشخص می‌شه.",
+    "1 set": "۱ ست",
+    "1 rep ·": "۱ تکرار ·",
+    "Your history": "تاریخچهٔ تو",
+    "Top stack, plates": "بالاترین پلیت",
+    "Open in Personal Records": "باز کردن در رکوردهای شخصی",
+    "Squat": "اسکوات",
+    "Hinge": "هینج (خم شدن از لگن)",
+    "Single leg": "تک‌پا",
+    "Horizontal push": "فشار افقی",
+    "Vertical push": "فشار عمودی",
+    "Horizontal pull": "کشش افقی",
+    "Vertical pull": "کشش عمودی",
+    "Carry": "حمل",
+    "Anti-extension": "ضد کشیدگی کمر",
+    "Anti-rotation": "ضد چرخش",
+    "Side trunk": "تنهٔ جانبی",
+    "Rotation": "چرخش",
+    "Jump & land": "پرش و فرود",
+    "Throw": "پرتاب",
+    "Sprint & change of direction": "اسپرینت و تغییر جهت",
+    "Mobility": "تحرک",
+    "One muscle at a time": "یک عضله در هر زمان",
+    "Conditioning": "آمادگی جسمانی",
+    "Ankle & foot": "مچ و کف پا",
+    "Calf & Achilles": "ساق و آشیل",
+    "Knee": "زانو",
+    "Hip & groin": "لگن و کشالهٔ ران",
+    "Hamstring": "همسترینگ",
+    "Low back": "کمر",
+    "Trunk": "تنه",
+    "Shoulder": "شانه",
+    "Elbow, forearm & wrist": "آرنج، ساعد و مچ دست",
+    "Neck": "گردن",
+    "FRONT": "جلو",
+    "BACK": "پشت",
+    "Muscle map, front and back": "نقشهٔ عضله‌ها، جلو و پشت",
+    "Mostly your": "بیشتر روی",
+    "and": "و",
+    "Your": "همچنین",
+    "work hard too.": "هم سخت کار می‌کنن.",
+    "works hard too.": "هم سخت کار می‌کنه.",
+    "No one muscle does the main work here. Your": "هیچ عضله‌ای تنها کار اصلی رو انجام نمی‌ده. اینجا",
+    "help.": "کمک می‌کنن.",
+    "helps.": "کمک می‌کنه.",
+    "It loads your": "فشار می‌ره روی",
+    "quads": "چهارسر ران",
+    "hamstrings": "همسترینگ",
+    "glutes": "باسن",
+    "adductors": "عضله‌های داخل ران",
+    "calves": "ساق پا",
+    "shins": "جلوی ساق",
+    "outer shins": "کنار ساق",
+    "back": "کمر و پشت",
+    "chest": "سینه",
+    "shoulders": "شانه‌ها",
+    "biceps": "جلو بازو",
+    "triceps": "پشت بازو",
+    "forearms": "ساعدها",
+    "core": "مرکز بدن",
+    "neck": "گردن",
+    "Quads": "چهارسر ران",
+    "Hamstrings": "همسترینگ",
+    "Glutes": "باسن",
+    "Adductors": "عضله‌های داخل ران",
+    "Calves": "ساق پا",
+    "Shins": "جلوی ساق",
+    "Outer shins": "کنار ساق",
+    "Back": "کمر و پشت",
+    "Chest": "سینه",
+    "Shoulders": "شانه‌ها",
+    "Biceps": "جلو بازو",
+    "Triceps": "پشت بازو",
+    "Forearms": "ساعدها",
+    "Core": "مرکز بدن",
+    "ankle & foot": "مچ و کف پا",
+    "calf & Achilles": "ساق و آشیل",
+    "calf & achilles": "ساق و آشیل",
+    "knee": "زانو",
+    "hip & groin": "لگن و کشالهٔ ران",
+    "hamstring": "همسترینگ",
+    "low back": "کمر",
+    "trunk": "تنه",
+    "shoulder": "شانه",
+    "elbow, forearm & wrist": "آرنج، ساعد و مچ دست",
+    "Your goal": "هدف تو",
+    "Your body": "بدن تو",
+    "Your test": "تست تو",
+    "Last cycle": "دورهٔ قبل",
+    "You said": "تو گفتی",
+    "Why am I doing this": "چرا این رو انجام می‌دم",
+    "In my plan": "توی برنامه‌م هست",
+    "Builds": "تقویت می‌کنه",
+    "Not in the app yet": "هنوز توی اپ نیست",
+    "Too hard?": "خیلی سخته؟",
+    "Too easy?": "خیلی راحته؟",
+    "Other kit?": "وسیلهٔ دیگه؟",
+    "Regressions": "نسخهٔ آسون‌تر",
+    "Progressions": "نسخهٔ سخت‌تر",
+    "Alternatives": "جایگزین‌ها",
+    "How do I do it?": "چطور انجامش بدم؟",
+    "What should I think about?": "به چی فکر کنم؟",
+    "What do people get wrong?": "کجا اشتباه می‌کنن؟",
+    "What does it do?": "این چیکار می‌کنه؟",
+    "How does it help on court?": "توی زمین چه کمکی می‌کنه؟",
+    "Where will I feel it?": "کجای بدنم حسش می‌کنم؟",
+    "Fewer steps": "مراحل کمتر",
+    "Why your plan looks like this": "چرا برنامه‌ت این شکلیه",
+    "Your plan": "برنامهٔ تو",
+    "Every exercise below is here because of something about you. Tap one to see more.": "هر حرکتی که پایینه به خاطر یه چیز دربارهٔ خودت اینجاست. روی هر کدوم بزن تا بیشتر ببینی.",
+    "Tennis · Padel": "تنیس · پدل",
+    "Beach Tennis": "بیچ تنیس",
+    "Tennis": "تنیس",
+    "Padel": "پدل",
+    "Armour": "محافظت",
+    "Brakes": "ترمز",
+    "Engine": "موتور",
+    "Movement": "حرکت",
+    "Muscle": "عضله",
+    "Power": "توان",
+    "Speed": "سرعت",
+    "Spring": "فنر",
+    "Strength": "قدرت",
+    "Endurance": "استقامت",
+    "Agility": "چابکی",
+    "Today builds:": "امروز تقویت می‌کنه:",
+    "What you're building": "داری چی می‌سازی",
+    "On court": "توی زمین",
+    "In your plan": "توی برنامهٔ تو",
+    "All": "همه",
+    "Your coach is building this library. Each exercise appears here once it's ready: what it's for, how to do it, and its easier, harder and other-equipment versions.": "مربیت داره این کتابخونه رو می‌سازه. هر حرکت وقتی آماده شد اینجا میاد: برای چی هست، چطور انجام می‌شه و نسخه‌های آسون‌تر، سخت‌تر و با وسیلهٔ دیگه‌ش.",
+    "Nothing matches. Try another word, or tap All.": "چیزی پیدا نشد. یه کلمهٔ دیگه امتحان کن، یا «همه» رو بزن.",
+    "New best": "رکورد جدید",
+    "Retest beaten": "تست دوباره رو شکستی",
+    "A new mark": "یه نشان جدید",
+    "Moment": "لحظه",
+    "A new level": "یه سطح جدید",
+    "Share": "اشتراک",
+    "Share your best": "رکوردت رو به اشتراک بذار",
+    "Share a win": "یه برد رو به اشتراک بذار",
+    "Share your retest": "تست دوباره‌ت رو به اشتراک بذار",
+    "Share your cycle": "دوره‌ت رو به اشتراک بذار",
+    "Share the whole road": "کل مسیر رو به اشتراک بذار",
+    "Share it": "به اشتراکش بذار",
+    "Share your mark": "نشانت رو به اشتراک بذار",
+    "Share your honour": "افتخارت رو به اشتراک بذار",
+    "Share your result": "نتیجه‌ت رو به اشتراک بذار",
+    "Share your card": "کارتت رو به اشتراک بذار",
+    "Share your level": "سطحت رو به اشتراک بذار",
+    "Share the goal": "هدفت رو به اشتراک بذار",
+    "Share your session": "جلسه‌ت رو به اشتراک بذار",
+    "The whole road": "کل مسیر",
+    "This cycle": "این دوره",
+    "Your card": "کارت تو",
+    "Which card": "کدوم کارت",
+    "Drawing your card…": "دارم کارتت رو می‌کشم…",
+    "Use your own photo": "از عکس خودت استفاده کن",
+    "Zoom": "زوم",
+    "Drag the picture to move it, pinch to zoom.": "عکس رو بکش تا جابه‌جا بشه، با دو انگشت زوم کن.",
+    "Remove the photo": "حذف عکس",
+    "Size": "اندازه",
+    "Story": "استوری",
+    "Post": "پست",
+    "Show the weights": "وزنه‌ها رو نشون بده",
+    "Show my name": "اسمم رو نشون بده",
+    "Save image": "ذخیرهٔ عکس",
+    "Copy caption": "کپی کپشن",
+    "Mention": "منشن کن",
+    "in your Story so Amir can share it too.": "توی استوری‌ت تا امیر هم بتونه بذارتش.",
+    "Choose another photo": "یه عکس دیگه انتخاب کن",
+    "That picture could not be read.": "اون عکس خونده نشد.",
+    "That picture could not be opened.": "اون عکس باز نشد.",
+    "The card could not be drawn on this phone. Try again with signal.": "کارت روی این گوشی کشیده نشد. با آنتن دوباره امتحان کن.",
+    "This phone can't share a picture from here, so it's saved instead.": "این گوشی نمی‌تونه از اینجا عکس بفرسته، برای همین ذخیره‌ش کردم.",
+    "Saved.": "ذخیره شد.",
+    "Caption copied.": "کپشن کپی شد.",
+    "Roadmap complete": "مسیر کامل شد",
+    "Cycle complete": "دوره کامل شد",
+    "The distance": "مسیری که اومدی",
+    "You've trained the whole plan, every cycle of it. Here's your card if you want to share it.": "کل برنامه رو تمرین کردی، همهٔ دوره‌هاش رو. اگه خواستی به اشتراک بذاری، کارتت اینجاست.",
+    "Tell the crew": "به تیم بگو",
+    "Amir": "امیر",
+    "Someone": "یه نفر",
+    "liked your post": "پستت رو لایک کرد",
+    "liked your moment": "لحظه‌ت رو لایک کرد",
+    "liked your achievement": "دستاوردت رو لایک کرد",
+    "liked your mark": "نشانت رو لایک کرد",
+    "joined the crew": "به تیم پیوست",
+    "cheered you.": "تشویقت کرد.",
+    "Cheered": "تشویق کردی",
+    "Cheer back": "تشویق برگردون",
+    "replied:": "جواب داد:",
+    "named you in a reply": "توی یه جواب اسمت رو آورد",
+    "Say hello": "سلام کن",
+    "answered your question": "به سؤالت جواب داد",
+    "wrote your week note": "نکتهٔ هفتهٔ تو رو نوشت",
+    "A new note from": "یه نکتهٔ جدید از",
+    "Your new cycle is here": "دورهٔ جدیدت اومد",
+    "Your new cycle is here:": "دورهٔ جدیدت اومد:",
+    "Loading…": "دارم لود می‌کنم…",
+    "No signal. The Inbox shows here when you are back online.": "آنتن نیست. وقتی دوباره آنلاین شدی، پیام‌ها اینجا میان.",
+    "Nothing new this week.": "این هفته چیز جدیدی نیست.",
+    "Closed": "بسته شد",
+    "This week's photo:": "عکس این هفته:",
+    "Post one": "یکی بذار",
+    "Join the crew": "به تیم بپیوند",
+    "This week in the crew": "این هفته توی تیم",
+    "Join the crew to vote.": "برای رأی دادن به تیم بپیوند.",
+    "No signal. Your vote did not go. Try again when you are back online.": "آنتن نیست. رأیت ثبت نشد. وقتی دوباره آنلاین شدی امتحان کن.",
+    "Voting has closed for this week.": "رأی‌گیری این هفته بسته شده.",
+    "That vote did not go. Try again.": "رأیت ثبت نشد. دوباره امتحان کن.",
+    "Ask for the crew": "برای تیم بپرس",
+    "Amir answers one question a week": "امیر هفته‌ای یه سؤال جواب می‌ده",
+    "No signal. Your question is still here. Tap Send again when you have signal.": "آنتن نیست. سؤالت هنوز اینجاست. وقتی آنتن داشتی دوباره «ارسال» رو بزن.",
+    "That's three today. Ask again tomorrow.": "امروز سه‌تا شد. فردا دوباره بپرس.",
+    "Keep it to 200 characters.": "تا ۲۰۰ حرف بنویس.",
+    "Write your question first.": "اول سؤالت رو بنویس.",
+    "That did not send. Try again.": "ارسال نشد. دوباره امتحان کن.",
+    "Mailbag": "صندوق سؤال",
+    "Ask Amir": "از امیر بپرس",
+    "Your question": "سؤال تو",
+    "What do you want to know about your training?": "دربارهٔ تمرینت چی می‌خوای بدونی؟",
+    "You can use my first name": "می‌تونی اسم کوچیکم رو بذاری",
+    "Amir answers one question a week for the crew. He reads every one.": "امیر هفته‌ای یه سؤال برای تیم جواب می‌ده. همهٔ سؤال‌ها رو می‌خونه.",
+    "Send": "ارسال",
+    "Sending…": "دارم می‌فرستم…",
+    "Sent. Amir reads every one.": "فرستاده شد. امیر همه‌شون رو می‌خونه.",
+    "From the crew": "از طرف تیم",
+    "Asked by the crew": "سؤال‌های تیم",
+    "Questions I answered": "سؤال‌هایی که جواب دادم",
+    "Nothing answered yet.": "هنوز سؤالی جواب داده نشده.",
+    "Someone asked": "یه نفر پرسید"
+  },
+  "patterns": [
+    [
+      "Exercise (\\d+) of (\\d+)",
+      "حرکت {n1} از {n2}"
+    ],
+    [
+      "Round (\\d+) of (\\d+)",
+      "راند {n1} از {n2}"
+    ],
+    [
+      "Set (\\d+) of (\\d+)",
+      "ست {n1} از {n2}"
+    ],
+    [
+      "Before exercise (\\d+)",
+      "قبل از حرکت {n1}"
+    ],
+    [
+      "(\\d+) items",
+      "{n1} مورد"
+    ],
+    [
+      "(.+) not ticked\\. Finish the session to rate it and send it to your coach\\.",
+      "$1 تیک نخورده. جلسه رو تموم کن تا نمره‌ش بدی و برای مربیت بره."
+    ],
+    [
+      "Set (\\d+) of (\\d+) · how did it go\\?",
+      "ست {n1} از {n2} · چطور بود؟"
+    ],
+    [
+      "Round (\\d+) of (\\d+) · how hard\\?",
+      "راند {n1} از {n2} · چقدر سخت بود؟"
+    ],
+    [
+      "Weight in (\\w+)\\. Tap to choose a unit",
+      "وزنه به $1. برای انتخاب واحد بزن"
+    ],
+    [
+      "last (\\d.*)",
+      "قبلی $1"
+    ],
+    [
+      "Weight on set (\\d+)",
+      "وزنه ست {n1}"
+    ],
+    [
+      "Effort (\\d+)",
+      "شدت {n1}"
+    ],
+    [
+      "(\\d[\\d–-]*) each side",
+      "{n1} برای هر طرف"
+    ],
+    [
+      "(.+) · set (\\d+) of (\\d+)",
+      "$1 · ست {n2} از {n3}"
+    ],
+    [
+      "(.+) · round (\\d+) of (\\d+)",
+      "$1 · راند {n2} از {n3}"
+    ],
+    [
+      "(.+) · last set",
+      "$1 · آخرین ست"
+    ],
+    [
+      "(.+) · last round",
+      "$1 · آخرین راند"
+    ],
+    [
+      "(\\d+) days ago",
+      "{n1} روز پیش"
+    ],
+    [
+      "(\\d+) months ago",
+      "{n1} ماه پیش"
+    ],
+    [
+      "Last time · (\\w+ \\d+ \\w+) · (.+)",
+      "دفعهٔ قبل · {d1} · {t2}"
+    ],
+    [
+      "(\\d+) reps? ·",
+      "{n1} تکرار ·"
+    ],
+    [
+      "You (\\d+), me (\\d+) · play resumes",
+      "تو {n1}، من {n2} · بازی ادامه پیدا می‌کنه"
+    ],
+    [
+      "Full time · you won (\\d+)–(\\d+)",
+      "پایان بازی · تو بردی {n1}–{n2}"
+    ],
+    [
+      "Full time · I won (\\d+)–(\\d+)",
+      "پایان بازی · من بردم {n1}–{n2}"
+    ],
+    [
+      "([\\d.]+ (?:kg|lb|plates?)) · (\\d+) sets",
+      "$1 · {n2} ست"
+    ],
+    [
+      "(\\d+) times? logged\\. What you did, never what to lift: your coach sets the load\\.",
+      "{n1} بار ثبت شده. چیزی که انجام دادی، نه چیزی که باید بزنی: وزنه رو مربیت تعیین می‌کنه."
+    ],
+    [
+      "(\\d+) times? logged · target effort (\\S+)\\. What you did, never what to lift: your coach sets the load\\.",
+      "{n1} بار ثبت شده · شدت هدف {n2}. چیزی که انجام دادی، نه چیزی که باید بزنی: وزنه رو مربیت تعیین می‌کنه."
+    ],
+    [
+      "(\\d+) times? logged · target effort (\\S+) · (\\S+) today\\. What you did, never what to lift: your coach sets the load\\.",
+      "{n1} بار ثبت شده · شدت هدف {n2} · امروز {n3}. چیزی که انجام دادی، نه چیزی که باید بزنی: وزنه رو مربیت تعیین می‌کنه."
+    ],
+    [
+      "Best set · most you could lift once, kg",
+      "بهترین ست · بیشترین وزنه‌ای که یه بار می‌تونی بزنی، کیلو"
+    ],
+    [
+      "Best set · most you could lift once, lb",
+      "بهترین ست · بیشترین وزنه‌ای که یه بار می‌تونی بزنی، پوند"
+    ],
+    [
+      "Best set · most you could lift once, plates",
+      "بهترین ست · بیشترین وزنه‌ای که یه بار می‌تونی بزنی، پلیت"
+    ],
+    [
+      "Top weight, kg",
+      "بیشترین وزنه، کیلو"
+    ],
+    [
+      "Top weight, lb",
+      "بیشترین وزنه، پوند"
+    ],
+    [
+      "(.+): from ([\\d.]+) to ([\\d.]+)",
+      "{t1}: از {n2} تا {n3}"
+    ],
+    [
+      "(\\w+ \\d+ \\w+) · Effort (.+) · low day",
+      "{d1} · شدت $2 · روز آمادگی پایین"
+    ],
+    [
+      "(\\w+ \\d+ \\w+) · Effort (.+)",
+      "{d1} · شدت $2"
+    ],
+    [
+      "(\\w+ \\d+ \\w+) · low day",
+      "{d1} · روز آمادگی پایین"
+    ],
+    [
+      "Your (ankle & foot|calf & achilles|knee|hip & groin|hamstring|low back|trunk|shoulder|elbow, forearm & wrist|neck|hip|ankle|back|hips|feet|wrist|elbow|calf|calves|quads|glutes|core)",
+      "{t1} تو"
+    ],
+    [
+      "· (\\d+) steps?",
+      "· {n1} مرحله"
+    ],
+    [
+      "About (.+)",
+      "درباره $1"
+    ],
+    [
+      "Why you have (.+)",
+      "چرا $1 توی برنامهٔ توئه"
+    ],
+    [
+      "Day (\\d+) · (.+)",
+      "روز {n1} · $2"
+    ],
+    [
+      "(.+): what it means",
+      "{t1}: یعنی چی"
+    ],
+    [
+      "All (\\d+) steps",
+      "هر {n1} مرحله"
+    ],
+    [
+      "(\\d+) sessions?\\. Last time (.+) reps\\.",
+      "{n1} جلسه. دفعهٔ قبل $2 تکرار."
+    ],
+    [
+      "(\\d+) sessions?\\. Last time (.+)\\.",
+      "{n1} جلسه. دفعهٔ قبل $2."
+    ],
+    [
+      "(\\d+) sessions?\\.",
+      "{n1} جلسه."
+    ],
+    [
+      "Why Cycle (\\d+) looks like this",
+      "چرا دورهٔ {n1} این شکلیه"
+    ],
+    [
+      "(\\d+) exercises?",
+      "{n1} حرکت"
+    ],
+    [
+      "Day (\\d+(?: · \\d+)+)",
+      "روز {n1}"
+    ],
+    [
+      "Nothing matches \"(.+)\"\\. Try another word, or tap All\\.",
+      "چیزی برای «$1» پیدا نشد. یه کلمهٔ دیگه امتحان کن، یا «همه» رو بزن."
+    ],
+    [
+      "In your plan · (\\d+)",
+      "توی برنامهٔ تو · {n1}"
+    ],
+    [
+      "Everything else · (\\d+)",
+      "بقیه · {n1}"
+    ],
+    [
+      "(New best|Retest beaten|A new mark|Moment|A new level) · Adding it up",
+      "{t1} · داره حساب می‌شه"
+    ],
+    [
+      "(New best|Retest beaten|A new mark|Moment|A new level): (.+)\\. Share it",
+      "{t1}: $2. برای اشتراک‌گذاری بزن"
+    ],
+    [
+      "(New best|Retest beaten|A new mark|Moment|A new level), adding it up: (.+)",
+      "{t1}، داره حساب می‌شه: $2"
+    ],
+    [
+      "\\+(\\d+) more in your Achievements, on Progress",
+      "+{n1} مورد دیگه توی دستاوردهات، توی پیشرفت"
+    ],
+    [
+      "(.+) retest",
+      "تست دوباره $1"
+    ],
+    [
+      "(\\d+) cycles · (\\d+) weeks?",
+      "{n1} دوره · {n2} هفته"
+    ],
+    [
+      "(\\d+) cycles",
+      "{n1} دوره"
+    ],
+    [
+      "(\\d+) of (\\d+) sessions? · (\\d+) weeks?",
+      "{n1} از {n2} جلسه · {n3} هفته"
+    ],
+    [
+      "(\\d+) of (\\d+) sessions?",
+      "{n1} از {n2} جلسه"
+    ],
+    [
+      "Cycle (\\d+) is done, and I've signed it off\\. Here's your card if you want to share it\\.",
+      "دورهٔ {n1} تموم شد و من تأییدش کردم. اگه خواستی به اشتراک بذاری، کارتت اینجاست."
+    ],
+    [
+      "Inbox, (\\d+) new",
+      "پیام‌ها، {n1} تا جدید"
+    ],
+    [
+      "and (\\d+) others? liked your post",
+      "و {n1} نفر دیگه پستت رو لایک کردن"
+    ],
+    [
+      "and (\\d+) others? liked your moment",
+      "و {n1} نفر دیگه لحظه‌ت رو لایک کردن"
+    ],
+    [
+      "and (\\d+) others? liked your achievement",
+      "و {n1} نفر دیگه دستاوردت رو لایک کردن"
+    ],
+    [
+      "and (\\d+) others? liked your mark",
+      "و {n1} نفر دیگه نشانت رو لایک کردن"
+    ],
+    [
+      "cheered you: (.+)",
+      "تشویقت کرد: $1"
+    ],
+    [
+      "Cheer (.+) back",
+      "تشویق $1 رو برگردون"
+    ],
+    [
+      "Say hello to (.+)",
+      "به $1 سلام کن"
+    ],
+    [
+      "(.+)\\. (\\d+) votes?\\. Your vote",
+      "$1. {n2} رأی. رأی تو"
+    ],
+    [
+      "(.+)\\. (\\d+) votes?\\. Tap to vote",
+      "$1. {n2} رأی. برای رأی دادن بزن"
+    ],
+    [
+      "(.+)\\. (\\d+) votes?",
+      "$1. {n2} رأی"
+    ],
+    [
+      "Amir's question\\. Closes (\\w+)\\.",
+      "سؤال امیر. تا {d1} وقت داری."
+    ],
+    [
+      "Show us: (.+)",
+      "نشونمون بده: $1"
+    ],
+    [
+      "(\\d+) answers?",
+      "{n1} جواب"
+    ],
+    [
+      "Asked by (\\S+) · (\\d{1,2} \\w+)",
+      "سؤال از $1 · {d2}"
+    ],
+    [
+      "Asked by (\\S+)",
+      "سؤال از $1"
+    ],
+    [
+      "(\\S+) asked",
+      "$1 پرسید"
+    ]
+  ],
+  "split": [
+    {
+      "line": 25947,
+      "text": "Mostly your <b>quads</b> and <b>glutes</b>. / Your <b>x</b> work hard too. / Your <b>x</b> help. / It loads your <b>x</b>.",
+      "note": "the About sheet's muscle lines are built as sentence + bolded muscle names in separate text nodes; piece by piece reads acceptably in RTL but word order cannot be fully natural"
+    },
+    {
+      "line": 26237,
+      "text": "Why am I doing this<span>?</span> / In my plan<span>?</span>",
+      "note": "the question mark is its own text node with no letters, so it stays Latin '?' after the Farsi words"
+    },
+    {
+      "line": 27059,
+      "text": "Mention <b>@amirardekanian</b> in your Story so Amir can share it too.",
+      "note": "the handle is a bolded node between two halves; reads acceptably in RTL"
+    },
+    {
+      "line": 27716,
+      "text": "<b>Mina</b>, <b>Reza</b> and 3 others liked your post",
+      "note": "names are bold nodes, the verb phrase is its own node; the verb is singular for one name and plural for several, and only the 'and N others' form can say plural"
+    }
+  ],
+  "readback": [
+    {
+      "line": 27818,
+      "text": "Cheers this week",
+      "note": "crewShowMyCheers() finds the Player Page heading with /^Cheers this week/.test(textContent); whoever translates that heading (a Player Page line) must not add 'Cheers this week' or the lookup fails in Farsi"
+    }
+  ]
+}

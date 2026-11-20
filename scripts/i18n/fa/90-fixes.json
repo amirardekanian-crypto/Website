@@ -1,0 +1,8 @@
+{
+  "area": "fixes found while testing the whole app in Farsi (read last, so they win)",
+  "exact": {},
+  "patterns": [
+    ["Effort (\\d+(?:\\.\\d+)?) → (\\d+(?:\\.\\d+)?) today", "شدت $1 ← $2 امروز"],
+    ["(.+) · Effort (\\d+(?:\\.\\d+)?) → (\\d+(?:\\.\\d+)?) today", "{t1} · شدت $2 ← $3 امروز"]
+  ]
+}

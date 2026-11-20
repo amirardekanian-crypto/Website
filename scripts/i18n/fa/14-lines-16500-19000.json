@@ -1,0 +1,1018 @@
+{
+  "area": "lines 16500-19000: Bring a partner copy, This cycle week bars, Player facts, the player page, Your photo, the Cheer, the crew sheets (what the crew sees, Reminders, posting), Personal Records and Log a max",
+  "exact": {
+    "Copied": "کپی شد",
+    "Copy": "کپی",
+    "Copied. Paste it to your friend.": "کپی شد. بفرست برای دوستت.",
+    "Bring a partner": "یه هم‌تمرینی بیار",
+    "Held": "حفظ شد",
+    "held": "حفظ شد",
+    "now": "الان",
+    "before they joined": "قبل از اومدنش",
+    "this week": "این هفته",
+    "This cycle": "این دوره",
+    "Extra": "اضافه",
+    "Tap the bar to see the days.": "روی نوار بزن تا روزها رو ببینی.",
+    "Tap a week for its sessions.": "روی یه هفته بزن تا جلسه‌هاش رو ببینی.",
+    "No sessions yet this cycle": "تو این دوره هنوز جلسه‌ای نداری",
+    "The crew sees these dates and nothing else. The names and the minutes stay with you.": "تیم فقط همین تاریخ‌ها رو می‌بینه. اسم‌ها و دقیقه‌ها پیش خودت می‌مونه.",
+    "Tennis": "تنیس",
+    "Padel": "پدل",
+    "Squash": "اسکواش",
+    "Badminton": "بدمینتون",
+    "Pickleball": "پیکل‌بال",
+    "Table tennis": "پینگ‌پنگ",
+    "Beach tennis": "تنیس ساحلی",
+    "None": "هیچ‌کدوم",
+    "Right-handed": "راست‌دست",
+    "Left-handed": "چپ‌دست",
+    "One hand": "یه دست",
+    "Two hands": "دو دست",
+    "Two-handed": "دو دست",
+    "One-handed": "یه دست",
+    "Right": "راست",
+    "Left": "چپ",
+    "Both": "هر دو",
+    "Right side": "سمت راست",
+    "Left side": "سمت چپ",
+    "Both sides": "هر دو سمت",
+    "For fun": "برای تفریح",
+    "Club": "باشگاهی",
+    "Competition": "مسابقه",
+    "Strength": "قدرت",
+    "Fitness": "آمادگی",
+    "Physique": "اندام",
+    "Running": "دویدن",
+    "Health": "سلامتی",
+    "Plays": "ورزش",
+    "Hand": "دست",
+    "Backhand": "بک‌هند",
+    "Side": "سمت",
+    "Level": "سطح",
+    "Trains for": "تمرین برای",
+    "Working on": "تمرکز روی",
+    "Instagram": "اینستاگرام",
+    "Add": "اضافه کن",
+    "Player facts": "مشخصات بازیکن",
+    "Add your game": "بازی‌ت رو اضافه کن",
+    "Club or city": "باشگاه یا شهر",
+    "What you are working on": "روی چی کار می‌کنی",
+    "Any racket sport, or none.": "هر ورزش راکتی، یا هیچ‌کدوم.",
+    "Any racket sport, or none. The crew sees what you add.": "هر ورزش راکتی، یا هیچ‌کدوم. تیم چیزی رو که اضافه کنی می‌بینه.",
+    "The crew sees these. A row you leave empty stays off your page.": "تیم اینا رو می‌بینه. ردیفی که خالی بذاری تو صفحه‌ت نمیاد.",
+    "A row you leave empty stays off your page.": "ردیفی که خالی بذاری تو صفحه‌ت نمیاد.",
+    "Use letters, numbers, dots and underscores only, 30 at most.": "فقط حرف، عدد، نقطه و آندرلاین. حداکثر ۳۰ تا.",
+    "No signal. That did not save. Try again when you are back online.": "سیگنال نداری. ذخیره نشد. وقتی آنلاین شدی دوباره امتحان کن.",
+    "That is not ready yet.": "این هنوز آماده نیست.",
+    "That did not save. Try again.": "ذخیره نشد. دوباره امتحان کن.",
+    "No signal. Your game shows when you are back online.": "سیگنال نداری. بازی‌ت وقتی آنلاین شدی نشون داده می‌شه.",
+    "Loading…": "دارم باز می‌کنم…",
+    "two-handed": "دو دست",
+    "one-handed": "یه دست",
+    "right side": "سمت راست",
+    "left side": "سمت چپ",
+    "both sides": "هر دو سمت",
+    "Profile": "پروفایل",
+    "Only you": "فقط تو",
+    "Level medal": "مدال سطح",
+    "Level medals": "مدال‌های سطح",
+    "Your numbers": "عددهای تو",
+    "Honours": "افتخارها",
+    "Posted this week": "پست‌های این هفته",
+    "Only you see this page now. Join the crew and this is what they see.": "الان فقط خودت این صفحه رو می‌بینی. به تیم بپیوند تا همین رو ببینن.",
+    "Join the crew": "پیوستن به تیم",
+    "This is what the crew sees.": "تیم همینو می‌بینه.",
+    "This is what the crew sees. Parts marked Only you stay with you.": "تیم همینو می‌بینه. بخش‌هایی که «فقط تو» دارن پیش خودت می‌مونن.",
+    "All ›": "همه ›",
+    "Change your photo": "عوض کردن عکس",
+    "Add your photo": "گذاشتن عکس",
+    "No signal. This page shows when you are back online.": "سیگنال نداری. این صفحه وقتی آنلاین شدی نشون داده می‌شه.",
+    "Share my card": "اشتراک کارتم",
+    "New": "جدید",
+    "Joined this week. Say hello.": "این هفته پیوسته. یه سلام بکن.",
+    "Cheered today": "امروز تشویق کردی",
+    "Cheer": "تشویق",
+    "Cheer back": "تشویق متقابل",
+    "Cheers this week": "تشویق‌های این هفته",
+    "Someone": "یه نفر",
+    "You": "تو",
+    "Athlete": "ورزشکار",
+    "Turn on notifications so the next cheer reaches you": "اعلان‌ها رو روشن کن تا تشویق بعدی به تو برسه",
+    "A session done": "یه جلسه تموم شد",
+    "Posted a photo": "عکس گذاشت",
+    "Posted": "پست کرد",
+    "Trophies": "جام‌ها",
+    "Your trophies": "جام‌های تو",
+    "Streaks": "ردیف‌ها",
+    "Now": "الان",
+    "January": "ژانویه",
+    "February": "فوریه",
+    "March": "مارس",
+    "April": "آوریل",
+    "May": "مه",
+    "June": "ژوئن",
+    "July": "ژوئیه",
+    "August": "اوت",
+    "September": "سپتامبر",
+    "October": "اکتبر",
+    "November": "نوامبر",
+    "December": "دسامبر",
+    "This is your photo now.": "این الان عکس توئه.",
+    "Pick a photo of you.": "یه عکس از خودت انتخاب کن.",
+    "Choose another photo": "یه عکس دیگه انتخاب کن",
+    "Choose a photo": "یه عکس انتخاب کن",
+    "Remove": "برداشتن",
+    "Zoom": "زوم",
+    "Making it small…": "دارم کوچیکش می‌کنم…",
+    "Drag to move. Pinch to zoom.": "بکش تا جابه‌جا شه. دو انگشتی بزرگ کن.",
+    "The crew sees it in a circle, wherever your name is. Your phone makes it small and takes its location off.": "تیم هرجا اسمت باشه عکس رو تو یه دایره می‌بینه. گوشیت عکس رو کوچیک می‌کنه و موقعیتش رو برمی‌داره.",
+    "Tap again to remove": "برای برداشتن دوباره بزن",
+    "Saving…": "دارم ذخیره می‌کنم…",
+    "No signal. Your photo is still here. Tap Save again when you have signal.": "سیگنال نداری. عکس هنوز اینجاست. وقتی سیگنال داشتی دوباره ذخیره رو بزن.",
+    "Your photo is saved.": "عکست ذخیره شد.",
+    "Your photo is off.": "عکست برداشته شد.",
+    "No signal. Try again when you have signal.": "سیگنال نداری. وقتی سیگنال داشتی دوباره امتحان کن.",
+    "Join the crew to add a photo.": "برای گذاشتن عکس، به تیم بپیوند.",
+    "That photo could not be opened. You can choose one below.": "این عکس باز نشد. پایین می‌تونی یکی دیگه انتخاب کنی.",
+    "Close the photo": "بستن عکس",
+    "Your photo": "عکس تو",
+    "Join the crew to cheer.": "برای تشویق کردن به تیم بپیوند.",
+    "Cheers are not ready yet.": "تشویق‌ها هنوز آماده نیستن.",
+    "That cheer did not go. Try again.": "تشویق نرفت. دوباره امتحان کن.",
+    "No signal. Cheer again when you are back online.": "سیگنال نداری. وقتی آنلاین شدی دوباره تشویق کن.",
+    "Turn your phone on and the next cheer reaches you.": "گوشیت رو روشن کن تا تشویق بعدی به تو برسه.",
+    "Your phone": "گوشی تو",
+    "Turn them on": "روشن کن",
+    "Add a word (optional)": "یه کلمه بنویس (اختیاری)",
+    "The crew can see your word for 7 days.": "تیم کلمهٔ تو رو ۷ روز می‌بینه.",
+    "Send": "بفرست",
+    "Sending…": "دارم می‌فرستم…",
+    "No signal. Your cheer is still here. Tap Send again when you have signal.": "سیگنال نداری. تشویقت هنوز اینجاست. وقتی سیگنال داشتی دوباره بفرست رو بزن.",
+    "That did not reach the crew. Tap it again when you have signal.": "به تیم نرسید. وقتی سیگنال داشتی دوباره بزن.",
+    "That did not go. Try again.": "نرفت. دوباره امتحان کن.",
+    "You kept yourself out of the crew, so you cannot react to a post.": "خودت رو از تیم بیرون گذاشتی، پس نمی‌تونی به پست واکنش بدی.",
+    "Join the crew to like a post.": "برای لایک کردن، به تیم بپیوند.",
+    "No signal. Try again when you are back online.": "سیگنال نداری. وقتی آنلاین شدی دوباره امتحان کن.",
+    "That did not delete. Try again.": "حذف نشد. دوباره امتحان کن.",
+    "Deleted. It is gone from every phone.": "حذف شد. از همهٔ گوشی‌ها رفت.",
+    "No signal. Answer again when you are back online.": "سیگنال نداری. وقتی آنلاین شدی دوباره جواب بده.",
+    "You're in the crew. Turn your phone on and their moments reach you.": "تو تیم هستی. گوشیت رو روشن کن تا لحظه‌هاشون به تو برسه.",
+    "You're in the crew. Your moments ring on the Bell.": "تو تیم هستی. لحظه‌هات روی Bell زنگ می‌خوره.",
+    "Kept to you. Nothing of yours reaches the crew.": "پیش خودت می‌مونه. هیچ چیزی از تو به تیم نمی‌رسه.",
+    "You kept yourself out of the crew, so you cannot see their pages.": "خودت رو از تیم بیرون گذاشتی، پس نمی‌تونی صفحه‌هاشون رو ببینی.",
+    "A session finished": "یه جلسه تموم شد",
+    "One line a day, naming whoever trained": "روزی یه خط، با اسم کسایی که تمرین کردن",
+    "A new level": "یه سطح جدید",
+    "A week held": "یه هفته حفظ شد",
+    "And how many in a row": "و چندتا پشت سر هم",
+    "A mark": "یه نشان",
+    "8 weeks held, 50 sessions with Amir, 10 bests…": "۸ هفته حفظ‌شده، ۵۰ جلسه با امیر، ۱۰ رکورد…",
+    "An achievement": "یه دستاورد",
+    "A personal best": "یه رکورد شخصی",
+    "The lift only, never the weight": "فقط اسم حرکت، هیچ‌وقت وزنه",
+    "A cycle finished": "یه دوره تموم شد",
+    "The month's honours": "افتخارهای ماه",
+    "The Monthly Open": "The Monthly Open",
+    "In the crew": "تو تیم",
+    "You can read the crew. Posting and the Bell are off for your account.": "می‌تونی تیم رو بخونی. پست گذاشتن و Bell برای حساب تو بسته‌ست.",
+    "Your name on the Bell:": "اسمت روی Bell:",
+    "Nothing of yours reaches the crew.": "هیچ چیزی از تو به تیم نمی‌رسه.",
+    "What the crew sees about you. Turn any of them off.": "چیزی که تیم از تو می‌بینه. هرکدوم رو می‌تونی خاموش کنی.",
+    "Leaving takes your posts, photos and likes off the server now. Everything you post is gone after 7 days anyway. Nothing on Crew earns XP.": "اگه بری، پست‌ها و عکس‌ها و لایک‌هات همین الان از سرور پاک می‌شه. هرچی بذاری بعد از ۷ روز خودش پاک می‌شه. هیچ چیزی توی تیم امتیاز نمی‌ده.",
+    "Train": "تمرین",
+    "When you have not trained for a couple of days": "وقتی چند روزه تمرین نکردی",
+    "Log your habits": "عادت‌هات رو ثبت کن",
+    "One a day, at the hour you pick": "روزی یکی، تو ساعتی که انتخاب می‌کنی",
+    "The crew": "تیم",
+    "Anything new on the Bell, a few at a time": "هر چیز تازه روی Bell، چندتا چندتا",
+    "A new cycle": "یه دوره جدید",
+    "When Amir publishes your next one": "وقتی امیر دورهٔ بعدیت رو منتشر کنه",
+    "On an iPhone a reminder only works once the app is on your Home Screen. Add it, open it from there, and come back.": "توی آیفون یادآور فقط وقتی کار می‌کنه که اپ روی صفحهٔ اصلی گوشیت باشه. اضافه‌ش کن، از همونجا بازش کن و برگرد.",
+    "Your phone is blocking notifications for this site. Nothing here can undo that: open your browser settings, allow notifications for amirardekani.com, then come back.": "گوشیت اعلان این سایت رو بسته. از اینجا نمی‌شه بازش کرد: تنظیمات مرورگرت رو باز کن، اعلان amirardekani.com رو مجاز کن و برگرد.",
+    "Off. Turn them on and you get a nudge when you have not trained, and one at the end of the day for your habits.": "خاموشه. روشنش کن تا وقتی تمرین نکردی یادآوری بگیری، و آخر روز هم برای عادت‌هات.",
+    "On. Nothing before 8am or after 10pm, and never more than two in a day.": "روشنه. قبل از ۸ صبح و بعد از ۱۰ شب چیزی نمیاد، و روزی بیشتر از دوتا نمی‌شه.",
+    "Turn reminders on": "روشن کردن یادآورها",
+    "One tap, then your phone asks you once.": "یه ضربه، بعد گوشیت یه بار ازت می‌پرسه.",
+    "What reaches you. Turn any of them off.": "چی به تو می‌رسه. هرکدوم رو می‌تونی خاموش کنی.",
+    "Time of day": "ساعت روز",
+    "The hour your reminders arrive": "ساعتی که یادآورها میان",
+    "Tap the time to move it an hour, between 8am and 10pm.": "روی ساعت بزن تا یه ساعت جلو بره، بین ۸ صبح تا ۱۰ شب.",
+    "Turn them all off": "همه رو خاموش کن",
+    "Your phone keeps the permission, so you can turn them back on here.": "گوشیت اجازه رو نگه می‌داره، پس از همینجا می‌تونی دوباره روشنشون کنی.",
+    "Tap again to turn them off": "برای خاموش کردن دوباره بزن",
+    "Reminders are on": "یادآورها روشنه",
+    "Your phone said no. You can undo that in its settings.": "گوشیت قبول نکرد. از تنظیمات گوشی می‌تونی عوضش کنی.",
+    "Add the app to your Home Screen first": "اول اپ رو به صفحهٔ اصلی گوشیت اضافه کن",
+    "Add the app to your Home Screen first.": "اول اپ رو به صفحهٔ اصلی گوشیت اضافه کن.",
+    "That did not work. Try again later.": "نشد. بعداً دوباره امتحان کن.",
+    "Your phone is on. Nothing before 8am or after 10pm.": "گوشیت روشنه. قبل از ۸ صبح و بعد از ۱۰ شب چیزی نمیاد.",
+    "That did not work. Account, then Reminders, when you want to try again.": "نشد. هروقت خواستی دوباره امتحان کنی: حساب، بعد یادآورها.",
+    "Reminders for your training and your habits, and the crew when something happens.": "یادآور برای تمرین و عادت‌هات، و برای تیم وقتی اتفاقی می‌افته.",
+    "Reminders are off": "یادآورها خاموشه",
+    "That did not save": "ذخیره نشد",
+    "Tell the crew": "به تیم خبر بده",
+    "Share with the crew": "با تیم به اشتراک بذار",
+    "A line about the session": "یه خط دربارهٔ جلسه",
+    "What happened in training?": "تو تمرین چی شد؟",
+    "Your message to the crew": "پیامت به تیم",
+    "Take the photo off": "برداشتن عکس",
+    "Add a photo": "یه عکس اضافه کن",
+    "Making it smaller…": "دارم کوچیکش می‌کنم…",
+    "That is 3 photos today. More tomorrow.": "امروز ۳ تا عکس گذاشتی. فردا بازم می‌تونی.",
+    "That is 3 photos today. More tomorrow. A session goes to the crew with a photo, so this one waits.": "امروز ۳ تا عکس گذاشتی. فردا بازم می‌تونی. جلسه با عکس به تیم می‌ره، پس این صبر می‌کنه.",
+    "A session goes to the crew with a photo.": "جلسه با یه عکس به تیم می‌ره.",
+    "Your photo gets a stamp:": "روی عکست یه مهر می‌خوره:",
+    "Made smaller before it's sent.": "قبل از فرستادن کوچیک می‌شه.",
+    "About 200 KB, and its location is taken off.": "حدود ۲۰۰ کیلوبایت، و موقعیتش برداشته می‌شه.",
+    "Gone after 7 days. Amir can remove any post. Only photos you would show your coach.": "بعد از ۷ روز پاک می‌شه. امیر می‌تونه هر پستی رو برداره. فقط عکسی بذار که به مربیت نشون می‌دی.",
+    "Post with the photo": "پست با عکس",
+    "Post": "پست",
+    "Posting…": "دارم پست می‌کنم…",
+    "Still sending. Checking…": "هنوز در حال فرستادنه. دارم چک می‌کنم…",
+    "It went. See it on Crew.": "رفت. تو تیم ببینش.",
+    "No signal. Your post is still here: tap Post again when you have signal.": "سیگنال نداری. پستت هنوز اینجاست: وقتی سیگنال داشتی دوباره پست رو بزن.",
+    "Posted to the crew.": "برای تیم پست شد.",
+    "Posted. See it on Crew.": "پست شد. تو تیم ببینش.",
+    "Telling the crew…": "دارم به تیم خبر می‌دم…",
+    "No signal. The crew did not get it.": "سیگنال نداری. به تیم نرسید.",
+    "The crew knows ✓": "تیم خبر داره ✓",
+    "A photo from today, on the Bell for 7 days.": "یه عکس از امروز، ۷ روز روی Bell.",
+    "Join the crew first. You see what they would see.": "اول به تیم بپیوند. همون چیزی رو می‌بینی که اونا می‌بینن.",
+    "Share the session": "اشتراک جلسه",
+    "A card for Instagram, with your own photo behind it.": "یه کارت برای اینستاگرام، با عکس خودت پشتش.",
+    "Week held": "هفته حفظ شد",
+    "That is over 280 characters.": "این بیشتر از ۲۸۰ حرفه.",
+    "Write something or add a photo.": "یه چیزی بنویس یا عکس بذار.",
+    "That is 10 posts today. More tomorrow.": "امروز ۱۰ تا پست گذاشتی. فردا بازم می‌تونی.",
+    "That photo did not work. Try another one.": "این عکس نشد. یکی دیگه امتحان کن.",
+    "Add a photo to tell the crew.": "برای خبر دادن به تیم، یه عکس بذار.",
+    "Say yes to the Bell on Crew first.": "اول تو تیم به Bell آره بگو.",
+    "That is over 140 characters.": "این بیشتر از ۱۴۰ حرفه.",
+    "That is 30 replies today. More tomorrow.": "امروز ۳۰ تا جواب دادی. فردا بازم می‌تونی.",
+    "This post has all the replies it can hold.": "این پست دیگه جای جواب نداره.",
+    "That post has gone.": "اون پست دیگه نیست.",
+    "That is off for your account.": "برای حساب تو بسته‌ست.",
+    "You cheered them today. Come back tomorrow.": "امروز تشویقش کردی. فردا بیا.",
+    "That is over 100 characters.": "این بیشتر از ۱۰۰ حرفه.",
+    "That is 30 cheers today. More tomorrow.": "امروز ۳۰ تا تشویق کردی. فردا بازم می‌تونی.",
+    "You cannot cheer yourself.": "نمی‌تونی خودت رو تشویق کنی.",
+    "That did not post. Try again.": "پست نشد. دوباره امتحان کن.",
+    "Nothing here yet. Your numbers, your records and your moments fill in as you train.": "هنوز چیزی اینجا نیست. عددها، رکوردها و لحظه‌هات با تمرین کردن پر می‌شن.",
+    "No change yet": "هنوز تغییری نیست",
+    "Fill in by themselves as you train.": "با تمرین کردن خودشون پر می‌شن.",
+    "Your best lifts": "بهترین حرکت‌هات",
+    "Personal Records": "رکوردهای شخصی",
+    "The most you could lift once, worked out from your sets. You never have to test it.": "بیشترین وزنه‌ای که می‌تونی یه بار بزنی، که از ست‌هات حساب می‌شه. لازم نیست تستش کنی.",
+    "Nothing here yet.": "هنوز چیزی اینجا نیست.",
+    "Here is how to get your first one:": "این‌جوری اولین رکوردت رو بگیر:",
+    "Open any exercise in today's session.": "هر حرکتی از جلسهٔ امروز رو باز کن.",
+    "Type in the weight you used.": "وزنه‌ای که زدی رو بنویس.",
+    "Tick the set, then tap your effort for it, which is how hard it felt out of 10.": "ست رو تیک بزن، بعد شدتش رو بزن، یعنی از ۱۰ چقدر سخت بود.",
+    "Finish the session. Your best set lands here by itself, and so does every new best after it.": "جلسه رو تموم کن. بهترین ستت خودبه‌خود اینجا میاد، و هر رکورد جدید بعدش هم همین‌طور.",
+    "Or put one in from here. It's useful when you have just tested a lift, or lifted somewhere the app was not open.": "یا خودت از اینجا یکی وارد کن. وقتی تازه یه حرکت رو تست کردی، یا جایی وزنه زدی که اپ باز نبود به کارت میاد.",
+    "Your number lands here. Go heavy and stop close to your limit and it will be a good one.": "عددت اینجا میاد. سنگین بزن و نزدیک حدّت وایسا تا عدد خوبی بشه.",
+    "Lift": "حرکت",
+    "Lifts": "حرکت‌ها",
+    "Your own body weight": "وزن بدن خودت",
+    "Add your body weight": "وزن بدنت رو اضافه کن",
+    "First estimate": "اولین برآورد",
+    "Your lifts": "حرکت‌های تو",
+    "Tap any lift to see how it has moved.": "روی هر حرکت بزن تا ببینی چطور پیش رفته.",
+    "Worked out from your sets, or entered after a test.": "از ست‌هات حساب شده، یا بعد از تست وارد شده.",
+    "Never tested": "هیچ‌وقت تست نشده",
+    "Logged today": "امروز ثبت شد",
+    "Logged yesterday": "دیروز ثبت شد",
+    "nothing on the record yet": "هنوز چیزی ثبت نشده",
+    "Not today: your check-in says a lower day. A retest waits for a green one.": "امروز نه: چک‌این‌ت می‌گه روز سبکیه. تست دوباره می‌مونه برای یه روز سبز.",
+    "Due for a retest": "وقت تست دوباره",
+    "You are at the end of a block. Retest this lift and the next one starts from a real number. Warm up properly, then one hard set — stop when the last rep is a true grind.": "آخر یه بلوکی. این حرکت رو دوباره تست کن تا بلوک بعدی از یه عدد واقعی شروع بشه. درست گرم کن، بعد یه ست سنگین بزن، وقتی تکرار آخر واقعاً له‌کننده شد وایسا.",
+    "You are at the end of a block. Retest these lifts and the next one starts from a real number. Warm up properly, then one hard set — stop when the last rep is a true grind.": "آخر یه بلوکی. این حرکت‌ها رو دوباره تست کن تا بلوک بعدی از یه عدد واقعی شروع بشه. درست گرم کن، بعد یه ست سنگین بزن، وقتی تکرار آخر واقعاً له‌کننده شد وایسا.",
+    "How this works": "چطور کار می‌کنه",
+    "Log a max": "ثبت یه رکورد",
+    "Pick the lift, then put in what you actually did. This cycle is first. Under it is every other lift you can put a number on.": "حرکت رو انتخاب کن، بعد چیزی که واقعاً زدی رو وارد کن. اول حرکت‌های این دوره‌ست. زیرش هر حرکت دیگه‌ایه که می‌شه براش عدد گذاشت.",
+    "Lifts you've done before": "حرکت‌هایی که قبلاً زدی",
+    "Any other lift": "هر حرکت دیگه",
+    "Search for a lift": "جستجوی حرکت",
+    "Search for a lift to log a max for": "یه حرکت پیدا کن تا براش رکورد ثبت کنی",
+    "Start typing and the lifts that can hold a record show up.": "شروع به نوشتن کن تا حرکت‌هایی که رکورد دارن بیان.",
+    "Pick from a list, never type a name.": "از لیست انتخاب کن، اسم نزن.",
+    "That is what keeps one exercise from becoming two records.": "اینجوری یه حرکت دوتا رکورد نمی‌شه.",
+    "The exercise list is still loading. Try again in a moment.": "لیست حرکت‌ها هنوز باز نشده. یه لحظه دیگه دوباره امتحان کن.",
+    "Nothing matches that. A jump, a throw, a carry or a single-muscle lift holds no record, so it is not here.": "چیزی پیدا نشد. پرش، پرتاب، حمل و حرکت تک‌عضله رکورد نمی‌گیرن، برای همین اینجا نیستن.",
+    "Put in the heaviest set you did, how many reps, and how hard it felt out of 10.": "سنگین‌ترین ستت رو وارد کن، چندتا تکرار، و از ۱۰ چقدر سخت بود.",
+    "What you lifted": "چی زدی",
+    "Weight unit. Tap to choose": "واحد وزنه. برای انتخاب بزن",
+    "How hard it felt, effort": "چقدر سخت بود، شدت",
+    "How hard?": "چقدر سخت؟",
+    "How hard? What effort means": "چقدر سخت؟ شدت یعنی چی",
+    "When": "کِی",
+    "Save to Personal Records": "ذخیره تو رکوردهای شخصی",
+    "A date in the past is fine. Log the day you lifted it,": "تاریخ گذشته مشکلی نداره. روزی رو بزن که زدی،",
+    "not the day you got round to typing it in.": "نه روزی که وارد کردی.",
+    "Put in a weight, the reps and your effort.": "وزنه، تکرار و شدتت رو وارد کن.",
+    "Sharp": "دقیق",
+    "Good": "خوب",
+    "Rough": "تقریبی",
+    "how much to trust it": "چقدر می‌شه بهش اعتماد کرد",
+    "nothing left in you": "هیچی توت نمونده",
+    "Your numbers · nothing left in you": "عددهای تو · هیچی توت نمونده",
+    "Heavy, and you stopped close to your limit. This is as good as it gets.": "سنگین بود و نزدیک حدّت وایسادی. از این بهتر نمی‌شه.",
+    "Want it sharper? Fewer reps with a heavier weight.": "دقیق‌ترش رو می‌خوای؟ تکرار کمتر با وزنهٔ سنگین‌تر.",
+    "Long sets are hard to judge. Fewer reps and more weight give a better number.": "ست‌های طولانی سخت برآورد می‌شن. تکرار کمتر و وزنهٔ بیشتر عدد بهتری می‌ده.",
+    "Retest beaten": "تست دوباره رکورد شد",
+    "New best": "رکورد جدید",
+    "Share": "اشتراک",
+    "Share your retest": "اشتراک تست دوباره‌ت",
+    "Share your new best": "اشتراک رکورد جدیدت",
+    "Share this record": "اشتراک این رکورد",
+    "Entry": "ثبت",
+    "Entries": "ثبت‌ها",
+    "Every entry": "همهٔ ثبت‌ها",
+    "Delete this entry": "حذف این ثبت",
+    "Delete?": "حذف؟",
+    "Every entry names the set it came from.": "هر ثبت اسم ستی رو که ازش اومده می‌گه.",
+    "Heavier sets closer to failure give the sharper numbers.": "ست‌های سنگین‌تر و نزدیک‌تر به ناتوانی عددهای دقیق‌تری می‌دن."
+  },
+  "patterns": [
+    [
+      "(\\d+) a week",
+      "{n1} بار در هفته"
+    ],
+    [
+      "(\\d+) a week · (\\d+) weeks?",
+      "{n1} بار در هفته · {n2} هفته"
+    ],
+    [
+      "(\\d+) sessions? this cycle",
+      "{n1} جلسه تو این دوره"
+    ],
+    [
+      "(\\d+) sessions? this cycle · (\\d+) extra",
+      "{n1} جلسه تو این دوره · {n2} اضافه"
+    ],
+    [
+      "No sessions yet this cycle · (\\d+) extra",
+      "تو این دوره هنوز جلسه‌ای نداری · {n1} اضافه"
+    ],
+    [
+      "This cycle · (\\d+) of (\\d+)",
+      "این دوره · {n1} از {n2}"
+    ],
+    [
+      "\\+(\\d+) extra",
+      "{n1} اضافه"
+    ],
+    [
+      "(\\d+) extra",
+      "{n1} اضافه"
+    ],
+    [
+      "(\\d+) of (\\d+)",
+      "{n1} از {n2}"
+    ],
+    [
+      "(\\d+) of (\\d+) sessions?",
+      "{n1} از {n2} جلسه"
+    ],
+    [
+      "W(\\d+)",
+      "ه{n1}"
+    ],
+    [
+      "(\\d+ of \\d+ sessions?|\\d+ sessions?) · (.+)",
+      "{t1} · {t2}"
+    ],
+    [
+      "(\\d+) extra · Held",
+      "{n1} اضافه · حفظ شد"
+    ],
+    [
+      "(\\w+ \\d+ \\w+) · (\\d+) min",
+      "{d1} · {n2} دقیقه"
+    ],
+    [
+      "(\\d+) min",
+      "{n1} دقیقه"
+    ],
+    [
+      "This week, (.+)",
+      "این هفته، {t1}"
+    ],
+    [
+      "Week (\\d+), (.+)",
+      "هفتهٔ {n1}، {t2}"
+    ],
+    [
+      "this week, (.+)",
+      "این هفته، {t1}"
+    ],
+    [
+      "(.+), (\\d+) extra",
+      "{t1}، {n2} اضافه"
+    ],
+    [
+      "(.+)\\. Tap to see its days\\.",
+      "{t1}. برای دیدن روزهاش بزن."
+    ],
+    [
+      "(.+)\\. Tap to see its sessions\\.",
+      "{t1}. برای دیدن جلسه‌هاش بزن."
+    ],
+    [
+      "(Tennis|Padel|Squash|Badminton|Pickleball|Table tennis|Beach tennis), (.+)",
+      "{t1}، {t2}"
+    ],
+    [
+      "(Competition|Strength|Fitness|Physique|Running|Health), (.+)",
+      "{t1}، {t2}"
+    ],
+    [
+      "(Right-handed|Left-handed), (two-handed|one-handed) backhand",
+      "{t1}، بک‌هند {t2}"
+    ],
+    [
+      "Close (Plays|Hand|Backhand|Side|Level|Club|Trains for|Working on|Instagram)",
+      "بستن {t1}"
+    ],
+    [
+      "(Tennis|Padel|Squash|Badminton|Pickleball|Table tennis|Beach tennis) · (right side|left side|both sides)",
+      "{t1} · {t2}"
+    ],
+    [
+      "(.+)'s numbers",
+      "عددهای $1"
+    ],
+    [
+      "(.+)'s trophies",
+      "جام‌های $1"
+    ],
+    [
+      "Trophies · (\\d+)",
+      "جام‌ها · {n1}"
+    ],
+    [
+      "Streaks · (\\d+)",
+      "ردیف‌ها · {n1}"
+    ],
+    [
+      "All (\\d+) trophies",
+      "همهٔ {n1} جام"
+    ],
+    [
+      "(\\d+) won so far\\.",
+      "{n1} تا تا حالا گرفتی."
+    ],
+    [
+      "LV (\\d+)",
+      "سطح {n1}"
+    ],
+    [
+      "Day (\\d+) done",
+      "روز {n1} تموم شد"
+    ],
+    [
+      "(.+) · (\\d+) likes?",
+      "{t1} · {n2} لایک"
+    ],
+    [
+      "With Amir since (\\w+) (\\d{4})",
+      "با امیر از {t1} {n2}"
+    ],
+    [
+      "Cheer (.+) back",
+      "تشویق متقابل $1"
+    ],
+    [
+      "Cheer (.+)",
+      "تشویق $1"
+    ],
+    [
+      "(.+)'s photo",
+      "عکس $1"
+    ],
+    [
+      "(.+) · (\\d+) days? left",
+      "{t1} · {n2} روز مونده"
+    ],
+    [
+      "A word for (.+), if you have one",
+      "یه کلمه برای $1، اگه داری"
+    ],
+    [
+      "Cheer sent to (.+)",
+      "تشویق برای $1 رفت"
+    ],
+    [
+      "You cheered (.+) today\\. Come back tomorrow\\.",
+      "امروز $1 رو تشویق کردی. فردا بیا."
+    ],
+    [
+      "(.+) is not in the crew any more\\.",
+      "$1 دیگه تو تیم نیست."
+    ],
+    [
+      "Tap the time to move it an hour, between 8am and 10pm\\. It applies to all (\\d+) of your phones\\.",
+      "روی ساعت بزن تا یه ساعت جلو بره، بین ۸ صبح تا ۱۰ شب. برای هر {n1} گوشیت اعمال می‌شه."
+    ],
+    [
+      "· (\\d+) min",
+      "· {n1} دقیقه"
+    ],
+    [
+      "· Week held",
+      "· هفته حفظ شد"
+    ],
+    [
+      "· (\\d{1,2} [A-Za-z]+)",
+      "· {d1}"
+    ],
+    [
+      "Logged (\\d+) days ago",
+      "{n1} روز پیش ثبت شد"
+    ],
+    [
+      "Logged (\\d+) weeks ago",
+      "{n1} هفته پیش ثبت شد"
+    ],
+    [
+      "· Never tested",
+      "· هیچ‌وقت تست نشده"
+    ],
+    [
+      "· Logged today",
+      "· امروز ثبت شد"
+    ],
+    [
+      "· Logged yesterday",
+      "· دیروز ثبت شد"
+    ],
+    [
+      "· Logged (\\d+) days ago",
+      "· {n1} روز پیش ثبت شد"
+    ],
+    [
+      "· Logged (\\d+) weeks ago",
+      "· {n1} هفته پیش ثبت شد"
+    ],
+    [
+      "You can lift ([\\d.]+) times your own body weight on the (.+)\\. On court that counts for more than the raw kilos\\.",
+      "تو {n1} برابر وزن بدن خودت رو توی $2 بلند می‌کنی. توی زمین، این از خود کیلوها مهم‌تره."
+    ],
+    [
+      "Test (.+)",
+      "تست $1"
+    ],
+    [
+      "A (.+) test: warm up in steps, then one hard set of (\\d+)\\. Stop when the last rep is a true grind — that is what makes the number worth having\\.",
+      "تست $1: مرحله‌به‌مرحله گرم کن، بعد یه ست سنگین {n2} تایی بزن. وقتی تکرار آخر واقعاً له‌کننده شد وایسا، چون عدد همینجوری ارزش پیدا می‌کنه."
+    ],
+    [
+      "Effort (\\d+)",
+      "شدت {n1}"
+    ],
+    [
+      "Your numbers · (\\d+) reps? left in you",
+      "عددهای تو · {n1} تکرار توت مونده"
+    ],
+    [
+      "(\\d+) reps with (\\d+) left in you is",
+      "{n1} تکرار با {n2} تا مونده توت، می‌شه"
+    ],
+    [
+      "(\\d+) to failure",
+      "{n1} تا ناتوانی"
+    ],
+    [
+      "Past (\\d+) the maths is a guess, not an estimate\\. Try a heavier set of 5 or fewer\\.",
+      "بعد از {n1} حساب فقط حدسه، نه برآورد. یه ست سنگین‌تر با ۵ تکرار یا کمتر امتحان کن."
+    ],
+    [
+      "That is the (.+) test done properly\\. Nothing to improve on the number itself\\.",
+      "این تست $1 درست انجام شد. روی خود عدد چیزی برای بهتر شدن نیست."
+    ],
+    [
+      "([\\d.]+) kg",
+      "{n1} کیلو"
+    ],
+    [
+      "▲ ([\\d.]+) kg",
+      "▲ {n1} کیلو"
+    ],
+    [
+      "▲ ([\\d.]+) kg since you started",
+      "▲ {n1} کیلو از وقتی شروع کردی"
+    ],
+    [
+      "(.+) · ▲ ([\\d.]+) kg since you started",
+      "$1 · ▲ {n2} کیلو از وقتی شروع کردی"
+    ],
+    [
+      "▼ ([\\d.]+) kg",
+      "▼ {n1} کیلو"
+    ],
+    [
+      "▼ ([\\d.]+) kg since you started",
+      "▼ {n1} کیلو از وقتی شروع کردی"
+    ],
+    [
+      "(.+) · ▼ ([\\d.]+) kg since you started",
+      "$1 · ▼ {n2} کیلو از وقتی شروع کردی"
+    ],
+    [
+      "([\\d.]+) kg since you started",
+      "{n1} کیلو از وقتی شروع کردی"
+    ],
+    [
+      "(\\d+ [A-Za-z]+) · ([\\d.]+) kg",
+      "{d1} · {n2} کیلو"
+    ],
+    [
+      "(.+), ([\\d.]+) kg, the same as when you started",
+      "$1، {n2} کیلو، مثل وقتی شروع کردی"
+    ],
+    [
+      "(.+), ([\\d.]+) kg, up ([\\d.]+) kg since (.+)",
+      "$1، {n2} کیلو، {n3} کیلو بیشتر از {d4}"
+    ],
+    [
+      "(.+), ([\\d.]+) kg, down ([\\d.]+) kg since (.+)",
+      "$1، {n2} کیلو، {n3} کیلو کمتر از {d4}"
+    ],
+    [
+      "kg (.+)",
+      "کیلو $1"
+    ],
+    [
+      "kg estimate",
+      "برآورد به کیلو"
+    ],
+    [
+      "kg since first",
+      "کیلو از اول"
+    ],
+    [
+      "([\\d.]+) kg over your last best",
+      "{n1} کیلو بیشتر از رکورد قبلیت"
+    ],
+    [
+      "([\\d.]+) kg · logged today",
+      "{n1} کیلو · امروز ثبت شد"
+    ],
+    [
+      "([\\d.]+) kg · logged yesterday",
+      "{n1} کیلو · دیروز ثبت شد"
+    ],
+    [
+      "([\\d.]+) kg · logged (\\d+) days ago",
+      "{n1} کیلو · {n2} روز پیش ثبت شد"
+    ],
+    [
+      "([\\d.]+) kg · logged (\\d+) weeks ago",
+      "{n1} کیلو · {n2} هفته پیش ثبت شد"
+    ],
+    [
+      "([\\d.]+) kg · never tested",
+      "{n1} کیلو · هیچ‌وقت تست نشده"
+    ],
+    [
+      "(\\d+ [A-Za-z]+) · ([\\d.,]+) kg × (\\d+) @ effort (\\d+)",
+      "{d1} · {n2} کیلو × {n3} @ شدت {n4}"
+    ],
+    [
+      "(\\d+ [A-Za-z]+) · ([\\d.,]+) kg × (\\d+) @ effort (\\d+) · tested",
+      "{d1} · {n2} کیلو × {n3} @ شدت {n4} · تست"
+    ],
+    [
+      "(\\d+ [A-Za-z]+) · ([\\d.,]+) kg × (\\d+) @ effort (\\d+) · from your sets",
+      "{d1} · {n2} کیلو × {n3} @ شدت {n4} · از ست‌هات"
+    ],
+    [
+      "([\\d.]+) lb",
+      "{n1} پوند"
+    ],
+    [
+      "▲ ([\\d.]+) lb",
+      "▲ {n1} پوند"
+    ],
+    [
+      "▲ ([\\d.]+) lb since you started",
+      "▲ {n1} پوند از وقتی شروع کردی"
+    ],
+    [
+      "(.+) · ▲ ([\\d.]+) lb since you started",
+      "$1 · ▲ {n2} پوند از وقتی شروع کردی"
+    ],
+    [
+      "▼ ([\\d.]+) lb",
+      "▼ {n1} پوند"
+    ],
+    [
+      "▼ ([\\d.]+) lb since you started",
+      "▼ {n1} پوند از وقتی شروع کردی"
+    ],
+    [
+      "(.+) · ▼ ([\\d.]+) lb since you started",
+      "$1 · ▼ {n2} پوند از وقتی شروع کردی"
+    ],
+    [
+      "([\\d.]+) lb since you started",
+      "{n1} پوند از وقتی شروع کردی"
+    ],
+    [
+      "(\\d+ [A-Za-z]+) · ([\\d.]+) lb",
+      "{d1} · {n2} پوند"
+    ],
+    [
+      "(.+), ([\\d.]+) lb, the same as when you started",
+      "$1، {n2} پوند، مثل وقتی شروع کردی"
+    ],
+    [
+      "(.+), ([\\d.]+) lb, up ([\\d.]+) lb since (.+)",
+      "$1، {n2} پوند، {n3} پوند بیشتر از {d4}"
+    ],
+    [
+      "(.+), ([\\d.]+) lb, down ([\\d.]+) lb since (.+)",
+      "$1، {n2} پوند، {n3} پوند کمتر از {d4}"
+    ],
+    [
+      "lb (.+)",
+      "پوند $1"
+    ],
+    [
+      "lb estimate",
+      "برآورد به پوند"
+    ],
+    [
+      "lb since first",
+      "پوند از اول"
+    ],
+    [
+      "([\\d.]+) lb over your last best",
+      "{n1} پوند بیشتر از رکورد قبلیت"
+    ],
+    [
+      "([\\d.]+) lb · logged today",
+      "{n1} پوند · امروز ثبت شد"
+    ],
+    [
+      "([\\d.]+) lb · logged yesterday",
+      "{n1} پوند · دیروز ثبت شد"
+    ],
+    [
+      "([\\d.]+) lb · logged (\\d+) days ago",
+      "{n1} پوند · {n2} روز پیش ثبت شد"
+    ],
+    [
+      "([\\d.]+) lb · logged (\\d+) weeks ago",
+      "{n1} پوند · {n2} هفته پیش ثبت شد"
+    ],
+    [
+      "([\\d.]+) lb · never tested",
+      "{n1} پوند · هیچ‌وقت تست نشده"
+    ],
+    [
+      "(\\d+ [A-Za-z]+) · ([\\d.,]+) lb × (\\d+) @ effort (\\d+)",
+      "{d1} · {n2} پوند × {n3} @ شدت {n4}"
+    ],
+    [
+      "(\\d+ [A-Za-z]+) · ([\\d.,]+) lb × (\\d+) @ effort (\\d+) · tested",
+      "{d1} · {n2} پوند × {n3} @ شدت {n4} · تست"
+    ],
+    [
+      "(\\d+ [A-Za-z]+) · ([\\d.,]+) lb × (\\d+) @ effort (\\d+) · from your sets",
+      "{d1} · {n2} پوند × {n3} @ شدت {n4} · از ست‌هات"
+    ],
+    [
+      "([\\d.]+) plate",
+      "{n1} پلیت"
+    ],
+    [
+      "▲ ([\\d.]+) plate",
+      "▲ {n1} پلیت"
+    ],
+    [
+      "▲ ([\\d.]+) plate since you started",
+      "▲ {n1} پلیت از وقتی شروع کردی"
+    ],
+    [
+      "(.+) · ▲ ([\\d.]+) plate since you started",
+      "$1 · ▲ {n2} پلیت از وقتی شروع کردی"
+    ],
+    [
+      "▼ ([\\d.]+) plate",
+      "▼ {n1} پلیت"
+    ],
+    [
+      "▼ ([\\d.]+) plate since you started",
+      "▼ {n1} پلیت از وقتی شروع کردی"
+    ],
+    [
+      "(.+) · ▼ ([\\d.]+) plate since you started",
+      "$1 · ▼ {n2} پلیت از وقتی شروع کردی"
+    ],
+    [
+      "([\\d.]+) plate since you started",
+      "{n1} پلیت از وقتی شروع کردی"
+    ],
+    [
+      "(\\d+ [A-Za-z]+) · ([\\d.]+) plate",
+      "{d1} · {n2} پلیت"
+    ],
+    [
+      "(.+), ([\\d.]+) plate, the same as when you started",
+      "$1، {n2} پلیت، مثل وقتی شروع کردی"
+    ],
+    [
+      "(.+), ([\\d.]+) plate, up ([\\d.]+) plate since (.+)",
+      "$1، {n2} پلیت، {n3} پلیت بیشتر از {d4}"
+    ],
+    [
+      "(.+), ([\\d.]+) plate, down ([\\d.]+) plate since (.+)",
+      "$1، {n2} پلیت، {n3} پلیت کمتر از {d4}"
+    ],
+    [
+      "plate (.+)",
+      "پلیت $1"
+    ],
+    [
+      "plate estimate",
+      "برآورد به پلیت"
+    ],
+    [
+      "plate since first",
+      "پلیت از اول"
+    ],
+    [
+      "([\\d.]+) plate over your last best",
+      "{n1} پلیت بیشتر از رکورد قبلیت"
+    ],
+    [
+      "([\\d.]+) plate · logged today",
+      "{n1} پلیت · امروز ثبت شد"
+    ],
+    [
+      "([\\d.]+) plate · logged yesterday",
+      "{n1} پلیت · دیروز ثبت شد"
+    ],
+    [
+      "([\\d.]+) plate · logged (\\d+) days ago",
+      "{n1} پلیت · {n2} روز پیش ثبت شد"
+    ],
+    [
+      "([\\d.]+) plate · logged (\\d+) weeks ago",
+      "{n1} پلیت · {n2} هفته پیش ثبت شد"
+    ],
+    [
+      "([\\d.]+) plate · never tested",
+      "{n1} پلیت · هیچ‌وقت تست نشده"
+    ],
+    [
+      "(\\d+ [A-Za-z]+) · ([\\d.,]+) plate × (\\d+) @ effort (\\d+)",
+      "{d1} · {n2} پلیت × {n3} @ شدت {n4}"
+    ],
+    [
+      "(\\d+ [A-Za-z]+) · ([\\d.,]+) plate × (\\d+) @ effort (\\d+) · tested",
+      "{d1} · {n2} پلیت × {n3} @ شدت {n4} · تست"
+    ],
+    [
+      "(\\d+ [A-Za-z]+) · ([\\d.,]+) plate × (\\d+) @ effort (\\d+) · from your sets",
+      "{d1} · {n2} پلیت × {n3} @ شدت {n4} · از ست‌هات"
+    ],
+    [
+      "([\\d.]+) plates",
+      "{n1} پلیت"
+    ],
+    [
+      "▲ ([\\d.]+) plates",
+      "▲ {n1} پلیت"
+    ],
+    [
+      "▲ ([\\d.]+) plates since you started",
+      "▲ {n1} پلیت از وقتی شروع کردی"
+    ],
+    [
+      "(.+) · ▲ ([\\d.]+) plates since you started",
+      "$1 · ▲ {n2} پلیت از وقتی شروع کردی"
+    ],
+    [
+      "▼ ([\\d.]+) plates",
+      "▼ {n1} پلیت"
+    ],
+    [
+      "▼ ([\\d.]+) plates since you started",
+      "▼ {n1} پلیت از وقتی شروع کردی"
+    ],
+    [
+      "(.+) · ▼ ([\\d.]+) plates since you started",
+      "$1 · ▼ {n2} پلیت از وقتی شروع کردی"
+    ],
+    [
+      "([\\d.]+) plates since you started",
+      "{n1} پلیت از وقتی شروع کردی"
+    ],
+    [
+      "(\\d+ [A-Za-z]+) · ([\\d.]+) plates",
+      "{d1} · {n2} پلیت"
+    ],
+    [
+      "(.+), ([\\d.]+) plates, the same as when you started",
+      "$1، {n2} پلیت، مثل وقتی شروع کردی"
+    ],
+    [
+      "(.+), ([\\d.]+) plates, up ([\\d.]+) plates since (.+)",
+      "$1، {n2} پلیت، {n3} پلیت بیشتر از {d4}"
+    ],
+    [
+      "(.+), ([\\d.]+) plates, down ([\\d.]+) plates since (.+)",
+      "$1، {n2} پلیت، {n3} پلیت کمتر از {d4}"
+    ],
+    [
+      "plates (.+)",
+      "پلیت $1"
+    ],
+    [
+      "plates estimate",
+      "برآورد به پلیت"
+    ],
+    [
+      "plates since first",
+      "پلیت از اول"
+    ],
+    [
+      "([\\d.]+) plates over your last best",
+      "{n1} پلیت بیشتر از رکورد قبلیت"
+    ],
+    [
+      "([\\d.]+) plates · logged today",
+      "{n1} پلیت · امروز ثبت شد"
+    ],
+    [
+      "([\\d.]+) plates · logged yesterday",
+      "{n1} پلیت · دیروز ثبت شد"
+    ],
+    [
+      "([\\d.]+) plates · logged (\\d+) days ago",
+      "{n1} پلیت · {n2} روز پیش ثبت شد"
+    ],
+    [
+      "([\\d.]+) plates · logged (\\d+) weeks ago",
+      "{n1} پلیت · {n2} هفته پیش ثبت شد"
+    ],
+    [
+      "([\\d.]+) plates · never tested",
+      "{n1} پلیت · هیچ‌وقت تست نشده"
+    ],
+    [
+      "(\\d+ [A-Za-z]+) · ([\\d.,]+) plates × (\\d+) @ effort (\\d+)",
+      "{d1} · {n2} پلیت × {n3} @ شدت {n4}"
+    ],
+    [
+      "(\\d+ [A-Za-z]+) · ([\\d.,]+) plates × (\\d+) @ effort (\\d+) · tested",
+      "{d1} · {n2} پلیت × {n3} @ شدت {n4} · تست"
+    ],
+    [
+      "(\\d+ [A-Za-z]+) · ([\\d.,]+) plates × (\\d+) @ effort (\\d+) · from your sets",
+      "{d1} · {n2} پلیت × {n3} @ شدت {n4} · از ست‌هات"
+    ],
+    [
+      "([\\d.]+)× bodyweight",
+      "{n1}× وزن بدن"
+    ],
+    [
+      "Lifting ([\\d.]+) kg means one thing at 65 kg and something else at 95 kg\\. What counts on court is how strong you are for your size\\. Add your weight and it shows up here\\.",
+      "اینکه {n1} کیلو بزنی، توی 65 کیلو یه معنی داره و توی 95 کیلو یه معنی دیگه. چیزی که توی زمین حساب می‌شه اینه که نسبت به جثه‌ت چقدر قوی هستی. وزنت رو اضافه کن تا اینجا نشون داده بشه."
+    ],
+    [
+      "Lifting ([\\d.]+) lb means one thing at 145 lb and something else at 210 lb\\. What counts on court is how strong you are for your size\\. Add your weight and it shows up here\\.",
+      "اینکه {n1} پوند بزنی، توی 145 پوند یه معنی داره و توی 210 پوند یه معنی دیگه. چیزی که توی زمین حساب می‌شه اینه که نسبت به جثه‌ت چقدر قوی هستی. وزنت رو اضافه کن تا اینجا نشون داده بشه."
+    ]
+  ],
+  "split": [
+    {
+      "line": 17822,
+      "text": "Your photo gets a stamp: <b>${parts.join(\" · \")}</b>",
+      "note": "the bold part is the session title, minutes, Week held and a date in one node, so it cannot be one pattern; the strip on the photo itself is translated piecewise"
+    },
+    {
+      "line": 18756,
+      "text": "${rp} reps with ${rir} left in you is <b>${eff} to failure</b>.<br>Past 10 the maths is a guess...",
+      "note": "sentence broken by a bold number: the pieces read in order but the grammar is stiff"
+    },
+    {
+      "line": 16600,
+      "text": "This cycle · ${done} of ${plan}<span>+${extra} extra</span><span>Only you</span>",
+      "note": "heading, extra-count and Only you label are three nodes"
+    },
+    {
+      "line": 16866,
+      "text": "Level medal<span class=\"pl-only\">Only you</span>",
+      "note": "label and badge are two nodes"
+    },
+    {
+      "line": 16593,
+      "text": "aria-label built from up to five clauses (this week, held, n of m sessions, extra, tap)",
+      "note": "translated by recursive patterns clause by clause; the order of clauses is English order"
+    }
+  ],
+  "readback": []
+}

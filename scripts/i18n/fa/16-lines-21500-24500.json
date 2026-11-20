@@ -1,0 +1,266 @@
+{
+  "area": "lines 21500-24500: set log table, hold screen, kg checks, unit menu, body weight screen, circuit log, notes, rest timer",
+  "exact": {
+    "Side 1 done": "طرف اول تمام شد",
+    "Get ready": "آماده شو",
+    "Hold": "نگه دار",
+    "Stop the hold. Nothing is ticked": "نگه داشتن رو قطع کن. چیزی تیک نمی‌خوره",
+    "Mark set done as written": "ست رو همون‌طور که نوشته شده تیک بزن",
+    "SET": "ست",
+    "REPS": "تکرار",
+    "Weight unit. Tap to choose": "واحد وزنه. برای انتخاب بزن",
+    "Weight unit": "واحد وزنه",
+    "Weight in": "وزنه به",
+    "How hard?": "چقدر سخت بود؟",
+    "How hard? What effort means": "چقدر سخت بود؟ شدت یعنی چی",
+    "Check the weight": "وزنه رو چک کن",
+    "Keep it": "بمونه",
+    "Fix it": "اصلاحش می‌کنم",
+    "Undo": "برگردون",
+    "Show me": "نشونم بده",
+    "Got it": "باشه",
+    "Sharp": "دقیق",
+    "Good": "خوب",
+    "Rough": "تقریبی",
+    "Heavy, and you stopped close to your limit. This is as good as it gets.": "سنگین بود و نزدیک حدّ خودت ایستادی. از این دقیق‌تر نمی‌شه.",
+    "Want it sharper? Fewer reps with a heavier weight.": "دقیق‌تر می‌خوای؟ تکرار کمتر با وزنهٔ سنگین‌تر.",
+    "Long sets are hard to judge. Fewer reps and more weight give a better number.": "ست طولانی رو سخت می‌شه سنجید. تکرار کمتر و وزنهٔ بیشتر عدد بهتری می‌ده.",
+    "Tap to add your first reading.": "برای ثبت اولین وزنت بزن.",
+    "First reading": "اولین وزن‌کشی",
+    "Level on your average": "ثابت نسبت به میانگین تو",
+    "Your weight over time. Weigh yourself at the same time of day, ideally first thing, and the line means something.": "وزن تو در طول زمان. هر روز یه ساعت ثابت وزن بکش، بهتره صبح اول وقت، تا خط معنی داشته باشه.",
+    "Nothing logged yet.": "هنوز چیزی ثبت نشده.",
+    "One reading is just a number. A few over a few weeks is the trend, and the trend is the part worth having.": "یه وزن‌کشی فقط یه عدده. چند تا تو چند هفته می‌شه روند، و روند همون چیزیه که ارزش داره.",
+    "Up over the range": "بالا رفته تو این بازه",
+    "Down over the range": "پایین اومده تو این بازه",
+    "Level over the range": "ثابت تو این بازه",
+    "Over the range": "تو این بازه",
+    "Reading": "وزن‌کشی",
+    "Readings": "وزن‌کشی",
+    "Level over this range, comparing average to average.": "ثابت تو این بازه، میانگین با میانگین مقایسه شده.",
+    "Range": "بازه",
+    "Every reading": "همهٔ وزن‌کشی‌ها",
+    "Delete?": "حذف؟",
+    "Delete this reading": "حذف این وزن‌کشی",
+    "The line is a 7-day average, the dots are what you actually weighed.": "خط میانگین ۷ روزه‌ست، نقطه‌ها همون وزنیه که واقعاً کشیدی.",
+    "Day to day a kilo is water. The line is the real answer.": "از یه روز به روز بعد، یه کیلو فقط آبه. خط جواب واقعیه.",
+    "Delete all my weight history": "حذف کل سابقهٔ وزن من",
+    "Tap again to delete every reading": "برای حذف همه، دوباره بزن",
+    "Today's weight": "وزن امروز",
+    "Weigh in": "ثبت وزن",
+    "Today's weight in kilograms": "وزن امروز به کیلو",
+    "Kilograms": "کیلوگرم",
+    "Pounds": "پوند",
+    "Plates": "پلیت",
+    "how many plates on the stack": "چند تا پلیت روی دستگاه",
+    "Note": "یادداشت",
+    "Anything about today's sets? Your coach sees it with this session.": "چیزی دربارهٔ ستای امروز هست؟ مربیت اینو با همین جلسه می‌بینه.",
+    "Skip the rest": "رد کردن استراحت",
+    "Close the rest timer": "بستن تایمر استراحت",
+    "Pause": "مکث",
+    "Paused": "متوقف",
+    "GO!": "برو!",
+    "Go": "برو",
+    "Next:": "بعدی:",
+    "Rest over. Go": "استراحت تموم شد. برو",
+    "That did not load. Check your signal and try again.": "لود نشد. آنتنت رو چک کن و دوباره امتحان کن."
+  },
+  "patterns": [
+    [
+      "Set (\\d+) of (\\d+) · (.+)",
+      "ست {n1} از {n2} · $3"
+    ],
+    [
+      "Set (\\d+): side 1 done\\. Tap to start side 2",
+      "ست {n1}: طرف اول تمام شد. برای شروع طرف دوم بزن"
+    ],
+    [
+      "Set (\\d+): get ready\\. Tap to stop",
+      "ست {n1}: آماده شو. برای توقف بزن"
+    ],
+    [
+      "Set (\\d+), side (\\d+) counting\\. Tap to stop",
+      "ست {n1}، طرف {n2} داره می‌شمره. برای توقف بزن"
+    ],
+    [
+      "Set (\\d+) counting\\. Tap to stop",
+      "ست {n1} داره می‌شمره. برای توقف بزن"
+    ],
+    [
+      "Get ready · side (\\d+)",
+      "آماده شو · طرف {n1}"
+    ],
+    [
+      "Side (\\d+) of 2",
+      "طرف {n1} از ۲"
+    ],
+    [
+      "Mark set (\\d+) done as written",
+      "ست {n1} رو همون‌طور که نوشته شده تیک بزن"
+    ],
+    [
+      "Effort (\\d+)",
+      "شدت {n1}"
+    ],
+    [
+      "Effort (\\d+)\\. Tap to change",
+      "شدت {n1}. برای تغییر بزن"
+    ],
+    [
+      "Effort (\\d+), above target\\. Tap to change",
+      "شدت {n1}، بالاتر از هدف. برای تغییر بزن"
+    ],
+    [
+      "Effort (\\d+), below target\\. Tap to change",
+      "شدت {n1}، پایین‌تر از هدف. برای تغییر بزن"
+    ],
+    [
+      "Rate set (\\d+)",
+      "شدت ست {n1} رو بزن"
+    ],
+    [
+      "Reps done on set (\\d+), if not (\\d+)",
+      "تکرار انجام‌شده تو ست {n1}، اگه {n2} نبود"
+    ],
+    [
+      "Reps done on set (\\d+)",
+      "تکرار انجام‌شده تو ست {n1}"
+    ],
+    [
+      "Weight on set (\\d+), last time (.+)",
+      "وزنه تو ست {n1}، دفعهٔ قبل $2"
+    ],
+    [
+      "Weight on set (\\d+)",
+      "وزنه تو ست {n1}"
+    ],
+    [
+      "R(\\d+) · How hard\\?",
+      "R$1 · چقدر سخت بود؟"
+    ],
+    [
+      "Round (\\d+): how hard\\? What effort means",
+      "راند {n1}: چقدر سخت بود؟ شدت یعنی چی"
+    ],
+    [
+      "(.+)\\? That's far above your numbers for this lift\\. Tap ✓ again to keep it\\.",
+      "$1؟ این خیلی بالاتر از عددهای قبلی تو تو این حرکته. برای نگه داشتنش دوباره ✓ رو بزن."
+    ],
+    [
+      "(.+)\\? That's far above your numbers for this lift\\. If it's a typo, fix it in the weight box\\.",
+      "$1؟ این خیلی بالاتر از عددهای قبلی تو تو این حرکته. اگه اشتباه تایپیه، تو کادر وزنه درستش کن."
+    ],
+    [
+      "([▲▼]) ([\\d.]+) kg on your average",
+      "$1 {n2} کیلو نسبت به میانگین تو"
+    ],
+    [
+      "Last weighed (.+)",
+      "آخرین وزن‌کشی: {d1}"
+    ],
+    [
+      "Up ([\\d.]+) kg over this range, comparing average to average\\.",
+      "{n1} کیلو بالا رفته تو این بازه، میانگین با میانگین مقایسه شده."
+    ],
+    [
+      "Down ([\\d.]+) kg over this range, comparing average to average\\.",
+      "{n1} کیلو پایین اومده تو این بازه، میانگین با میانگین مقایسه شده."
+    ],
+    [
+      "(\\d+) months?",
+      "{n1} ماه"
+    ],
+    [
+      "You haven't ticked (.+)\\. Done it\\? Tap its number\\. Skipped it\\? That's fine\\.",
+      "$1 رو تیک نزدی. انجامش دادی؟ شمارهٔ اون رو بزن. ردش کردی؟ اشکالی نداره."
+    ],
+    [
+      "You haven't ticked (.+)\\. Done them\\? Tap their numbers\\. Skipped them\\? That's fine\\.",
+      "$1 رو تیک نزدی. انجامشون دادی؟ شماره‌هاشون رو بزن. ردشون کردی؟ اشکالی نداره."
+    ],
+    [
+      "Rest paused, (\\d+) seconds left\\. Tap to open the rest timer",
+      "استراحت متوقفه، {n1} ثانیه مونده. برای باز کردن تایمر بزن"
+    ],
+    [
+      "Rest (\\d+) seconds left\\. Tap to open the rest timer",
+      "استراحت، {n1} ثانیه مونده. برای باز کردن تایمر بزن"
+    ],
+    [
+      "(.+) · set (\\d+) of (\\d+)",
+      "$1 · ست {n2} از {n3}"
+    ],
+    [
+      "Weight in kg\\. Tap to choose a unit",
+      "وزنه به کیلو. برای انتخاب واحد بزن"
+    ],
+    [
+      "Weights are now in kg\\. The numbers you typed did not change\\.",
+      "وزنه‌ها الان به کیلو هستن. عددهایی که زدی عوض نشدن."
+    ],
+    [
+      "Weights are now in kg for this circuit\\.",
+      "وزنه‌های این سیرکویت الان به کیلو هستن."
+    ],
+    [
+      "Weights are now in kg for this exercise\\.",
+      "وزنه‌های این حرکت الان به کیلو هستن."
+    ],
+    [
+      "Weight in lb\\. Tap to choose a unit",
+      "وزنه به پوند. برای انتخاب واحد بزن"
+    ],
+    [
+      "Weights are now in lb\\. The numbers you typed did not change\\.",
+      "وزنه‌ها الان به پوند هستن. عددهایی که زدی عوض نشدن."
+    ],
+    [
+      "Weights are now in lb for this circuit\\.",
+      "وزنه‌های این سیرکویت الان به پوند هستن."
+    ],
+    [
+      "Weights are now in lb for this exercise\\.",
+      "وزنه‌های این حرکت الان به پوند هستن."
+    ],
+    [
+      "Weight in plates\\. Tap to choose a unit",
+      "وزنه به پلیت. برای انتخاب واحد بزن"
+    ],
+    [
+      "Weights are now in plates\\. The numbers you typed did not change\\.",
+      "وزنه‌ها الان به پلیت هستن. عددهایی که زدی عوض نشدن."
+    ],
+    [
+      "Weights are now in plates for this circuit\\.",
+      "وزنه‌های این سیرکویت الان به پلیت هستن."
+    ],
+    [
+      "Weights are now in plates for this exercise\\.",
+      "وزنه‌های این حرکت الان به پلیت هستن."
+    ]
+  ],
+  "split": [
+    {
+      "line": 23752,
+      "text": "You haven't ticked ${A, B and C}. Done them? ...",
+      "note": "names are joined with ' and ' inside one captured name, so the joiner stays English in a list of two or more"
+    }
+  ],
+  "readback": [
+    {
+      "line": 22552,
+      "text": "kg / hand",
+      "note": "paintSets() compares the unit button's textContent to unitHead(); a translated button would be rewritten each paint"
+    },
+    {
+      "line": 22577,
+      "text": "last-time placeholder like '20 kg' / 'plates'",
+      "note": "paintSets() compares wIn.placeholder to the English hint"
+    },
+    {
+      "line": 23575,
+      "text": "4 each side",
+      "note": "paintKgCol() compares the reps placeholder to the English text"
+    }
+  ]
+}

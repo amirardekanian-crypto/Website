@@ -1,0 +1,907 @@
+{
+  "area": "lines 14000-16500: career card, moments, achievements cabinet, Crew and the Bell, Player Page, partner card",
+  "exact": {
+    "Share ↗": "اشتراک ↗",
+    "Share": "اشتراک",
+    "Share your card": "اشتراک کارت تو",
+    "Your numbers": "اعداد تو",
+    "New from Amir": "جدید از امیر",
+    "1 week held": "۱ هفته نگه داشتی",
+    "Weeks in a row you trained": "هفته‌هایی که پشت‌سرهم تمرین کردی",
+    "Comebacks that held for a week": "برگشت‌هایی که یک هفته دوام آوردن",
+    "weeks held": "هفتهٔ نگه‌داشته",
+    "week held": "هفتهٔ نگه‌داشته",
+    "sessions with Amir": "جلسه با امیر",
+    "session with Amir": "جلسه با امیر",
+    "personal bests": "رکورد شخصی",
+    "personal best": "رکورد شخصی",
+    "comebacks": "برگشت",
+    "comeback": "برگشت",
+    "January": "ژانویه",
+    "February": "فوریه",
+    "March": "مارس",
+    "April": "آوریل",
+    "May": "مه",
+    "June": "ژوئن",
+    "July": "ژوئیه",
+    "August": "اوت",
+    "September": "سپتامبر",
+    "October": "اکتبر",
+    "November": "نوامبر",
+    "December": "دسامبر",
+    "Jan": "ژانویه",
+    "Feb": "فوریه",
+    "Mar": "مارس",
+    "Apr": "آوریل",
+    "Jun": "ژوئن",
+    "Jul": "ژوئیه",
+    "Aug": "اوت",
+    "Sep": "سپتامبر",
+    "Oct": "اکتبر",
+    "Nov": "نوامبر",
+    "Dec": "دسامبر",
+    "From Amir": "از طرف امیر",
+    "Reply on WhatsApp": "جواب در واتس‌اپ",
+    "Amir saw this": "امیر این رو دید",
+    "Share a moment": "اشتراک یه لحظه",
+    "Your moments": "لحظه‌های تو",
+    "Your marks, your achievements, Amir's lines and the month's honours land here as you earn them.": "نشان‌ها، دستاوردها، حرف‌های امیر و افتخارهای ماه، همین‌که به دستشون بیاری اینجا میان.",
+    "Amir picked you that month.": "امیر اون ماه تو رو انتخاب کرد.",
+    "Every training week held.": "همهٔ هفته‌های تمرین نگه داشته شد.",
+    "Consistency": "پایداری",
+    "Showing up on your days, week after week.": "توی روزهات حاضر شدن، هفته به هفته.",
+    "Commitment": "تعهد",
+    "Doing the work as written, and staying with it.": "انجام کار همون‌طور که نوشته شده، و ادامه دادنش.",
+    "Getting better, proven in the log and the tests.": "بهتر شدن، با ثبت جلسه‌ها و تست‌ها ثابت شده.",
+    "Resilience": "تاب‌آوری",
+    "Coming back when it goes wrong.": "برگشتن وقتی کار خراب می‌شه.",
+    "Hold this week too. 1 week to go.": "این هفته رو هم نگه دار. ۱ هفته مونده.",
+    "A year in a row": "یک سال پشت‌سرهم",
+    "First best": "اولین رکورد",
+    "Every one of them, earned.": "همهٔ اون‌ها، با زحمت به دست اومده.",
+    "Not yet": "هنوز نه",
+    "Now": "الان",
+    "Honours": "افتخارها",
+    "Latest": "تازه‌ترین",
+    "All achievements": "همهٔ دستاوردها",
+    "Show": "نمایش",
+    "All": "همه",
+    "Won": "بردی",
+    "To win": "برای بردن",
+    "Nothing won yet. Your first one is close.": "هنوز چیزی نبردی. اولینش نزدیکه.",
+    "Nothing here.": "اینجا چیزی نیست.",
+    "New": "جدید",
+    "Share it": "اشتراک بزار",
+    "Tell the crew": "به تیم بگو",
+    "Streaks": "روزهای پشت‌سرهم",
+    "Most sessions": "بیشترین جلسه",
+    "Most improved": "بیشترین پیشرفت",
+    "Full Month": "ماه کامل",
+    "Amir's Pick": "انتخاب امیر",
+    "From your habits": "از عادت‌هات",
+    "What your daily habits can win. They count toward the four kinds too.": "چیزی که عادت‌های روزانه‌ات می‌تونن ببرن. برای چهار دستهٔ اصلی هم حساب می‌شن.",
+    "weeks": "هفته",
+    "months": "ماه",
+    "bests": "رکورد",
+    "sessions": "جلسه",
+    "Level 100 and up": "سطح ۱۰۰ به بالا",
+    "Level medal · 100 and up": "مدال سطح · ۱۰۰ به بالا",
+    "Level medal · 1 to 9": "مدال سطح · ۱ تا ۹",
+    "Levels 1 to 9": "سطح‌های ۱ تا ۹",
+    "Amir, the Coach tab": "امیر، تب مربی",
+    "Crew, a new post from Amir": "تیم، یه پست جدید از امیر",
+    "Like": "لایک",
+    "You": "تو",
+    "joined the crew": "به تیم پیوست",
+    "held a week": "یه هفته رو نگه داشت",
+    "finished a cycle": "یه دوره رو تموم کرد",
+    "entered the Monthly Open": "وارد Monthly Open شد",
+    "Change your reaction": "عوض کردن واکنش",
+    "More ways to say it": "راه‌های بیشتر برای گفتنش",
+    "Join the crew to like this": "برای لایک کردن به تیم بپیوند",
+    "Liked. Tap to take it back": "لایک شد. برای پس گرفتن بزن",
+    "Like this": "لایک",
+    "Join the crew?": "به تیم می‌پیوندی؟",
+    "Finish a session and your name joins one line a day saying who trained. Reach a new level, hold a week, hit a mark or set a best and the crew sees that too, for 7 days. Never a weight. Join and you can post messages and photos here as well.": "یه جلسه رو تموم کنی، اسمت توی یه خط روزانه میاد که می‌گه کی تمرین کرده. به سطح جدید برسی، یه هفته رو نگه داری، به یه نشان برسی یا رکورد بزنی، تیم اینم می‌بینه، تا ۷ روز. هیچ‌وقت وزنه‌ای نشون داده نمی‌شه. اگه بپیوندی می‌تونی اینجا پیام و عکس هم بذاری.",
+    "This is what the crew sees. Never a weight, never your check-in.": "این چیزیه که تیم می‌بینه. هیچ‌وقت وزنه، هیچ‌وقت چک‌این تو.",
+    "You can leave any time from your initials, under What the crew sees.": "هر وقت خواستی می‌تونی از حرف‌های اول اسمت، زیر «چیزی که تیم می‌بینه» بری بیرون.",
+    "Join the crew": "پیوستن به تیم",
+    "Keep it to me": "برای خودم بمونه",
+    "every week held": "هر هفته رو نگه داشت",
+    "his pick of the month": "انتخاب امیر برای این ماه",
+    "Athlete": "ورزشکار",
+    "Amir": "امیر",
+    "The Open": "The Open",
+    "Nobody has put a result up yet. Be first.": "هنوز کسی نتیجه‌ای نذاشته. اولین نفر باش.",
+    "Share your result": "اشتراک نتیجه‌ات",
+    "Send a better one": "یه نتیجهٔ بهتر بفرست",
+    "Send Amir your result": "نتیجه‌ات رو برای امیر بفرست",
+    "to the crew": "برای تیم",
+    "A session done": "یه جلسه تموم شد",
+    "Pinned": "سنجاق‌شده",
+    "Photo": "عکس",
+    "Open Amir's photo": "باز کردن عکس امیر",
+    "Open your photo": "باز کردن عکس تو",
+    "Tap again to delete the post": "برای حذف پست دوباره بزن",
+    "Tap again to delete": "برای حذف دوباره بزن",
+    "Reply to Amir": "جواب به امیر",
+    "Reply to your post": "جواب به پست تو",
+    "Reply to this post": "جواب به این پست",
+    "Reply…": "جواب بده…",
+    "Join the crew to reply": "برای جواب دادن به تیم بپیوند",
+    "Reply": "جواب",
+    "To Amir's post": "به پست امیر",
+    "To your post": "به پست تو",
+    "Say something": "یه چیزی بگو",
+    "Your reply": "جواب تو",
+    "Crew names to add": "اسم‌های تیم برای اضافه کردن",
+    "Gone after 7 days with the post. Amir can remove any reply.": "بعد از ۷ روز همراه پست پاک می‌شه. امیر می‌تونه هر جوابی رو برداره.",
+    "Sending…": "دارم می‌فرستم…",
+    "No signal. Your reply is still here: tap Reply again when you have signal.": "آنتن نیست. جوابت همین‌جاست: وقتی آنتن داشتی دوباره «جواب» رو بزن.",
+    "No signal. Try again when you are back online.": "آنتن نیست. وقتی آنلاین شدی دوباره امتحان کن.",
+    "That is over 140 characters.": "این بیشتر از ۱۴۰ حرفه.",
+    "Cheered today": "امروز تشویق کردی",
+    "Amir's pick": "انتخاب امیر",
+    "Nobody has trained yet": "هنوز کسی تمرین نکرده",
+    "See who is in the crew": "ببین کی توی تیمه",
+    "In the crew ›": "توی تیم ›",
+    "Double-tap a face to cheer. Tap to see their page.": "برای تشویق دو بار روی صورت بزن. برای دیدن صفحه‌اش یه بار بزن.",
+    "Say hello": "سلام کن",
+    "The crew this week": "تیم این هفته",
+    "Finish one and the crew sees it.": "یکی رو تموم کن تا تیم ببینه.",
+    "Fire sent. Tap to take it back": "آتیش فرستاده شد. برای پس گرفتن بزن",
+    "Strong sent. Tap to take it back": "قوی فرستاده شد. برای پس گرفتن بزن",
+    "Well done sent. Tap to take it back": "آفرین فرستاده شد. برای پس گرفتن بزن",
+    "Love it sent. Tap to take it back": "عاشقشم فرستاده شد. برای پس گرفتن بزن",
+    "Send Fire": "بفرست: آتیش",
+    "Join the crew to send Fire": "برای فرستادن «آتیش» به تیم بپیوند",
+    "Send Strong": "بفرست: قوی",
+    "Join the crew to send Strong": "برای فرستادن «قوی» به تیم بپیوند",
+    "Send Well done": "بفرست: آفرین",
+    "Join the crew to send Well done": "برای فرستادن «آفرین» به تیم بپیوند",
+    "Send Love it": "بفرست: عاشقشم",
+    "Join the crew to send Love it": "برای فرستادن «عاشقشم» به تیم بپیوند",
+    "The board shows here when you are back online.": "جدول وقتی دوباره آنلاین بشی اینجا نشون داده می‌شه.",
+    "The board shows here once you have signal.": "جدول وقتی آنتن داشته باشی اینجا نشون داده می‌شه.",
+    "No signal. The crew shows here when you are back online.": "آنتن نیست. تیم وقتی آنلاین بشی اینجا نشون داده می‌شه.",
+    "Loading the crew…": "دارم تیم رو می‌آرم…",
+    "The Bell": "زنگ",
+    "What's new": "چه خبر",
+    "Share something with the crew": "یه چیزی با تیم به اشتراک بذار",
+    "You can read the crew here. Posting is off for your account.": "اینجا می‌تونی تیم رو بخونی. پست گذاشتن برای حساب تو خاموشه.",
+    "You keep your moments to yourself, so the crew does not see you here.": "لحظه‌هات رو پیش خودت نگه می‌داری، پس تیم تو رو اینجا نمی‌بینه.",
+    "Quiet so far this week.": "این هفته تا الان ساکته.",
+    "Quiet so far this week. Share a photo from training and get it going.": "این هفته تا الان ساکته. یه عکس از تمرین بذار تا شروع بشه.",
+    "This season": "این فصل",
+    "The whole board": "کل جدول",
+    "Points for this season only. Everything you train and every habit you tick adds to it. Nothing on Crew earns a point.": "امتیازها فقط برای همین فصله. هر تمرین و هر عادتی که تیک بزنی بهش اضافه می‌کنه. هیچ چیزی توی تیم امتیاز نمی‌ده.",
+    "Everyone here said yes to the Bell. They see your name and what you did. They never see a weight or your check-in. You can leave any time from": "همه‌ی اینجا به Bell آره گفتن. اسم تو و کاری که کردی رو می‌بینن. هیچ‌وقت وزنه یا چک‌این تو رو نمی‌بینن. هر وقت خواستی می‌تونی بری، از",
+    "The crew shows here once you have signal.": "تیم وقتی آنتن داشته باشی اینجا نشون داده می‌شه.",
+    "You kept yourself out of the crew, so you cannot see their pages.": "خودت رو از تیم بیرون نگه داشتی، پس نمی‌تونی صفحه‌هاشون رو ببینی.",
+    "Join the crew to see their page.": "برای دیدن صفحه‌اش به تیم بپیوند.",
+    "They are not in the crew any more.": "اونا دیگه توی تیم نیستن.",
+    "That page is not ready yet.": "اون صفحه هنوز آماده نیست.",
+    "That page did not load. Try again.": "اون صفحه باز نشد. دوباره امتحان کن.",
+    "No signal. This is the last copy on your phone.": "آنتن نیست. این آخرین نسخه‌ست که روی گوشیته.",
+    "No signal. This page shows when you are back online.": "آنتن نیست. این صفحه وقتی آنلاین بشی نشون داده می‌شه.",
+    "No signal. Your game shows when you are back online.": "آنتن نیست. بازی تو وقتی آنلاین بشی نشون داده می‌شه.",
+    "That did not refresh. This is the last copy on your phone.": "به‌روز نشد. این آخرین نسخه‌ست که روی گوشیته.",
+    "Your page is here": "صفحهٔ تو اینجاست",
+    "This is what the crew sees.": "این چیزیه که تیم می‌بینه.",
+    "See your page": "دیدن صفحهٔ تو",
+    "Only you": "فقط تو",
+    "cheer": "تشویق",
+    "cheers": "تشویق",
+    "Bring a partner": "یه هم‌تمرینی بیار",
+    "Get your code": "گرفتن کد تو",
+    "Copy": "کپی",
+    "Send on WhatsApp": "ارسال در واتس‌اپ",
+    "Getting your code…": "دارم کدت رو می‌گیرم…",
+    "No signal. Tap again when you have signal.": "آنتن نیست. وقتی آنتن داشتی دوباره بزن.",
+    "That did not work. Try again.": "نشد. دوباره امتحان کن."
+  },
+  "patterns": [
+    [
+      "((?:reached|held|finished|earned|set|made|had|won|got|joined|entered) .+) · ((?:reached|held|finished|earned|set|made|had|won|got|joined|entered) .+)",
+      "{t1} · {t2}"
+    ],
+    [
+      "Hold every week of (January|February|March|April|May|June|July|August|September|October|November|December)\\. (\\d+) of (\\d+) so far\\.",
+      "همهٔ هفته‌های {t1} رو نگه دار. تا الان {n2} از {n3}."
+    ],
+    [
+      "had the most sessions in (January|February|March|April|May|June|July|August|September|October|November|December)",
+      "بیشترین جلسه رو در {t1} داشت"
+    ],
+    [
+      "earned a Full Month in (January|February|March|April|May|June|July|August|September|October|November|December)",
+      "ماه کامل {t1} رو گرفت"
+    ],
+    [
+      "won Most improved for (January|February|March|April|May|June|July|August|September|October|November|December)",
+      "برندهٔ بیشترین پیشرفت برای {t1} شد"
+    ],
+    [
+      "Amir's Pick for (January|February|March|April|May|June|July|August|September|October|November|December): (.+)",
+      "انتخاب امیر برای {t1}: $2"
+    ],
+    [
+      "got Amir's Pick for (January|February|March|April|May|June|July|August|September|October|November|December)",
+      "انتخاب امیر برای {t1} شد"
+    ],
+    [
+      "Amir's [Pp]ick for (January|February|March|April|May|June|July|August|September|October|November|December)",
+      "انتخاب امیر برای {t1}"
+    ],
+    [
+      "Most sessions in (January|February|March|April|May|June|July|August|September|October|November|December)",
+      "بیشترین جلسه در {t1}"
+    ],
+    [
+      "Most improved in (January|February|March|April|May|June|July|August|September|October|November|December)",
+      "بیشترین پیشرفت در {t1}"
+    ],
+    [
+      "Amir's Pick for (January|February|March|April|May|June|July|August|September|October|November|December)",
+      "انتخاب امیر برای {t1}"
+    ],
+    [
+      "(January|February|March|April|May|June|July|August|September|October|November|December)( \\d{4})? · (.+)",
+      "{t1}{n2} · {t3}"
+    ],
+    [
+      "Amir's pick · (January|February|March|April|May|June|July|August|September|October|November|December)",
+      "انتخاب امیر · {t1}"
+    ],
+    [
+      "(January|February|March|April|May|June|July|August|September|October|November|December) · from Amir",
+      "{t1} · از طرف امیر"
+    ],
+    [
+      "Full month: (January|February|March|April|May|June|July|August|September|October|November|December)",
+      "ماه کامل: {t1}"
+    ],
+    [
+      "(January|February|March|April|May|June|July|August|September|October|November|December) (\\d{4})",
+      "{t1} {n2}"
+    ],
+    [
+      "(January|February|March|April|May|June|July|August|September|October|November|December) honours",
+      "افتخارهای {t1}"
+    ],
+    [
+      "(January|February|March|April|May|June|July|August|September|October|November|December) · done",
+      "{t1} · انجام شد"
+    ],
+    [
+      "(\\d+) friends? joined · (\\d+)% off each of your next (\\d+) cycles is waiting for you\\.",
+      "{n1} دوست پیوست · {n2}٪ تخفیف برای هر کدوم از {n3} دورهٔ بعدی‌ت منتظرته."
+    ],
+    [
+      "(Most sessions|Most improved|Full Month|Amir's Pick), (.+?), (.+)\\. Opens their page",
+      "{t1}، $2، {t3}. صفحهٔ اون رو باز می‌کنه"
+    ],
+    [
+      "(Most sessions|Most improved|Full Month|Amir's Pick), (.+?), (.+)\\. Opens your page",
+      "{t1}، $2، {t3}. صفحهٔ تو رو باز می‌کنه"
+    ],
+    [
+      "(Most sessions|Most improved|Full Month|Amir's Pick), (.+)\\. Opens their page",
+      "{t1}، $2. صفحهٔ اون رو باز می‌کنه"
+    ],
+    [
+      "(Most sessions|Most improved|Full Month|Amir's Pick), (.+)\\. Opens your page",
+      "{t1}، $2. صفحهٔ تو رو باز می‌کنه"
+    ],
+    [
+      "(Fire|Strong|Well done|Love it) sent\\. Tap to take it back\\. (\\d+) sent",
+      "{t1} فرستاده شد. برای پس گرفتن بزن. {n2} نفر فرستادن"
+    ],
+    [
+      "(\\d+) friends? joined · (\\d+)% off your next cycle is waiting for you\\.",
+      "{n1} دوست پیوست · {n2}٪ تخفیف برای دورهٔ بعدی‌ت منتظرته."
+    ],
+    [
+      "(Most sessions|Most improved|Full Month|Amir's Pick), (.+) (\\d{4})",
+      "{t1}، {t2} {n3}"
+    ],
+    [
+      "Join the crew to send (Fire|Strong|Well done|Love it)\\. (\\d+) sent",
+      "برای فرستادن «{t1}» به تیم بپیوند. {n2} نفر فرستادن"
+    ],
+    [
+      "Answer the check-in before your next session and you get (.+)\\.",
+      "قبل از جلسهٔ بعدی چک‌این رو جواب بده، $1 رو می‌گیری."
+    ],
+    [
+      "([\\d,.]+) of ([\\d,.]+) (weeks|months|bests|sessions|comebacks)",
+      "{n1} از {n2} {t3}"
+    ],
+    [
+      "(.+)\\. Your medal now\\. The next one comes at level (\\d+)\\.",
+      "{t1}. مدال الانت. بعدی توی سطح {n2} می‌رسه."
+    ],
+    [
+      "(Levels \\d+ to \\d+|Level 100 and up)\\. (Now|Done|From \\d+)",
+      "{t1}. {t2}"
+    ],
+    [
+      "They get (\\d+)% off\\. You get (\\d+)% off your next cycle\\.",
+      "اون {n1}٪ تخفیف می‌گیره. تو {n2}٪ تخفیف برای دورهٔ بعدی‌ت می‌گیری."
+    ],
+    [
+      "Your result: (.+)\\. Beat it and send me the new one\\.",
+      "نتیجهٔ تو: $1. ازش بهتر بزن و جدیدش رو برام بفرست."
+    ],
+    [
+      "Send (Fire|Strong|Well done|Love it)\\. (\\d+) sent",
+      "بفرست: {t1}. {n2} نفر فرستادن"
+    ],
+    [
+      "(\\d+) friends? joined · your (\\d+)% off is used",
+      "{n1} دوست پیوست · {n2}٪ تخفیفت استفاده شد"
+    ],
+    [
+      "Your best lift is up (\\d+)%\\. (\\d+)% gets it\\.",
+      "بهترین حرکتت {n1}٪ بالا رفته. با {n2}٪ می‌گیریش."
+    ],
+    [
+      "Achievements: (\\d+) of (\\d+), (\\d+) new\\. (.+)",
+      "دستاوردها: {n1} از {n2}، {n3} تا جدید. {t4}"
+    ],
+    [
+      "(.+) · (\\d+m|\\d+h|Now|Yesterday|[A-Z][a-z]{2})",
+      "{t1} · {t2}"
+    ],
+    [
+      "(\\d+) of (\\d+) weeks in a row\\. (\\d+) to go\\.",
+      "{n1} از {n2} هفتهٔ پشت‌سرهم. {n3} تا مونده."
+    ],
+    [
+      "One more session this week and you get (.+)\\.",
+      "یه جلسهٔ دیگه این هفته بزنی، $1 رو می‌گیری."
+    ],
+    [
+      "(\\d+) cards? to pick from, signed by Amir\\.",
+      "{n1} کارت برای انتخاب، با امضای امیر."
+    ],
+    [
+      "([\\d,.]+) of ([\\d,.]+) days with all four",
+      "{n1} از {n2} روز با هر چهار تا"
+    ],
+    [
+      "(.+)\\. Yours when you reach level (\\d+)\\.",
+      "{t1}. وقتی به سطح {n2} برسی مال توئه."
+    ],
+    [
+      "Liked\\. Tap to take it back\\. (\\d+) liked",
+      "لایک شد. برای پس گرفتن بزن. {n1} نفر لایک کردن"
+    ],
+    [
+      "(\\d+) more check-ins? before a session\\.",
+      "{n1} چک‌این دیگه قبل از جلسه."
+    ],
+    [
+      "Progress, (\\d+) new in your achievements",
+      "پیشرفت، {n1} تا جدید توی دستاوردها"
+    ],
+    [
+      "Join the crew to like this\\. (\\d+) liked",
+      "برای لایک کردن به تیم بپیوند. {n1} نفر لایک کردن"
+    ],
+    [
+      "Achievements: (\\d+) of (\\d+), (\\d+) new",
+      "دستاوردها: {n1} از {n2}، {n3} تا جدید"
+    ],
+    [
+      "(\\d+) sessions? with Amir that month\\.",
+      "{n1} جلسه با امیر در اون ماه."
+    ],
+    [
+      "(Fire|Strong|Well done|Love it), (\\d+)",
+      "{t1}، {n2}"
+    ],
+    [
+      "You can name (\\d+) people in a reply\\.",
+      "توی یه جواب می‌تونی {n1} نفر رو اسم ببری."
+    ],
+    [
+      "(.+)\\. You passed it on the way up\\.",
+      "{t1}. توی مسیر ازش رد شدی."
+    ],
+    [
+      "(.+), held the week, new in the crew",
+      "{t1}، هفته رو نگه داشته، تازه توی تیمه"
+    ],
+    [
+      "set new bests on (.+) and (\\d+) more",
+      "رکورد جدید زد روی $1 و {n2} تای دیگه"
+    ],
+    [
+      "(.+ with Amir) · (\\d+) achievements?",
+      "{t1} · {n2} دستاورد"
+    ],
+    [
+      "(\\d+) of (\\d+) days with all four\\.",
+      "{n1} از {n2} روز با هر چهار تا."
+    ],
+    [
+      "Achievements: (\\d+) of (\\d+)\\. (.+)",
+      "دستاوردها: {n1} از {n2}. {t3}"
+    ],
+    [
+      "(.+) is not in the crew any more\\.",
+      "$1 دیگه توی تیم نیست."
+    ],
+    [
+      "Finish (\\d+) sessions with Amir\\.",
+      "{n1} جلسه با امیر تموم کن."
+    ],
+    [
+      "Make (\\d+) comebacks that stuck\\.",
+      "{n1} برگشتِ ماندگار بساز."
+    ],
+    [
+      "reached (\\d+) weeks held in a row",
+      "به {n1} هفتهٔ پشت‌سرهم رسید"
+    ],
+    [
+      "(.+?) held a week, (\\d+) in a row",
+      "$1 یه هفته رو نگه داشت، {n2} تا پشت‌سرهم"
+    ],
+    [
+      "reached (\\d+) sessions with Amir",
+      "به {n1} جلسه با امیر رسید"
+    ],
+    [
+      "Level (\\d+) · ([\\d,]+) to (\\d+)",
+      "سطح {n1} · {n2} تا {n3}"
+    ],
+    [
+      "All (\\d+) training weeks held\\.",
+      "هر {n1} هفتهٔ تمرین نگه داشته شد."
+    ],
+    [
+      "(.+)\\. Not won yet\\. (.+)\\. New",
+      "{t1}. هنوز نبردی. {t2}. جدید"
+    ],
+    [
+      "made (\\d+) comebacks that stuck",
+      "{n1} برگشتِ ماندگار ساخت"
+    ],
+    [
+      "Last 7 days · (\\d+) in the crew",
+      "۷ روز گذشته · {n1} نفر توی تیم"
+    ],
+    [
+      "(\\d+) more Library sessions?\\.",
+      "{n1} جلسهٔ دیگه از کتابخانه."
+    ],
+    [
+      "(\\d+) more months? with Amir\\.",
+      "{n1} ماه دیگه با امیر."
+    ],
+    [
+      "(.+?), (.+?) and (\\d+) others?",
+      "$1، $2 و {n3} نفر دیگه"
+    ],
+    [
+      "\\+([\\d,]+) XP when you win it",
+      "+{n1} امتیاز وقتی ببری"
+    ],
+    [
+      "Achievements · (\\d+) of (\\d+)",
+      "دستاوردها · {n1} از {n2}"
+    ],
+    [
+      "Your numbers\\. Level (\\d+)\\.",
+      "اعداد تو. سطح {n1}."
+    ],
+    [
+      "Achievements: (\\d+) of (\\d+)",
+      "دستاوردها: {n1} از {n2}"
+    ],
+    [
+      "(.+)\\. Won (.+), (\\d+) times",
+      "{t1}. بردی {d2}، {n3} بار"
+    ],
+    [
+      "Level medal · (\\d+) to (\\d+)",
+      "مدال سطح · {n1} تا {n2}"
+    ],
+    [
+      "Level (\\d+), not reached yet",
+      "سطح {n1}، هنوز نرسیدی"
+    ],
+    [
+      "reached (\\d+) personal bests",
+      "به {n1} رکورد شخصی رسید"
+    ],
+    [
+      "You, (.+?) and (\\d+) others?",
+      "تو، $1 و {n2} نفر دیگه"
+    ],
+    [
+      "(.+?) set a new best on (.+)",
+      "$1 رکورد جدید زد روی $2"
+    ],
+    [
+      "(.+) · (\\d+) weeks in a row",
+      "{t1} · {n2} هفتهٔ پشت‌سرهم"
+    ],
+    [
+      "Hold (\\d+) weeks in a row\\.",
+      "{n1} هفتهٔ پشت‌سرهم نگه دار."
+    ],
+    [
+      "(\\d+) of (\\d+) goals done\\.",
+      "{n1} از {n2} هدف انجام شد."
+    ],
+    [
+      "([\\d,.]+) of ([\\d,.]+) done",
+      "{n1} از {n2} انجام شد"
+    ],
+    [
+      "held a week, (\\d+) in a row",
+      "یه هفته رو نگه داشت، {n1} تا پشت‌سرهم"
+    ],
+    [
+      "Level (\\d+) · adding it up",
+      "سطح {n1} · دارم حساب می‌کنم"
+    ],
+    [
+      "(\\d+) weeks? held in a row",
+      "{n1} هفتهٔ پشت‌سرهم نگه داشتی"
+    ],
+    [
+      "Set (\\d+) personal bests\\.",
+      "{n1} رکورد شخصی بزن."
+    ],
+    [
+      "([\\d,]+) XP to level (\\d+)",
+      "{n1} امتیاز تا سطح {n2}"
+    ],
+    [
+      "(.+?) finished Cycle (\\d+)",
+      "$1 دورهٔ {n2} رو تموم کرد"
+    ],
+    [
+      "(\\d+) sessions? with Amir",
+      "{n1} جلسه با امیر"
+    ],
+    [
+      "(.+)\\. Not won yet\\. (.+)",
+      "{t1}. هنوز نبردی. {t2}"
+    ],
+    [
+      "(.+?) reached level (\\d+)",
+      "$1 به سطح {n2} رسید"
+    ],
+    [
+      "(\\d+) won · (\\d+) to win",
+      "{n1} تا بردی · {n2} تا مونده"
+    ],
+    [
+      "Won (.+) · \\+([\\d,]+) XP",
+      "بردی {d1} · +{n2} امتیاز"
+    ],
+    [
+      "Open Next up: Day (\\w+)",
+      "باز کردن بعدی: روز {n1}"
+    ],
+    [
+      "(.+)\\. Your medal now\\.",
+      "{t1}. مدال الانت."
+    ],
+    [
+      "(.+?) and (\\d+) others?",
+      "$1 و {n2} نفر دیگه"
+    ],
+    [
+      "Like this\\. (\\d+) liked",
+      "لایک. {n1} نفر لایک کردن"
+    ],
+    [
+      "(.+), place (\\d+), (.+)",
+      "$1، رتبهٔ {n2}، $3"
+    ],
+    [
+      "(\\d+) (?:entry|entries)",
+      "{n1} نتیجه"
+    ],
+    [
+      "(.+) joined this week\\.",
+      "$1 این هفته به تیم پیوست."
+    ],
+    [
+      "([\\d,]+) of ([\\d,]+)\\.",
+      "{n1} از {n2}."
+    ],
+    [
+      "([\\d,.]+) of ([\\d,.]+)",
+      "{n1} از {n2}"
+    ],
+    [
+      "set a new best on (.+)",
+      "رکورد جدید زد روی $1"
+    ],
+    [
+      "(.+?) finished a cycle",
+      "$1 یه دوره رو تموم کرد"
+    ],
+    [
+      "(.+) trained yesterday",
+      "$1 دیروز تمرین کردن"
+    ],
+    [
+      "(\\d+) personal bests?",
+      "{n1} رکورد شخصی"
+    ],
+    [
+      "\\+([\\d.]+)% on (.+)\\.",
+      "+{n1}٪ روی $2."
+    ],
+    [
+      "(\\d+) of (\\d+) medals",
+      "{n1} از {n2} مدال"
+    ],
+    [
+      "(\\d+) months in a row",
+      "{n1} ماه پشت‌سرهم"
+    ],
+    [
+      "Levels (\\d+) to (\\d+)",
+      "سطح‌های {n1} تا {n2}"
+    ],
+    [
+      "(.+)\\. Won (.+)\\. New",
+      "{t1}. بردی {d2}. جدید"
+    ],
+    [
+      "Honour · (.+) (\\d{4})",
+      "افتخار · {t1} {n2}"
+    ],
+    [
+      "(.+), new in the crew",
+      "{t1}، تازه توی تیمه"
+    ],
+    [
+      "set new bests on (.+)",
+      "رکورد جدید زد روی $1"
+    ],
+    [
+      "(.+?) joined the crew",
+      "$1 به تیم پیوست"
+    ],
+    [
+      "(.+) trained on (\\w+)",
+      "$1 روز {d2} تمرین کردن"
+    ],
+    [
+      "(\\d+) weeks in a row",
+      "{n1} هفتهٔ پشت‌سرهم"
+    ],
+    [
+      "finished Cycle (\\d+)",
+      "دورهٔ {n1} رو تموم کرد"
+    ],
+    [
+      "New from Amir: (.+)",
+      "جدید از امیر: $1"
+    ],
+    [
+      "(.+), held the week",
+      "{t1}، هفته رو نگه داشته"
+    ],
+    [
+      "reached level (\\d+)",
+      "به سطح {n1} رسید"
+    ],
+    [
+      "(\\d+) achievements?",
+      "{n1} دستاورد"
+    ],
+    [
+      "(\\d+) plan sessions",
+      "{n1} جلسه از برنامه"
+    ],
+    [
+      "Won by (.+?) · (.+)",
+      "برنده: $1 · {d2}"
+    ],
+    [
+      "(.+) · 1 week held",
+      "{t1} · ۱ هفته نگه داشتی"
+    ],
+    [
+      "(.+) trained today",
+      "$1 امروز تمرین کردن"
+    ],
+    [
+      "Share level (\\d+)",
+      "اشتراک سطح {n1}"
+    ],
+    [
+      "(\\d+) weeks? held",
+      "{n1} هفتهٔ نگه‌داشته"
+    ],
+    [
+      "(.+), not won yet",
+      "{t1}، هنوز نبردی"
+    ],
+    [
+      "(.+?) held a week",
+      "$1 یه هفته رو نگه داشت"
+    ],
+    [
+      "Open (.+)'s photo",
+      "باز کردن عکس $1"
+    ],
+    [
+      "Say hello to (.+)",
+      "سلام کردن به $1"
+    ],
+    [
+      "(\\d+) of (\\d+) ·",
+      "{n1} از {n2} ·"
+    ],
+    [
+      "(\\d+) comebacks?",
+      "{n1} برگشت"
+    ],
+    [
+      "(\\d+) of (\\d+)\\.",
+      "{n1} از {n2}."
+    ],
+    [
+      "(\\d+)% of (\\d+)%",
+      "{n1}٪ از {n2}٪"
+    ],
+    [
+      "(.+), their page",
+      "صفحهٔ $1"
+    ],
+    [
+      "(.+)\\. Won (.+)",
+      "{t1}. بردی {d2}"
+    ],
+    [
+      "Won (\\d+) times",
+      "{n1} بار بردی"
+    ],
+    [
+      "Show all (\\d+)",
+      "نمایش همهٔ {n1}"
+    ],
+    [
+      "Day (\\d+) done",
+      "روز {n1} تموم شد"
+    ],
+    [
+      "To (.+)'s post",
+      "به پست $1"
+    ],
+    [
+      "\\+([\\d,]+) XP",
+      "+{n1} امتیاز"
+    ],
+    [
+      "Next up: (.+)",
+      "بعدی: $1"
+    ],
+    [
+      "Reply to (.+)",
+      "جواب به $1"
+    ],
+    [
+      "You and (.+)",
+      "تو و $1"
+    ],
+    [
+      "(\\d+) times",
+      "{n1} بار"
+    ],
+    [
+      "earned (.+)",
+      "$1 رو گرفت"
+    ],
+    [
+      "All (\\d+) ›",
+      "همهٔ {n1} ›"
+    ],
+    [
+      "(.+)'s page",
+      "صفحهٔ $1"
+    ],
+    [
+      "Won by (.+)",
+      "برنده: $1"
+    ],
+    [
+      "From (\\d+)",
+      "از {n1}"
+    ],
+    [
+      "Cheer (.+)",
+      "تشویق $1"
+    ],
+    [
+      "(\\d+) new",
+      "{n1} تا جدید"
+    ],
+    [
+      "Won (.+)",
+      "بردی {d1}"
+    ],
+    [
+      "Add (.+)",
+      "اضافه کردن $1"
+    ],
+    [
+      "LV (\\d+)",
+      "سطح {n1}"
+    ],
+    [
+      "(\\d+)m",
+      "{n1} دقیقه"
+    ],
+    [
+      "(\\d+)h",
+      "{n1} ساعت"
+    ]
+  ],
+  "split": [
+    {
+      "line": 14437,
+      "text": "Home week line: base count + ' · ' + run (paintWeekRun, one node)",
+      "note": "covered by (.+) · N weeks in a row with {t1}; base text from another slice"
+    },
+    {
+      "line": 15418,
+      "text": "Bell line: <name> reached level 14 · held a week (crewPartText parts joined with ' · ')",
+      "note": "name is a button (own node) with a door, but plain text in the SAME node without one; both forms written, long mixed lines fall back to English pieces"
+    },
+    {
+      "line": 15436,
+      "text": "set new bests on A, B and C (crewList joins names with ' and ')",
+      "note": "names stay English, the 'and' between them cannot be split"
+    },
+    {
+      "line": 15448,
+      "text": "You, Sara and 2 others (crewKudosWords)",
+      "note": "names and 'and' share one node"
+    },
+    {
+      "line": 15993,
+      "text": "Sara and Ali trained today (crewSessHTML)",
+      "note": "names joined by ' and ' share one node"
+    },
+    {
+      "line": 16165,
+      "text": "Everyone here said yes to the Bell. ... leave any time from <strong>What the crew sees</strong>.",
+      "note": "sentence broken by a <strong>, the tail is '.' only"
+    },
+    {
+      "line": 14327,
+      "text": "September · from Amir (goal card)",
+      "note": "month is a name word; pattern lists the 12 months"
+    }
+  ],
+  "readback": [
+    {
+      "line": 14137,
+      "text": "home-week-sum textContent",
+      "note": "paintWeekRun reads el.textContent as the base when dataset.count is unset, then appends the run; works with Farsi but the count text comes from another slice"
+    },
+    {
+      "line": 15736,
+      "text": "go.textContent (Reply / Send label)",
+      "note": "saved as label and written back; round-trips safely"
+    },
+    {
+      "line": 16491,
+      "text": "btn.textContent (Get your code)",
+      "note": "saved as label and written back; round-trips safely"
+    }
+  ]
+}

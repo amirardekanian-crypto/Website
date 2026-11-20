@@ -1,0 +1,151 @@
+{
+  "area": "lines 1-9000: head and CSS (only CSS content 'VIDEO'), the static HTML of every screen, sign-in, timer and hold overlays, readiness sheet, plan-offline line, new-version toast, error screens, boot, sign-in script",
+  "exact": {
+    "· sample athlete. Your real programme is built from scratch.": "· ورزشکار نمونه. برنامهٔ واقعی تو از صفر ساخته می‌شه.",
+    "Live demo": "دموی زنده",
+    "Apply": "ثبت‌نام",
+    "Exit demo and return to site": "خروج از دمو و برگشت به سایت",
+    "Exit ✕": "خروج ✕",
+    "Loading your plan": "دارم برنامه‌ات رو باز می‌کنم",
+    "Plan not available": "برنامه در دسترس نیست",
+    "coach": "مربی",
+    "in": "توی",
+    "your pocket.": "جیبت.",
+    "A path to your target.": "مسیر رسیدن به هدفت.",
+    "Username": "نام کاربری",
+    "Password": "رمز",
+    "Show password": "نمایش رمز",
+    "Hide password": "پنهان کردن رمز",
+    "Sign in": "ورود",
+    "Lost your details?": "اطلاعات ورودت رو گم کردی؟",
+    "Message Amir": "پیام به امیر",
+    "and he'll send new ones.": "بده، اون اطلاعات جدید برات می‌فرسته.",
+    "Your numbers": "عددهای تو",
+    "Getting stronger": "قوی‌تر شدن",
+    "Your body": "بدن تو",
+    "What you've earned": "چیزهایی که به دست آوردی",
+    "Back to Progress": "برگشت به پیشرفت",
+    "Back to library": "برگشت به کتابخانه",
+    "Back to Crew": "برگشت به تیم",
+    "Your best lifts": "بهترین حرکت‌های تو",
+    "Body Weight": "وزن بدن",
+    "Your habits": "عادت‌های تو",
+    "Daily habits": "عادت‌های روزانه",
+    "Everything, explained": "همه‌چیز، ساده توضیح داده شده",
+    "How it works": "چطور کار می‌کنه",
+    "Your moments": "لحظه‌های تو",
+    "Train it, learn it, know it": "تمرین کن، یاد بگیر، بشناس",
+    "Playbook": "راهنمای بازی",
+    "Search exercises": "جستجوی حرکت‌ها",
+    "Before you start": "قبل از شروع",
+    "Safety checks: what to stop for": "چک ایمنی: کِی باید وایستی",
+    "Completed": "تمام‌شده",
+    "Train together": "با هم تمرین کنیم",
+    "The crew": "تیم",
+    "This season": "این فصل",
+    "In the crew": "توی تیم",
+    "A photo from the crew": "یه عکس از تیم",
+    "Last 7 days": "۷ روز گذشته",
+    "Your coach": "مربی تو",
+    "Coach Amir": "مربی امیر",
+    "Strength & conditioning coach": "مربی قدرت و آمادگی جسمانی",
+    "Sound on": "صدا روشن",
+    "Minimise the rest. It keeps running": "استراحت رو کوچیک کن. تایمر ادامه داره",
+    "Minimise": "کوچیک کردن",
+    "Close the rest timer": "بستن تایمر استراحت",
+    "+15s": "+۱۵ ثانیه",
+    "Reset": "ریست",
+    "Skip →": "رد شدن ←",
+    "Play while you rest": "تو استراحت بازی کن",
+    "React to the hit · 4 drills": "واکنش به ضربه · ۴ تمرین",
+    "Air hockey against me · one match": "ایر هاکی با من · یه مسابقه",
+    "Tennis against me · a set lasts your workout": "تنیس با من · یه ست به اندازهٔ تمرینت",
+    "Breathe with the ball · in 4, out 6": "با توپ نفس بکش · ۴ تا دم، ۶ تا بازدم",
+    "Get set": "آماده شو",
+    "Hold timer": "تایمر نگه‌داشتن",
+    "Hold": "نگه‌داشتن",
+    "Stop the hold. Nothing is ticked": "توقف نگه‌داشتن. چیزی تیک نمی‌خوره",
+    "Start side 2": "شروع سمت ۲",
+    "Stop": "توقف",
+    "Open": "باز کردن",
+    "Readiness check": "چک آمادگی",
+    "Ten seconds, and honest answers. On a lower day the app eases today's targets for you, and you can still train as written.": "ده ثانیه وقت بذار و راست جواب بده. اگه روز سبکی باشه، اپ هدف‌های امروزت رو سبک‌تر می‌کنه، ولی می‌تونی همون‌طور که نوشته شده هم تمرین کنی.",
+    "Begin session ▶": "شروع جلسه ▶",
+    "Skip for today": "امروز رد کن",
+    "Exercise history": "تاریخچهٔ حرکت",
+    "How Guided works": "حالت هدایت‌شده چطور کار می‌کنه",
+    "Exit guided mode": "خروج از حالت هدایت‌شده",
+    "Update": "به‌روزرسانی",
+    "Your plan was updated": "برنامه‌ات به‌روز شد",
+    "Refresh": "تازه‌سازی",
+    "Heads up": "حواست باشه",
+    "The server didn't confirm your plan. Your sets are saved on this phone.": "سرور برنامه‌ات رو تأیید نکرد. ست‌هات روی این گوشی ذخیره شدن.",
+    "Offline": "آفلاین",
+    "Your plan as saved on this phone": "برنامه‌ات، ذخیره‌شده روی این گوشی",
+    "This sign-in or link isn't accepted any more. Sign in again, or message Amir on WhatsApp if it keeps happening.": "این ورود یا لینک دیگه قبول نمی‌شه. دوباره وارد شو، یا اگه تکرار شد تو واتس‌اپ به امیر پیام بده.",
+    "Sign in again": "دوباره وارد شو",
+    "Message Amir on WhatsApp": "پیام به امیر تو واتس‌اپ",
+    "A new version of the app is ready": "نسخهٔ جدید اپ آماده‌ست",
+    "New version": "نسخهٔ جدید",
+    "Reload": "باز کردن دوباره",
+    "The app got stuck opening. Tap Try again. If it keeps happening, send me the line under the button on WhatsApp.": "اپ موقع باز شدن گیر کرد. «دوباره امتحان کن» رو بزن. اگه تکرار شد، خطی که زیر دکمه‌ست رو تو واتس‌اپ برام بفرست.",
+    "Stuck opening": "گیر کرد",
+    "Try again": "دوباره امتحان کن",
+    "The app couldn't reach the server, and this phone hasn't saved your plan yet. Try again when you have signal. Once it has opened with a connection, it opens without one too.": "اپ به سرور وصل نشد و این گوشی هنوز برنامه‌ات رو ذخیره نکرده. وقتی آنتن داشتی دوباره امتحان کن. یه بار که با اینترنت باز بشه، بدون اینترنت هم باز می‌شه.",
+    "No connection": "اینترنت وصل نیست",
+    "Signing you in…": "دارم واردت می‌کنم…",
+    "Signing in…": "دارم وارد می‌شم…",
+    "Signed in": "وارد شدی",
+    "That username or password is not right. Check the message Amir sent you.": "نام کاربری یا رمز درست نیست. پیامی که امیر برات فرستاده رو چک کن.",
+    "The sign-in could not load on this connection. Check your connection, or switch between wifi and mobile data, then tap Sign in again.": "با این اینترنت صفحهٔ ورود باز نشد. اینترنتت رو چک کن، یا بین وای‌فای و دیتای گوشی عوض کن، بعد دوباره «ورود» رو بزن.",
+    "Could not sign in just now. Check your connection and try again.": "الان نشد وارد بشی. اینترنتت رو چک کن و دوباره امتحان کن."
+  },
+  "patterns": [
+    [
+      "today (\\d{1,2}:\\d{2})",
+      "امروز $1"
+    ],
+    [
+      "yesterday (\\d{1,2}:\\d{2})",
+      "دیروز $1"
+    ],
+    [
+      "(Mon|Tue|Wed|Thu|Fri|Sat|Sun) (\\d{1,2}:\\d{2})",
+      "{t1} $2"
+    ]
+  ],
+  "split": [
+    {
+      "line": 6578,
+      "text": "A <em>coach</em> in<br>your pocket.",
+      "note": "Four nodes: 'A', 'coach', 'in', 'your pocket.' Entries 'A' and 'in' are one word each and would also translate any other node that is exactly 'A' or 'in'. Farsi reads 'یه مربی توی / جیبت.' so it works, but a single wrapped string would be safer."
+    },
+    {
+      "line": 6610,
+      "text": "Lost your details? <a>Message Amir</a> and he'll send new ones.",
+      "note": "Three nodes around a link; the Farsi verb 'بده' sits in the third node after the link, so word order is fixed by the English split."
+    },
+    {
+      "line": 8204,
+      "text": "Your plan as saved on this phone, <span>when</span>",
+      "note": "The comma between the two nodes stays a Latin comma (a node with no letters is not touched)."
+    },
+    {
+      "line": 6536,
+      "text": "<strong>Live demo</strong> · sample athlete. Your real programme is built from scratch.",
+      "note": "Two nodes; the second starts with a middle dot."
+    }
+  ],
+  "readback": [
+    {
+      "line": 7076,
+      "text": "Sound on (aria-label and title of #timerSoundBtn)",
+      "note": "toggleRestSound() sets these attributes; check it does not compare them. The 'Sound off' variant is outside this range."
+    },
+    {
+      "line": 7096,
+      "text": "Start (#startStopBtn)",
+      "note": "toggleTimer() swaps this label between Start / Pause / Resume; check it does not compare textContent, and that data-sym is what it reads."
+    }
+  ]
+}

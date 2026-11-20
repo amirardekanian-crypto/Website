@@ -22,6 +22,7 @@ The atlas across the whole repo — pages, assets, skills, scripts, docs — is
 | [`rules/coach-dashboard.md`](rules/coach-dashboard.md) | the coach dashboard |
 | [`rules/career.md`](rules/career.md) | Career Mode |
 | [`rules/push.md`](rules/push.md) | reminders on a phone |
+| [`rules/farsi-app.md`](rules/farsi-app.md) | the athlete app in Farsi: the language switch, the words, right to left |
 | [`rules/site.md`](rules/site.md) | the public site, the Farsi products, the chatbot |
 | [`rules/seo.md`](rules/seo.md) | article pages, SEO, content parity |
 | [`rules/design.md`](rules/design.md) | design work |

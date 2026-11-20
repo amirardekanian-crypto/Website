@@ -1,0 +1,631 @@
+{
+  "area": "lines 9000-11500: account sheet, help, welcome, first-session hints, Progress road, week note and limits, day cards, Home (greeting, between cycles, unfinished-day card), cycle card and wins, day panels (session bar, finish card), numbers line, coach note, how-to row, rest button",
+  "exact": {
+    "The demo keeps your taps on this phone only. Nothing reaches me.": "دمو فقط روی همین گوشی ذخیره می‌شه. چیزی به من نمی‌رسه.",
+    "Coach preview: you are looking at this athlete's app as your coach sign-in.": "پیش‌نمایش مربی: اپ این ورزشکار رو با ورود مربی‌ات می‌بینی.",
+    "A session report is still waiting for signal. It stays on this phone and goes when you sign in here again.": "یه گزارش جلسه هنوز منتظر آنتنه. روی همین گوشی می‌مونه و وقتی دوباره وارد شی می‌ره.",
+    "Amir": "امیر",
+    "You're in": "وارد شدی",
+    "Your plan is ready.": "برنامه‌ات آماده‌ست.",
+    "Any questions, message me on WhatsApp. The button is in the Coach tab.": "هر سؤالی داشتی، تو واتس‌اپ به من پیام بده. دکمه‌اش تو تب مربیه.",
+    "Look around first": "اول یه نگاه بنداز",
+    "Tap": "روی",
+    "Start": "شروع",
+    "Guided": "حالت هدایت‌شده",
+    "as you begin, so I know how long the session took. Or": "بزن، وقتی شروع می‌کنی تا بدونم جلسه چقدر طول کشید. یا",
+    ": one set at a time, with your rest timed.": "بزن: یه ست یه ست، با زمان استراحت.",
+    "Weight in, set done: tap the": "وزنه رو نوشتی و ست تموم شد؟ روی",
+    "Set done? Tap the": "ست تموم شد؟ روی",
+    "circle": "دایره",
+    ". One tap means done as written.": "بزن. یه تپ یعنی همون‌طور که نوشته شده انجام دادی.",
+    ". One tap means done as written. Different reps? Type them first.": "بزن. یه تپ یعنی همون‌طور که نوشته شده انجام دادی. تکرارت فرق داشت؟ اول اون رو بنویس.",
+    "How hard was that set?": "اون ست چقدر سخت بود؟",
+    ": not one more rep.": "یعنی یه تکرار دیگه هم نمی‌تونستی.",
+    ": two left. I read every effort when I write your next cycle.": "یعنی دو تا تکرار دیگه می‌تونستی. وقتی دورهٔ بعدیت رو می‌نویسم همهٔ شدت‌ها رو می‌خونم.",
+    "Got it": "فهمیدم",
+    "Now": "الان",
+    "Up next": "بعدی",
+    "Locked": "قفل",
+    "From Amir": "از طرف امیر",
+    "The aims": "هدف‌ها",
+    "Why your plan looks like this": "چرا برنامه‌ات این شکلیه",
+    "Why this cycle matters": "چرا این دوره مهمه",
+    "The rest of my note": "بقیهٔ نوشتهٔ من",
+    "Expected outcomes": "نتیجه‌هایی که انتظار داریم",
+    "Game Plan": "برنامهٔ بازی",
+    "Back-off week": "هفتهٔ سبک",
+    "Max effort": "حداکثر شدت",
+    "except the retest": "به‌جز تست دوباره",
+    "except retests": "به‌جز تست‌های دوباره",
+    "lower, not below": "پایین‌تر، نه کمتر از",
+    "sets fewer": "ست کمتر",
+    "set fewer": "ست کمتر",
+    "Done this week": "این هفته انجام شد",
+    "In progress": "در حال انجام",
+    "Saved for you": "برات ذخیره شد",
+    "How hard was that session?": "اون جلسه چقدر سخت بود؟",
+    "1 = very easy · 10 = maximum effort": "1 = خیلی راحت · 10 = بیشترین شدت",
+    "Share a win": "اشتراک‌گذاری یه پیشرفت",
+    "Roadmap complete": "مسیر کامل شد",
+    "Cycle complete": "دوره تموم شد",
+    "Share the whole road": "اشتراک‌گذاری کل مسیر",
+    "Share your cycle": "اشتراک‌گذاری دوره‌ات",
+    "Read it": "بخونش",
+    "Message Amir to start it.": "به امیر پیام بده تا شروعش کنه.",
+    "What comes next?": "بعدش چی؟",
+    "Message Amir any time.": "هر وقت خواستی به امیر پیام بده.",
+    "What's next": "بعدش چی",
+    "That was the last cycle of your plan. I'll be in touch about what comes next.": "این آخرین دورهٔ برنامه‌ات بود. دربارهٔ ادامه‌اش بهت خبر می‌دم.",
+    "Between cycles": "بین دوره‌ها",
+    "Keep moving": "فعال بمون",
+    "Repeat a session": "تکرار یه جلسه",
+    "The one you did least this cycle. A good one to repeat.": "این دوره از همه کمتر انجامش دادی. برای تکرار خوبه.",
+    "Session done this week": "جلسه این هفته انجام شد",
+    "One session at a time": "یه جلسه در هر زمان",
+    "Back to overview": "برگشت به نمای کلی",
+    "Toggle dark mode": "تغییر حالت تیره",
+    "Program": "برنامه",
+    "Good morning": "صبح بخیر",
+    "Good afternoon": "ظهر بخیر",
+    "Good evening": "عصر بخیر",
+    "Training": "تمرین",
+    "Home (the session keeps running)": "خانه (جلسه ادامه داره)",
+    "Ready when you are": "هر وقت آماده‌ای",
+    "Start ▶": "شروع ▶",
+    "One set at a time": "یه ست، یه ست",
+    "Reset": "ریست",
+    "Reset?": "ریست؟",
+    "Stop here": "همین‌جا تمومش کن",
+    "Stop here?": "همین‌جا تمومش کنیم؟",
+    "Ask Amir": "از امیر بپرس",
+    "More: Pause, Guided, Reset, Stop here and Ask Amir": "بیشتر: مکث، حالت هدایت‌شده، ریست، تمومش کن و از امیر بپرس",
+    "More: Pause, Reset, Stop here and Ask Amir": "بیشتر: مکث، ریست، تمومش کن و از امیر بپرس",
+    "Sets done in this session": "ست‌های انجام‌شده تو این جلسه",
+    "Session effort": "شدت جلسه",
+    "Notes for Coach (optional)": "یادداشت برای مربی (اختیاری)",
+    "How it went, anything that felt off…": "چطور گذشت، چیزی که حس خوبی نداشت…",
+    "Keep going": "ادامه بده",
+    "Ask me on WhatsApp": "تو واتس‌اپ ازم بپرس",
+    "Pain, a swap, a question: I answer there, not in the app. Your note comes along.": "درد، تعویض حرکت، یه سؤال: اونجا جواب می‌دم، نه تو اپ. یادداشتت هم همراهش می‌ره.",
+    "Ticked off on today's card": "تو کارت امروز تیک خورد",
+    "Your rating": "امتیاز تو",
+    "Send the update to your coach": "گزارش رو برای مربی بفرست",
+    "Start this day again": "این روز رو از اول شروع کن",
+    "This clears today's sets. Tap again to clear.": "این ست‌های امروز رو پاک می‌کنه. برای پاک کردن دوباره بزن.",
+    "Time": "زمان",
+    "Distance": "مسافت",
+    "Work": "کار",
+    "Hold": "نگه‌داشتن",
+    "Down": "پایین",
+    "s": "ثانیه",
+    "s · pause": "ثانیه · مکث",
+    "sets×reps": "ست×تکرار",
+    "sets×time": "ست×زمان",
+    "sets×distance": "ست×مسافت",
+    "sets×work": "ست×کار",
+    "time": "زمان",
+    "distance": "مسافت",
+    "work": "کار",
+    "tempo": "تمپو",
+    "Tempo: what the numbers mean": "تمپو: عددها یعنی چی",
+    "Coach's note.": "نکتهٔ مربی.",
+    "More": "بیشتر",
+    "Less": "کمتر",
+    "Has a coach's note": "نکتهٔ مربی داره",
+    "Coaching Cues": "نکته‌های تمرینی",
+    "You need:": "لازم داری:",
+    "Open in YouTube": "باز کردن در YouTube",
+    "How to do it": "چطور انجامش بدی",
+    "video": "ویدیو",
+    "Rest timer": "تایمر استراحت",
+    "Tick every set": "همهٔ ست‌ها رو تیک بزن"
+  },
+  "patterns": [
+    [
+      "(\\d+) session reports are still waiting for signal\\. It stays on this phone and goes when you sign in here again\\.",
+      "{n1} گزارش جلسه هنوز منتظر آنتنه. روی همین گوشی می‌مونه و وقتی دوباره وارد شی می‌ره."
+    ],
+    [
+      "Welcome, (.+)\\.",
+      "خوش اومدی، $1."
+    ],
+    [
+      "Your plan is ready\\. First up is (.+)\\.",
+      "برنامه‌ات آماده‌ست. اول $1 رو شروع می‌کنی."
+    ],
+    [
+      "(\\d+) reasons?",
+      "{n1} دلیل"
+    ],
+    [
+      "(\\d+) things? to hit",
+      "{n1} هدف برای رسیدن"
+    ],
+    [
+      "(\\d+) weeks? ·",
+      "{n1} هفته ·"
+    ],
+    [
+      "Cycle (\\d+), (.+), done\\. Open its archive\\.",
+      "دورهٔ {n1}، $2، تموم شد. آرشیوش رو باز کن."
+    ],
+    [
+      "Max effort (\\d+(?:\\.\\d+)?)(?: except the retest| except retests)?",
+      "حداکثر شدت {n1}"
+    ],
+    [
+      "Max effort (\\d+(?:\\.\\d+)?) except the retest",
+      "حداکثر شدت {n1}، به‌جز تست دوباره"
+    ],
+    [
+      "Max effort (\\d+(?:\\.\\d+)?) except retests",
+      "حداکثر شدت {n1}، به‌جز تست‌های دوباره"
+    ],
+    [
+      "(\\d+) sets? fewer",
+      "{n1} ست کمتر"
+    ],
+    [
+      "Effort (\\d+(?:\\.\\d+)?) lower, not below 6",
+      "شدت {n1} واحد پایین‌تر، نه کمتر از ۶"
+    ],
+    [
+      "(\\d+) exercises?",
+      "{n1} حرکت"
+    ],
+    [
+      "Optional · (\\d+) exercises?",
+      "اختیاری · {n1} حرکت"
+    ],
+    [
+      "Day (\\d+), (.+), optional, done this week",
+      "روز {n1}، $2، اختیاری، این هفته انجام شد"
+    ],
+    [
+      "Day (\\d+), (.+), optional",
+      "روز {n1}، $2، اختیاری"
+    ],
+    [
+      "Day (\\d+), (.+), done this week",
+      "روز {n1}، $2، این هفته انجام شد"
+    ],
+    [
+      "Day (\\d+), (?!.*(?:, optional|, done this week)$)(.+)",
+      "روز {n1}، $2"
+    ],
+    [
+      "(In progress|Next up) · Day (\\d+)",
+      "{t1} · روز {n2}"
+    ],
+    [
+      "(In progress|Next up) · Day (\\d+) · Optional",
+      "{t1} · روز {n2} · اختیاری"
+    ],
+    [
+      "Day (\\d+) · Optional",
+      "روز {n1} · اختیاری"
+    ],
+    [
+      "(\\d+) of (\\d+) sets",
+      "{n1} از {n2} ست"
+    ],
+    [
+      "(\\w+)'s Day (.+) wasn't finished",
+      "{d1}: روز $2 تموم نشده بود"
+    ],
+    [
+      "Session effort (\\d+) of 10",
+      "شدت جلسه {n1} از ۱۰"
+    ],
+    [
+      "I still got it, as you left it: (\\d+) of (\\d+) sets\\. Next time tap Done at the end.",
+      "من ذخیره‌اش کردم، همون‌طور که ولش کردی: {n1} از {n2} ست. دفعهٔ بعد آخرش تمام رو بزن."
+    ],
+    [
+      "I still got it, as you left it: (\\d+) of (\\d+) sets\\. You trained from (.+?) to your last set at (.+?), (\\d+) min\\. Next time tap Done at the end.",
+      "من ذخیره‌اش کردم، همون‌طور که ولش کردی: {n1} از {n2} ست. از ساعت $3 تا آخرین ستت، ساعت $4، تمرین کردی، {n5} دقیقه. دفعهٔ بعد آخرش تمام رو بزن."
+    ],
+    [
+      "I still got it, as you left it: (\\d+) of (\\d+) sets\\. And (\\d+) more like it\\. Next time tap Done at the end.",
+      "من ذخیره‌اش کردم، همون‌طور که ولش کردی: {n1} از {n2} ست. و {n3} تای دیگه مثل این. دفعهٔ بعد آخرش تمام رو بزن."
+    ],
+    [
+      "I still got it, as you left it: (\\d+) of (\\d+) sets\\. You trained from (.+?) to your last set at (.+?), (\\d+) min\\. And (\\d+) more like it\\. Next time tap Done at the end.",
+      "من ذخیره‌اش کردم، همون‌طور که ولش کردی: {n1} از {n2} ست. از ساعت $3 تا آخرین ستت، ساعت $4، تمرین کردی، {n5} دقیقه. و {n6} تای دیگه مثل این. دفعهٔ بعد آخرش تمام رو بزن."
+    ],
+    [
+      "I still got it, as you left it: (\\d+) of (\\d+) sets\\. Effort (\\d+(?:\\.\\d+)?) saved\\. Thanks\\. Next time tap Done at the end.",
+      "من ذخیره‌اش کردم، همون‌طور که ولش کردی: {n1} از {n2} ست. شدت {n3} ثبت شد. ممنون. دفعهٔ بعد آخرش تمام رو بزن."
+    ],
+    [
+      "I still got it, as you left it: (\\d+) of (\\d+) sets\\. You trained from (.+?) to your last set at (.+?), (\\d+) min\\. Effort (\\d+(?:\\.\\d+)?) saved\\. Thanks\\. Next time tap Done at the end.",
+      "من ذخیره‌اش کردم، همون‌طور که ولش کردی: {n1} از {n2} ست. از ساعت $3 تا آخرین ستت، ساعت $4، تمرین کردی، {n5} دقیقه. شدت {n6} ثبت شد. ممنون. دفعهٔ بعد آخرش تمام رو بزن."
+    ],
+    [
+      "I still got it, as you left it: (\\d+) of (\\d+) sets\\. And (\\d+) more like it\\. Effort (\\d+(?:\\.\\d+)?) saved\\. Thanks\\. Next time tap Done at the end.",
+      "من ذخیره‌اش کردم، همون‌طور که ولش کردی: {n1} از {n2} ست. و {n3} تای دیگه مثل این. شدت {n4} ثبت شد. ممنون. دفعهٔ بعد آخرش تمام رو بزن."
+    ],
+    [
+      "I still got it, as you left it: (\\d+) of (\\d+) sets\\. You trained from (.+?) to your last set at (.+?), (\\d+) min\\. And (\\d+) more like it\\. Effort (\\d+(?:\\.\\d+)?) saved\\. Thanks\\. Next time tap Done at the end.",
+      "من ذخیره‌اش کردم، همون‌طور که ولش کردی: {n1} از {n2} ست. از ساعت $3 تا آخرین ستت، ساعت $4، تمرین کردی، {n5} دقیقه. و {n6} تای دیگه مثل این. شدت {n7} ثبت شد. ممنون. دفعهٔ بعد آخرش تمام رو بزن."
+    ],
+    [
+      "felt easier: effort (\\d+(?:\\.\\d+)?) → (\\d+(?:\\.\\d+)?)",
+      "راحت‌تر شد: شدت {n1} → {n2}"
+    ],
+    [
+      "\\+(\\d+) reps?",
+      "{n1} تکرار بیشتر"
+    ],
+    [
+      "\\+(\\d+) reps?, same effort",
+      "{n1} تکرار بیشتر، با همون فشار"
+    ],
+    [
+      "(\\d+) reps felt easier: effort (\\d+(?:\\.\\d+)?) → (\\d+(?:\\.\\d+)?)",
+      "{n1} تکرار راحت‌تر شد: شدت {n2} → {n3}"
+    ],
+    [
+      "about (\\d+)% stronger",
+      "حدود {n1}٪ قوی‌تر"
+    ],
+    [
+      "about (\\d+)% stronger at the same effort",
+      "حدود {n1}٪ قوی‌تر با همون فشار"
+    ],
+    [
+      "heavier and harder: about (\\d+)% stronger",
+      "سنگین‌تر و سخت‌تر: حدود {n1}٪ قوی‌تر"
+    ],
+    [
+      "heavier for fewer reps: about (\\d+)% stronger",
+      "سنگین‌تر با تکرار کمتر: حدود {n1}٪ قوی‌تر"
+    ],
+    [
+      "more reps with less: about (\\d+)% stronger",
+      "تکرار بیشتر با وزنهٔ کمتر: حدود {n1}٪ قوی‌تر"
+    ],
+    [
+      "\\+(\\d+(?:\\.\\d+)?) kg, same reps",
+      "{n1} کیلو بیشتر، با همون تعداد تکرار"
+    ],
+    [
+      "\\+(\\d+(?:\\.\\d+)?) kg, same reps, same effort",
+      "{n1} کیلو بیشتر، با همون تعداد تکرار و همون فشار"
+    ],
+    [
+      "\\+(\\d+(?:\\.\\d+)?) kg, and it felt easier",
+      "{n1} کیلو بیشتر، و راحت‌تر"
+    ],
+    [
+      "\\+(\\d+(?:\\.\\d+)?) kg and \\+(\\d+) reps?",
+      "{n1} کیلو و {n2} تکرار بیشتر"
+    ],
+    [
+      "\\+(\\d+) reps? at (\\d+(?:\\.\\d+)?) kg",
+      "{n1} تکرار بیشتر با {n2} کیلو"
+    ],
+    [
+      "\\+(\\d+) reps? at (\\d+(?:\\.\\d+)?) kg, same effort",
+      "{n1} تکرار بیشتر با {n2} کیلو، با همون فشار"
+    ],
+    [
+      "(\\d+(?:\\.\\d+)?) kg × (\\d+) felt easier: effort (\\d+(?:\\.\\d+)?) → (\\d+(?:\\.\\d+)?)",
+      "{n1} کیلو × {n2}، راحت‌تر شد: شدت {n3} → {n4}"
+    ],
+    [
+      "\\+(\\d+(?:\\.\\d+)?) lb, same reps",
+      "{n1} پوند بیشتر، با همون تعداد تکرار"
+    ],
+    [
+      "\\+(\\d+(?:\\.\\d+)?) lb, same reps, same effort",
+      "{n1} پوند بیشتر، با همون تعداد تکرار و همون فشار"
+    ],
+    [
+      "\\+(\\d+(?:\\.\\d+)?) lb, and it felt easier",
+      "{n1} پوند بیشتر، و راحت‌تر"
+    ],
+    [
+      "\\+(\\d+(?:\\.\\d+)?) lb and \\+(\\d+) reps?",
+      "{n1} پوند و {n2} تکرار بیشتر"
+    ],
+    [
+      "\\+(\\d+) reps? at (\\d+(?:\\.\\d+)?) lb",
+      "{n1} تکرار بیشتر با {n2} پوند"
+    ],
+    [
+      "\\+(\\d+) reps? at (\\d+(?:\\.\\d+)?) lb, same effort",
+      "{n1} تکرار بیشتر با {n2} پوند، با همون فشار"
+    ],
+    [
+      "(\\d+(?:\\.\\d+)?) lb × (\\d+) felt easier: effort (\\d+(?:\\.\\d+)?) → (\\d+(?:\\.\\d+)?)",
+      "{n1} پوند × {n2}، راحت‌تر شد: شدت {n3} → {n4}"
+    ],
+    [
+      "\\+(\\d+(?:\\.\\d+)?) plates?, same reps",
+      "{n1} پلیت بیشتر، با همون تعداد تکرار"
+    ],
+    [
+      "\\+(\\d+(?:\\.\\d+)?) plates?, same reps, same effort",
+      "{n1} پلیت بیشتر، با همون تعداد تکرار و همون فشار"
+    ],
+    [
+      "\\+(\\d+(?:\\.\\d+)?) plates?, and it felt easier",
+      "{n1} پلیت بیشتر، و راحت‌تر"
+    ],
+    [
+      "\\+(\\d+(?:\\.\\d+)?) plates? and \\+(\\d+) reps?",
+      "{n1} پلیت و {n2} تکرار بیشتر"
+    ],
+    [
+      "\\+(\\d+) reps? at (\\d+(?:\\.\\d+)?) plates?",
+      "{n1} تکرار بیشتر با {n2} پلیت"
+    ],
+    [
+      "\\+(\\d+) reps? at (\\d+(?:\\.\\d+)?) plates?, same effort",
+      "{n1} تکرار بیشتر با {n2} پلیت، با همون فشار"
+    ],
+    [
+      "(\\d+(?:\\.\\d+)?) plates? × (\\d+) felt easier: effort (\\d+(?:\\.\\d+)?) → (\\d+(?:\\.\\d+)?)",
+      "{n1} پلیت × {n2}، راحت‌تر شد: شدت {n3} → {n4}"
+    ],
+    [
+      "(\\d+) lifts? up this cycle",
+      "{n1} حرکت تو این دوره پیشرفت کرد"
+    ],
+    [
+      "Cycle (\\d+) complete",
+      "دورهٔ {n1} تموم شد"
+    ],
+    [
+      "· (\\d+) of (\\d+)",
+      "· {n1} از {n2}"
+    ],
+    [
+      "Cycle (\\d+) of (\\d+)",
+      "دورهٔ {n1} از {n2}"
+    ],
+    [
+      "Finished (\\d+ \\w+) · (\\d+) cycles? · (\\d+) weeks?",
+      "{d1} تموم شد · {n2} دوره · {n3} هفته"
+    ],
+    [
+      "Finished (\\d+ \\w+) · (\\d+) cycles?",
+      "{d1} تموم شد · {n2} دوره"
+    ],
+    [
+      "Finished (\\d+ \\w+) · see it on Progress",
+      "{d1} تموم شد · تو پیشرفت ببینش"
+    ],
+    [
+      "Finished (\\d+ \\w+)",
+      "{d1} تموم شد"
+    ],
+    [
+      "of (\\d+)",
+      "از {n1}"
+    ],
+    [
+      "of (\\d+) sessions?",
+      "از {n1} جلسه"
+    ],
+    [
+      "(\\d+ \\w+) – (\\d+ \\w+) ·",
+      "{d1} – {d2} ·"
+    ],
+    [
+      "(\\d+ \\w+) – (\\d+ \\w+)",
+      "{d1} – {d2}"
+    ],
+    [
+      "(\\d+) days? left",
+      "{n1} روز مونده"
+    ],
+    [
+      "From Amir: (.+) Read the whole note\\.",
+      "از طرف امیر: $1 کل نوشته رو بخون."
+    ],
+    [
+      "Ready for Cycle (\\d+)\\?",
+      "برای دورهٔ {n1} آماده‌ای؟"
+    ],
+    [
+      "No new week until Cycle (\\d+) starts\\. Want to keep moving\\? Any session from (.+) still works\\.",
+      "تا شروع دورهٔ {n1} هفتهٔ جدیدی نیست. می‌خوای فعال بمونی؟ هر جلسه‌ای از $2 هنوز جواب می‌ده."
+    ],
+    [
+      "There is no new week to train\\. Want to keep moving\\? Any session from (.+) still works\\.",
+      "هفتهٔ جدیدی برای تمرین نیست. می‌خوای فعال بمونی؟ هر جلسه‌ای از $1 هنوز جواب می‌ده."
+    ],
+    [
+      "Cycle (\\d+) · (\\d+) sessions?",
+      "دورهٔ {n1} · {n2} جلسه"
+    ],
+    [
+      "Day (\\d+) · (.+)",
+      "روز {n1} · $2"
+    ],
+    [
+      "All (\\d+) done",
+      "همهٔ {n1} تا انجام شد"
+    ],
+    [
+      "(\\d+) of (\\d+) done",
+      "{n1} از {n2} انجام شد"
+    ],
+    [
+      "All (\\d+) sessions done this week",
+      "هر {n1} جلسهٔ این هفته انجام شد"
+    ],
+    [
+      "(\\d+) of (\\d+) sessions? done this week",
+      "{n1} از {n2} جلسه این هفته انجام شد"
+    ],
+    [
+      "You're in the middle of Day (\\d+)\\. Finish it first\\. To end it early, tap ⋯ on its bar, then Stop here\\.",
+      "وسط روز {n1} هستی. اول اون رو تموم کن. برای زودتر تموم کردنش، روی ⋯ تو نوارش بزن، بعد «همین‌جا تمومش کن»."
+    ],
+    [
+      "Back to Day (\\d+)",
+      "برگشت به روز {n1}"
+    ],
+    [
+      "D(\\d+)",
+      "روز {n1}"
+    ],
+    [
+      "Session rating (\\d+) of 10",
+      "امتیاز جلسه {n1} از ۱۰"
+    ],
+    [
+      "Rest (\\d+) min",
+      "استراحت {n1} دقیقه"
+    ],
+    [
+      "Rest (\\d+) s",
+      "استراحت {n1} ثانیه"
+    ],
+    [
+      "Rest (\\d+) min (\\d+) s",
+      "استراحت {n1} دقیقه و {n2} ثانیه"
+    ],
+    [
+      "Down (\\d+(?:\\.\\d+)?) s",
+      "{n1} ثانیه پایین"
+    ],
+    [
+      "Down (\\d+(?:\\.\\d+)?) s · pause (\\d+(?:\\.\\d+)?) s",
+      "{n1} ثانیه پایین · {n2} ثانیه مکث"
+    ],
+    [
+      "Down (\\d+(?:\\.\\d+)?) s · pause",
+      "{n1} ثانیه پایین · مکث"
+    ],
+    [
+      "s · pause (\\d+(?:\\.\\d+)?) s",
+      "ثانیه · {n1} ثانیه مکث"
+    ],
+    [
+      "(\\d+) × ([\\d\\-–]+) each side",
+      "{n1} × {n2} هر طرف"
+    ],
+    [
+      "(\\d+) × ([\\d\\-–]+) s each side",
+      "{n1} × {n2} ثانیه، هر طرف"
+    ],
+    [
+      "(\\d+) × ([\\d\\-–]+) s",
+      "{n1} × {n2} ثانیه"
+    ],
+    [
+      "([\\d\\-–]+) each side",
+      "{n1} هر طرف"
+    ],
+    [
+      "([\\d\\-–]+) s each side",
+      "{n1} ثانیه، هر طرف"
+    ],
+    [
+      "(\\d+) min",
+      "{n1} دقیقه"
+    ],
+    [
+      "(\\d+) s",
+      "{n1} ثانیه"
+    ],
+    [
+      "(\\d+) min (\\d+) s",
+      "{n1} دقیقه و {n2} ثانیه"
+    ],
+    [
+      "(\\d+) steps?",
+      "{n1} مرحله"
+    ],
+    [
+      "video · (\\d+) steps?",
+      "ویدیو · {n1} مرحله"
+    ],
+    [
+      "(\\d+) cues?",
+      "{n1} نکته"
+    ],
+    [
+      "video · (\\d+) cues?",
+      "ویدیو · {n1} نکته"
+    ],
+    [
+      "(\\d+) steps? · (\\d+) cues?",
+      "{n1} مرحله · {n2} نکته"
+    ],
+    [
+      "video · (\\d+) steps? · (\\d+) cues?",
+      "ویدیو · {n1} مرحله · {n2} نکته"
+    ],
+    [
+      "Tick (.+)",
+      "تیک $1"
+    ],
+    [
+      "Effort (\\d+(?:\\.\\d+)?)/10",
+      "شدت {n1}/۱۰"
+    ],
+    [
+      "(.+) · Effort (\\d+(?:\\.\\d+)?)/10",
+      "{t1} · شدت {n2}/۱۰"
+    ]
+  ],
+  "split": [
+    {
+      "line": 9405,
+      "text": "Tap <b>Start</b> as you begin, so I know how long the session took. Or <b>Guided</b>: one set at a time, with your rest timed.",
+      "note": "bold words split the sentence; pieces written to read in order, but Tap alone becomes a word for every standalone Tap"
+    },
+    {
+      "line": 9410,
+      "text": "Weight in, set done: tap the <b>circle</b>. One tap means done as written. Different reps? Type them first.",
+      "note": "the bold word splits it; the trailing node starts with a full stop"
+    },
+    {
+      "line": 9413,
+      "text": "How hard was that set? <b>10</b>: not one more rep. <b>8</b>: two left. I read every effort when I write your next cycle.",
+      "note": "two bold numbers split the explanation into five nodes"
+    },
+    {
+      "line": 10850,
+      "text": "Down <span class=\"t-hot\">3</span> s · pause <span class=\"t-hot\">1</span> s",
+      "note": "the tempo line splits at every number of 2 or more; the lone \"s\" node had to get its own entry"
+    },
+    {
+      "line": 11340,
+      "text": "video · 5 steps · 3 cues",
+      "note": "one node, written as every combination of the three parts"
+    },
+    {
+      "line": 10200,
+      "text": "I still got it, as you left it: N of M sets. [You trained from A to B, N min.] [And N more like it.] [Effort N saved. Thanks.] Next time tap Done at the end.",
+      "note": "optional clauses make eight different single nodes, one pattern each"
+    }
+  ],
+  "readback": [
+    {
+      "line": 9042,
+      "text": "Dismiss",
+      "note": "showInstallOffer() compares the A2HS button text to Dismiss; do not translate it in the dictionary, or the button is not relabelled"
+    },
+    {
+      "line": 10476,
+      "text": "btSlot.innerHTML !== h",
+      "note": "paintWeek() compares the translated slot against the English string, so it rewrites the slot each call (harmless, only wasted work)"
+    },
+    {
+      "line": 11279,
+      "text": "setSlot: el.innerHTML !== html",
+      "note": "same: a translated slot never equals the English html, so it is redrawn on every call"
+    },
+    {
+      "line": 10504,
+      "text": "el.dataset.count = el.textContent",
+      "note": "home-week-sum count is stored and re-read at line 14137; it is stored before the observer translates, so English, but watch it"
+    }
+  ]
+}

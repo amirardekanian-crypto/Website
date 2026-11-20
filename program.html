@@ -186,6 +186,10 @@
      loads the same version from jsDelivr: bump all three together (a NEW file name), with scripts/headless/coach/reallib.js and
      scripts/headless/signin.js run first. -->
 <script defer src="/assets/js/supabase-2.117.3.js" onerror="window.SB_FAILED=true"></script>
+<!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
+     returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
+     Language is hidden until the words are done (?fa=1 shows it on one phone). See the file's header. -->
+<script src="/assets/js/i18n.js?v=1" data-fa="/assets/js/i18n-fa.js?v=1"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -8381,6 +8385,7 @@ async function _resumeSync() {
         return;
       }
       savePlanCopy(PLAN_OFFLINE.id, res.data);
+      if (window.AAI18N) AAI18N.adopt(((res.data || {}).athlete || {}).lang, false);   // the app in Farsi: kept for the next open, never a reload here
       paintPlanOffline(JSON.stringify(res.data) === PLAN_OFFLINE.raw ? 'hide' : 'changed');
     }
     const pulled = await _pullOnce(_sbKey);
@@ -8564,6 +8569,9 @@ setTimeout(() => bootStuck('nothing answered in ' + Math.round(BOOT_CEILING_MS /
         DATA = res.data;
         // Saved before anything below touches DATA, so the copy is the server's own.
         savePlanCopy(clientId, DATA);
+        // The app in Farsi (assets/js/i18n.js): once the switch is for everyone, a phone that never chose opens in the language of the
+        // athlete's intake form (athlete.lang). This is the first open with no saved plan, so nothing is under way: a reload is safe.
+        if (window.AAI18N) AAI18N.adopt((DATA.athlete || {}).lang, true);
       }
     }
   } catch (e) { /* offline or rejected — the fallbacks below cover it */ }
@@ -9078,6 +9086,11 @@ function openAccount(e) {
           <button type="button" data-theme="light" aria-pressed="${!dark}">Light</button>
           <button type="button" data-theme="dark" aria-pressed="${dark}">Dark</button>
         </span></div>
+      ${(window.AAI18N && AAI18N.beta) ? `<div class="acct-theme"><span class="acct-lbl">Language</span>
+        <span class="acct-seg acct-lang" role="group" aria-label="Language" translate="no">
+          <button type="button" data-lang="en" aria-pressed="${!AAI18N.fa}">English</button>
+          <button type="button" data-lang="fa" lang="fa" aria-pressed="${AAI18N.fa}">فارسی</button>
+        </span></div>` : ''}
       ${install}
       ${pushReady() ? door('acct-push', 'bell', 'Reminders') : ''}
       ${crewOn() && !pages && !u13 ? door('acct-crew', 'sees', 'What the crew sees') : ''}
@@ -9085,8 +9098,12 @@ function openAccount(e) {
       <a class="hrow" href="/privacy.html" target="_blank" rel="noopener">${acctIc('privacy')}<span class="hrow-b"><span class="hrow-v">Privacy</span></span><span class="hrow-a" aria-hidden="true">›</span></a>
     </div>
     ${out}`;
-  ov.querySelectorAll('.acct-seg button').forEach(b => b.addEventListener('click', () => {
+  ov.querySelectorAll('.acct-seg button[data-theme]').forEach(b => b.addEventListener('click', () => {
     if ((b.dataset.theme === 'dark') !== document.body.hasAttribute('data-dark')) toggleDark();
+  }));
+  // Language (2026-11-20): a reload in the other language. Hidden until AAI18N.beta (assets/js/i18n.js).
+  ov.querySelectorAll('.acct-lang button').forEach(b => b.addEventListener('click', () => {
+    if ((b.dataset.lang === 'fa') !== !!AAI18N.fa) AAI18N.setLang(b.dataset.lang);
   }));
   const ins = document.getElementById('acct-install');
   if (ins) ins.addEventListener('click', () => {
@@ -11521,7 +11538,7 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
       <div class="round-row-main"${isPrep ? ` onclick="togglePrepCues(event, this.closest('.round-row'))"` : ''}>
         <span class="round-letter">${letter}</span>
         <span class="round-name">${esc(item.name)}</span>
-        <span class="round-detail">${esc(itemDose(item))}</span>
+        <span class="round-detail" data-en="${esc(itemDose(item))}">${esc(itemDose(item))}</span>
         ${logWeight ? `<span class="wt-field"><input class="round-wt" type="text" inputmode="decimal" placeholder="–" aria-label="Weight, ${esc(item.name)}" data-item="${i}"><button type="button" class="circ-unit" aria-haspopup="menu" aria-expanded="false" aria-label="Weight unit. Tap to choose">kg</button></span>` : ''}
         ${itemPlay}
         ${cueTog}
@@ -12971,7 +12988,8 @@ function openCabShelf(title) {
   try { if (cabFilter() !== 'all') cabSetFilter('all'); } catch (e) { /* the page draws with what it has */ }
   goTo('achievements');
   setTimeout(() => {
-    const sec = [...document.querySelectorAll('#ach-body .cab-sec')].find(s => ((s.querySelector('.cab-t') || {}).textContent || '').trim() === title);
+    const want = [title, window.AAI18N ? AAI18N.t(title) : title];   // in Farsi the shelf's title is drawn translated
+    const sec = [...document.querySelectorAll('#ach-body .cab-sec')].find(s => want.includes(((s.querySelector('.cab-t') || {}).textContent || '').trim()));
     if (sec) sec.scrollIntoView({ block: 'start' });
   }, 60);
 }
@@ -17236,7 +17254,7 @@ window.playerCheersAsk = playerCheersAsk;
 function playerCheersHTML(p, own) {
   const ch = p.cheers || {}, rows = Array.isArray(ch.recent) ? ch.recent : [], ask = own ? playerCheersAskHTML() : '';
   if (!rows.length && !ask) return '';
-  return `<h2 class="prog-sec">Cheers this week</h2><div class="pl-list">${rows.map(r => playerCheerRow(r, own)).join('')}${ask}</div>`;
+  return `<h2 class="prog-sec" data-sec="cheers">Cheers this week</h2><div class="pl-list">${rows.map(r => playerCheerRow(r, own)).join('')}${ask}</div>`;
 }
 // The sheet "Cheer Sara": a word if you like, 100 characters, and Send.
 function openCheer(key) {
@@ -20903,7 +20921,9 @@ function rdTarget(card, ex, drop, note) {
       const det = it && rows[k] && rows[k].querySelector('.round-detail');
       if (!det) return;
       rdKeep(det);
-      det.textContent = det.textContent.replace('Effort ' + ir + '/10', `Effort ${ir} → ${it} today`);
+      // From the English kept on the row (data-en): in Farsi the shown text is already translated, so the English is never in it.
+      const src = det.dataset.en != null ? det.dataset.en : det.textContent;
+      det.textContent = src.replace('Effort ' + ir + '/10', `Effort ${ir} → ${it} today`);
     });
   }
 }
@@ -25955,18 +25975,47 @@ function setSpine(list) {
     }));
   });
 }
+// The Spine in Farsi (2026-11-20, the app in Farsi: assets/js/i18n.js). In Farsi an entry's steps, cues, purpose and On court
+// line are its Farsi ones where it has them (get_exercises_fa(), stage65: the same four texts the course reads, written and
+// approved in coach.html → Exercises); whatever it has no Farsi for stays English. The name is never changed. 'spinecache_fa'
+// is a cache of get_exercises_fa() with no athlete prefix, so _snapshot() never sends it. 'spinecache' itself stays English.
+function spineFaOverlay(list) {
+  if (!(window.AAI18N && AAI18N.fa) || !Array.isArray(list)) return list;
+  let fa = null;
+  try { fa = JSON.parse(localStorage.getItem('spinecache_fa') || 'null'); } catch (e) { /* no copy yet */ }
+  if (!Array.isArray(fa) || !fa.length) return list;
+  const by = {};
+  fa.forEach(f => { if (f && f.id) by[f.id] = f; });
+  return list.map(e => {
+    const f = e && by[e.id];
+    if (!f) return e;
+    const o = Object.assign({}, e), c = f.cues || {};
+    if (Array.isArray(f.steps) && f.steps.some(s => typeof s === 'string' && s.trim())) o.steps = f.steps;
+    if ((c.good || []).length || (c.bad || []).length) o.cues = { good: c.good || [], bad: c.bad || [] };
+    if (f.purpose) o.purpose = f.purpose;
+    if (f.tennis) o.tennis = f.tennis;
+    return o;
+  });
+}
 function loadSpineCache() {
-  try { const c = JSON.parse(localStorage.getItem('spinecache') || 'null'); if (Array.isArray(c)) setSpine(c); }
+  try { const c = JSON.parse(localStorage.getItem('spinecache') || 'null'); if (Array.isArray(c)) setSpine(spineFaOverlay(c)); }
   catch (e) { /* no copy yet */ }
 }
 async function refreshSpine() {
   try {
     const sb = await _sbReady();
     if (!sb) return;
-    const res = await _withTimeout(sb.rpc('get_exercises'), 8000);
+    const fa = !!(window.AAI18N && AAI18N.fa);
+    const [res, resFa] = await Promise.all([
+      _withTimeout(sb.rpc('get_exercises'), 8000),
+      fa ? _withTimeout(sb.rpc('get_exercises_fa'), 8000).catch(() => null) : Promise.resolve(null),
+    ]);
     if (!res || res.error || !Array.isArray(res.data)) return;
     try { _lsRawSet('spinecache', JSON.stringify(res.data)); } catch (e) { /* storage full */ }
-    setSpine(res.data);
+    if (resFa && !resFa.error && Array.isArray(resFa.data)) {
+      try { _lsRawSet('spinecache_fa', JSON.stringify(resFa.data)); } catch (e) { /* storage full */ }
+    }
+    setSpine(spineFaOverlay(res.data));
     _spineFresh = true;
     // Records file themselves only for lifts the Spine knows (recordsItself()); on a new
     // phone history can arrive first, so run the fill again now the entries are here.
@@ -27769,7 +27818,7 @@ function crewShowMyCheers(from) {
   openPlayer('me', from || 'crew');
   let n = 0;
   const find = () => {
-    const h = [...document.querySelectorAll('#crewplayer-body h2.prog-sec')].find(x => /^Cheers this week/.test(x.textContent));
+    const h = [...document.querySelectorAll('#crewplayer-body h2.prog-sec')].find(x => x.dataset.sec === 'cheers' || /^Cheers this week/.test(x.textContent));   // data-sec: in Farsi the heading's words are not English
     if (!h) { if (++n < 12) setTimeout(find, 150); return; }
     try { h.scrollIntoView({ block: 'start', behavior: 'auto' }); } catch (e) { h.scrollIntoView(); }
     crewLight('#crewplayer-body .pl-ch', 'stay');   // the newest cheer's row
