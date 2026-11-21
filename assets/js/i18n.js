@@ -61,6 +61,7 @@
     },
     t: function (s) { return s; },
     addFa: function () {},
+    names: {}, nameOf: function (s) { return s; }, addNames: function () {},   // the real ones are set in Farsi only (section 3)
     skip: '',
   };
   if (!A.fa) return;
@@ -247,7 +248,11 @@
     // kept its full stop on its own side, and a line that starts with one ("Chalk. توی مسیر…") still reads right to left.
     var faT = /[\u0600-\u06FF]/.test(tpl);
     return tpl.replace(/\{([ndt])(\d)\}|\$(\d)/g, function (all, k, i, j) {
-      if (j) { var c = m[+j] == null ? '' : m[+j]; return faT && /[A-Za-z]/.test(c) ? ISO_F + c + ISO_R : c; }
+      if (j) {
+        var c = m[+j] == null ? '' : m[+j];
+        if (A.names[norm(c)]) return A.names[norm(c)];   // a person's name inside a sentence ("You cheered Sara today")
+        return faT && /[A-Za-z]/.test(c) ? ISO_F + c + ISO_R : c;
+      }
       var v = m[+i] == null ? '' : m[+i];
       if (k === 'n') return faNum(v);
       if (k === 'd') return dateOf(v) || look(v) || v;   // a month alone ("October") is its Shamsi month in the word lists
@@ -260,6 +265,7 @@
     if (!k || k.length < 2) return null;   // a lone letter is a circuit's A, B, C, never a word
     var ex = A.exact;
     if (Object.prototype.hasOwnProperty.call(ex, k)) return ex[k];
+    if (Object.prototype.hasOwnProperty.call(A.names, k)) return A.names[k];
     for (var i = 0; i < A.patterns.length; i++) {
       var p = A.patterns[i], m = k.match(p[0]);
       if (m) { var r = fill(p[1], m); if (r != null) return r; }
@@ -316,6 +322,26 @@
     return /[\u0600-\u06FF]/.test(r) ? r.replace(/\s+·\s+/g, '،' + RLM + ' ').replace(/\s+·$/, '،' + RLM) : r;
   }
   A.t = function (s) { var r = tr(String(s == null ? '' : s)); return r == null ? s : r; };
+  // People's names (2026-11-21, Amir: "in farsi version, people name should be in farsi as well"). Never in the public word
+  // file: they come from the server (get_names_fa(), stage114: the athlete's own and their crew's, as each is drawn), through
+  // program.html's loadNamesFa(), and only what is on the screen changes. nameOf() is for what the page draws on a canvas.
+  A.names = {};
+  A.nameOf = function (s) { var k = norm(s || ''); return Object.prototype.hasOwnProperty.call(A.names, k) ? A.names[k] : s; };
+  A.addNames = function (map) {
+    var fresh = false;
+    Object.keys(map || {}).forEach(function (k) {
+      var v = map[k];
+      if (typeof v === 'string' && /[؀-ۿ]/.test(v) && A.names[norm(k)] !== v) { A.names[norm(k)] = v; fresh = true; }
+    });
+    // Names that arrived after the screen was drawn: each text that is exactly a name takes its Farsi now.
+    if (fresh && document.body) {
+      var tw = document.createTreeWalker(document.body, 4, null), n;
+      while ((n = tw.nextNode())) {
+        var c = n.data.trim();
+        if (c && Object.prototype.hasOwnProperty.call(A.names, norm(c)) && !nameKept(n.parentElement)) { n.data = n.data.replace(c, A.names[norm(c)]); seen.set(n, n.data); }
+      }
+    }
+  };
   A.addFa = function (exact, patterns) {
     Object.keys(exact || {}).forEach(function (k) { if (exact[k]) A.exact[norm(k)] = exact[k]; });
     (patterns || []).forEach(function (p) { A.patterns.push([p[0] instanceof RegExp ? p[0] : new RegExp('^' + p[0] + '$'), p[1]]); });
@@ -334,6 +360,9 @@
   var seen = new WeakMap();     // text node -> the text it held after we last looked
   var seenA = new WeakMap();    // element -> { attr: value after we last looked }
   function skipped(el) { return !el || (el.closest && el.closest(A.skip)); }
+  // Where a name stays as it is: code, what someone typed (dir="auto", inputs), and an exercise's name.
+  var NAME_KEEP = 'script,style,textarea,code,noscript,[dir="auto"],.item-name,.nm-tail,.ex-name,.tl-name,.round-name,.circ-name,.ax-name,.lib-ex-name,.sg-name,.step-ex-name,.timer-exercise-name,.rm-name';
+  function nameKept(el) { return !el || (el.closest && el.closest(NAME_KEEP)); }
   // An arrow drawn as text on its own points the way the page reads: forward is left in Farsi. Only → and ←: a lone ‹ or ›
   // is mirrored by the browser already (see ends()), and turning it as well pointed every Home row's › the wrong way.
   var FLIP = { '→': '←', '←': '→', '?': '؟' };
@@ -357,7 +386,18 @@
   // The programmes' Farsi says RPE; the app's effortWord() turns RPE into "Effort" before drawing, inside Farsi too
   // ("Effort یعنی چی", "از هر effort یکی کم کن"). Here it becomes the Farsi word.
   var EFFORT = /\b[Ee]ffort\b/g;
-  function faEffort(s) { return /[\u0600-\u06FF]/.test(s) && /ffort/.test(s) ? s.replace(EFFORT, 'شدت') : s; }
+  function faEffort(s) { return /[\u0600-\u06FF]/.test(s) && /ffort/.test(s) ? faCheckin(s.replace(EFFORT, 'شدت')) : faCheckin(s); }
+  // A note that names the check-in's answers in English inside Farsi ("توی چک‌این بیشترش Poor، Tired، Stressed یا Bit off
+  // بوده") says them as the check-in's own buttons do (Amir, 2026-11-21: "put check in words in farsi"): the same words, from
+  // the word lists. The generic ones (OK, Good, Great, None, Mild, Slight) are left alone: they are words in other places too.
+  var CHECKIN = ['Very poor', 'Very stressed', 'Very sore', 'Very fresh', 'Not ready', 'Fully ready', 'Bit off', 'Exhausted',
+    'Excellent', 'Stressed', 'Neutral', 'Tired', 'Poor', 'Sore'];
+  var CHECKIN_RE = new RegExp('\\b(' + CHECKIN.join('|') + ')\\b', 'g');
+  function faCheckin(s) {
+    if (!/[\u0600-\u06FF]/.test(s) || !CHECKIN_RE.test(s)) return s;
+    CHECKIN_RE.lastIndex = 0;
+    return s.replace(CHECKIN_RE, function (w) { return A.exact[w] || w; });
+  }
   function faMixed(s) {
     if (!/[\u0600-\u06FF]/.test(s) || !/[A-Za-z]/.test(s) || s.indexOf(ISO_L) >= 0 || s.indexOf(ISO_F) >= 0) return s;
     function wrap(t) {
@@ -375,6 +415,10 @@
     var d = n.data;
     if (seen.get(n) === d) return;
     var core = d.trim(), p = n.parentElement;
+    // A person's name, wherever it stands (a crew face, a page's name, the greeting), but never in what someone types.
+    if (core && Object.prototype.hasOwnProperty.call(A.names, norm(core)) && !nameKept(p)) {
+      n.data = d.replace(core, A.names[norm(core)]); seen.set(n, n.data); return;
+    }
     if (FLIP[core]) { if (!skipped(p)) n.data = d.replace(core, FLIP[core]); seen.set(n, n.data); return; }
     if (p && !skipped(p)) {
       for (var ci = 0; ci < CTX.length; ci++) {
