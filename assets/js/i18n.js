@@ -310,7 +310,7 @@
     // "ویدیو۶۰ مرحله"; "هفته ۱ تا ۵ · تمام" looked like "۵۰"): in a Farsi line it is a Persian comma, also at the line's
     // end where the next piece is its own element. A right-to-left mark rides after it: a Persian digit straight after a
     // Latin name took the name's direction ("Split Step · 1 of 4" was drawn "۴ از SPLIT STEP ،۱").
-    return m[1] + ltrDose(faDots(r)) + m[3];
+    return m[1] + ltrDose(faDots(faMixed(r))) + m[3];
   }
   function faDots(r) {
     return /[\u0600-\u06FF]/.test(r) ? r.replace(/\s+·\s+/g, '،' + RLM + ' ').replace(/\s+·$/, '،' + RLM) : r;
@@ -342,12 +342,39 @@
   // A rest button carries its time on it: "2 min 30 s" spelled out in Farsi ("۲ دقیقه و ۳۰ ثانیه") is twice as long and
   // ran over the Note beside it, so on the button it is a clock, "۲:۳۰".
   var CLOCK = '.rest-t';
+  // A word whose Farsi depends on where it stands. The check-in's last question ("Overall, how ready do you feel?") answers
+  // 3 with معمولی, not the باشه "OK" is everywhere else (Amir, 2026-11-21).
+  var CTX = [['.readiness-q[data-key="overall"] .readiness-opt-lab', { 'OK': 'معمولی' }]];
+  // A short English run inside a Farsi line ("«استپ‌آف لندینگ» (Step-Off Landing)", "Back Squat", "Effort ۷") is kept as one
+  // left-to-right piece that never breaks across lines: split by the line's end, "(Step-Off" sat at the end of one line and
+  // "Landing)" at the start of the next, brackets turned round. Longer runs keep their own order but may still wrap.
+  // What people type (an element marked dir="auto") is left as it is.
+  var NBSP = String.fromCharCode(0xA0), WJ = String.fromCharCode(0x2060);
+  var LATIN_RUN = new RegExp("\\(?[A-Za-z][A-Za-z0-9'’&.\\-]*(?:[ " + NBSP + "]+[A-Za-z0-9][A-Za-z0-9'’&.\\-]*)*\\)?", 'g');
+  function faMixed(s) {
+    if (!/[\u0600-\u06FF]/.test(s) || !/[A-Za-z]/.test(s) || s.indexOf(ISO_L) >= 0 || s.indexOf(ISO_F) >= 0) return s;
+    function wrap(t) {
+      if (t.length <= 32) t = t.replace(/ /g, NBSP).replace(/-/g, '-' + WJ);
+      return ISO_L + t + ISO_R;
+    }
+    return s.replace(LATIN_RUN, function (w) {
+      var open = w.charAt(0) === '(', close = w.charAt(w.length - 1) === ')';
+      if (open && !close) return '(' + wrap(w.slice(1));
+      if (close && !open) return wrap(w.slice(0, -1)) + ')';
+      return wrap(w);
+    });
+  }
   function doText(n) {
     var d = n.data;
     if (seen.get(n) === d) return;
     var core = d.trim(), p = n.parentElement;
     if (FLIP[core]) { if (!skipped(p)) n.data = d.replace(core, FLIP[core]); seen.set(n, n.data); return; }
     if (p && !skipped(p)) {
+      for (var ci = 0; ci < CTX.length; ci++) {
+        if (p.closest && p.closest(CTX[ci][0]) && Object.prototype.hasOwnProperty.call(CTX[ci][1], core)) {
+          n.data = d.replace(core, CTX[ci][1][core]); seen.set(n, n.data); return;
+        }
+      }
       var mc = p.closest && p.closest(CLOCK) && core.match(/^(\d+) min (\d+) s$/);
       if (mc) { n.data = d.replace(core, faNum(mc[1] + ':' + (mc[2].length < 2 ? '0' : '') + mc[2])); seen.set(n, n.data); return; }
       if (/^\d+$/.test(core) && p.closest && p.closest(SENTENCE_NUM)) { n.data = faNum(d); seen.set(n, n.data); return; }
@@ -360,7 +387,10 @@
     if (/[A-Za-z]/.test(d) && !skipped(p)) {
       var r = tr(d);
       if (r != null) { if (r !== d) n.data = r; }
-      else if (A.missing.size < 5000 && /[A-Za-z]{2}/.test(d)) A.missing.add(norm(d));
+      else {
+        if (A.missing.size < 5000 && /[A-Za-z]{2}/.test(d)) A.missing.add(norm(d));
+        if (!(p && p.closest && p.closest('[dir="auto"]'))) { var mx = faMixed(d); if (mx !== d) n.data = mx; }
+      }
     }
     seen.set(n, n.data);
   }

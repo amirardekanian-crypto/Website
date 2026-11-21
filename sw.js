@@ -578,7 +578,9 @@
 // the rest games' centred cards, and the words that were left in English.
 // v260: i18n-fa.js (?v=12) changed (2026-11-21): Farsi for First Light's block titles and focus tag (workouts/care/morning-back.json).
 // v261: i18n.js (?v=5) changed (2026-11-21): the check-in's Farsi answers no longer touch the edges of their boxes.
-const CACHE = 'aap-v261';
+// v262: i18n.js (?v=6) changed (2026-11-21): a short English run in a Farsi line stays whole and in order (Step-Off Landing), and the
+// check-in's last question answers 3 with معمولی (Amir).
+const CACHE = 'aap-v262';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -618,7 +620,7 @@ const SHELL = [
   '/assets/js/between-sets.js',
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
-  '/assets/js/i18n.js?v=5',
+  '/assets/js/i18n.js?v=6',
   '/assets/js/i18n-fa.js?v=12',
 ];
 
