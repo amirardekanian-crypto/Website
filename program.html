@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=11" data-fa="/assets/js/i18n-fa.js?v=15"></script>
+<script src="/assets/js/i18n.js?v=11" data-fa="/assets/js/i18n-fa.js?v=16"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -5024,12 +5024,38 @@
   #screen-plan .fw-dw, #screen-plan .fw-wl { font: 400 var(--fs-label)/1 'Space Mono', monospace; color: var(--ring); text-align: center; }
   #screen-plan .fw-wl { text-align: left; }
   #screen-plan .fw-wl.is-now { color: var(--ink); font-weight: 700; }
+  /* A held week: the label is the app's done circle (Today's habit tick, the set circles): solid green, a white tick (Amir, 2026-11-21: "A, the tick"). */
+  #screen-plan .fw-wl.is-held { position: relative; display: block; width: 22px; height: 22px; border-radius: 50%; background: var(--fill); }
+  #screen-plan .fw-wl.is-held i { position: absolute; left: 8px; top: 4px; width: 5px; height: 10px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  #screen-plan .fw-k.is-h { border-radius: 50%; background: var(--fill); }
   #screen-plan .fw-c { position: relative; display: grid; place-items: center; width: 100%; max-width: 40px; aspect-ratio: 1; justify-self: center; margin: 0; padding: 0;
     border: 0; border-radius: 6px; background: var(--ghost); color: #fff; font: 700 var(--fs-label)/1 'Space Mono', monospace; }
   #screen-plan .fw-c.is-fut { background: none; box-shadow: inset 0 0 0 1px var(--hair); }
   #screen-plan .fw-c.is-p { background: var(--fill); }
   #screen-plan .fw-c.is-l { background: var(--mint); color: var(--fill); }
   #screen-plan .fw-c.is-pl { background: linear-gradient(135deg, var(--fill) 50%, var(--mint) 50%); }
+  /* Court Log (#123, stage116): court time (tennis, padel, a match) in ink, anything else (a run, other) in the warm grey; never steel, which
+     means an RPE under target and nothing else, and never clay (Progress is single-accent). A day with two
+     kinds is split corner to corner by the first two: .is-mix with --fa and --fb set by the .fa-* / .fb-* classes. */
+  #screen-plan .fw-c.is-c { background: var(--ink); color: var(--paper); }
+  #screen-plan .fw-c.is-o { background: var(--ring); }
+  #screen-plan .fw-c.is-mix { background: linear-gradient(135deg, var(--fa) 50%, var(--fb) 50%); color: #fff; text-shadow: 0 0 2px rgba(0,0,0,.9), 0 0 4px rgba(0,0,0,.6); }   /* the count reads on either half, in both themes */
+  #screen-plan .fw-c.fa-p { --fa: var(--fill); } #screen-plan .fw-c.fa-l { --fa: var(--mint); } #screen-plan .fw-c.fa-c { --fa: var(--ink); } #screen-plan .fw-c.fa-o { --fa: var(--ring); }
+  #screen-plan .fw-c.fb-p { --fb: var(--fill); } #screen-plan .fw-c.fb-l { --fb: var(--mint); } #screen-plan .fw-c.fb-c { --fb: var(--ink); } #screen-plan .fw-c.fb-o { --fb: var(--ring); }
+  #screen-plan .fw-k.is-c { background: var(--ink); }
+  #screen-plan .fw-k.is-o { background: var(--ring); }
+  #screen-plan .fw-add { display: block; width: 100%; min-height: 44px; margin-top: 10px; border: 1px dashed var(--green-ink); border-radius: 999px; background: none;
+    color: var(--green-ink); font: 600 var(--fs-body)/1 'Barlow', sans-serif; cursor: pointer; }
+  #screen-plan .fw-add:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  /* The Add activity sheet and a logged activity's row, in #hist-overlay (the shared sheet). */
+  .act-sec { margin: 14px 0 6px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
+  .act-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .act-min { display: flex; align-items: center; gap: 10px; }
+  .act-min input { width: 92px; min-height: 44px; padding: 0 12px; border: 1px solid var(--field); border-radius: 8px; background: var(--row); color: var(--ink); font: 600 var(--fs-field)/1 'Barlow', sans-serif; }
+  .act-err { min-height: 1.3em; margin: 10px 0 0; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--clay-ink); }
+  .act-go { margin-top: 12px; }
+  .act-del { min-height: 36px; padding: 0 12px; border: 1px solid var(--hair); border-radius: 999px; background: none; color: var(--grey); font: 600 var(--fs-small)/1 'Barlow', sans-serif; cursor: pointer; }
+  .act-del.armed { border-color: var(--clay); color: var(--clay-ink); }
   #screen-plan .fw-c.is-now { box-shadow: 0 0 0 2px var(--row), 0 0 0 4px var(--ink); }
   #screen-plan button.fw-c { cursor: pointer; }
   #screen-plan button.fw-c:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 3px; }
@@ -6806,7 +6832,8 @@
   <!-- Your weeks (#122 Five Weeks, round 11, 2026-11-21; Amir: "an activity tracker for people so they can see what kind of activity
        they had over the past month or 5 weeks", then "go with your picks"). The cycle's weeks as rows, a square per day: a plan session
        in green, a Library session in mint, both split. A tap on a day lists what was in it. From get_five_weeks() (stage115), the same
-       weeks as the Player Page's bars. Private: never on the crew's screens. paintFiveWeeks(). -->
+       weeks as the Player Page's bars. + Add activity (Court Log, #123, stage116) puts tennis, padel and the rest on it too.
+       Private: never on the crew's screens. paintFiveWeeks(), openActivitySheet(). -->
   <h2 class="prog-sec" id="fw-title" hidden>Your weeks</h2>
   <div id="fw-wrap"></div>
 
@@ -18729,6 +18756,13 @@ function fwAdd(iso, n) {
   return d.toISOString().slice(0, 10);
 }
 function fwMins(n) { n = Math.round(Number(n) || 0); const h = Math.floor(n / 60), m = n % 60; return h ? (m ? `${h}h ${m}m` : `${h}h`) : `${m}m`; }
+// The four kinds a day can hold, in the order a split square takes them: a plan session, a Library session, court time (Court Log:
+// tennis, padel, a match) and anything else the athlete logged (a run, other). Their one-letter class is the square's colour.
+const FW_KINDS = { plan: 'p', library: 'l', court: 'c', other: 'o' };
+const FW_KIND_ORDER = ['plan', 'library', 'court', 'other'];
+const ACT_KINDS = [['tennis', 'Tennis'], ['padel', 'Padel'], ['match', 'Match'], ['run', 'Run'], ['other', 'Other']];
+const ACT_EFFORT = [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']];
+function fwKindOf(d) { return FW_KINDS[d && d.k] ? d.k : 'plan'; }
 function fiveWeeksHTML() {
   fwFromCache();
   const c = FW;
@@ -18736,18 +18770,20 @@ function fiveWeeksHTML() {
   const weeks = c.weeks.filter(w => w && /^\d{4}-\d{2}-\d{2}$/.test(String(w.from || '')));
   const today = ymdLocal(new Date());
   const byDay = {};
-  let nP = 0, nL = 0, mins = 0;
+  const n = { plan: 0, library: 0, court: 0, other: 0 }, m = { court: 0, other: 0 };
+  let mins = 0;
+  const held = weeks.filter(w => w.held).length;
   weeks.forEach(w => (Array.isArray(w.days) ? w.days : []).forEach(d => {
     if (!d || !d.day) return;
+    const k = fwKindOf(d);
     (byDay[d.day] = byDay[d.day] || []).push(d);
-    if (d.k === 'library') nL++; else nP++;
-    if (Number(d.mins) > 0) mins += Number(d.mins);
+    n[k]++;
+    if (Number(d.mins) > 0) { mins += Number(d.mins); if (k === 'court' || k === 'other') m[k] += Number(d.mins); }
   }));
-  if (!nP && !nL) return '';   // nothing done yet this cycle: Day one and the plan say it better than an empty grid
   const first = weeks[0].from;
   const dow = Array.from({ length: 7 }, (_, i) => {
-    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(fwAdd(first, i));
-    return PL_DOW[new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])).getUTCDay()];
+    const mm = /^(\d{4})-(\d{2})-(\d{2})/.exec(fwAdd(first, i));
+    return PL_DOW[new Date(Date.UTC(+mm[1], +mm[2] - 1, +mm[3])).getUTCDay()];
   });
   const head = `<span></span>` + dow.map(d => `<span class="fw-dw">${d}</span>`).join('');
   const rows = weeks.map((w, wi) => {
@@ -18756,24 +18792,36 @@ function fiveWeeksHTML() {
       const day = fwAdd(w.from, i);
       if (w.to && day > String(w.to)) return '<span></span>';
       const items = byDay[day] || [];
-      const hasP = items.some(x => x.k !== 'library'), hasL = items.some(x => x.k === 'library');
-      const cls = `fw-c${hasP && hasL ? ' is-pl' : hasP ? ' is-p' : hasL ? ' is-l' : ''}${!items.length && day > today ? ' is-fut' : ''}${day === today ? ' is-now' : ''}`;
+      const kinds = FW_KIND_ORDER.filter(k => items.some(x => fwKindOf(x) === k));
+      // The first two kinds: plan and Library keep their own split (is-pl, as before Court Log); any other pair is .is-mix.
+      const look = !kinds.length ? '' : kinds.length === 1 ? ' is-' + FW_KINDS[kinds[0]]
+        : (kinds[0] === 'plan' && kinds[1] === 'library') ? ' is-pl' : ` is-mix fa-${FW_KINDS[kinds[0]]} fb-${FW_KINDS[kinds[1]]}`;
+      const cls = `fw-c${look}${!items.length && day > today ? ' is-fut' : ''}${day === today ? ' is-now' : ''}`;
       if (!items.length) return `<span class="${cls}" aria-hidden="true"></span>`;
       const said = plDay(day) + ': ' + items.map(x => x.title || (x.k === 'library' ? 'Library session' : 'Plan session')).join(', ');
       return `<button type="button" class="${cls}" onclick="openFiveWeeksDay('${day}')" aria-label="${esc(said)}">${items.length > 1 ? items.length : ''}</button>`;
     }).join('');
-    return `<span class="fw-wl${now ? ' is-now' : ''}">W${Number(w.w) || wi + 1}</span>${cells}`;
+    // A held week (#122, Amir 2026-11-21: "A, the tick"): the label becomes the app's own done circle, the server's week_held fact (the
+    // Player Page's bars read the same one), so the two can never disagree.
+    const wn = Number(w.w) || wi + 1;
+    const lab = w.held ? `<span class="fw-wl is-held" role="img" aria-label="Week ${wn}, held"><i aria-hidden="true"></i></span>` : `<span class="fw-wl${now ? ' is-now' : ''}">W${wn}</span>`;
+    return `${lab}${cells}`;
   }).join('');
   const foot = [
-    nP ? `<span><i class="fw-k is-p"></i><b>${nP}</b> <span>${nP === 1 ? 'plan session' : 'plan sessions'}</span></span>` : '',
-    nL ? `<span><i class="fw-k is-l"></i><b>${nL}</b> <span>${nL === 1 ? 'Library session' : 'Library sessions'}</span></span>` : '',
+    held ? `<span><i class="fw-k is-h"></i><b>${held}</b> <span>${held === 1 ? 'week held' : 'weeks held'}</span></span>` : '',
+    n.plan ? `<span><i class="fw-k is-p"></i><b>${n.plan}</b> <span>${n.plan === 1 ? 'plan session' : 'plan sessions'}</span></span>` : '',
+    n.library ? `<span><i class="fw-k is-l"></i><b>${n.library}</b> <span>${n.library === 1 ? 'Library session' : 'Library sessions'}</span></span>` : '',
+    n.court ? `<span><i class="fw-k is-c"></i><b>${fwMins(m.court)}</b> <span>on court</span></span>` : '',
+    n.other ? `<span><i class="fw-k is-o"></i><b>${fwMins(m.other)}</b> <span>other</span></span>` : '',
     mins ? `<span><b>${fwMins(mins)}</b> <span>trained</span></span>` : ''
   ].filter(Boolean).join('');
+  const any = n.plan + n.library + n.court + n.other > 0;
   return `<div class="fw-card">
     <div class="fw-h"><span>${c.n ? 'Cycle ' + esc(String(c.n)) : ''}</span><span>${weeks.length} ${weeks.length === 1 ? 'week' : 'weeks'}</span></div>
     <div class="fw-g">${head}${rows}</div>
-    <div class="fw-f">${foot}</div>
-    <p class="fw-tip">Tap a day to see what you did.</p>
+    ${foot ? `<div class="fw-f">${foot}</div>` : ''}
+    <p class="fw-tip">${any ? 'Tap a day to see what you did.' : 'Your sessions show here as you train. Add your tennis, padel or anything else you do.'}</p>
+    <button type="button" class="fw-add" onclick="openActivitySheet()">+ Add activity</button>
   </div>`;
 }
 function paintFiveWeeks() {
@@ -18785,15 +18833,21 @@ function paintFiveWeeks() {
   if (head) head.hidden = !h;
 }
 window.paintFiveWeeks = paintFiveWeeks;
-// One day's list, in the sheet the Player Page's weeks use (#hist-overlay).
+// One day's list, in the sheet the Player Page's weeks use (#hist-overlay). A logged activity (Court Log) carries Delete, two taps (LOG-02).
 function openFiveWeeksDay(day) {
   const ov = document.getElementById('hist-overlay');
   if (!ov || !fwOk(FW)) return;
   const items = [];
   FW.weeks.forEach(w => (Array.isArray(w && w.days) ? w.days : []).forEach(d => { if (d && d.day === day) items.push(d); }));
-  if (!items.length) return;
+  if (!items.length) { ov.classList.remove('visible'); return; }
+  const effort = { easy: 'Easy', normal: 'Normal', hard: 'Hard' };
   const row = d => {
-    const lib = d.k === 'library';
+    const k = fwKindOf(d);
+    if (k === 'court' || k === 'other') {
+      const q = [Number(d.mins) > 0 ? Math.round(Number(d.mins)) + ' min' : '', effort[d.effort] || ''].filter(Boolean).join(' · ');
+      return `<div class="pl-row"><div><span class="t">${esc(d.title || 'Activity')}</span><span class="q">${esc(q)}</span></div>${d.id ? `<button type="button" class="act-del" onclick="deleteActivity(this, '${esc(String(d.id))}', '${day}')">Delete</button>` : '<span></span>'}</div>`;
+    }
+    const lib = k === 'library';
     const q = [lib ? (FW_SHELF[d.shelf] ? FW_SHELF[d.shelf] + ' · Library' : 'Library session') : 'Plan session', Number(d.mins) > 0 ? Math.round(Number(d.mins)) + ' min' : ''].filter(Boolean).join(' · ');
     return `<div class="pl-row"><div><span class="t" dir="auto">${esc(d.title || (lib ? 'Library session' : 'Plan session'))}</span><span class="q">${esc(q)}</span></div>${d.extra ? '<span class="pl-xt">Extra</span>' : '<span></span>'}</div>`;
   };
@@ -18804,6 +18858,93 @@ function openFiveWeeksDay(day) {
   ov.classList.add('visible');
 }
 window.openFiveWeeksDay = openFiveWeeksDay;
+
+// ── COURT LOG — #123 (round 11, 2026-11-21; Amir: "Build Court Log") ───────────────────────────────────────────────────────────
+// What the plan never sees, added in three taps: the kind, the minutes, how hard, for today or the last 3 days. log_activity()
+// (stage116) checks all of it again and keeps one row per draft key, so a retry never writes twice. It pays no XP and never reaches
+// the crew. Like a Library Done it is NOT queued for later: one row saying "did this", and the server only takes the last 3 days.
+let _act = null;   // the open draft: { kind, day, mins, effort, key, busy, err }
+function actDays() {
+  const t = new Date();
+  return [0, 1, 2, 3].map(i => { const d = new Date(t.getFullYear(), t.getMonth(), t.getDate() - i); return [ymdLocal(d), i === 0 ? 'Today' : i === 1 ? 'Yesterday' : plDay(ymdLocal(d))]; });
+}
+function openActivitySheet() {
+  if (!ATHLETE_ID || window.IS_DEMO || window.IS_PREVIEW) return;
+  _act = { kind: 'tennis', day: ymdLocal(new Date()), mins: 60, effort: 'normal', key: crewNewKey(), busy: false, err: '' };
+  paintActivitySheet();
+  document.getElementById('hist-overlay').classList.add('visible');
+}
+window.openActivitySheet = openActivitySheet;
+function paintActivitySheet() {
+  const ov = document.getElementById('hist-overlay');
+  if (!ov || !_act) return;
+  const chip = (group, v, label) => `<button type="button" class="pl-chip" aria-pressed="${_act[group] === v}" onclick="actPick('${group}', '${v}')">${esc(label)}</button>`;
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">Your weeks</div>
+    <h2 class="readiness-title">Add activity</h2>
+    <p class="readiness-sub">Training outside your plan. It shows on your weeks and Amir sees it.</p>
+    <div class="act-sec">What</div><div class="act-row">${ACT_KINDS.map(([v, l]) => chip('kind', v, l)).join('')}</div>
+    <div class="act-sec">When</div><div class="act-row">${actDays().map(([v, l]) => chip('day', v, l)).join('')}</div>
+    <div class="act-sec">Minutes</div>
+    <div class="act-min"><input id="act-mins" type="number" inputmode="numeric" min="5" max="600" step="5" value="${Number(_act.mins) || ''}" aria-label="Minutes" oninput="_act && (_act.mins = this.value)">
+      <div class="act-row">${[30, 60, 90, 120].map(v => `<button type="button" class="pl-chip" aria-pressed="${Number(_act.mins) === v}" onclick="actPick('mins', ${v})">${v}</button>`).join('')}</div></div>
+    <div class="act-sec">How hard</div><div class="act-row">${ACT_EFFORT.map(([v, l]) => chip('effort', v, l)).join('')}</div>
+    <p class="act-err" role="alert">${esc(_act.err || '')}</p>
+    <button type="button" class="ws-done-btn act-go" onclick="saveActivity()"${_act.busy ? ' disabled' : ''}>${_act.busy ? 'Saving…' : 'Save'}</button>`;
+}
+function actPick(group, v) {
+  if (!_act || _act.busy) return;
+  _act[group] = group === 'mins' ? Number(v) : v;
+  _act.err = '';
+  paintActivitySheet();
+}
+window.actPick = actPick;
+async function saveActivity() {
+  if (!_act || _act.busy) return;
+  const mins = Math.round(Number(_act.mins));
+  if (!(mins >= 5 && mins <= 600)) { _act.err = 'Minutes: a number from 5 to 600.'; paintActivitySheet(); return; }
+  _act.mins = mins; _act.busy = true; _act.err = ''; paintActivitySheet();
+  const MSG = { 'activity:full': 'That day already has 8 activities.', 'activity:day': 'Only today and the last 3 days can be added.' };
+  try {
+    const sb = await _sbReady();
+    if (!sb) throw new Error('offline');
+    const res = await _withTimeout(sb.rpc('log_activity', { p_athlete_id: ATHLETE_ID, p_id: _act.key, p_day: _act.day, p_kind: _act.kind, p_minutes: mins, p_effort: _act.effort }), 10000);
+    if (!res || res.error) throw (res && res.error) || new Error('no answer');
+    const day = _act.day;
+    _act = null;
+    document.getElementById('hist-overlay').classList.remove('visible');
+    aaToast('Added to your weeks.');
+    if (FW && fwOk(FW)) {   // shown at once, before the server's own answer replaces it
+      const r = res.data || {}, wk = FW.weeks.find(w => w && day >= String(w.from) && day <= String(w.to));
+      if (wk) { (wk.days = wk.days || []).push({ day, k: ['tennis', 'padel', 'match'].indexOf(r.kind) >= 0 ? 'court' : 'other', kind: r.kind, title: plCap(String(r.kind || 'activity')), mins: r.minutes, effort: r.effort, id: r.id }); paintFiveWeeks(); }
+    }
+    loadFiveWeeks();
+  } catch (e) {
+    const m = String((e && e.message) || '');
+    if (_act) { _act.busy = false; _act.err = MSG[m] || (/offline|fetch|no answer|timed? ?out/i.test(m) ? 'No signal. Try again when you have one.' : 'That did not save. Try again.'); paintActivitySheet(); }
+  }
+}
+window.saveActivity = saveActivity;
+// A logged activity's Delete: two taps (armedTap, LOG-02), then delete_activity(), then the day's sheet again.
+function deleteActivity(btn, id, day) {
+  armedTap(btn, 'Tap again to delete', async () => {
+    btn.disabled = true;
+    try {
+      const sb = await _sbReady();
+      if (!sb) throw new Error('offline');
+      const res = await _withTimeout(sb.rpc('delete_activity', { p_athlete_id: ATHLETE_ID, p_id: id }), 10000);
+      if (!res || res.error) throw (res && res.error) || new Error('no answer');
+      if (FW && fwOk(FW)) FW.weeks.forEach(w => { if (w && Array.isArray(w.days)) w.days = w.days.filter(d => !(d && String(d.id) === id)); });
+      paintFiveWeeks();
+      openFiveWeeksDay(day);
+      loadFiveWeeks();
+    } catch (e) {
+      btn.disabled = false;
+      aaToast('That did not delete. Try again when you have signal.');
+    }
+  });
+}
+window.deleteActivity = deleteActivity;
 
 function ceilingCardHtml() {
   const lifts = ceilingLifts();

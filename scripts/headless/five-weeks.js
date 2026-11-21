@@ -3,7 +3,8 @@
 // The card reads get_five_weeks() (stage115; here the stub's `fiveWeeks`) and draws the cycle's weeks as rows, a square per day: a plan
 // session (.is-p), a Library session (.is-l), both (.is-pl), a day to come (.is-fut), today ringed (.is-now). Checked on a made-up cycle:
 // the squares, the counts in the foot, a day's sheet, the copy on the phone and never synced, no card with nothing done, no card from a
-// server without stage115, the copy shown offline, nothing called in the demo, and no sideways scroll at 320 px in dark mode.
+// server without stage115, the copy shown offline, nothing called in the demo, no sideways scroll at 320 px in dark mode, and Court Log (#123,
+// stage116): the sheet, a save, the split squares, the foot, the checks on the phone and the server's, Delete in two taps.
 // Serve the repo first (python -m http.server <port> --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
 const H = require('./lib');
@@ -65,6 +66,10 @@ const calls = (p, n) => p.evaluate(n => (window.__STUB.calls || []).filter(c => 
     C.check('every day with something in it is a button (7 days)', c.btn === 7, c.btn);
     C.check('the foot counts 5 plan sessions, 3 Library sessions and the minutes', /5 plan sessions/.test(c.foot) && /3 Library sessions/.test(c.foot) && /5h 47m trained/.test(c.foot), c.foot);
     C.check('the head names the cycle and its weeks', /Cycle 2/.test(c.head) && /3 weeks/.test(c.head), c.head);
+    const held = await p.evaluate(() => [...document.querySelectorAll('#fw-wrap .fw-wl')].map(e => ({ held: e.classList.contains('is-held'), say: e.getAttribute('aria-label') || '', text: e.textContent.trim() })));
+    C.check('a held week (W1) is the green tick circle, said as "Week 1, held"; the others keep W2, W3', held.length === 3 && held[0].held && held[0].say === 'Week 1, held'
+      && !held[1].held && held[1].text === 'W2' && !held[2].held, JSON.stringify(held));
+    C.check('the foot says 1 week held, first', /^1 week held/.test(c.foot), c.foot);
     const order = await p.evaluate(() => {
       const ids = ['cycle-card-wrap', 'fw-title', 'numbers-title'].map(id => document.getElementById(id));
       return ids.every(Boolean) && (ids[0].compareDocumentPosition(ids[1]) & 4) && (ids[1].compareDocumentPosition(ids[2]) & 4) ? 'ok' : 'wrong';
@@ -91,12 +96,14 @@ const calls = (p, n) => p.evaluate(n => (window.__STUB.calls || []).filter(c => 
     await ctx.close();
   }
 
-  // ── 2. nothing done yet this cycle: no card ──
+  // ── 2. nothing done yet this cycle: the card stays (Court Log, 2026-11-21), its grid empty, a line that says why, and Add activity ──
   {
     const empty = weeks(); empty.weeks.forEach(w => { w.days = []; w.done = 0; w.held = false; });
     const { ctx, p } = await open(browser, { fiveWeeks: empty });
     const c = await card(p);
-    C.check('nothing done yet: no card', !c.shown, JSON.stringify(c));
+    const tip = await p.evaluate(() => ({ tip: (document.querySelector('#fw-wrap .fw-tip') || {}).textContent || '', add: !!document.querySelector('#fw-wrap .fw-add'), foot: !!document.querySelector('#fw-wrap .fw-f') }));
+    C.check('nothing done yet: the card, with no coloured day and no foot', c.shown && c.p + c.l + c.pl === 0 && !tip.foot, JSON.stringify(c));
+    C.check('nothing done yet: it says what fills it and offers Add activity', /Add your tennis, padel/.test(tip.tip) && tip.add, JSON.stringify(tip));
     await ctx.close();
   }
 
@@ -134,6 +141,64 @@ const calls = (p, n) => p.evaluate(n => (window.__STUB.calls || []).filter(c => 
     });
     C.check('320 px: the card fits and the page does not scroll sideways', r.right <= r.vw && r.sw <= r.vw, JSON.stringify(r));
     C.check('320 px: a day square is still at least 24 px', r.min >= 24, r.min);
+    await ctx.close();
+  }
+
+  // ── 7. Court Log (#123, stage116): add tennis yesterday, a run today; the squares, the foot, a retry, Delete in two taps ──
+  {
+    const { ctx, p } = await open(browser);
+    await p.evaluate(() => document.querySelector('#fw-wrap .fw-add').click());
+    await p.waitForTimeout(200);
+    const sheet = await p.evaluate(() => {
+      const ov = document.getElementById('hist-overlay');
+      return { open: ov.classList.contains('visible'), title: (ov.querySelector('.readiness-title') || {}).textContent, kinds: [...ov.querySelectorAll('.act-row')][0].querySelectorAll('.pl-chip').length,
+        days: [...ov.querySelectorAll('.act-row')][1].querySelectorAll('.pl-chip').length, picked: [...ov.querySelectorAll('.pl-chip[aria-pressed="true"]')].map(b => b.textContent) };
+    });
+    C.check('Add activity opens its sheet: five kinds, four days, tennis today 60 normal picked', sheet.open && sheet.title === 'Add activity' && sheet.kinds === 5 && sheet.days === 4
+      && JSON.stringify(sheet.picked) === JSON.stringify(['Tennis', 'Today', '60', 'Normal']), JSON.stringify(sheet));
+    // tennis, yesterday, 90, hard
+    await p.evaluate(() => { actPick('day', [...document.querySelectorAll('#hist-overlay .act-row')][1].querySelectorAll('.pl-chip')[1].getAttribute('onclick').match(/'(\d{4}-\d{2}-\d{2})'/)[1]); actPick('mins', 90); actPick('effort', 'hard'); });
+    await p.evaluate(() => saveActivity());
+    await p.waitForTimeout(400);
+    let c = await card(p);
+    const sent = await p.evaluate(() => (window.__STUB.params || []).filter(x => x[0] === 'log_activity').map(x => x[1]));
+    C.check('saved once, as the athlete: tennis, yesterday, 90 min, hard, with a draft key', sent.length === 1 && sent[0].p_athlete_id === H.ID && sent[0].p_kind === 'tennis'
+      && sent[0].p_day === at(-1) && sent[0].p_minutes === 90 && sent[0].p_effort === 'hard' && /^[0-9a-f-]{36}$/.test(sent[0].p_id), JSON.stringify(sent));
+    C.check('the sheet closes after a save', await p.evaluate(() => !document.getElementById('hist-overlay').classList.contains('visible')));
+    C.check('yesterday (a plan day) is now split plan / court', await p.evaluate(d => { const b = [...document.querySelectorAll('#fw-wrap button.fw-c')].find(x => x.getAttribute('onclick').includes(d)); return !!b && b.classList.contains('is-mix') && b.classList.contains('fa-p') && b.classList.contains('fb-c'); }, at(-1)));
+    C.check('the foot adds 1h 30m on court', /1h 30m on court/.test(c.foot), c.foot);
+    // a run today: today already has a Library session, so library / other
+    await p.evaluate(() => { openActivitySheet(); actPick('kind', 'run'); actPick('mins', 30); actPick('effort', 'easy'); });
+    await p.evaluate(() => saveActivity());
+    await p.waitForTimeout(400);
+    c = await card(p);
+    C.check('today is split Library / other after a run', await p.evaluate(d => { const b = [...document.querySelectorAll('#fw-wrap button.fw-c')].find(x => x.getAttribute('onclick').includes(d)); return !!b && b.classList.contains('fa-l') && b.classList.contains('fb-o'); }, at(0)));
+    C.check('the foot adds 30m other', /30m other/.test(c.foot), c.foot);
+    // a bad number never leaves the phone
+    await p.evaluate(() => { openActivitySheet(); _act.mins = 2; });
+    await p.evaluate(() => saveActivity());
+    const bad = await p.evaluate(() => ({ err: (document.querySelector('#hist-overlay .act-err') || {}).textContent, n: (window.__STUB.params || []).filter(x => x[0] === 'log_activity').length }));
+    C.check('2 minutes is refused on the phone, with the reason', /5 to 600/.test(bad.err) && bad.n === 2, JSON.stringify(bad));
+    // the server says the day is full
+    await p.evaluate(() => { window.__STUB.actErr = 'activity:full'; _act.mins = 45; });
+    await p.evaluate(() => saveActivity());
+    await p.waitForTimeout(300);
+    const full = await p.evaluate(() => ({ err: (document.querySelector('#hist-overlay .act-err') || {}).textContent, open: document.getElementById('hist-overlay').classList.contains('visible'), btn: (document.querySelector('#hist-overlay .act-go') || {}).disabled }));
+    C.check('a full day is said in plain words, the sheet stays and Save works again', /already has 8/.test(full.err) && full.open && full.btn === false, JSON.stringify(full));
+    await p.evaluate(() => { window.__STUB.actErr = null; document.getElementById('hist-overlay').classList.remove('visible'); });
+    // Delete: two taps
+    await p.evaluate(d => openFiveWeeksDay(d), at(-1));
+    const del = await p.evaluate(async () => {
+      const b = document.querySelector('#hist-overlay .act-del');
+      b.click(); const armed = b.textContent;
+      const n1 = (window.__STUB.params || []).filter(x => x[0] === 'delete_activity').length;
+      b.click(); await new Promise(r => setTimeout(r, 400));
+      return { armed, n1, n2: (window.__STUB.params || []).filter(x => x[0] === 'delete_activity').length, left: document.querySelectorAll('#hist-overlay .act-del').length };
+    });
+    C.check('Delete takes two taps, then the activity goes', del.armed === 'Tap again to delete' && del.n1 === 0 && del.n2 === 1 && del.left === 0, JSON.stringify(del));
+    c = await card(p);
+    C.check('and the court time leaves the foot', !/on court/.test(c.foot), c.foot);
+    C.check('Court Log: no page errors', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }
 

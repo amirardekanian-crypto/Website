@@ -59,6 +59,27 @@
       if (S.fiveWeeks === undefined) return res({ data: null, error: { message: 'Could not find the function public.get_five_weeks(p_athlete_id) in the schema cache', code: 'PGRST202' }, status: 404 });
       return res({ data: JSON.parse(JSON.stringify(S.fiveWeeks)), error: null, status: 200 });
     }
+    // Court Log (#123, stage116): log_activity adds to `fiveWeeks` the way the server's reader would show it (one row per p_id; actErr = a
+    // message to refuse with, e.g. 'activity:full'); delete_activity takes it out. Both are kept in '__stubcfg' so a reload sees them.
+    if (name === 'log_activity') {
+      if (S.actErr) return res({ data: null, error: { message: S.actErr, code: 'P0001' }, status: 400 });
+      var row = { id: params.p_id, athlete_id: params.p_athlete_id, day: params.p_day, kind: params.p_kind, minutes: params.p_minutes, effort: params.p_effort };
+      var fw = S.fiveWeeks, seen = false;
+      if (fw && fw.weeks) fw.weeks.forEach(function (w) { (w.days || []).forEach(function (d) { if (d.id === row.id) seen = true; }); });
+      if (fw && fw.weeks && !seen) fw.weeks.forEach(function (w) {
+        if (row.day >= w.from && row.day <= w.to) (w.days = w.days || []).push({ day: row.day, k: ['tennis', 'padel', 'match'].indexOf(row.kind) >= 0 ? 'court' : 'other',
+          kind: row.kind, title: row.kind.charAt(0).toUpperCase() + row.kind.slice(1), mins: row.minutes, effort: row.effort, id: row.id });
+      });
+      S.actLog = (S.actLog || []).concat(seen ? [] : [row]);
+      try { var c1 = JSON.parse(localStorage.getItem('__stubcfg') || '{}'); c1.fiveWeeks = fw; localStorage.setItem('__stubcfg', JSON.stringify(c1)); } catch (e) {}
+      return res({ data: row, error: null, status: 200 });
+    }
+    if (name === 'delete_activity') {
+      var gone = false;
+      if (S.fiveWeeks && S.fiveWeeks.weeks) S.fiveWeeks.weeks.forEach(function (w) { var b = (w.days || []).length; w.days = (w.days || []).filter(function (d) { return d.id !== params.p_id; }); if (w.days.length < b) gone = true; });
+      try { var c2 = JSON.parse(localStorage.getItem('__stubcfg') || '{}'); c2.fiveWeeks = S.fiveWeeks; localStorage.setItem('__stubcfg', JSON.stringify(c2)); } catch (e) {}
+      return res({ data: gone, error: null, status: 200 });
+    }
     // Career Mode (phase 2): get_profile answers the stub's `profile` as given (none set: no answer, as an RPC the stub does not know).
     if (name === 'get_profile') return res({ data: S.profile ? JSON.parse(JSON.stringify(S.profile)) : null, error: null, status: 200 });
     // Career Mode phase 3, the shelf (stage70's split): get_awards(p_athlete_id) is the athlete's own rows, read only when the shelf opens. Like the server it

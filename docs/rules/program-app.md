@@ -163,4 +163,5 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   most once every 20 minutes. Five functions, one set per app: change both. `node scripts/headless/new-version.js`.
 - **Your weeks is the athlete's own** (#122 Five Weeks, Amir 2026-11-21; `PROGRAM-APP.md` → *Your weeks*): `get_five_weeks()` is read by the
   athlete and the coach only, and nothing from it reaches the crew, the Bell or a share card (a Library title can hint at pain). Its weeks are
-  the server's `career_weeks()`, never a Monday-to-Sunday rebuild on the phone, and it pays no XP.
+  the server's `career_weeks()`, never a Monday-to-Sunday rebuild on the phone, and it pays no XP. Court Log's `activity_log` (stage116) is
+  written only through `log_activity()` / `delete_activity()`, pays no XP either, and is in BACKUP_TABLES, the snapshot and the erase list.

@@ -48,11 +48,11 @@ Amir: *"how would i find out if some one did this?"* (a Library session marked d
 
 | Where | What it shows | Source |
 |---|---|---|
-| The work, under the metric strip | **Five weeks**: the athlete's current cycle as rows of days, a plan session green, a Library session mint, both split; hover a day for its sessions and minutes. Nothing when nothing is done yet or the server has no stage115. Read once per athlete per store. | `get_five_weeks(p_athlete_id)` (stage115), `fiveWeeksC()`, `fiveWeeksPanelC()` |
+| The work, under the metric strip | **Five weeks**: the athlete's current cycle as rows of days, a plan session green, a Library session mint, court time the athlete logged (Court Log, stage116) ink, anything else they logged grey, two kinds split; a held week's label is a green circle with a tick; the head says the weeks held and the court hours; hover a day for its sessions, minutes and a logged one's effort. Nothing when nothing is done yet or the server has no stage115. Read once per athlete per store. | `get_five_weeks(p_athlete_id)` (stage115), `fiveWeeksC()`, `fiveWeeksPanelC()` |
 | Library, above the shelves | **Done lately**: every Library session marked done in the last 30 days, newest first, the name a link to the file. | `library_sessions` (`S.libDone`, read with the library) |
 | Library, each workout row | *done N times by M · last <date>*. | the same |
 
-A failed read of `library_sessions` is named in the load banner (*the Library sessions athletes marked done*), never drawn as nobody doing them.
+Court Log's rows (`activity_log`) are in ⚙ Tools → Backup and in the Erase panel's list (*logged activities*). A failed read of `library_sessions` is named in the load banner (*the Library sessions athletes marked done*), never drawn as nobody doing them.
 
 ## The month's honours wait for Amir (2026-10-25)
 

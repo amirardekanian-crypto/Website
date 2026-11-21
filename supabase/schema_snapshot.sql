@@ -8,7 +8,7 @@
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
 -- The extensions the live project has: pg_cron (pg_catalog), pg_net (extensions), pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 77 tables, 330 functions, 11 sequences.
+-- 78 tables, 332 functions, 11 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -22,6 +22,16 @@ create sequence public.seasons_id_seq as integer start with 1 increment by 1 cac
 create sequence public.spine_versions_id_seq as bigint start with 1 increment by 1 cache 1;
 
 -- ── 2. tables ───────────────────────────────────────────────────────────────
+create table public.activity_log (
+  id uuid default gen_random_uuid() not null,
+  athlete_id text not null,
+  day date not null,
+  kind text not null,
+  minutes integer not null,
+  effort text not null,
+  created_at timestamp with time zone default now() not null
+);
+
 create table public.affiliates (
   code text not null,
   percent integer default 10 not null,
@@ -4722,7 +4732,7 @@ declare
   c_athlete_tables constant text[] := array[
     'programs', 'program_versions', 'coaching_logs', 'coaching_log_versions',
     'session_history', 'athlete_progress', 'hab_notes', 'hab_titles', 'hab_season_results', 'leaderboard_optin',
-    'library_sessions', 'messages', 'call_logs', 'cycle_reports', 'athlete_keys', 'hab_contacts', 'athlete_identities', 'athlete_status', 'career_facts', 'career_scores', 'career_awards', 'career_recognition', 'courtside_marks', 'career_honours', 'career_goals', 'career_notes', 'athlete_profile', 'crew_mentions', 'crew_replies', 'crew_award_likes', 'crew_cheers', 'crew_faces', 'crew_cheer_tally', 'crew_kudos', 'crew_photos', 'crew_posts', 'crew_open_results', 'crew_rings', 'crew_consent', 'push_sent', 'push_subs', 'crew_push_q', 'crew_push_seen', 'push_cycle_seen', 'referral_credits', 'crew_toss_votes', 'crew_questions'];
+    'library_sessions', 'activity_log', 'messages', 'call_logs', 'cycle_reports', 'athlete_keys', 'hab_contacts', 'athlete_identities', 'athlete_status', 'career_facts', 'career_scores', 'career_awards', 'career_recognition', 'courtside_marks', 'career_honours', 'career_goals', 'career_notes', 'athlete_profile', 'crew_mentions', 'crew_replies', 'crew_award_likes', 'crew_cheers', 'crew_faces', 'crew_cheer_tally', 'crew_kudos', 'crew_photos', 'crew_posts', 'crew_open_results', 'crew_rings', 'crew_consent', 'push_sent', 'push_subs', 'crew_push_q', 'crew_push_seen', 'push_cycle_seen', 'referral_credits', 'crew_toss_votes', 'crew_questions'];
   -- Not clients: the public demo, and the identity coach.html reads the board through (AMIR_ATHLETE_ID there).
   c_protected constant text[] := array['demo', 'amir_ardekani'];
   -- Arabic-Indic (U+0660-0669) and Persian (U+06F0-06F9) digits, and what they fold to.
@@ -7539,6 +7549,23 @@ AS $function$
   where t.lang = (case when p_lang = 'fa' then 'fa' else 'en' end)
 $function$;
 
+CREATE OR REPLACE FUNCTION public.delete_activity(p_athlete_id text, p_id uuid)
+ RETURNS boolean
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare n integer;
+begin
+  if p_athlete_id is null or (not public.is_coach() and p_athlete_id is distinct from public.current_athlete_id()) then
+    raise exception 'not your athlete record';
+  end if;
+  delete from public.activity_log where id = p_id and athlete_id = p_athlete_id;
+  get diagnostics n = row_count;
+  return n > 0;
+end
+$function$;
+
 CREATE OR REPLACE FUNCTION public.delete_intake(p_id uuid)
  RETURNS void
  LANGUAGE plpgsql
@@ -8239,27 +8266,33 @@ begin
             and row_number() over (partition by w.week, f.pday order by f.d, f.ref) = 1) as in_plan
       from f join w on f.d between w.wfrom and w.wto),
   fd as (
-    select fw.week, fw.d, fw.ref, fw.in_plan, fw.mins,
-           case when fw.kind = 'library_session' then 'library' else 'plan' end as k,
-           ls.category_id as shelf,
-           left(btrim(regexp_replace(
-             case when fw.kind = 'library_session'
-                  then coalesce(ls.title, 'Library session')
-                  else coalesce((select coalesce(nullif(btrim(e ->> 'title'), ''), nullif(btrim(e ->> 'focusTag'), ''))
-                                   from pdays pd, jsonb_array_elements(case when jsonb_typeof(pd.days) = 'array' then pd.days else '[]'::jsonb end) e
-                                  where e ->> 'id' = fw.pday limit 1), case when fw.pday is not null then 'Day ' || fw.pday else 'Session' end) end,
-             '\s+', ' ', 'g')), 60) as title
+    select fw.week, fw.d, fw.ref as sk, fw.in_plan,
+           jsonb_strip_nulls(jsonb_build_object(
+             'day', fw.d, 'k', case when fw.kind = 'library_session' then 'library' else 'plan' end,
+             'title', left(btrim(regexp_replace(
+                case when fw.kind = 'library_session'
+                     then coalesce(ls.title, 'Library session')
+                     else coalesce((select coalesce(nullif(btrim(e ->> 'title'), ''), nullif(btrim(e ->> 'focusTag'), ''))
+                                      from pdays pd, jsonb_array_elements(case when jsonb_typeof(pd.days) = 'array' then pd.days else '[]'::jsonb end) e
+                                     where e ->> 'id' = fw.pday limit 1), case when fw.pday is not null then 'Day ' || fw.pday else 'Session' end) end,
+                '\s+', ' ', 'g')), 60),
+             'mins', fw.mins, 'shelf', ls.category_id,
+             'extra', case when fw.kind <> 'library_session' and not fw.in_plan then true end)) as j
       from fw
       left join lateral (select l.title, l.category_id from public.library_sessions l
                           where fw.kind = 'library_session' and l.athlete_id = p_athlete_id and l.slug = fw.slug and l.completed_on = fw.d
                           limit 1) ls on true),
+  -- stage116: what the athlete logged themself (Court Log). Never a plan session, so never in `done`.
+  ad as (
+    select w.week, a.day as d, 'z' || a.created_at::text || a.id::text as sk, false as in_plan,
+           jsonb_build_object('day', a.day, 'k', case when a.kind in ('tennis', 'padel', 'match') then 'court' else 'other' end,
+                              'kind', a.kind, 'title', initcap(a.kind), 'mins', a.minutes, 'effort', a.effort, 'id', a.id) as j
+      from public.activity_log a join w on a.day between w.wfrom and w.wto
+     where a.athlete_id = p_athlete_id),
+  items as (select * from fd union all select * from ad),
   wk as (
-    select fd.week,
-           count(*) filter (where fd.in_plan) as done,
-           jsonb_agg(jsonb_strip_nulls(jsonb_build_object('day', fd.d, 'k', fd.k, 'title', fd.title, 'mins', fd.mins, 'shelf', fd.shelf,
-                                                          'extra', case when fd.k = 'plan' and not fd.in_plan then true end))
-                     order by fd.d, fd.ref) as days
-      from fd group by fd.week)
+    select it.week, count(*) filter (where it.in_plan) as done, jsonb_agg(it.j order by it.d, it.sk) as days
+      from items it group by it.week)
   select jsonb_build_object(
            'n', max(w.cycle_num), 'from', max(w.cstart), 'to', max(w.cend), 'current', bool_or(w.is_current),
            'weeks', coalesce(jsonb_agg(jsonb_build_object(
@@ -9441,6 +9474,37 @@ CREATE OR REPLACE FUNCTION public.library_touch()
  LANGUAGE plpgsql
 AS $function$
 begin new.updated_at := now(); return new; end $function$;
+
+CREATE OR REPLACE FUNCTION public.log_activity(p_athlete_id text, p_id uuid, p_day date, p_kind text, p_minutes integer, p_effort text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare v_row public.activity_log;
+begin
+  if p_athlete_id is null or (not public.is_coach() and p_athlete_id is distinct from public.current_athlete_id()) then
+    raise exception 'not your athlete record';
+  end if;
+  if p_id is null then raise exception 'activity:no_id'; end if;
+  if p_day is null or p_day < current_date - 3 or p_day > current_date + 1 then raise exception 'activity:day'; end if;
+  if p_kind is null or p_kind not in ('tennis', 'padel', 'match', 'run', 'other') then raise exception 'activity:kind'; end if;
+  if p_minutes is null or p_minutes < 5 or p_minutes > 600 then raise exception 'activity:minutes'; end if;
+  if p_effort is null or p_effort not in ('easy', 'normal', 'hard') then raise exception 'activity:effort'; end if;
+  select * into v_row from public.activity_log where id = p_id;
+  if found then
+    if v_row.athlete_id is distinct from p_athlete_id then raise exception 'not your athlete record'; end if;
+    return to_jsonb(v_row);
+  end if;
+  if (select count(*) from public.activity_log where athlete_id = p_athlete_id and day = p_day) >= 8 then
+    raise exception 'activity:full';
+  end if;
+  insert into public.activity_log (id, athlete_id, day, kind, minutes, effort)
+  values (p_id, p_athlete_id, p_day, p_kind, p_minutes, p_effort)
+  returning * into v_row;
+  return to_jsonb(v_row);
+end
+$function$;
 
 CREATE OR REPLACE FUNCTION public.log_library_session(p_athlete_id text, p_slug text, p_on date DEFAULT NULL::date)
  RETURNS TABLE(logged_on date, counted_as text, workout_title text)
@@ -11097,6 +11161,10 @@ begin
 end; $function$;
 
 -- ── 4. constraints ───────────────────────────────────────────────────────────
+alter table public.activity_log add constraint activity_log_effort_check CHECK ((effort = ANY (ARRAY['easy'::text, 'normal'::text, 'hard'::text])));
+alter table public.activity_log add constraint activity_log_kind_check CHECK ((kind = ANY (ARRAY['tennis'::text, 'padel'::text, 'match'::text, 'run'::text, 'other'::text])));
+alter table public.activity_log add constraint activity_log_minutes_check CHECK (((minutes >= 5) AND (minutes <= 600)));
+alter table public.activity_log add constraint activity_log_pkey PRIMARY KEY (id);
 alter table public.affiliates add constraint affiliates_code_shape CHECK ((code ~ '^[A-Z0-9]{2,32}$'::text));
 alter table public.affiliates add constraint affiliates_kind_check CHECK ((kind = ANY (ARRAY['coach'::text, 'athlete'::text])));
 alter table public.affiliates add constraint affiliates_percent_range CHECK (((percent >= 1) AND (percent <= 90)));
@@ -11337,6 +11405,7 @@ alter table public.referral_credits add constraint referral_credits_code_fkey FO
 alter table public.tps_accounts add constraint tps_accounts_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
 
 -- ── 5. indexes, triggers, row-level security, policies ──────────────────────
+CREATE INDEX activity_log_athlete_day ON public.activity_log USING btree (athlete_id, day);
 CREATE UNIQUE INDEX affiliates_one_athlete_code ON public.affiliates USING btree (athlete_id) WHERE (kind = 'athlete'::text);
 CREATE INDEX assess_notes_account ON public.assess_notes USING btree (account_id);
 CREATE INDEX assess_players_account ON public.assess_players USING btree (account_id);
@@ -11428,6 +11497,7 @@ CREATE TRIGGER qualities_version_trg BEFORE DELETE OR UPDATE ON public.qualities
 CREATE TRIGGER career_session_trg AFTER INSERT OR DELETE OR UPDATE ON public.session_history FOR EACH ROW EXECUTE FUNCTION career_on_session();
 CREATE TRIGGER tps_accounts_label_trg BEFORE INSERT OR UPDATE OF label ON public.tps_accounts FOR EACH ROW EXECUTE FUNCTION move_buyer_label('course');
 
+alter table public.activity_log enable row level security;
 alter table public.affiliates enable row level security;
 alter table public.assess_accounts enable row level security;
 alter table public.assess_content enable row level security;
@@ -11506,6 +11576,7 @@ alter table public.tps_content enable row level security;
 alter table public.tps_publish_keys enable row level security;
 alter table public.xp_rules enable row level security;
 
+create policy "coach manage activity log" on public.activity_log as permissive for ALL to authenticated using (is_coach()) with check (is_coach());
 create policy "coach manage affiliates" on public.affiliates as permissive for ALL to authenticated using (is_coach()) with check (is_coach());
 create policy "buyer reads own assess account" on public.assess_accounts as permissive for SELECT to authenticated using ((user_id = ( SELECT auth.uid() AS uid)));
 create policy "coach manages assess accounts" on public.assess_accounts as permissive for ALL to authenticated using (( SELECT is_coach() AS is_coach)) with check (( SELECT is_coach() AS is_coach));
@@ -11597,6 +11668,9 @@ create policy "members read tps content" on public.tps_content as permissive for
 create policy "coach manage xp rules" on public.xp_rules as permissive for ALL to authenticated using (is_coach()) with check (is_coach());
 
 -- ── 6. grants: exactly what the live project has ────────────────────────────
+revoke all on table public.activity_log from public, anon, authenticated, service_role;
+grant select, insert, update, delete, truncate, references, trigger, maintain on table public.activity_log to authenticated;
+grant select, insert, update, delete, truncate, references, trigger, maintain on table public.activity_log to service_role;
 revoke all on table public.affiliates from public, anon, authenticated, service_role;
 grant select, insert, update, delete, truncate, references, trigger, maintain on table public.affiliates to authenticated;
 grant select, insert, update, delete, truncate, references, trigger, maintain on table public.affiliates to service_role;
@@ -12270,6 +12344,8 @@ revoke all on function public.cycle_push_sweep() from public, anon, authenticate
 grant execute on function public.cycle_push_sweep() to service_role;
 revoke all on function public.cycle_push_words(p_lang text) from public, anon, authenticated, service_role;
 grant execute on function public.cycle_push_words(p_lang text) to service_role;
+revoke all on function public.delete_activity(p_athlete_id text, p_id uuid) from public, anon, authenticated, service_role;
+grant execute on function public.delete_activity(p_athlete_id text, p_id uuid) to authenticated, service_role;
 revoke all on function public.delete_intake(p_id uuid) from public, anon, authenticated, service_role;
 grant execute on function public.delete_intake(p_id uuid) to authenticated, service_role;
 revoke all on function public.end_quests(p_start date, p_end date) from public, anon, authenticated, service_role;
@@ -12368,6 +12444,8 @@ revoke all on function public.library_sessions_for(p_athlete_id text, p_days int
 grant execute on function public.library_sessions_for(p_athlete_id text, p_days integer) to authenticated, service_role;
 revoke all on function public.library_touch() from public, anon, authenticated, service_role;
 grant execute on function public.library_touch() to anon, authenticated, service_role, public;
+revoke all on function public.log_activity(p_athlete_id text, p_id uuid, p_day date, p_kind text, p_minutes integer, p_effort text) from public, anon, authenticated, service_role;
+grant execute on function public.log_activity(p_athlete_id text, p_id uuid, p_day date, p_kind text, p_minutes integer, p_effort text) to authenticated, service_role;
 revoke all on function public.log_library_session(p_athlete_id text, p_slug text, p_on date) from public, anon, authenticated, service_role;
 grant execute on function public.log_library_session(p_athlete_id text, p_slug text, p_on date) to anon, authenticated, service_role;
 revoke all on function public.mark_athlete_read(p_athlete_id text, p_key text) from public, anon, authenticated, service_role;
