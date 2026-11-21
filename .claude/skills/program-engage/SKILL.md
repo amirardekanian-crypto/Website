@@ -341,7 +341,8 @@ the current and next cycle's tagline and aims (the roadmap's English stays as lo
 SCHEMA.md → *Programme texts in two languages* has the keys.
 - **The same text, not more.** One twin per English text, item for item (three paragraphs, three twins). When the
   English changes, the twin changes with it.
-- **Amir's spoken Farsi** (COM-3): warm, informal تو, short sentences, everyday words, no em-dash or semicolon.
+- **Amir's Farsi** (COM-3, COM-1): formal شما since 2026-11-21 (Amir: *"from now on, formal voice"*), still warm, short
+  sentences, everyday words, no em-dash or semicolon.
   Persian digits in sentences (۷). Exercise names stay in English letters, as the app shows them. "effort" is شدت.
 - **A week note's numbers never change** (`rpeCap`, `setsDrop`, `rpeDrop`): the twin says the same number, and its
   first sentence is the rule, under 100 characters (COM-16), as in English.

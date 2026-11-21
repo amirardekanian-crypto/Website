@@ -47,6 +47,10 @@ written from: [`scripts/i18n/BRIEF.md`](../../scripts/i18n/BRIEF.md).
   An engine change is the same with `i18n.js?v=`.
 - **New English in program.html gets its Farsi in the same run.** Pre-commit guard 31 (`scripts/i18n/check_new_words.js`)
   lists added texts with no Farsi words; it warns and never blocks, so read its list and add the words.
+- **New Farsi text is formal, شما** (Amir, 2026-11-21: *"from now on, formal voice"*, then *"Only new text"*). Every
+  Farsi an athlete reads that is written from 2026-11-21 on (the app's words, programme twins, Library items, the
+  Spine) uses شما (`می‌کنید`, `بزنید`, `ست‌هاتون`), still plain, short and warm. Text written before stays as it is:
+  nothing is rewritten for the voice. Where a line below says informal تو, this line wins for new text.
 - **Every Farsi word an athlete reads is a draft until Amir has read it** (COM-3 in his Farsi voice: spoken, warm,
   informal تو). The engine's `AAI18N.missing` lists every English string a Farsi screen met with no words: read it in
   the browser to find what is left.

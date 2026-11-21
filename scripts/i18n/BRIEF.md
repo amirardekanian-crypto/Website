@@ -43,7 +43,9 @@ constant tables of words that are drawn (labels, tips, guide cards, help text). 
   a button label used as a key), do NOT add that string; list it under `"readback"` with its line.
 
 ## The voice
-Amir's own Farsi, as he texts his athletes: warm, spoken (محاوره‌ای), short sentences, informal "تو" (never "شما"):
+**Since 2026-11-21 new words are formal, "شما"** (Amir: *"from now on, formal voice"*, *"Only new text"*;
+docs/rules/farsi-app.md): `می‌کنید`, `بزنید`, still plain and short. The words already written stay as they are.
+Before that it was: Amir's own Farsi, as he texts his athletes: warm, spoken (محاوره‌ای), short sentences, informal "تو" (never "شما"):
 `همون`, `می‌شه`, `نمی‌خواد`, `بزن`, `برو`. Plain words, no formal written Farsi, no English words where a normal Iranian gym-goer
 says a Farsi one. Use the zero-width non-joiner correctly (`می‌شه`, `حرکت‌ها`, `ست‌ها`). Use `؟` for questions and Persian digits in
 sentences (through `{n1}`). Keep it about as long as the English: labels on buttons must stay short.

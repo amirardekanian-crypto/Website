@@ -943,7 +943,8 @@ same ID. Read a rule's story and its history before changing it.
   and the Farsi of each day's `focusTag` and the cycle's tagline and aims) has its English in the field and its Farsi
   beside it in `<key>_fa` (SCHEMA.md → *Programme texts in two languages*). A string twins a string, a list twins a
   list of the same length, and the twin says the same thing, no more. Both are Amir's voice (COM-3); the Farsi is his
-  spoken Farsi (informal تو, Persian digits in sentences). Names, `exId`, `rx`, ids and every number never get a twin,
+  Farsi (formal شما for every text written since 2026-11-21, Amir: *"from now on, formal voice"*, *"Only new
+  text"*; before that informal تو, and those twins stay as written; Persian digits in sentences). Names, `exId`, `rx`, ids and every number never get a twin,
   and a week note's numbers are the same in both. The app shows the phone's language (`faTwins()`), English when a
   twin is missing. `athlete.lang` picks only the app's first language, the reminders and the WhatsApp message (COM-2).
   It starts with each athlete's next cycle; the current cycles of the Farsi athletes and the demo were given their

@@ -288,7 +288,7 @@ languages"*. The athlete app shows a Library session in the phone's language. So
 `before[].text`, `focusTag`, every exercise `note`, a circuit item's `note` and `detail`, `why.text`. Everything else is
 byte for byte the English: `id`, `title` (the app logs it), `category`, `countsAs`, `duration`, `equipment`, block
 `title` and `icon` (the app's logic reads block titles; the screen translates them), exercise `name`, `exId`, `type`, all
-of `rx`, `intent`. The Farsi is Amir's spoken voice (COM-3, informal تو), the safety lines in `before` exact. The rules and
+of `rx`, `intent`. The Farsi is Amir's voice (COM-3), formal شما since 2026-11-21 (docs/rules/farsi-app.md), the safety lines in `before` exact. The rules and
 the glossary: `scripts/i18n/LIBRARY-BRIEF.md`. Check it with
 `node scripts/i18n/check_library_fa.js --files workouts/<shelf>/<id>.json` (pre-commit guard 30 runs it on every staged
 workout file and fails a file with no `fa`). A change to the English is a change to the Farsi copy in the same run.

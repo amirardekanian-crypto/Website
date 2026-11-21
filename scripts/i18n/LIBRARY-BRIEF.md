@@ -20,7 +20,8 @@ Read your input file (`{ "<slug>": <English item>, ... }`). Write the output fil
 `videoUrl`, everything in `rx`, `intent`. Same keys, same order of items, nothing added or dropped.
 
 ## The voice
-Amir's own Farsi, as he texts his athletes: warm, spoken (محاوره‌ای), short sentences, informal تو (never شما): `همون`,
+**Since 2026-11-21 a new item's Farsi is formal, شما** (Amir: *"from now on, formal voice"*, *"Only new text"*;
+docs/rules/farsi-app.md), still plain and short; items already written stay as they are. Before that: `همون`,
 `می‌شه`, `نمی‌خواد`, `بزن`. Plain gym words an Iranian player uses. Exercise names inside a sentence stay in English.
 Correct zero-width non-joiners (`می‌شه`, `حرکت‌ها`), `؟` for questions, Persian digits in sentences (۳ دقیقه), but leave a
 number that is part of a dose exactly as a dose reads. The safety lines (`before`) are about pain, dizziness and chest
