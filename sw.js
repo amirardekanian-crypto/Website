@@ -573,7 +573,10 @@
 // 8 px apart, and a player page opened before the emblems load draws no trophies instead of throwing.
 // v258: program.html and i18n-fa.js (?v=10) changed (2026-11-20, Amir: "build 116, 117 and 119"): the Toss hides its answers until you vote and shows
 // last week's (stage114), what is new since your last visit has a dot and "You're all caught up", and a first cheer asks for your face.
-const CACHE = 'aap-v258';
+// v259: i18n.js (?v=4) and i18n-fa.js (?v=11) changed (2026-11-21, the Farsi app walked screen by screen): chevrons and arrows point the way
+// the page reads, Latin doses stay left to right, a Persian comma for the dot beside a digit, Space Mono's wide space, the rest pill's clock,
+// the rest games' centred cards, and the words that were left in English.
+const CACHE = 'aap-v259';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -613,8 +616,8 @@ const SHELL = [
   '/assets/js/between-sets.js',
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
-  '/assets/js/i18n.js?v=3',
-  '/assets/js/i18n-fa.js?v=10',
+  '/assets/js/i18n.js?v=4',
+  '/assets/js/i18n-fa.js?v=11',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).
