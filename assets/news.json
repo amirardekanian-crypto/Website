@@ -2,6 +2,24 @@
   "_about": "What's new in the app, shown in every athlete's Inbox for 14 days (program.html, newsRows/openNews). Newest first. Each entry: id (unique), at (ISO time), en and fa: { title, items: [one short line each], sign }. Written in Amir's voice (COM-3) in both languages (COM-1). THE RULE (docs/rules/working-with-amir.md): a change to program.html that an athlete would notice ships with its entry here in the same commit; .githooks/commit-msg blocks a program.html commit without this file unless the message says [no news].",
   "items": [
     {
+      "id": "2026-11-21-team-farsi",
+      "at": "2026-11-21T15:00:00Z",
+      "en": {
+        "title": "Team, fixed in Farsi",
+        "items": [
+          "On a Farsi phone, every win on Team now reads in Farsi, with Farsi numbers and the full day name."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "صفحهٔ تیم، درست شد",
+        "items": [
+          "توی نسخهٔ فارسی، همهٔ موفقیت‌های صفحهٔ تیم حالا فارسی نوشته می‌شن، با عددهای فارسی و اسم کامل روز."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-21-week",
       "at": "2026-11-21T12:00:00Z",
       "en": {

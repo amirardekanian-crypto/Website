@@ -103,7 +103,7 @@
     // The video frame's corner word is CSS content, which the word lists never see.
     "html.is-fa .ex-video::after{content:'\\0648\\06CC\\062F\\06CC\\0648'}" +
     // A person's name takes its direction from its own first letter: "Mina S." keeps its full stop after the S.
-    'html.is-fa .cr-nm{unicode-bidi:plaintext}' +
+    'html.is-fa .cr-nm,html.is-fa .cr-nb{unicode-bidi:plaintext}' +
     // The check-in's answers: the box has 2 px each side, and Farsi words are wider ("خیلی پراسترس", "آماده نیستم" sat 2 px
     // from the edge). 6 px each side, so a two-word answer breaks onto its second line as the design allows (two lines at 11 px).
     'html.is-fa .readiness-opt{padding-left:6px;padding-right:6px}html.is-fa .readiness-opt-lab{max-width:100%}';
@@ -374,7 +374,14 @@
   var CLOCK = '.rest-t';
   // A word whose Farsi depends on where it stands. The check-in's last question ("Overall, how ready do you feel?") answers
   // 3 with معمولی, not the باشه "OK" is everywhere else (Amir, 2026-11-21).
-  var CTX = [['.readiness-q[data-key="overall"] .readiness-opt-lab', { 'OK': 'معمولی' }]];
+  var CTX = [['.readiness-q[data-key="overall"] .readiness-opt-lab', { 'OK': 'معمولی' }],
+    // The Team feed's "when" under a moment (2026-11-21): a short day name is the whole day, never the one-letter "پ" a calendar strip uses.
+    ['.cr-when,.cr-lnwhen', { Mon: 'دوشنبه', Tue: 'سه‌شنبه', Wed: 'چهارشنبه', Thu: 'پنجشنبه', Fri: 'جمعه', Sat: 'شنبه', Sun: 'یکشنبه' }],
+    // ...and "You" before it means you liked it: "تو، دیروز" read as "you, yesterday".
+    ['.cr-kww', { 'You': 'لایک شما' }]];
+  // A count standing alone on the Team screen (a heart's count, a vote's percent, last week's tally, the +6 face): Persian digits,
+  // and the Persian percent sign (2026-11-21: "57%" and "1" sat beside "۷ رأی" and "۳ جلسه").
+  var COUNT = '.cr-mcd,.cr-ht b,.cr-half .n,.cr-tosslast .tn,.cr-face';
   // A short English run inside a Farsi line ("«استپ‌آف لندینگ» (Step-Off Landing)", "Back Squat", "Effort ۷") is kept as one
   // left-to-right piece that never breaks across lines: split by the line's end, "(Step-Off" sat at the end of one line and
   // "Landing)" at the start of the next, brackets turned round. Longer runs keep their own order but may still wrap.
@@ -430,6 +437,7 @@
       if (mc) { n.data = d.replace(core, faNum(mc[1] + ':' + (mc[2].length < 2 ? '0' : '') + mc[2])); seen.set(n, n.data); return; }
       if (/^\d+$/.test(core) && p.closest && p.closest(SENTENCE_NUM)) { n.data = faNum(d); seen.set(n, n.data); return; }
       if (!/[A-Za-z]/.test(d) && d.indexOf('×') >= 0) { var dz = faDose(d); if (dz !== d) n.data = dz; seen.set(n, n.data); return; }
+      if (!/[A-Za-z]/.test(d) && /\d/.test(d) && p.closest && p.closest(COUNT)) { n.data = faNum(d).replace(/%/g, '٪'); seen.set(n, n.data); return; }
       // The prescription's own numbers (a circuit row's "8", the effort's "7/10"): Persian digits, as the sets and reps.
       if (!/[A-Za-z]/.test(d) && /\d/.test(d) && p.closest && p.closest(RX_NUM)) { n.data = faNum(d); seen.set(n, n.data); return; }
       // A phone number ("+44 7435 363461") read its groups backwards in a right-to-left line: kept left to right.
