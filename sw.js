@@ -589,7 +589,8 @@
 // gains Your weeks, the cycle's weeks as a grid of days (get_five_weeks(), stage115); Farsi words for it.
 // v268: program.html, i18n.js (?v=11) and sharecard.js changed (2026-11-21, Amir: "in farsi version, people name should be in farsi as
 // well"). People's names in Farsi on a Farsi phone (stage114 get_names_fa(), loadNamesFa(), AAI18N.addNames()), a Farsi share card too.
-const CACHE = 'aap-v268';
+// v269: i18n-fa.js (?v=15) changed (2026-11-21): the weekly Toss and photo themes in Farsi, through 8 February.
+const CACHE = 'aap-v269';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -630,7 +631,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=11',
-  '/assets/js/i18n-fa.js?v=14',
+  '/assets/js/i18n-fa.js?v=15',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).
