@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=11" data-fa="/assets/js/i18n-fa.js?v=18"></script>
+<script src="/assets/js/i18n.js?v=11" data-fa="/assets/js/i18n-fa.js?v=19"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -12259,7 +12259,7 @@ const APP_GUIDE = [
   { icon: 'check-circle', key: 'hold', title: 'Hold Serve: weeks in a row you trained',
     body: `<p>A week is <strong>held</strong> when you finish every session in it. Stopping a session early still counts. Library sessions don't.</p><p>Hold weeks in a row and the count beside <strong>This Week</strong> on Home goes up — the count next to it says what is left this week. Miss a week and it starts again from the next week you hold. The time between cycles never counts against you.</p><p>The weeks are your plan's own weeks, the same ones <strong>This Week</strong> counts. The number is worked out on my side, so after a week ends it can take until your next session to update.</p>` },
   { icon: 'activity', key: 'weeks', title: 'Your weeks and your own activity',   // 2026-11-21: Five Weeks (#122) and Court Log (#123), told in the guide by the What's new rule
-    body: `<p>Your weeks, on Progress, shows your cycle a week to a row, with a square for each day. A plan session is green, a Library session is mint, and a held week has a tick. Tap a day to see what you did. Tennis, padel, a match or a run never shows in your plan, so add it: tap + Add activity, choose what it was, which day (today or the last 3 days), the minutes and how hard, then tap Save. Court time is dark on your weeks, anything else grey. I see it too. The crew never does.</p>` },
+    body: `<p>Your weeks, on Progress, shows your cycle a week to a row, with a square for each day. A plan session is green, a Library session is mint, and a held week has a tick. Tap a day to see what you did. Tennis, padel, a match or a run never shows in your plan, so add it: tap + Add activity, choose what it was, which day (today or the last 3 days), the minutes and how hard, then tap Save. Court time is dark on your weeks, anything else grey. I see it too. The crew sees it only if you turn on Your activity: tap your initials, then What the crew sees.</p>` },
   { icon: 'compass', key: 'lang', title: 'Language',   // 2026-11-21: Settings → Language for every athlete
     body: `<p>The app speaks English and Farsi. Tap your initials, then Language, to switch. Everything I write for you comes in both languages, and the names of the exercises stay in English.</p>` },
   { icon: 'activity', key: 'share', title: 'Share a win',
@@ -17401,6 +17401,7 @@ function playerHTML(key, p, note) {
   if (tiles) b += `<h2 class="prog-sec">${own ? 'Your numbers' : esc(first) + "'s numbers"}</h2>${tiles}`;
   if (own) b += playerPartnerHTML(p);      // Bring a partner (step 9): your page only, right after the numbers
   b += playerCycleHTML(key, p, own, mk);   // This cycle (step 4): the week bars, with the extra sessions as dots
+  b += playerActivityHTML(p, own, first);   // their own activity, only when they chose to show it (stage118, 2026-11-21)
   b += playerFactsHTML(key, p, own);       // Player facts (step 5)
   const tro = plTrophies(p), medals = plMedals(lvN);
   if (tro.length) {
@@ -17773,6 +17774,15 @@ function playerActionsHTML(key, p) {
 }
 // "Cheers this week": the last 7 days' cheers, newest first: the face, the name (Coach for Amir), the word, the day. The number is the tile's (`cheers.total`, every cheer
 // sent with the clap button since joining, no likes); a season count beside it would say the same thing twice, so the heading carries none.
+// Your activity on a page (2026-11-21, stage118): the last 7 days of what the person added on Your weeks, only when they turned on "Your activity" in
+// What the crew sees. What, which day, how long; never how hard. Your own page shows it too while it is on, so you see what the crew sees.
+function playerActivityHTML(p, own, first) {
+  const a = Array.isArray(p.activity) ? p.activity : null;
+  if (!a || !a.length) return '';
+  const rows = a.slice(0, 7).map(r => `<div class="pl-row"><div><span class="t">${esc(ACT_LABEL[r.kind] || plCap(String(r.kind || 'Activity')))}</span>`
+    + `<span class="q">${esc(plDay(r.day))} · ${Number(r.minutes) || 0} min</span></div></div>`).join('');
+  return `<h2 class="prog-sec">${own ? 'Your activity' : esc(first) + "'s activity"}<span class="prog-sec-n">Last 7 days</span></h2><div class="pl-list">${rows}</div>`;
+}
 function playerCheerRow(r, own) {
   const mineCk = crewMe().ck, pp = r.coach ? { amir: true, who: 'Amir' } : { ck: r.ck || null, fv: r.fv == null ? null : r.fv, who: r.who || '', me: !!(mineCk && r.ck === mineCk) };
   const q = [r.word ? `<span dir="auto">${esc(r.word)}</span>` : '', esc(crewDayWord(r.day))].filter(Boolean).join(' · ');
@@ -18111,7 +18121,11 @@ const CREW_KINDS = [
   ['session', 'A session finished', 'One line a day, naming whoever trained'],
   ['level', 'A new level'], ['week', 'A week held', 'And how many in a row'], ['mark', 'A mark', '8 weeks held, 50 sessions with Amir, 10 bests…'],
   ['achievement', 'An achievement'], ['best', 'A personal best', 'The lift and its weight'], ['cycle', 'A cycle finished'],
-  ['honour', "The month's honours"], ['open', 'The Monthly Open']];
+  ['honour', "The month's honours"], ['open', 'The Monthly Open'],
+  // Your activity (2026-11-21; Amir: "let people choose if they allow other people to see their activity or no like other things in the setting"): what you add
+  // on Your weeks (Court Log). OFF until you turn it on, unlike every other switch here, because it was private when it began (stage118).
+  ['activity', 'Your activity', 'Tennis, padel and runs you add on Your weeks: what, which day, how long. Never how hard. Off unless you turn it on.']];
+const CREW_KINDS_OFF = ['activity'];   // switches that are off until the athlete turns them on
 // ── Reminders (stage84, 2026-10-19) ──────────────────────────────────────────────────────────────
 // Amir: "the push should be automatically on, unless they want to turn off in their app settings."
 // So every kind is on from the moment the phone allows it, and this panel is where they come off.
@@ -18358,7 +18372,7 @@ function openCrewSettings() {
   const ov = document.getElementById('hist-overlay');
   if (!ov || !BELL) return;
   const me = crewMe(), yes = me.answer === 'yes', kinds = me.kinds || {};
-  const sw = CREW_KINDS.map(([k, w, s]) => `<label class="cr-sw"><span>${esc(w)}${s ? `<small>${esc(s)}</small>` : ''}</span><input type="checkbox" data-kind="${k}" ${kinds[k] === false ? '' : 'checked'}></label>`).join('');
+  const sw = CREW_KINDS.map(([k, w, s]) => `<label class="cr-sw"><span>${esc(w)}${s ? `<small>${esc(s)}</small>` : ''}</span><input type="checkbox" data-kind="${k}" ${(CREW_KINDS_OFF.indexOf(k) >= 0 ? kinds[k] === true : kinds[k] !== false) ? 'checked' : ''}></label>`).join('');
   ov.querySelector('.readiness-modal').innerHTML = `
     <div class="readiness-eyebrow">Crew</div>
     <h2 class="readiness-title">What the crew sees</h2>
@@ -28480,18 +28494,24 @@ function inboxScan() {
   try { wnote = cyc ? weekNoteNow(cyc) : null; } catch (e) { wnote = null; }
   const wn = wnote ? idx + '|' + wnote.wk + '|' + inboxHash(wnote.text) : '';
   const cards = ((DATA.notes && DATA.notes.cards) || []).map(c => String((c && c.title) || '') + '|' + String((c && c.date) || ''));
+  // The plan (2026-11-21, Amir: "they should also know when their whole 6 month plan changes ... by clicking it goes to the tab and shows them"):
+  // a fingerprint of every cycle's name, weeks, focus, aims and teaser, so a change Amir makes to the road is noticed like a new note.
+  const rm = inboxHash(JSON.stringify((DATA.cycles || []).map(c => c ? [c.name, c.weeks, c.focus, c.outcomes, c.teaser, c.aims] : null)));
   const rec = all[ATHLETE_ID];
   const now = new Date().toISOString();
   if (!rec || typeof rec !== 'object') {
-    all[ATHLETE_ID] = { wn, nc: cards, cy: idx, rows: [] };
+    all[ATHLETE_ID] = { wn, nc: cards, cy: idx, rm, rows: [] };
   } else {
     const rows = (Array.isArray(rec.rows) ? rec.rows : []).filter(r => r && Date.now() - Date.parse(r.at) < 7 * 86400000);
     const put = row => { const i = rows.findIndex(r => r.k === row.k); if (i >= 0) rows.splice(i, 1); rows.unshift(row); };
     if (wn && wn !== rec.wn) put({ k: 'wn', at: now });
-    const known = Array.isArray(rec.nc) ? rec.nc : [], fresh = cards.findIndex(c => known.indexOf(c) < 0);
-    if (fresh >= 0) put({ k: 'nc', at: now, i: fresh, title: ((DATA.notes.cards[fresh] || {}).title) || '' });
-    if (Number.isInteger(rec.cy) && idx > rec.cy) put({ k: 'cy', at: now, name: (cyc && cyc.name) || '' });
-    all[ATHLETE_ID] = { wn, nc: cards, cy: idx, rows };
+    // New notes (2026-11-21, Amir: "i want them to recive a note for their new notes, and when clicked, goes to the tab"): one row that says how many
+    const known = Array.isArray(rec.nc) ? rec.nc : [], freshAll = cards.map((c, i) => known.indexOf(c) < 0 ? i : -1).filter(i => i >= 0), fresh = freshAll.length ? freshAll[0] : -1;
+    if (fresh >= 0) put({ k: 'nc', at: now, i: fresh, n: freshAll.length, title: ((DATA.notes.cards[fresh] || {}).title) || '' });
+    const advanced = Number.isInteger(rec.cy) && idx > rec.cy;
+    if (advanced) put({ k: 'cy', at: now, name: (cyc && cyc.name) || '' });
+    else if (rec.rm && rm !== rec.rm) put({ k: 'pl', at: now });   // the road changed inside a cycle: its own row (a new cycle's row already says to look at the plan)
+    all[ATHLETE_ID] = { wn, nc: cards, cy: idx, rm, rows };
   }
   try { _lsRawSet(INBOX_KNOWN, JSON.stringify(all)); } catch (e) { /* storage full: nothing is lost, the next open compares again */ }
 }
@@ -28657,8 +28677,9 @@ function inboxSpec(r, i) {
     case 'news': t = `<b>Amir</b>: ${esc(r.title || '')}`; q = r.first || ''; face = { amir: true, who: 'Amir' }; break;   // What's new (2026-11-21)
     case 'answer': t = '<b>Amir</b> answered your question'; q = String(r.q || ''); face = { amir: true, who: 'Amir' }; break;
     case 'wn': t = '<b>Amir</b> wrote your week note'; face = { amir: true, who: 'Amir' }; break;
-    case 'nc': t = 'A new note from <b>Amir</b>'; q = String(r.title || ''); face = { amir: true, who: 'Amir' }; break;
-    case 'cy': t = `Your new cycle is here${r.name ? ': <b>' + esc(r.name) + '</b>' : ''}`; face = { amir: true, who: 'Amir' }; break;
+    case 'nc': t = Number(r.n) > 1 ? `${Number(r.n)} new notes from <b>Amir</b>` : 'A new note from <b>Amir</b>'; q = String(r.title || ''); face = { amir: true, who: 'Amir' }; break;
+    case 'cy': t = `Your new cycle is here${r.name ? ': <b>' + esc(r.name) + '</b>' : ''}`; q = 'See its aims and your plan'; face = { amir: true, who: 'Amir' }; break;
+    case 'pl': t = '<b>Amir</b> updated your plan'; q = 'See what changed and why'; face = { amir: true, who: 'Amir' }; break;
     default: return null;
   }
   const p = crewPersonOf(face);
@@ -28735,10 +28756,22 @@ function inboxGo(i) {
       setTimeout(() => { const b = document.getElementById('cn-h-' + Number(r.i)); if (b) { if (b.getAttribute('aria-expanded') !== 'true') b.click(); try { b.scrollIntoView({ block: 'center' }); } catch (e) { b.scrollIntoView(); } } }, 60);
       break;
     }
-    case 'cy': goTo('home'); break;
+    case 'cy': case 'pl': inboxShowPlan(); break;   // the Game Plan on Progress, the current cycle's row open with its aims (2026-11-21; it opened Home before)
   }
 }
 window.inboxGo = inboxGo;
+// Progress, scrolled to the Game Plan, the current cycle's row opened and lit: its aims, its focus and what comes next are in it.
+function inboxShowPlan() {
+  goTo('plan');
+  setTimeout(() => {
+    const row = document.querySelector('#road-wrap .road-row.is-now') || document.querySelector('#road-wrap .road-row');
+    if (!row) return;
+    const head = row.querySelector('button.road-head[aria-expanded="false"]');
+    if (head) head.click();
+    try { row.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) { row.scrollIntoView(); }
+    crewLight('#road-wrap .road-row.is-now', 'stay');
+  }, 120);
+}
 // Your own cheers (Cheers this week on your page), newest first, with the newest row lit. The one place both Land on It (step 1) and the Inbox's cheer rows use.
 function crewShowMyCheers(from) {
   if (!crewPagesOn()) { goTo('crew'); return; }

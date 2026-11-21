@@ -596,7 +596,9 @@
 // and minutes in Farsi, Running for a run (Run is the order بدو), a plan day's Farsi title when it has one (get_five_weeks(), stage117).
 // v272: program.html and i18n-fa.js (?v=18) changed (2026-11-21): What's new from Amir in every Inbox (assets/news.json), Pass It On (118),
 // and How the app works: the Crew card rewritten, new cards Your weeks and Language.
-const CACHE = 'aap-v272';
+// v273: program.html and i18n-fa.js (?v=19) changed (2026-11-21): Your activity, a switch in What the crew sees (off until turned on, stage118);
+// the Inbox counts new notes, and a new cycle or a changed plan opens the Game Plan.
+const CACHE = 'aap-v273';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -637,7 +639,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=11',
-  '/assets/js/i18n-fa.js?v=18',
+  '/assets/js/i18n-fa.js?v=19',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).

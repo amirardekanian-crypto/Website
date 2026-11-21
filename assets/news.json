@@ -2,6 +2,50 @@
   "_about": "What's new in the app, shown in every athlete's Inbox for 14 days (program.html, newsRows/openNews). Newest first. Each entry: id (unique), at (ISO time), en and fa: { title, items: [one short line each], sign }. Written in Amir's voice (COM-3) in both languages (COM-1). THE RULE (docs/rules/working-with-amir.md): a change to program.html that an athlete would notice ships with its entry here in the same commit; .githooks/commit-msg blocks a program.html commit without this file unless the message says [no news].",
   "items": [
     {
+      "id": "2026-11-21-inbox",
+      "at": "2026-11-21T18:30:00Z",
+      "en": {
+        "title": "Your Inbox tells you when your plan changes",
+        "items": [
+          "When I write your new cycle, your Inbox says so. Tap it to see the new cycle's aims on your plan.",
+          "If I change your plan in the middle of a cycle, your Inbox tells you too, and shows you where.",
+          "New notes from me show in your Inbox with how many there are. Tap to read them on the Coach tab."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "صندوقت بهت می‌گه کی برنامه‌ات عوض می‌شه",
+        "items": [
+          "وقتی دورهٔ جدیدت رو می‌نویسم، صندوقت بهت می‌گه. بزن تا هدف‌های دورهٔ جدید رو تو برنامه‌ات ببینی.",
+          "اگه وسط یه دوره برنامه‌ات رو عوض کنم، صندوقت بهت می‌گه و نشون می‌ده کجا.",
+          "یادداشت‌های جدید من با تعدادشون تو صندوقت میان. بزن تا تو تب مربی بخونیشون."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
+      "id": "2026-11-21-activity",
+      "at": "2026-11-21T18:00:00Z",
+      "en": {
+        "title": "You choose who sees your activity",
+        "items": [
+          "Tennis, padel and runs you add on Your weeks are private to you and me.",
+          "If you want the crew to see them, tap your initials, then What the crew sees, and turn on Your activity.",
+          "The crew sees what, which day and how long, on your page. Never how hard. Turn it off any time."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "خودت انتخاب می‌کنی کی فعالیتت رو ببینه",
+        "items": [
+          "تنیس، پدل و دویدنی که تو «هفته‌های تو» اضافه می‌کنی فقط بین من و توئه.",
+          "اگه می‌خوای تیم ببینه، روی حرف‌های اول اسمت بزن، بعد «تیم چی می‌بینه»، و «فعالیت تو» رو روشن کن.",
+          "تیم تو صفحه‌ات می‌بینه چی بوده، کدوم روز و چقدر. هیچ‌وقت اینکه چقدر سخت بوده. هر وقت خواستی خاموشش کن."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-21-goals",
       "at": "2026-11-21T16:00:00Z",
       "en": {

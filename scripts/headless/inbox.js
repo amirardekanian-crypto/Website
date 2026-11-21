@@ -269,7 +269,8 @@ const lit = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); r
     C.check('the notes row opens the Coach tab with that card open', (await screenNow(p)) === 'screen-notes' && await p.evaluate(() => document.getElementById('cn-h-0').getAttribute('aria-expanded')) === 'true');
     await openInboxFrom(p, 'notes');
     await p.evaluate(() => document.querySelector('#inbox-body .ib-row[data-k="cy"] .ib-go').click()); await p.waitForTimeout(400);
-    C.check('the cycle row opens Home', (await screenNow(p)) === 'screen-home');
+    C.check('the cycle row opens Progress at the Game Plan, the current cycle row open (2026-11-21)', (await screenNow(p)) === 'screen-plan'
+      && await p.evaluate(() => { const r = document.querySelector('#road-wrap .road-row.is-now'); return !r || r.classList.contains('is-open') || !r.querySelector('button.road-head'); }));
     await p.evaluate(() => goTo('plan'));
     C.check('opened once, they are not new again after a reload of the list', await p.evaluate(() => { inboxScan(); return inboxCount(); }) === 0);
     await ctx.close();
@@ -307,6 +308,30 @@ const lit = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); r
       const one = await push({ title: 'Mina S. cheered you', body: 'Have a look.', tag: 'crew' });
       C.check('sw.js: a folded crew push opens #inbox (English and Farsi), a single one still opens #crew', folded.data.url === '/program.html#inbox' && faFolded.data.url === '/program.html#inbox' && one.data.url === '/program.html#crew', [folded.data.url, faFolded.data.url, one.data.url].join(' '));
     } catch (e) { C.check('sw.js: a folded crew push opens #inbox', /The crew has been busy[\s\S]{0,200}#inbox/.test(swSrc) && /program\.html#crew/.test(swSrc), 'could not run the worker: ' + e.message); }
+  }
+
+  // ── 4b. the plan changing, and several new notes at once (2026-11-21, Amir: "they should also know when their whole 6 month plan changes") ──────────
+  {
+    const prog = H.fixture();
+    const idx = prog.currentCycleIndex;
+    prog.notes = prog.notes || {}; prog.notes.cards = (prog.notes.cards || []).concat([{ title: 'Sleep before match days', date: '2026-11-20', body: 'x' }, { title: 'Travel week', date: '2026-11-21', body: 'y' }]);
+    const known = JSON.stringify({ [H.ID]: { wn: '', nc: [], cy: idx, rm: '12345', rows: [] } });   // same cycle, an older plan fingerprint
+    const { ctx, p } = await open(browser, { inbox: [], opts: { prog, init: `try { localStorage.setItem('aa.inbox.known', ${JSON.stringify(known)}); } catch (e) {}` } });
+    await waitTab(p); await p.waitForTimeout(900);
+    await openInboxFrom(p, 'home');
+    const all = await p.evaluate(() => [...document.querySelectorAll('#inbox-body .ib-row')].map(r => r.dataset.k + ': ' + r.querySelector('.ib-t').textContent.replace(/\s+/g, ' ').trim()));
+    const n = prog.notes.cards.length;
+    C.check(`several new notes are one row that says how many ("${n} new notes from Amir")`, all.some(x => x === `nc: ${n} new notes from Amir`), all.join(' | '));
+    C.check('a plan that changed inside the same cycle: "Amir updated your plan", and no new-cycle row', all.some(x => x === 'pl: Amir updated your plan') && !all.some(x => x.indexOf('cy:') === 0), all.join(' | '));
+    await p.evaluate(() => document.querySelector('#inbox-body .ib-row[data-k="pl"] .ib-go').click()); await p.waitForTimeout(700);
+    C.check('…it opens Progress at the Game Plan', (await screenNow(p)) === 'screen-plan');
+    await ctx.close();
+    const fresh = JSON.stringify({ [H.ID]: { wn: '', nc: [], cy: idx, rows: [] } });   // a phone that never saw a plan fingerprint: no row, it only learns it
+    const b = await open(browser, { inbox: [], opts: { prog: H.fixture(), init: `try { localStorage.setItem('aa.inbox.known', ${JSON.stringify(fresh)}); } catch (e) {}` } });
+    await waitTab(b.p); await b.p.waitForTimeout(900);
+    await openInboxFrom(b.p, 'home');
+    C.check('a phone with no plan fingerprint yet makes no plan row (it only remembers this one)', !(await b.p.$('#inbox-body .ib-row[data-k="pl"]')));
+    await b.ctx.close();
   }
 
   // ── 5. the Toss card ──────────────────────────────────────────────────────────────────────────────────────────────────
