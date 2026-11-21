@@ -140,6 +140,8 @@ the principles (their *How to add*).
   - 2026-08-02, Athlete J C1 — caught by the dose/time audit
 - `REC-6` **High-stress and concurrent athletes also get a flexible session order.**
   - Split out of REC-2 on 2026-09-26, when REC-2 became three levels: it is the second half of the 2026-06-15 rule, not a new one.
+- `REC-7` **Court Log informs; Amir decides.**
+  - Amir, 2026-11-21, asking for #125 Load Read (round 11, after Court Log shipped), verbatim: "build it, but dont let program designer change the load of the person gym training without me / having this information will help with their recovery and monitoring their program and training days , but shouldnt automatically affect program".
 
 ## Session structure & time
 

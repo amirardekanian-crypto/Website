@@ -283,7 +283,7 @@ IDEAS = [
   problem="A design run picks volume without knowing the player's court load, which for a tennis or padel player is the biggest load of the week.",
   how="One query added to the athlete brief and to /cycle-report's read: minutes by week and kind from activity_log, beside the plan sessions.",
   athlete="The programme bends around their tennis.",
-  coach="Better decisions from data he did not have to ask for on WhatsApp.",
+  coach="Better decisions from data he did not have to ask for on WhatsApp. Built as information only (REC-7, Amir: \"dont let program designer change the load ... without me\"): the design run asks him, it never changes a load from it.",
   mvp="One line in /cycle-report: court hours this cycle, by week.",
   adv="Court minutes times effort in coach.html's load ratio, beside gym sessions."),
 ]
@@ -313,7 +313,7 @@ STATUS = {
  91: ("Picked 25 Oct, builds with the weekly crew", "https://claude.ai/artifact/Ap56d6pvqEfExFYsFN7P1T"),
  120: ("Built and live 20 Nov", "https://claude.ai/artifact/8kYKCuynCHXZFhhgBKoQkL"),
  121: ("Built and live 20 Nov", "https://claude.ai/artifact/7bydrN3KFDsDhEtZuyGv4w"),
- 125: ("Picked 21 Nov, builds after Court Log", "https://claude.ai/artifact/7yRMTQJAmuJjkLmwZ7PQo2"),
+ 125: ("Built 21 Nov, information only (REC-7)", "https://claude.ai/artifact/7yRMTQJAmuJjkLmwZ7PQo2"),
 }
 
 def chips(i):

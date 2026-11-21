@@ -5,6 +5,12 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-11-21 · Load Read: "build it, but dont let program designer change the load of the person gym training without me".**
+  Then: *"having this information will help with their recovery and monitoring their program and training days , but shouldnt
+  automatically affect program"*. What it teaches: data the athlete logs about their life outside the plan informs Amir and is
+  never a lever the pipeline pulls on its own. Pitch such data as a read and a question for him (it became REC-7), never as an
+  automatic adjustment, even when the adjustment looks obvious.
+
 - **2026-11-21 · Round 11 'Five Weeks': "Go with your picks".** He asked for *"a activity tracker for people so they can see what kind of
   activity they had over the past month or 5 weeks"* and whether it belongs to the Crew; took every pick in one line: the grid first on Progress
   (A), the cycle's weeks, Five Weeks and The Mirror before Court Log, private with counts only for the crew, no XP for logged court time. What it

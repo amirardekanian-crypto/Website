@@ -112,6 +112,7 @@ stale copy reached athletes.
 | REC-4 | No two slow weeks in a row: the final week trains as written, except a competition taper or less volume on some lifts for retests. | roadmap · design | ✓ (warn: a back-off with no competition) |
 | REC-5 | A concurrent athlete gets a double-day rule: gym after sport or 4–6 hours apart, otherwise the minimum dose with the primary at RPE 6. | design · engage | oblig `double-day` |
 | REC-6 | High-stress and concurrent athletes also get a flexible session order in their notes. | design · engage | |
+| REC-7 | Court Log is information only: read it for recovery and training days, and ask Amir; never change gym load or days from it alone. | design · report · edit | |
 
 ### Session structure & time
 | ID | Rule | Stage | Check |
@@ -575,6 +576,12 @@ same ID. Read a rule's story and its history before changing it.
   the edge case.
 - `REC-6` **High-stress and concurrent athletes also get a flexible session order.** The minimum dose that used to come with it now belongs to every athlete's red day
   (REC-2).
+- `REC-7` **Court Log informs; Amir decides.** What an athlete logs in the app outside the plan (tennis, padel, matches, runs:
+  `activity_log`, stage116; /cycle-report's Q5) is read for recovery and monitoring: hours on court per week, hard sessions,
+  a match the night before a heavy day, a week of two tournaments. It goes in the Debrief and the design's recovery read as a fact,
+  and anything it suggests (fewer sets, a lighter week, another day order, a double-day rule) is put to Amir as a question at the
+  checkpoint, with the numbers. It never changes sets, reps, RPE, the number of days or the volume by itself, in design, in an edit
+  or in a report, and a missing log is not evidence of no court time: athletes log some sessions, not all.
 
 ## Session structure & time
 - `SES-1` **`workouts.days[]` is authored in the best execution order.** The order days appear in

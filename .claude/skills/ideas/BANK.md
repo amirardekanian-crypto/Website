@@ -557,7 +557,7 @@ Add activity, not the Crew (counts only; a court session told by choice).
 | 122 | Five Weeks | A 5-week grid (the cycle's W1-W5) first on Progress: a square per day coloured by kind (plan, Library by shelf, court, other), minutes per kind, tap a day for its list; MVP from session_history + library_sessions, no new table | — | **built** 2026-11-21 (stage115, sw aap-v261; PROGRAM-APP.md → *Your weeks*) |
 | 123 | Court Log | "+ Add activity": Tennis, Padel, Match, Run, Other, minutes, Easy/Normal/Hard, today or the last 3 days; one `activity_log` table (backup + erase lists the same day); no XP at first | 122 | **built** 2026-11-21 (stage116; Amir: "Build Court Log"; PROGRAM-APP.md → *Your weeks* → Court Log) |
 | 124 | The Mirror | The same grid on each athlete page in coach.html, and Library → Done lately with a count per session (what made "Your coach can see you did it" true) | 122 | **built** 2026-11-21 (stage115, sw aap-v261; PROGRAM-APP.md → *Your weeks*) |
-| 125 | Load Read | Court Log feeds /program-design (court hours as context) and /cycle-report ("14 hours this cycle"), later court minutes × effort in the load ratio | 123 | pitched (grown idea) |
+| 125 | Load Read | Court Log feeds /program-design (court hours as context) and /cycle-report ("14 hours this cycle"), later court minutes × effort in the load ratio | 123 | **built** 2026-11-21 as information only (REC-7; Amir: "dont let program designer change the load ... without me"): /cycle-report Q5 and the Debrief, /program-design asks |
 
 Cut on the page (so they are not re-pitched): steps and phone health data, calories, a streak of active days, a public minutes leaderboard.
 

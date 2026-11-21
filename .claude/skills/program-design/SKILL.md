@@ -42,6 +42,8 @@ You are a colleague, not an interrogator. **Ask Amir when, and only when:**
 2. **A decision needs info the brief/roadmap/principles don't contain.** Ask — never invent.
 3. **The volume count flags an under-dose** that's a real choice (accept
    maintenance for time, or find the sets).
+4. **The Court Log suggests a change to the gym work** (REC-7): heavy court weeks, hard matches before heavy days. Always
+   ask, with the hours, and never apply it yourself, even when the answer looks obvious.
 
 **Do NOT ask** when a sensible default exists or a principle already settles it — decide,
 and note your reasoning in one line. **Batch** questions; don't drip them. **One mandatory
@@ -125,7 +127,7 @@ change before I build?"* before writing exercises.
      runs the Gmail import, reads every session, the calls and the log's data problems, the
      RPE-at-10 trap, The Ceiling and any profile change, and appends the Debrief. (Its WhatsApp
      report is Amir's to send or not.) If sessions were logged after the Debrief, read just those
-     with cycle-report's Q2 and Q3, the Debrief's date as the start. Paste any check-in chat Amir
+     with cycle-report's Q2 and Q3 (and Q5, the Court Log, REC-7), the Debrief's date as the start. Paste any check-in chat Amir
      gives you into the read. `ctx.row.programme` holds the prescription.
      ⚠ **Never the old returning brief.** The `athlete-brief` agent's returning mode was retired on
      2026-09-26: it spent ~225k tokens and 10 minutes re-deriving what a Debrief says, with its own
@@ -208,6 +210,10 @@ cycle's log entry).
   the check-in chat. Separate training fatigue from life load. Close with a concrete
   consequence (session length, frequency, autoregulation, deload) or an explicit "no
   adjustment needed" + why. Never ignore the chat.
+  **Court time** (the Debrief's Training line, or cycle-report's Q5): hours a week, the hard sessions, a match the day before
+  a heavy session. It is read here as a fact, **and only Amir turns it into a change (REC-7)**: never cut or add sets, reps,
+  RPE, days or volume because of it on your own. A change it suggests is a question at the STEP 1 checkpoint (item 4 below),
+  with the numbers; until he answers, the plan is designed as if there were no Court Log.
 - **INJURY / MOVEMENT STATUS** — emerged / persisted / resolved; per item, the exercise-
   level implication. For a back, the direction decides the picks: which is worse, bending forward,
   arching back or sitting long (the cycle report asks it; without an answer it is a STEP 0.4b

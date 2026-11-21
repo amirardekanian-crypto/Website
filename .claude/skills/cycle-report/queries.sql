@@ -121,3 +121,17 @@ select
            (select count(distinct m[1]::int) from regexp_matches(cl.body, '\n## Cycle 0*(\d+)', 'g') m) k
          from public.coaching_logs cl where cl.athlete_id = params.id) lg)                coaching_log
 from params;
+
+-- ─── Q5 · Court Log (stage116): what the athlete played or did outside the plan. INFORMATION ONLY (REC-7) ──────
+-- Tennis, padel and matches are court time; a run or anything else is "other". Week 0 = the 3 days before startDate.
+-- It explains recovery and the training days (a hard match the night before a heavy session); it never changes a load by
+-- itself: what it suggests goes to Amir as a question.
+with params as (select 'ATHLETE_ID'::text id, date 'START' s, date 'END' e)
+select greatest(0, (a.day - params.s) / 7 + 1)                         as week,
+       case when a.kind in ('tennis', 'padel', 'match') then 'court' else 'other' end as k,
+       a.kind, count(*) as n, sum(a.minutes) as minutes,
+       count(*) filter (where a.effort = 'hard') as hard,
+       string_agg(to_char(a.day, 'Dy DD Mon') || ' ' || a.minutes || 'm ' || a.effort, ', ' order by a.day) as days
+from public.activity_log a, params
+where a.athlete_id = params.id and a.day between params.s - 3 and params.e
+group by 1, 2, 3 order by 1, 2, 3;

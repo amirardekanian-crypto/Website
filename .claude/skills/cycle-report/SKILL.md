@@ -95,6 +95,9 @@ because athletes often start a day or two before the date) and run them:
   returns the log's head, profile, Exercise Ledger and roadmap, plus the cycle just trained: its
   design read, its in-cycle edits. Older cycles are left out, unless the log has no finished
   profile yet: then it comes back whole.)
+- **Q5** Court Log (stage116): what the athlete logged in the app outside the plan, by week: court time (tennis, padel, a
+  match) and other (a run, anything else), minutes, how many were hard, and the days. **Information only (REC-7).** Empty is
+  not "no tennis": athletes log some sessions, not all, and the log only exists since 2026-11-21.
 
 ## Step 2 · The read (for Amir first, then the athlete)
 
@@ -121,6 +124,7 @@ Work through this list. Each line is a finding only if the data says so.
 | **Baselines** | every number the cycle promised to change: is there a starting value? | No baseline = the promise can never be shown; add a test to the next cycle's week 1 |
 | **Sleep** | readiness `sleep`: avg, and poor nights by weekday | Call a pattern only at 3+ points; 2 is "watch" |
 | **Words** | day notes, messages, calls | What the athlete said goes in "what you told me" |
+| **Court time** | Q5: court hours per week, the hard ones, and any that fell the day before a session (match it with Q2's dates) | Recovery and the training days: it explains a low readiness or a flat week. Never a load change by itself (REC-7): what it suggests goes to Amir at Step 3 |
 
 Then look forward: `next_cycle.focuses` and `teaser` (the locked roadmap), the ledger's deferred
 exercises ("enters C2"), and anything Amir already promised the athlete.
@@ -141,6 +145,8 @@ One chat message, only what the data can't answer:
 - **Language of the message** if the log's last Debrief doesn't say (Farsi on WhatsApp for
   athletes in Iran; the programme app itself stays English).
 - Anything specific he wants celebrated.
+- **Court time** (REC-7), when Q5 has any: the numbers, and what you'd suggest for the next cycle, as a question. He decides;
+  the Debrief records his answer as the decision, or the hours as a fact.
 
 Say what you already found in two or three lines so he can correct a misread before it's written.
 
@@ -222,7 +228,8 @@ If not, leave it out.
 ×<ratio> the model, per day (D1 73 vs 51) · each primary's top set, first → last, flat lifts named
 · the Ceiling for a flagged lift: e1RM, grade, date (TST-6) · a data fault only as the decision it
 forces ("take no starting load from his RPE", PRG-11; "whole bar or per side unknown") · each
-promise or gate: met / partly / not yet, with its number · at most one short quote, only when it
+promise or gate: met / partly / not yet, with its number · court time from Q5, when any was logged: hours a week
+and the hard ones, as a fact (REC-7: information, never a decision) · at most one short quote, only when it
 moves the dose.
 
 **Profile changes** — only what changed: an injury new or resolved, kit, gym, schedule, goal, a
