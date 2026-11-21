@@ -7,6 +7,13 @@
   push `main` by itself, one push at a time (Pages deploys it; see *Verifying the live site*). A
   session that has to work on a branch (a cloud session) merges its PR the same day. Don't stop at
   "pushed to a branch".
+- **Every change athletes notice is told** (Amir, 2026-11-21: *"this should be a rule, that after any change to program.html
+  people should know what have changed"*). A commit that changes what an athlete sees or does in `program.html` adds an
+  entry at the top of `assets/news.json` in the same commit: a title and one short line per change, in Amir's voice
+  (COM-3), English and Farsi (COM-1), signed Amir. Every athlete's Inbox shows it for 14 days as *Amir: <title>*, and
+  the sheet lists the lines. A change nobody would notice (a refactor, a test, a comment, a coach-only fix) says
+  `[no news]` in its commit message. `.githooks/commit-msg` blocks a `program.html` commit with neither, and checks the
+  file is readable (both languages, unique ids, newest first). Several small changes on one day can share one entry.
 - **Push back** when something's wrong or stale; fix at the **source** and keep the two language
   sites consistent on facts. He gives blunt feedback — that's normal, not a problem.
 - **Verify before merging.** Render changes headless and check them.

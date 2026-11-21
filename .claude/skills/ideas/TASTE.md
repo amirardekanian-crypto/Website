@@ -5,6 +5,13 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-11-21 · 118 Pass It On, and a standing rule: athletes are told every change.** *"lets build 118 i like it"*, then *"yes i want it to
+  be delivered in their inbox, if we add a function to the app, changed the function of the app. this should be a rule, that after any change
+  to program.html people should know what have changed"*, and the same day *"have a read of what have changed in the app in last 3-4 days, send a
+  message in everyones inbox in english and farsi / if its a big function, add to how to use the app section as well"*. What it teaches: he
+  treats the athletes as people who should be told, in their language, what changed; a feature is not finished until it is announced and in
+  How the app works. Built as assets/news.json + an Inbox row, with a commit-msg hook so no session forgets.
+
 - **2026-11-21 · Load Read: "build it, but dont let program designer change the load of the person gym training without me".**
   Then: *"having this information will help with their recovery and monitoring their program and training days , but shouldnt
   automatically affect program"*. What it teaches: data the athlete logs about their life outside the plan informs Amir and is

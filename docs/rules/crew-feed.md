@@ -81,3 +81,14 @@ Amir, 2026-11-20, "build 116, 117 and 119". The build record is `docs/ref/progra
 - **Show Your Face (119).** When someone has cheered you and you have no face yet, a card asks for it: "<First> cheered you. Add your face so the crew sees who they are cheering."
   It sits at the top of the Inbox and under "Cheers this week" on your own page. Add your face opens the photo sheet. Not now puts it away for good on that phone. Members only,
   never under 13, and it goes by itself once a face is saved.
+
+## Pass It On (118) and What's new (2026-11-21)
+
+- **Pass It On** (Amir: *"lets build 118 i like it"*). Where your cheers show (the Inbox, and Cheers this week on your own page), a card names up
+  to two crew mates who trained today and have no cheer from you yet, each with one Cheer button. It reads today's `people` (stage111), so it
+  says only what is true: they trained, and you have not cheered them. It never claims nobody cheered them. After a cheer the card moves on.
+  Not shown to a non-member or an account ticked under 13.
+- **What's new reaches every athlete's Inbox** (Amir: *"after any change to program.html people should know what have changed"*). The words
+  are in `assets/news.json`, English and Farsi, in Amir's voice. Each entry shows 14 days as *Amir: <title>* and opens a sheet of short
+  lines. The rule and its hook are in [`working-with-amir.md`](working-with-amir.md) → *Every change athletes notice is told*. A big
+  feature also gets its card in How the app works (`APP_GUIDE`), with its Farsi.

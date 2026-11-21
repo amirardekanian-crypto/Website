@@ -214,7 +214,7 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('the guide: a Crew card naming its controls, and Crew among the tabs', /<strong>Crew<\/strong> is the crew/.test(g) && /Share something with the crew/.test(g) && /Tell the crew/.test(g) && /<strong>Join the crew<\/strong>/.test(g));
     C.check('…and it names the real controls: What the crew sees (not Crew and the Bell, not "of you"), In the crew › beside the numbers, and no word of a foot row', /tap your initials, then <strong>What the crew sees<\/strong>/.test(g) && !/Crew and the Bell/.test(g) && !/sees of you/.test(g)
       && /<strong>In the crew ›<\/strong> beside the numbers/.test(g) && !/just below/.test(g));
-    C.check('…and it says Like, not Kudos, and never Ring it', /<strong>Like<\/strong>/.test(g) && !/kudos/i.test(g) && !/Ring it/.test(g));
+    C.check('…and it says like (the heart under a post, to like it), not Kudos, and never Ring it', /Tap the heart under a post or a win to like it/.test(g) && !/kudos/i.test(g) && !/Ring it/.test(g));
     // never synced
     const synced = await p.evaluate(() => Object.keys(_snapshot()).filter(k => /crewcache|crewseen/.test(k)));
     C.check('the Bell\'s copy and the seen post never sync', synced.length === 0 && !!(await p.evaluate(id => localStorage.getItem(id + '_crewcache'), H.ID)), JSON.stringify(synced));
@@ -1417,6 +1417,82 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     };
     const dbl = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); if (!e) return false; e.click(); e.click(); return true; }, sel);
     const toastOf = p => p.evaluate(() => { const t = document.getElementById('aaToast'); return !t || t.hidden ? null : t.innerText.replace(/\s+/g, ' ').trim(); });
+
+    // 118 · Pass It On: from today's Trained Today people, up to two with no cheer from you, one tap each (the Inbox and Cheers this week on your own page)
+    {
+      const CKD = 'eeeeeeee-0000-4000-8000-000000000005', CKS = 'ffffffff-0000-4000-8000-000000000006';
+      const mkP = o => { const b = mkBell(o); b.crew = b.crew.concat([{ ck: CKS, who: 'Sara T.', fv: null }]); return b; };   // the stub only cheers someone in the crew
+      const cheerRow = [{ k: 'cheer', at: iso(now - 5 * 60e3), who: 'Dara N.', amir: false, ck: CKD, fv: null, word: 'Strong', back: true }];
+      const people = [{ ck: CKP, fv: null, who: 'Mina S.', cheered: false }, { ck: CKR, fv: null, who: 'Reza K.', cheered: false }, { ck: CKS, fv: null, who: 'Sara T.', cheered: false }];
+      const po = p => p.evaluate(() => ({ n: document.querySelectorAll('.cr-passon').length, t: ((document.querySelector('.cr-passon .po-t') || {}).textContent || '').replace(/\s+/g, ' ').trim(),
+        b: [...document.querySelectorAll('.cr-passon .po-go')].map(x => x.getAttribute('aria-label')) }));
+      const inboxOf = async (b, extra) => {
+        const o = await open(browser, Object.assign({ bell: b, seed: { _faceask: 'done' }, stub: { inbox: { rows: cheerRow } } }, extra || {}));
+        await waitTab(o.p); await o.p.waitForTimeout(500);
+        await o.p.evaluate(() => goTo('inbox')); await o.p.waitForTimeout(600);
+        return o;
+      };
+      {
+        const x = await inboxOf(mkP({ people }));
+        let s = await po(x.p);
+        C.check('Pass it on: in the Inbox with a cheer on it, today\'s people give a card naming two (not three) of them: "Pass it on. Mina and Reza trained today."', s.n === 1 && s.t === 'Pass it on. Mina and Reza trained today.' && s.b.join() === 'Cheer Mina,Cheer Reza', JSON.stringify(s));
+        await x.p.evaluate(() => document.querySelector('.cr-passon .po-go').click()); await x.p.waitForTimeout(500);
+        const sent = await calls(x.p, 'crew_cheer');
+        s = await po(x.p);
+        C.check('…a tap sends crew_cheer for her (no word) and the card moves on to whoever is left: "Reza and Sara"', sent.length === 1 && sent[0].p_subject === CKP && s.n === 1 && s.t === 'Pass it on. Reza and Sara trained today.' && s.b.join() === 'Cheer Reza,Cheer Sara', JSON.stringify([sent, s]));
+        await x.p.evaluate(() => document.querySelectorAll('.cr-passon .po-go')[0].click()); await x.p.waitForTimeout(500);
+        await x.p.evaluate(() => document.querySelectorAll('.cr-passon .po-go')[0].click()); await x.p.waitForTimeout(500);
+        s = await po(x.p);
+        C.check('…after the last of them is cheered the card is gone (three crew_cheer calls in all)', s.n === 0 && (await calls(x.p, 'crew_cheer')).length === 3, JSON.stringify([s, (await calls(x.p, 'crew_cheer')).length]));
+        C.check('…and no page errors', !x.p.errs.length, x.p.errs.join(' | '));
+        await x.ctx.close();
+      }
+      {
+        const x = await inboxOf(mkP({ people: [{ ck: CKP, fv: null, who: 'Mina S.', cheered: true }, { ck: CKR, fv: null, who: 'Reza K.', cheered: false }, { ck: CKS, fv: null, who: 'Sara T.', cheered: false }] }));
+        const s = await po(x.p);
+        C.check('Pass it on: a person the server says you cheered today (cheered: true) is skipped: "Reza and Sara"', s.t === 'Pass it on. Reza and Sara trained today.' && s.b.join() === 'Cheer Reza,Cheer Sara', JSON.stringify(s));
+        await x.ctx.close();
+      }
+      {
+        const x = await inboxOf(mkP({ people: [{ ck: CKP, fv: null, who: 'Mina S.', cheered: true }, { ck: CKR, fv: null, who: 'Reza K.', cheered: true }] }));
+        C.check('Pass it on: everybody already cheered: no card', (await po(x.p)).n === 0);
+        await x.ctx.close();
+      }
+      {
+        const x = await inboxOf(mkP({ people: null }));
+        C.check('Pass it on: a Bell whose "trained" line has no `people`: no card', (await po(x.p)).n === 0);
+        await x.ctx.close();
+      }
+      {
+        const x = await inboxOf(mkP({ people }), { stub: { inbox: { rows: [] } } });
+        C.check('Pass it on: an Inbox with no cheer on it: no card', (await po(x.p)).n === 0);
+        await x.ctx.close();
+      }
+      {
+        const b = mkP({ people }); b.items = b.items.filter(i => i.t !== 'sess');
+        const x = await inboxOf(b);
+        C.check('Pass it on: no "trained today" line on the Bell: no card', (await po(x.p)).n === 0);
+        await x.ctx.close();
+      }
+      for (const [what, me] of [['a non-member', { answer: 'no', can_post: false }], ['an athlete under 13', { under13: true, can_post: false }]]) {
+        const x = await open(browser, { bell: mkP({ people, me }) });
+        await waitTab(x.p); await x.p.waitForTimeout(500);
+        C.check('Pass it on: ' + what + ' never gets the card (crewPassOnHTML is empty)', await x.p.evaluate(() => crewPassOnHTML() === '' && crewPassOnPeople().length === 0));
+        await x.ctx.close();
+      }
+      {
+        const pg = { me: { cheers: { total: 1, season: 1, recent: [{ ck: CKD, who: 'Dara N.', fv: null, coach: false, word: 'Go', day: todayK }] } } };
+        const x = await open(browser, { bell: mkP({ people }), seed: { _faceask: 'done' }, stub: { crewPages: pg } });
+        await waitTab(x.p); await x.p.evaluate(() => openPlayer('me')); await x.p.waitForTimeout(900);
+        const s = await x.p.evaluate(() => { const c = document.querySelector('#crewplayer-body .cr-passon'), h = document.querySelector('#crewplayer-body h2[data-sec="cheers"]'); return { n: document.querySelectorAll('#crewplayer-body .cr-passon').length, under: !!(c && h && h.nextElementSibling === c), t: c ? c.querySelector('.po-t').textContent.replace(/\s+/g, ' ').trim() : '' }; });
+        C.check('Pass it on: on your own page, under "Cheers this week", when someone cheered you: "Pass it on. Mina and Reza trained today."', s.n === 1 && s.under && s.t === 'Pass it on. Mina and Reza trained today.', JSON.stringify(s));
+        await x.ctx.close();
+        const e = await open(browser, { bell: mkP({ people }), seed: { _faceask: 'done' }, stub: { crewPages: { me: { cheers: { total: 0, season: 0, recent: [] } } } } });
+        await waitTab(e.p); await e.p.evaluate(() => openPlayer('me')); await e.p.waitForTimeout(900);
+        C.check('…and not on your own page with no cheers on it', !(await e.p.$('#crewplayer-body .cr-passon')));
+        await e.ctx.close();
+      }
+    }
 
     // 114 · the day's people as faces, under a heading that says the day and the count; the words line is not drawn beside them
     {

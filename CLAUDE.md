@@ -52,6 +52,8 @@ Each line is the short form. The file beside it holds the full wording, which is
   both apps with it. → [`docs/rules/push.md`](docs/rules/push.md)
 - **A doc move never changes a rule's wording or its ID.** New narration goes in
   [`docs/record/`](docs/record/INDEX.md), never in a rules file. → [`docs/README.md`](docs/README.md)
+- **Every change athletes notice is told**: a `program.html` change ships with its entry in `assets/news.json`
+  (their Inbox, English and Farsi), or `[no news]` in the message. → [`docs/rules/working-with-amir.md`](docs/rules/working-with-amir.md)
 - **Run the hooks.** `git config core.hooksPath .githooks`, once per clone; a habits.html or
   sw.js commit that skips them has reached the live site before.
   → [`docs/rules/working-with-amir.md`](docs/rules/working-with-amir.md)

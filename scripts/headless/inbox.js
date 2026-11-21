@@ -58,10 +58,12 @@ const SERVER_ROWS = () => [
 const BOOK = () => [{ q: 'How often should I deload?', a: 'Every fifth week, or sooner if your sleep is bad.', at: iso(now - 26 * 3600e3), by: 'Mina S.' },
   { q: 'Is soreness a sign of a good session?', a: 'No. It is a sign you did something new.', at: iso(now - 4 * 86400e3), by: null }];
 
+// The real assets/news.json is served here, and its What's new row would count on every tray and badge below: the file answers an empty list unless a check brings its own (section What's new, below).
+const NEWS_OFF = `(function () { var f = window.fetch.bind(window); window.fetch = function (u, o) { if (/\\/assets\\/news\\.json/.test(String(u && u.url || u))) return Promise.resolve(new Response('{"items":[]}', { status: 200, headers: { 'Content-Type': 'application/json' } })); return f(u, o); }; })();`;
 async function open(browser, o = {}) {
   const b = o.bell === null ? null : (o.bell || bell(o.b || {}));
   return H.openProgram(browser, Object.assign({ w: 390, h: 844, stub: Object.assign({ crewBoard: [] }, b ? { bell: b } : {}, o.inbox === null ? {} : { inbox: { rows: o.inbox || SERVER_ROWS() } }, o.stub || {}),
-    seed: Object.assign({ _cheerhint: 'done' }, o.seed || {}) }, o.opts || {}));
+    seed: Object.assign({ _cheerhint: 'done' }, o.seed || {}) }, o.opts || {}, { init: NEWS_OFF + ((o.opts && o.opts.init) || '') }));
 }
 const calls = (p, name) => p.evaluate(n => (window.__STUB.params || []).filter(x => x[0] === n).map(x => x[1]), name);
 const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-tabs .nav-item[data-tab="crew"]'), null, { timeout: 8000 }).then(() => true, () => false);
@@ -677,6 +679,54 @@ const lit = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); r
       await e.p.evaluate(() => openPlayer('me')); await e.p.waitForTimeout(900);
       C.check('face ask: your own page with no cheers has no card', !(await e.p.$('#crewplayer-body .cr-faceask')));
       await e.ctx.close();
+    }
+  }
+
+  // What's new from Amir (2026-11-21): /assets/news.json, one Inbox row per entry for 14 days, the sheet with the bullets and his name
+  {
+    const nw = (id, ageDays, en, fa) => ({ id, at: iso(now - ageDays * 86400e3), en, fa });
+    const EN1 = { title: 'What\'s new this week', items: ['The app speaks Farsi.', 'Your weeks shows every day.'], sign: 'Amir' };
+    const FA1 = { title: 'چیزای جدید این هفته', items: ['اپ فارسی حرف می‌زنه.', 'هفته‌های تو همهٔ روزها را نشون می‌ده.'], sign: 'امیر' };
+    // the page's own fetch of the file answers this list, so the real assets/news.json never decides a check
+    const withNews = list => `(function () { var f = window.fetch.bind(window); window.fetch = function (u, o) { if (/\\/assets\\/news\\.json/.test(String(u && u.url || u))) return Promise.resolve(new Response(JSON.stringify({ items: ${JSON.stringify(list)} }), { status: 200, headers: { 'Content-Type': 'application/json' } })); return f(u, o); }; })();`;
+    const newsRowOn = (p) => p.evaluate(() => [...document.querySelectorAll('#inbox-body .ib-row[data-k="news"]')].map(r => ({ t: r.querySelector('.ib-t').textContent.replace(/\s+/g, ' ').trim(), q: ((r.querySelector('.ib-q') || {}).textContent || '').replace(/\s+/g, ' ').trim() })));
+    {
+      const { ctx, p } = await open(browser, { inbox: [], opts: { init: withNews([nw('n-new', 0.05, EN1, FA1), nw('n-old', 15, { title: 'Old news', items: ['x'], sign: 'Amir' }, null), nw('n-ten', 10, { title: 'Ten days ago', items: ['y'], sign: 'Amir' }, null)]) } });
+      await waitTab(p); await p.waitForTimeout(900);
+      C.check('What\'s new: two entries inside 14 days count on the tray (the third, 15 days old, does not)', (await badge(p)) === '2', await badge(p));
+      await openInboxFrom(p, 'home');
+      const rows = await newsRowOn(p);
+      C.check('…the Inbox row reads "Amir: What\'s new this week" with the first line under it', rows.some(r => r.t === 'Amir: What\'s new this week' && /The app speaks Farsi\./.test(r.q)), JSON.stringify(rows));
+      C.check('…an entry 10 days old still shows, and one 15 days old does not', rows.some(r => /Ten days ago/.test(r.t)) && !rows.some(r => /Old news/.test(r.t)) && rows.length === 2, JSON.stringify(rows));
+      C.check('…the tray count clears once the Inbox is opened', (await badge(p)) === '', await badge(p));
+      await p.evaluate(() => document.querySelector('#inbox-body .ib-row[data-k="news"] .ib-go').click()); await p.waitForTimeout(400);
+      const sh = await p.evaluate(() => ({ on: document.getElementById('hist-overlay').classList.contains('visible'), eyebrow: (document.querySelector('#hist-overlay .readiness-eyebrow') || {}).textContent || '', title: (document.querySelector('#hist-overlay .readiness-title') || {}).textContent || '',
+        li: [...document.querySelectorAll('#hist-overlay ul.news-list li')].map(x => x.textContent), sign: (document.querySelector('#hist-overlay p.news-sign') || {}).textContent || '' }));
+      C.check('…a tap opens the sheet: "From Amir · <day month>", the title, the bullets and Amir\'s name', sh.on && /^From Amir · \d{1,2} [A-Z][a-z]+$/.test(sh.eyebrow) && sh.title === 'What\'s new this week' && sh.li.join('|') === 'The app speaks Farsi.|Your weeks shows every day.' && sh.sign === 'Amir', JSON.stringify(sh));
+      C.check('…the entry is kept on the phone (aa_news_cache) for no signal', await p.evaluate(() => { try { return JSON.parse(localStorage.getItem('aa_news_cache')).length === 3; } catch (e) { return false; } }));
+      C.check('…no page errors', !p.errs.length, p.errs.join(' | '));
+      await ctx.close();
+    }
+    {
+      // no signal: the file does not answer, the copy kept on the phone stands
+      const { ctx, p } = await open(browser, { inbox: [], opts: { init: `localStorage.setItem('aa_news_cache', ${JSON.stringify(JSON.stringify([nw('n-cache', 2, EN1, FA1)]))}); (function () { window.fetch = function (u, o) { return /news\.json/.test(String(u && u.url || u)) ? Promise.reject(new TypeError('offline')) : Promise.resolve(new Response('{}', { status: 404 })); }; })();` } });
+      await waitTab(p); await p.waitForTimeout(700);
+      await openInboxFrom(p, 'home');
+      const rows = await newsRowOn(p);
+      C.check('What\'s new with no signal: the copy kept on the phone still gives its row', rows.length === 1 && rows[0].t === 'Amir: What\'s new this week', JSON.stringify(rows));
+      await ctx.close();
+    }
+    {
+      const { ctx, p } = await open(browser, { inbox: [], opts: { init: "localStorage.setItem('aa_lang_beta', '1'); localStorage.setItem('aa_lang', 'fa');" + withNews([nw('n-new', 0.05, EN1, FA1)]) } });
+      await waitTab(p); await p.waitForTimeout(900);
+      const fa = await p.evaluate(() => !!(window.AAI18N && AAI18N.fa));
+      await openInboxFrom(p, 'home');
+      const rows = await newsRowOn(p);
+      C.check('What\'s new on a Farsi phone: the row reads the Farsi title and first line', fa && rows.length === 1 && rows[0].t.indexOf('چیزای جدید این هفته') >= 0 && rows[0].q.indexOf('اپ فارسی') >= 0 && !/What's new/.test(rows[0].t), JSON.stringify([fa, rows]));
+      await p.evaluate(() => document.querySelector('#inbox-body .ib-row[data-k="news"] .ib-go').click()); await p.waitForTimeout(400);
+      const sh = await p.evaluate(() => ({ title: (document.querySelector('#hist-overlay .readiness-title') || {}).textContent || '', li: document.querySelectorAll('#hist-overlay ul.news-list li').length, sign: (document.querySelector('#hist-overlay p.news-sign') || {}).textContent || '' }));
+      C.check('…and its sheet has the Farsi title, both bullets and the Farsi sign-off', sh.title === 'چیزای جدید این هفته' && sh.li === 2 && sh.sign === 'امیر', JSON.stringify(sh));
+      await ctx.close();
     }
   }
 

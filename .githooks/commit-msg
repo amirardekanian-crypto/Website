@@ -1,0 +1,40 @@
+#!/bin/sh
+# WHAT'S NEW (Amir, 2026-11-21: "this should be a rule, that after any change to program.html people should know what have changed").
+# A commit that changes program.html must also change assets/news.json, the entry every athlete sees in their Inbox for 14 days
+# (program.html: newsRows(), openNews()). A change no athlete would notice (a refactor, a comment, a test, a coach-only fix, a
+# version bump) says so in its message with [no news]. Rule: docs/rules/working-with-amir.md, "Every change athletes notice is told".
+msg_file="$1"
+staged=$(git diff --cached --name-only)
+
+if echo "$staged" | grep -qx "assets/news.json"; then
+  # the file must stay readable by the app: valid JSON, items with id, at, en.title and fa.title, newest first
+  if ! node -e '
+    const j = JSON.parse(require("fs").readFileSync("assets/news.json", "utf8"));
+    if (!Array.isArray(j.items)) throw new Error("items is not a list");
+    const ids = new Set(); let prev = Infinity;
+    for (const n of j.items) {
+      if (!n.id || ids.has(n.id)) throw new Error("an entry has no id, or a repeated one: " + n.id);
+      ids.add(n.id);
+      const t = Date.parse(n.at); if (!t) throw new Error(n.id + ": at is not a date");
+      if (t > prev) throw new Error(n.id + ": entries must be newest first");
+      prev = t;
+      for (const l of ["en", "fa"]) if (!n[l] || !n[l].title || !Array.isArray(n[l].items) || !n[l].items.length) throw new Error(n.id + ": " + l + " needs a title and items (COM-1: both languages)");
+    }
+  '; then
+    echo "commit-msg: BLOCKED -- assets/news.json is not what the app can read (details above)."
+    exit 1
+  fi
+fi
+
+if echo "$staged" | grep -qx "program.html"; then
+  if ! echo "$staged" | grep -qx "assets/news.json"; then
+    if ! grep -qi "\[no news\]" "$msg_file"; then
+      echo "commit-msg: BLOCKED -- program.html changed, but assets/news.json did not."
+      echo "  Athletes are told every change they would notice (docs/rules/working-with-amir.md, \"Every change athletes notice is told\")."
+      echo "  Add an entry at the top of assets/news.json in Amir's voice, English and Farsi, then commit again."
+      echo "  If no athlete would notice this change, put [no news] in the commit message."
+      exit 1
+    fi
+  fi
+fi
+exit 0

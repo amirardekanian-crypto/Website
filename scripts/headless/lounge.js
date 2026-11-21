@@ -1932,7 +1932,8 @@ const on = n => !ONLY.length || ONLY.includes(n);
     await homeWait(cq.p);
     const cb0 = await box(cq.p);
     await cq.p.evaluate(() => openPlayer('me')); await cq.p.waitForTimeout(700);
-    const crow = () => cq.p.evaluate(() => { const r = document.querySelector('#crewplayer-body .pl-push'); const l = r && r.parentElement; return r ? { t: r.textContent.replace(/\s+/g, ' ').trim(), tag: r.tagName, last: l.lastElementChild === r, list: l.classList.contains('pl-list'), head: (l.previousElementSibling || {}).textContent, h: Math.round(r.getBoundingClientRect().height) } : null; });
+    const crow = () => cq.p.evaluate(() => { const r = document.querySelector('#crewplayer-body .pl-push'); const l = r && r.parentElement; return r ? { t: r.textContent.replace(/\s+/g, ' ').trim(), tag: r.tagName, last: l.lastElementChild === r, list: l.classList.contains('pl-list'), head: (() => { let e = l.previousElementSibling; while (e && e.tagName !== 'H2') e = e.previousElementSibling; return (e || {}).textContent; })(),   // the heading, past the face ask and Pass it on cards (119, 118) that sit between it and the list
+      h: Math.round(r.getBoundingClientRect().height) } : null; });
     let cr = await crow();
     C.check('your own page, the phone able to take notifications and not on: one plain row under Cheers this week, "Turn on notifications so the next cheer reaches you" (after the cheers, a button, 44 px or more)',
       !!cr && /^Turn on notifications so the next cheer reaches you/.test(cr.t) && cr.tag === 'BUTTON' && cr.last && cr.list && cr.head === 'Cheers this week' && cr.h >= 44, JSON.stringify(cr));

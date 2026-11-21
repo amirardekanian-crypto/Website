@@ -1,0 +1,43 @@
+{
+  "_about": "What's new in the app, shown in every athlete's Inbox for 14 days (program.html, newsRows/openNews). Newest first. Each entry: id (unique), at (ISO time), en and fa: { title, items: [one short line each], sign }. Written in Amir's voice (COM-3) in both languages (COM-1). THE RULE (docs/rules/working-with-amir.md): a change to program.html that an athlete would notice ships with its entry here in the same commit; .githooks/commit-msg blocks a program.html commit without this file unless the message says [no news].",
+  "items": [
+    {
+      "id": "2026-11-21-week",
+      "at": "2026-11-21T12:00:00Z",
+      "en": {
+        "title": "What's new this week",
+        "items": [
+          "The app speaks Farsi. Tap your initials, then Language, to switch. Everything I write for you comes in both languages.",
+          "Your weeks, on Progress, shows every day of your cycle. Tap a day to see what you did.",
+          "Played tennis or padel, or went for a run? Tap + Add activity on Your weeks. I see it too. The crew never does.",
+          "A day marked Optional is a bonus. Skipping it never breaks your week.",
+          "Crew has a new look. Tap the heart to like, or double-tap a post. Hold the heart for more reactions.",
+          "Trained today shows who trained. Double-tap a face to cheer them.",
+          "Wins show as cards. A new best shows its weight and how much it went up. To keep your bests to yourself, tap your initials, then What the crew sees.",
+          "The weekly question hides the answers until you vote. A dot shows what's new since your last visit.",
+          "When someone cheers you, pass it on. The app shows who trained today and has no cheer from you yet.",
+          "No photo yet? Add one so the crew knows who they're cheering.",
+          "All of it is in How the app works: tap your initials to find it."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "چیزای جدید این هفته",
+        "items": [
+          "اپ فارسی حرف می‌زنه. روی حرف‌های اول اسمت بزن، بعد «زبان»، تا عوضش کنی. هر چیزی که برات می‌نویسم به هر دو زبان میاد.",
+          "«هفته‌های تو»، تو پیشرفت، همهٔ روزهای دوره‌ات رو نشون می‌ده. روی یه روز بزن تا ببینی چی کار کردی.",
+          "تنیس یا پدل بازی کردی، یا دویدی؟ تو «هفته‌های تو» «+ اضافه کردن فعالیت» رو بزن. من هم می‌بینمش. تیم هیچ‌وقت نمی‌بینه.",
+          "روزی که «اختیاری» نوشته شده یه جایزه است. اگه انجامش ندی هفته‌ات خراب نمی‌شه.",
+          "تیم یه ظاهر جدید داره. برای لایک روی قلب بزن، یا دو بار روی پست بزن. قلب رو نگه دار تا واکنش‌های بیشتر بیاد.",
+          "«امروز تمرین کردن» نشون می‌ده کی تمرین کرده. دو بار روی عکسش بزن تا تشویقش کنی.",
+          "موفقیت‌ها کارت دارن. رکورد جدید وزنه‌اش و اینکه چقدر بالا رفته رو نشون می‌ده. اگه می‌خوای رکوردهات پیش خودت بمونه، روی حرف‌های اول اسمت بزن، بعد «تیم چی می‌بینه».",
+          "سؤال هفته جواب‌ها رو تا وقتی رأی ندادی نشون نمی‌ده. یه نقطه نشون می‌ده از آخرین باری که سر زدی چی جدیده.",
+          "وقتی یکی تشویقت می‌کنه، تو هم تشویق کن. اپ نشون می‌ده کی امروز تمرین کرده و هنوز تشویقش نکردی.",
+          "هنوز عکس نذاشتی؟ یکی بذار تا تیم بدونه داره کی رو تشویق می‌کنه.",
+          "همه‌اش تو «اپ چطور کار می‌کنه» هست: روی حرف‌های اول اسمت بزن تا پیداش کنی."
+        ],
+        "sign": "امیر"
+      }
+    }
+  ]
+}
