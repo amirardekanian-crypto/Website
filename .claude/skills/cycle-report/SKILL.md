@@ -1,6 +1,6 @@
 ---
 name: cycle-report
-description: End-of-cycle report for one coached athlete. Reads the five weeks they just trained (session logs, loads, RPE, readiness, weigh-ins, Personal Records, messages, calls) against what the cycle promised, then produces TWO things. The athlete's cycle report is a WhatsApp message covering wins, what they told Amir, what comes next, what Amir needs from them and three questions. The second is a coach-only "Debrief" section appended to their coaching log, which /program-design reads before the next cycle. Use when Amir says "cycle report", "debrief <name>", "end of cycle for <name>", "how did <name>'s cycle go", "write <name> a report", or in a cycle's closing week before designing the next one.
+description: End-of-cycle report for one coached athlete. Reads the five weeks they just trained (session logs, loads, RPE, readiness, weigh-ins, Personal Records, messages, calls) against what the cycle promised, then produces TWO things. The athlete's cycle report is a WhatsApp message covering wins, what they told Amir, what comes next, what Amir needs from them and three questions, and it suggests the athlete's next monthly goal for Amir to pick. The second is a coach-only "Debrief" section appended to their coaching log, which /program-design reads before the next cycle. Use when Amir says "cycle report", "debrief <name>", "end of cycle for <name>", "how did <name>'s cycle go", "write <name> a report", or in a cycle's closing week before designing the next one.
 ---
 
 # /cycle-report: the end of a cycle, and the start of the next design
@@ -24,7 +24,7 @@ Built 2026-09-24 from the first one, an athlete's Cycle 1 (idea #12, The Debrief
 so the athlete's answers reach the design. Running it after the next cycle is already written
 still saves the record, but the questions come too late to shape anything.
 
-Files here: **`queries.sql`** (four read-only queries, tested on real rows) · **`shamsi.py`**
+Files here: **`queries.sql`** (six read-only queries, tested on real rows) · **`shamsi.py`**
 (dates for a Farsi report).
 
 ---
@@ -98,6 +98,8 @@ because athletes often start a day or two before the date) and run them:
 - **Q5** Court Log (stage116): what the athlete logged in the app outside the plan, by week: court time (tennis, padel, a
   match) and other (a run, anything else), minutes, how many were hard, and the days. **Information only (REC-7).** Empty is
   not "no tennis": athletes log some sessions, not all, and the log only exists since 2026-11-21.
+- **Q6** the monthly goal (`career_goals`): one row per calendar month from the cycle's start to next month, with the line,
+  the day it was ticked, and `can_write` (the server takes a write or a tick only for last, this or next month).
 
 ## Step 2 · The read (for Amir first, then the athlete)
 
@@ -124,6 +126,7 @@ Work through this list. Each line is a finding only if the data says so.
 | **Baselines** | every number the cycle promised to change: is there a starting value? | No baseline = the promise can never be shown; add a test to the next cycle's week 1 |
 | **Sleep** | readiness `sleep`: avg, and poor nights by weekday | Call a pattern only at 3+ points; 2 is "watch" |
 | **Words** | day notes, messages, calls | What the athlete said goes in "what you told me" |
+| **Monthly goal** | Q6: each goal the cycle touched, ticked or not, against the evidence (a "3 sessions every week" goal is checked against Q2) | Met and not ticked: Amir ticks it at Step 3. It feeds the next goal (Step 3) |
 | **Court time** | Q5: court hours per week, the hard ones, and any that fell the day before a session (match it with Q2's dates) | Recovery and the training days: it explains a low readiness or a flat week. Never a load change by itself (REC-7): what it suggests goes to Amir at Step 3 |
 
 Then look forward: `next_cycle.focuses` and `teaser` (the locked roadmap), the ledger's deferred
@@ -147,6 +150,28 @@ One chat message, only what the data can't answer:
 - Anything specific he wants celebrated.
 - **Court time** (REC-7), when Q5 has any: the numbers, and what you'd suggest for the next cycle, as a question. He decides;
   the Debrief records his answer as the decision, or the hours as a fact.
+- **The monthly goal** (below): tick the one he met, if it isn't ticked, and pick the next one.
+
+### The next monthly goal (Amir, 2026-11-21: *"have cycle-report suggest next month's goal"*)
+
+The goal is **a job for the athlete, not the cycle's outcome** (Amir, 2026-10-20: *"a goal they have to do. not their cycle
+outcome"*, L10). One line, at most 140 characters, on their Progress screen under *<Month> · from Amir*, with a ring that fills
+green when Amir ticks it. No XP.
+
+**Which month:** this month if it has no goal yet and at least 10 days are left; otherwise next month. Q6's `can_write` must
+be true. A goal already written for that month is shown to Amir, never overwritten without his word.
+
+**Offer two, each a different kind**, drawn from this read, never invented:
+- the thing that most limited the cycle the athlete can fix himself: consistency ("3 sessions every week of December, no week
+  missed"), the data design needs ("RPE on every main lift"), the habit Amir keeps chasing on WhatsApp (sleep, the warm-up,
+  the weekly weigh-in), or a court habit (the activation before every match, court time in the Court Log);
+- often the first line of *What I need from you*, said as a goal.
+
+**A good goal:** Amir can tick it yes or no on the last day without asking anyone · it's in the athlete's hands · **never a
+load, a lift or a performance number** (that is the cycle's outcome, and PRG-2) · plain words that sound like Amir (COM-3) ·
+in the language the athlete reads the app in, the same as the message.
+
+Put the two in the Step 3 message with one line on why each, and the month. Amir picks, rewrites or says none.
 
 Say what you already found in two or three lines so he can correct a misread before it's written.
 
@@ -181,6 +206,8 @@ what's next, and what I need from you.>
 
 *<What I need from you>* 🙏                            ← at most 4
 ۱. *<the ask>.* <the fact, once> <why it matters to him> <how, in one tap if possible>
+   ← when Amir picked a monthly goal, one of these is it: "*Your December goal:* <line>. It's in the app,
+     on Progress. I tick it when it's done." A goal ticked this cycle is a bullet in *What went well*.
 
 *<Three questions, a short answer is enough>*          ← at most 3; each one feeds the next design
 ۱. …
@@ -290,15 +317,35 @@ No row yet (a brand-new athlete whose first cycle wasn't logged)? Insert one wit
 this Debrief reports on becomes one History line, and the facts still live move to the profile and
 the ledger first.
 
+### Save the goal (on Amir's word only)
+
+The athlete reads `career_goals`, so a write here shows in their app. Only the line Amir picked or wrote, only after he says so.
+The coach functions need a coach login, so write the row directly with the same rules (at most 140 characters, one line,
+`can_write` true):
+
+```sql
+-- the goal Amir picked; never replaces a ticked goal
+insert into public.career_goals as g (athlete_id, month, line) values ('<id>', date '<YYYY-MM-01>', $G$<line>$G$)
+on conflict (athlete_id, month) do update set line = excluded.line, updated_at = now() where g.done_at is null
+returning month, line, done_at;
+-- the goal he met, ticked
+update public.career_goals set done_at = coalesce(done_at, now()), updated_at = now()
+ where athlete_id = '<id>' and month = date '<YYYY-MM-01>' returning month, line, done_at;
+```
+
+No row back from the insert = that month's goal is already ticked: say so, and nothing changed. Amir can also do both himself
+in coach.html → Today, under the athlete's name (that screen writes and ticks this month's goal only).
+
 ## Step 6 · Hand over
 
 In this order, in chat:
 1. **The message**, ready to paste, between two rules. Nothing else inside the rules.
 2. What was **left out on purpose** and why (a medical question for Amir to ask himself, a typo),
    and the sources in one line: the sessions read, the Gmail import's line, film, calls.
-3. **What was saved**: the section's length (about 1.5k; say why if it is much longer), that the
+3. **The goal**: what was ticked and what was written, for which month, or "no goal set" when Amir said none.
+4. **What was saved**: the section's length (about 1.5k; say why if it is much longer), that the
    prefix checksum matched, and the trim's line: the log's length before → after, old text saved.
-4. The next step: `/program-design <name>` once the athlete answers. Paste the answers into that run:
+5. The next step: `/program-design <name>` once the athlete answers. Paste the answers into that run:
    design records them in the new cycle's log entry, and when the Debrief's Open list still has a
    question with no recorded answer it asks Amir first, *wait or design now with stated defaults*.
 

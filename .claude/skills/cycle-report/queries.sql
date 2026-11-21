@@ -135,3 +135,16 @@ select greatest(0, (a.day - params.s) / 7 + 1)                         as week,
 from public.activity_log a, params
 where a.athlete_id = params.id and a.day between params.s - 3 and params.e
 group by 1, 2, 3 order by 1, 2, 3;
+
+-- ─── Q6 · The monthly goal (career_goals, stage75; L10): every goal from the cycle's months to next month ──────────
+-- One line Amir writes, one tick. A goal is for a CALENDAR month, so a 5-week cycle touches two or three of them.
+-- `can_write` = the server still takes a write or a tick for that month (coach_set_goal: last, this or next month).
+with params as (select 'ATHLETE_ID'::text id, date 'START' s, date 'END' e),
+months as (select generate_series(date_trunc('month', params.s - 3), date_trunc('month', current_date) + interval '1 month', interval '1 month')::date m
+           from params)
+select to_char(months.m, 'FMMonth YYYY') as month, g.line, g.done_at::date as done,
+       months.m between (date_trunc('month', current_date) - interval '1 month')::date
+                    and (date_trunc('month', current_date) + interval '1 month')::date as can_write
+from months cross join params
+left join public.career_goals g on g.athlete_id = params.id and g.month = months.m
+order by months.m;
