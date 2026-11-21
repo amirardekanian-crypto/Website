@@ -99,7 +99,8 @@ Grouped into one round of questions, the genuine gaps to close:
   on conflict (athlete_id) do nothing;
   ```
   **`name_fa` is their name in Farsi letters** (Amir, 2026-11-21: *"in farsi version, people name should be in farsi as
-  well"*), for every athlete, the English-speaking ones too: the Farsi app shows it (stage114 `get_names_fa()`). A Farsi
+  well"*), for a Farsi-speaking athlete only: the Farsi app shows it (stage114 `get_names_fa()`). An English speaker's name
+  stays in English everywhere, so they get no `name_fa` (Amir, 2026-11-21: *"lemuel and kurniawan and juan are english speakers"*). A Farsi
   form's name is often already in Farsi; otherwise write the usual Persian spelling (Alireza → علیرضا) and show it to Amir in
   the brief. Never put a name in `scripts/i18n/` (that file is public).
   **`lang` is the athlete's language** (Amir, 2026-11-20: *"let the client pick their language"*): the
