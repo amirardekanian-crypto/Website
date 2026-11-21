@@ -247,6 +247,10 @@ def twin_pairs(data):
     if nxt:
         yield from keys(nxt, ('tagline', 'focuses'), f"cycle {nxt.get('num')}")
         yield from keys(nxt.get('teaser'), ('paragraphs', 'subtitle'), f"cycle {nxt.get('num')} teaser")
+    # The roadmap's later cycles too (Amir, 2026-11-21: "the aims of the cycles should be in farsi as well … for later, write
+    # in both language"): /program-roadmap writes every cycle's tagline and aims in both languages.
+    for c in cycles[i + 2:]:
+        if isinstance(c, dict): yield from keys(c, ('tagline', 'focuses'), f"cycle {c.get('num')}")
     for d in (data.get('workouts') or {}).get('days') or []:
         yield from keys(d, ('focusTag', 'completionTitle', 'completionMessage'), f"Day {d.get('id')}")
     for d, b, ex, it in exercises(data):

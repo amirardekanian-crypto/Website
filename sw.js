@@ -587,7 +587,9 @@
 // v266: i18n.js (?v=10) changed (2026-11-21, Amir: "put check in words in farsi"): a Farsi note naming the check-in's answers in English says the buttons' Farsi.
 // v267: program.html, coach.html and i18n-fa.js (?v=14) changed (2026-11-21, round 11 Five Weeks, Amir: "go with your picks"): Progress
 // gains Your weeks, the cycle's weeks as a grid of days (get_five_weeks(), stage115); Farsi words for it.
-const CACHE = 'aap-v267';
+// v268: program.html, i18n.js (?v=11) and sharecard.js changed (2026-11-21, Amir: "in farsi version, people name should be in farsi as
+// well"). People's names in Farsi on a Farsi phone (stage114 get_names_fa(), loadNamesFa(), AAI18N.addNames()), a Farsi share card too.
+const CACHE = 'aap-v268';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -627,7 +629,7 @@ const SHELL = [
   '/assets/js/between-sets.js',
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
-  '/assets/js/i18n.js?v=10',
+  '/assets/js/i18n.js?v=11',
   '/assets/js/i18n-fa.js?v=14',
 ];
 

@@ -138,6 +138,10 @@ from public.programs where athlete_id = '<id>';
 ````
 - Each `cycles[]` item is `{num, name, tagline, art, weeks, startDate, endDate, focuses}` (SCHEMA.md
   → `cycles`). Messages, teasers and week notes come later, from /program-assemble.
+- **Every cycle's aims and tagline are written in both languages** (COM-1; Amir, 2026-11-21: *"the aims of the cycles
+  should be in farsi as well … for later, write in both language"*): `tagline_fa` beside `tagline` and `focuses_fa` beside
+  `focuses` (a list of the same length, line for line), for EVERY cycle of the roadmap, in formal Farsi (شما, COM-1).
+  The cycle's `name` stays English. The app shows the Farsi on a Farsi phone (SCHEMA.md → *Programme texts in two languages*).
 - The update touches only a row with no roadmap. If it touched nothing, the athlete already has one:
   stop, since a change to a locked roadmap is design's `roadmap_amend:` (PRC-17).
 - If the athlete already had a log (the insert did nothing), append the `## Roadmap — <date>` section

@@ -91,12 +91,17 @@ Grouped into one round of questions, the genuine gaps to close:
     jsonb_build_object(
       'athlete', jsonb_build_object(
         'id','<id>', 'firstName','<First>', 'lastName','<Last>', 'boardName','<First Last>',
-        'lang','<en|fa>'),
+        'lang','<en|fa>',
+        'name_fa', jsonb_build_object('first','<نام>', 'last','<نام خانوادگی>')),
       'sport',   jsonb_build_object('badge','🎾 Tennis Performance')   -- optional
     ),
     'intake')
   on conflict (athlete_id) do nothing;
   ```
+  **`name_fa` is their name in Farsi letters** (Amir, 2026-11-21: *"in farsi version, people name should be in farsi as
+  well"*), for every athlete, the English-speaking ones too: the Farsi app shows it (stage114 `get_names_fa()`). A Farsi
+  form's name is often already in Farsi; otherwise write the usual Persian spelling (Alireza → علیرضا) and show it to Amir in
+  the brief. Never put a name in `scripts/i18n/` (that file is public).
   **`lang` is the athlete's language** (Amir, 2026-11-20: *"let the client pick their language"*): the
   app's language, the language their notifications go out in, and the language of the WhatsApp handoff
   message (COM-2); the programme's own words are written in both languages for everyone (COM-1). The intake form now asks it as **"App Language"** (`English` or `Farsi`, required,

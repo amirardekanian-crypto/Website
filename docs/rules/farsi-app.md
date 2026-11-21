@@ -51,6 +51,11 @@ written from: [`scripts/i18n/BRIEF.md`](../../scripts/i18n/BRIEF.md).
   Farsi an athlete reads that is written from 2026-11-21 on (the app's words, programme twins, Library items, the
   Spine) uses شما (`می‌کنید`, `بزنید`, `ست‌هاتون`), still plain, short and warm. Text written before stays as it is:
   nothing is rewritten for the voice. Where a line below says informal تو, this line wins for new text.
+- **People's names are in Farsi on a Farsi phone** (Amir, 2026-11-21: *"in farsi version, people name should be in farsi as
+  well"*). Never in the public word file: each athlete's Farsi name is `athlete.name_fa` {first, last} in their programme,
+  and `get_names_fa()` (stage114) gives a signed-in athlete their own and their crew's, as each is drawn. The engine swaps
+  them on the screen only (`AAI18N.addNames()`, `nameOf()` for share cards and the games); DATA and everything sent keep
+  the English. A new athlete's `name_fa` is written at intake (`/athlete-intake`).
 - **Every Farsi word an athlete reads is a draft until Amir has read it** (COM-3 in his Farsi voice: spoken, warm,
   informal تو). The engine's `AAI18N.missing` lists every English string a Farsi screen met with no words: read it in
   the browser to find what is left.

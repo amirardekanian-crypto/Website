@@ -8,7 +8,7 @@
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
 -- The extensions the live project has: pg_cron (pg_catalog), pg_net (extensions), pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 77 tables, 329 functions, 11 sequences.
+-- 77 tables, 330 functions, 11 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -8497,6 +8497,38 @@ begin
                   from public.career_honours h where h.athlete_id = v_id and h.honour <> 'near' and h.confirmed_at is not null))   /* stage101: confirmed only */;
 end $function$;
 
+CREATE OR REPLACE FUNCTION public.get_names_fa()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare
+  v_me  text := public.current_athlete_id();
+  v_out jsonb := '{}'::jsonb;
+  r     record;
+begin
+  if v_me is null then return v_out; end if;
+  for r in
+    select p.athlete_id,
+           btrim(coalesce(p.data->'athlete'->>'firstName', '')) f, btrim(coalesce(p.data->'athlete'->>'lastName', '')) l,
+           btrim(coalesce(p.data->'athlete'->'name_fa'->>'first', '')) ff, btrim(coalesce(p.data->'athlete'->'name_fa'->>'last', '')) fl,
+           btrim(coalesce(c.name, '')) shown
+      from public.programs p
+      left join public.crew_consent c on c.athlete_id = p.athlete_id
+     where p.athlete_id = v_me or c.answer = 'yes'
+  loop
+    if r.ff = '' or r.f = '' then continue; end if;
+    v_out := v_out || jsonb_build_object(r.f, r.ff);
+    if r.l <> '' and r.fl <> '' then
+      v_out := v_out || jsonb_build_object(r.f || ' ' || r.l, r.ff || ' ' || r.fl,
+                                           r.f || ' ' || left(r.l, 1) || '.', r.ff || ' ' || left(r.fl, 1) || '.');
+    end if;
+    -- The name shown in the crew is one of those three forms; one an athlete typed some other way stays as typed.
+  end loop;
+  return v_out;
+end $function$;
+
 CREATE OR REPLACE FUNCTION public.get_profile(p_athlete_id text DEFAULT NULL::text)
  RETURNS jsonb
  LANGUAGE plpgsql
@@ -12276,6 +12308,8 @@ revoke all on function public.get_my_history(p_athlete_id text, p_days integer) 
 grant execute on function public.get_my_history(p_athlete_id text, p_days integer) to anon, authenticated, service_role;
 revoke all on function public.get_my_moments(p_athlete_id text) from public, anon, authenticated, service_role;
 grant execute on function public.get_my_moments(p_athlete_id text) to authenticated, service_role;
+revoke all on function public.get_names_fa() from public, anon, authenticated, service_role;
+grant execute on function public.get_names_fa() to authenticated, service_role;
 revoke all on function public.get_profile(p_athlete_id text) from public, anon, authenticated, service_role;
 grant execute on function public.get_profile(p_athlete_id text) to authenticated, service_role;
 revoke all on function public.get_program(p_athlete_id text, p_key text) from public, anon, authenticated, service_role;

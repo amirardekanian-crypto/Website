@@ -112,7 +112,7 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   as lifted, never the estimate, no RPE-only win), never shows body weight, a check-in answer or pain, and nothing leaves the phone until Share or
   Save image. **Every Farsi word on a card is in sharecard.js's `FA` table; Amir read and approved them on 2026-10-19, and a word added after that day is a draft until he reads it.** sharecard.js is in sw.js's SHELL, served cache-first
   by its plain URL: a change to what it draws ships with a CACHE bump (a comment alone does not need one), and `node scripts/headless/sharecard.js`
-  runs after it (every card, both sizes, both languages, text inside its box). Farsi cards: Shamsi dates, the athlete's name in English letters.
+  runs after it (every card, both sizes, both languages, text inside its box). Farsi cards: Shamsi dates, the athlete's name in Farsi (Amir, 2026-11-21: *"in farsi version, people name should be in farsi as well"*; `first_fa` from `get_names_fa()`, stage114; English letters only when the phone has no Farsi name).
 - **The cards had their own design pass** (2026-10-19; `PROGRAM-APP.md` → *The share cards' design pass*; the page
   https://claude.ai/artifact/LiVQZ1kM3Cihz5FWRHvZPv, Amir: *"go with your picks"*). Direction A, the app's cover language as a poster: a picture
   graded into the green, the athlete's name and the date on the top strip, ONE huge number (a count is the outlined P24 numeral), one clay thing,

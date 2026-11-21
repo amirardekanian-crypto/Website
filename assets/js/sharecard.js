@@ -194,7 +194,7 @@
   // only the words it has already covered. The voice is the Farsi site's: warm and colloquial ("همون"). A lift's name and a cycle's
   // name stay in English, as they are in the app.
   // DECIDED (Amir, 2026-10-17: "Keep all three Farsi choices"): Iranian (Shamsi) dates on a Farsi card (۲۵ مهر ۱۴۰۵, not the design
-  // page's Gregorian); the athlete's name in English letters (a programme holds no Farsi spelling of it); "Career Mode" in English on the
+  // page's Gregorian); the athlete's name in English letters (a programme held no Farsi spelling of it; since 2026-11-21 a Farsi card takes spec.first_fa); "Career Mode" in English on the
   // level card (levelEye).
   const FA = {
     coach: 'امیر اردکانی · مربی',
@@ -1553,7 +1553,9 @@
     const c = document.createElement('canvas');
     c.width = S.W; c.height = S.H;
     const x = c.getContext('2d');
-    const p = new Painter(x, S, lang, imgs, Object.assign({ first: spec.first }, opts));
+    // A Farsi card writes the athlete's name in Farsi when the page hands one in (spec.first_fa, 2026-11-21, Amir: "in farsi version,
+    // people name should be in farsi as well"); before that, and with none, the name in English letters.
+    const p = new Painter(x, S, lang, imgs, Object.assign({ first: lang === 'fa' && spec.first_fa ? spec.first_fa : spec.first }, opts));
     if (opts.layer !== 'fg') drawGround(x, S, imgs, fitOf(opts.fit));
     if (opts.layer !== 'bg') tpl(p, spec);
     c._boxes = p.boxes; c._fit = p.fit; c._size = S;
