@@ -23,7 +23,11 @@ changed: the server, the XP and the levels are exactly as before.
   *Every mark* on the top one; weeks held adds *best 9* when the run now is below the best) and a small bar toward it. Weeks held is the
   run now and its marks are a run's length, so its next mark is above the best run. Sessions with Amir adds a finished session no answer
   has counted (`careerPendingSessions()`). Under it the month's goal (`.cs-goal`, from `get_my_moments().goal`): a ring, *October goal
-  · from Amir* and his line; done, the ring fills green and says *done*. Then **Your moments** (`momentsHTML()`, `#moments-title` with
+  · from Amir* and his line; done, the ring fills green and says *done*. **A goal ticked
+  late** (2026-11-21: Amir ticks at the end of a cycle, often in the next month): any month's goal ticked in the last 7 days shows as
+  its own done card above this month's (`goalLateDone()`, `GOAL_LATE_DAYS`, from `get_my_moments().goals`), with Share
+  (`shareGoal(month)`). **Every ticked goal is a moment** (kind `goal`, *October goal, done*, his line, on the tick's day; shareable
+  through `hlMomentSpec()`), so a tick is never lost when the month turns. Tests: `career.js` (a goal ticked late). Then **Your moments** (`momentsHTML()`, `#moments-title` with
   the count): newest first, six shown and *Show all N*: each mark reached (`get_awards()` badges' `days`, one row per tier: *8 weeks
   held in a row*), each achievement with its line (a name in capitals reads as a name), each of Amir's lines (*From Amir*, his words in
   clay, *Reply on WhatsApp* under it: `coachWhatsAppUrl()` with the line quoted; WhatsApp only, no reply box), and each honour (*Most

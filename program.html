@@ -14540,15 +14540,24 @@ function csAchRowHTML() {
 // a goal they have to do. not their cycle outcome"). It sat in the middle of the card above, between the four numbers and the
 // doors, where it read as one more statistic. It is a job he set: his label in clay (DS-01 — it asks for something), his line in
 // ink, and a ring that fills green when he ticks it off in Courtside. One line, at most 140 characters, from career_goals.
+// A goal ticked after its month (Amir ticks at the end of a CYCLE, which is not the end of a month; 2026-11-21: "when its ticked,
+// it will be for end of the cycle, how they can see they have done it?") stays on the card for 7 days from the tick, above this
+// month's own goal, so the tick is seen. After that it lives on in Your moments (momentsList(), kind 'goal').
+const GOAL_LATE_DAYS = 7;
+function goalLateDone() {
+  const my = MOM_T && MOM_T.my, cur = my && my.goal && my.goal.month, now = Date.now();
+  return ((my && my.goals) || []).filter(g => g && g.line && g.done_at && g.month !== cur
+      && now - new Date(g.done_at).getTime() < GOAL_LATE_DAYS * 864e5)
+    .sort((a, b) => String(b.month).localeCompare(String(a.month)))[0] || null;
+}
 function goalCardHTML() {
-  const g = MOM_T && MOM_T.my && MOM_T.my.goal;
-  if (!g || !g.line) return '';
-  const mon = momMonth(g.month, true);
-  return `<div class="goal-card${g.done_at ? ' is-done' : ''}">
+  const cur = MOM_T && MOM_T.my && MOM_T.my.goal;
+  const card = g => `<div class="goal-card${g.done_at ? ' is-done' : ''}">
     <span class="goal-ring" aria-hidden="true"></span>
-    <span class="goal-b"><span class="goal-k">${esc(mon)} · ${g.done_at ? 'done' : 'from Amir'}</span><span class="goal-l">${esc(g.line)}</span>`
-    + (g.done_at && !window.IS_PREVIEW ? '<button type="button" class="mo-share" onclick="shareGoal()">Share</button>' : '')
+    <span class="goal-b"><span class="goal-k">${esc(momMonth(g.month, true))} · ${g.done_at ? 'done' : 'from Amir'}</span><span class="goal-l">${esc(g.line)}</span>`
+    + (g.done_at && !window.IS_PREVIEW ? `<button type="button" class="mo-share" onclick="shareGoal('${esc(String(g.month).slice(0, 10))}')">Share</button>` : '')
     + `</span></div>`;
+  return [goalLateDone(), cur].filter(g => g && g.line).map(card).join('');
 }
 // "2026-09-01" → "September" (long) or "Sep".
 function momMonth(d, long) {
@@ -14605,6 +14614,13 @@ function momentsList() {
     const sort = nx ? nx.getFullYear() + '-' + String(nx.getMonth() + 1).padStart(2, '0') + '-01' : h.month;
     const hv = h.honour === 'sessions' && n > 0 ? { n } : h.honour === 'improved' && pct > 0 ? { pct, lift: v.lift ? String(v.lift) : '' } : {};
     out.push({ day: h.month, sort, kind: 'honour', w, s, honour: true, hKind: h.honour, hv });
+  });
+  // Every goal Amir ticked, on the day he ticked it (2026-11-21: the card shows a month's goal only during that month and 7 days after
+  // a late tick, so this is where a done goal lives on). The title names the goal's month; the day is the tick's.
+  ((my && my.goals) || []).forEach(g => {
+    if (!g || !g.line || !g.done_at || !g.month) return;
+    const day = ymdLocal(new Date(g.done_at));
+    out.push({ day, sort: day, kind: 'goal', w: momMonth(g.month, true) + ' goal, done', s: g.line, goalMonth: String(g.month).slice(0, 10) });
   });
   const saw = new Set(((my && my.saw) || []).filter(x => typeof x === 'string'));
   out.forEach(x => { x.saw = !!(x.award_id && saw.has(x.award_id)); });
@@ -27774,6 +27790,7 @@ function hlMomentSpec(x) {
   const first = hlFirst();
   if (x.kind === 'mark' && x.markKey && x.markN > 0) return { kind: 'mark', key: x.markKey, n: x.markN, next: x.markNext || 0, date: x.day, first };
   if (x.kind === 'achievement') return { kind: 'achievement', name: x.w, caption: x.s || '', meaning: x.meaning || '', date: x.day, first, emblem: x.aid ? { k: 'ach', id: x.aid } : undefined };
+  if (x.kind === 'goal' && x.goalMonth) return hlGoalSpec(x.goalMonth);
   if (x.kind === 'honour' && x.hKind) return Object.assign({ kind: 'honour', honour: x.hKind, monthIso: x.day, date: x.sort, first }, x.hv || {});
   return null;
 }
@@ -27801,12 +27818,14 @@ function hlPlayerSpec() {
 function sharePlayerCard() { const s = hlPlayerSpec(); if (s) openShareSheet([s], 0); }
 window.sharePlayerCard = sharePlayerCard;
 // The month's goal, ticked (L10): Amir's own line, in his words, with DONE on it.
-function hlGoalSpec() {
-  const g = MOM_T && MOM_T.my && MOM_T.my.goal;
+// Any month's goal, not only this month's (2026-11-21: a goal ticked at the end of a cycle is often last month's).
+function hlGoalSpec(month) {
+  const my = MOM_T && MOM_T.my, m = month ? String(month).slice(0, 10) : '';
+  const g = !m ? my && my.goal : ((my && my.goals) || []).concat(my && my.goal ? [my.goal] : []).find(x => x && String(x.month).slice(0, 10) === m);
   if (!g || !g.line || !g.done_at) return null;
-  return { kind: 'goal', first: hlFirst(), month: momMonth(g.month, true), text: g.line, date: String(g.done_at).slice(0, 10) };
+  return { kind: 'goal', first: hlFirst(), month: momMonth(g.month, true), text: g.line, date: ymdLocal(new Date(g.done_at)) };
 }
-function shareGoal() { const s = hlGoalSpec(); if (s) openShareSheet([s], 0); }
+function shareGoal(month) { const s = hlGoalSpec(month); if (s) openShareSheet([s], 0); }
 window.shareGoal = shareGoal;
 // A new level, offered on the finished card when the session took them up one.
 function shareLevel(lv) {

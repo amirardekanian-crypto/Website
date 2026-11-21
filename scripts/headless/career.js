@@ -621,6 +621,25 @@ async function trainingLight(browser, C) {
       return g ? { cls: g.className, l: g.querySelector('.goal-k').textContent.replace(/\s+/g, ' ').trim(), ring: r && getComputedStyle(r).backgroundColor } : null; });
     C.check('a goal Amir ticked off: "<Month> · done" and the ring filled green', !!dg && /is-done/.test(dg.cls) && dg.l === monthName(monthStart(0)) + ' · done' && /rgb\(14, 74, 54\)/.test(dg.ring || ''), JSON.stringify(dg));
     await d.ctx.close();
+    // 2026-11-21: Amir ticks at the end of a CYCLE, often in the next month. Last month's goal ticked 2 days ago shows above this month's,
+    // done, for 7 days from the tick; one ticked 9 days ago does not. Every ticked goal is a moment on its tick's day, and can be shared.
+    const late = new Date(Date.now() - 2 * 864e5).toISOString(), old = new Date(Date.now() - 40 * 864e5).toISOString();
+    const lt = await openRW(browser, { stub: { myMoments: myMomentsFx({ goals: [
+      { month: monthStart(0), line: 'Four sessions a week, no gaps.', done_at: null },
+      { month: monthStart(-1), line: 'RPE on every main lift.', done_at: late },
+      { month: monthStart(-2), line: 'Weigh in every Monday.', done_at: old }] }) } });
+    await waitRow(lt.p);
+    await goProgress(lt.p);
+    await momentsReady(lt.p);
+    const lg = await lt.p.evaluate(() => ({ cards: [...document.querySelectorAll('#goal-wrap .goal-card')].map(g => [g.querySelector('.goal-k').textContent.replace(/\s+/g, ' ').trim(), /is-done/.test(g.className), !!g.querySelector('.mo-share')]),
+      moments: momentsList().filter(x => x.kind === 'goal').map(x => [x.w, x.s, x.day, !!hlMomentSpec(x)]) }));
+    C.check('a goal ticked late (last month’s, 2 days ago): "<Last month> · done" with Share, above this month’s goal; a goal ticked 40 days ago is not on the card',
+      lg.cards.length === 2 && lg.cards[0][0] === monthName(monthStart(-1)) + ' · done' && lg.cards[0][1] && lg.cards[0][2] && lg.cards[1][0] === monthName(monthStart(0)) + ' · from Amir' && !lg.cards[1][1], JSON.stringify(lg.cards));
+    C.check('every ticked goal is a moment: "<Month> goal, done", Amir’s line, the tick’s day, shareable; an unticked goal is not',
+      lg.moments.length === 2 && lg.moments.some(m => m[0] === monthName(monthStart(-1)) + ' goal, done' && m[1] === 'RPE on every main lift.' && m[3])
+      && lg.moments.some(m => m[0] === monthName(monthStart(-2)) + ' goal, done') && !lg.moments.some(m => /Four sessions/.test(m[1])), JSON.stringify(lg.moments));
+    C.check('a late goal: no page errors', lt.p.errs.length === 0, JSON.stringify(lt.p.errs));
+    await lt.ctx.close();
     const n0 = await openRW(browser, { stub: { myMoments: myMomentsFx({ goal: null, notes: [], honours: [], saw: [] }) } });
     await waitRow(n0.p);
     await goProgress(n0.p);

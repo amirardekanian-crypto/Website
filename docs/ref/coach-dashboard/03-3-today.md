@@ -65,6 +65,12 @@ changes `reasonsOf()`, the *N people* count, a tab badge or the strip's counters
   Write one*, or the goal with **✓ Mark done** (then *✓ Done 24 Oct* and Undo) and Edit. Enter saves, Escape cancels, an empty Save clears a goal that is
   not ticked. **From Amir…** opens one line (90 characters) kept for their app, one a day; *Take back* while unread. Athletes see the goal and the line
   from step 3 (the light screens), not before: until then they reach them on WhatsApp.
+  **Last month's goal, the 1st to the 7th** (2026-11-21, Amir: *"when its ticked, it will be for end of the cycle, how they can see
+  they have done it?"*): a cycle's end often lands in the next month, so in a month's first 7 days the header shows last month's goal
+  on its own line above this month's, with its own **✓ Mark done** (then *✓ Done 3 Dec* and Undo), which ticks last month
+  (`goalDone(id, done, month)`, `lastMonthKey()`; the server has always taken last month). No Edit there. From the 8th it is gone.
+  The athlete's card shows a late tick for 7 days and Your moments keeps every ticked goal. `/cycle-report` suggests the next goal
+  and ticks the one met, on Amir's word. Test: `run.js courtside-goal-late`.
 - **Your time** (GAME-11): about five messages a week at 20 seconds each, two minutes on the 1st, a minute per goal.
 
 | Counter | What it counts |

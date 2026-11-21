@@ -258,6 +258,10 @@
       "{t1} · از طرف امیر"
     ],
     [
+      "(January|February|March|April|May|June|July|August|September|October|November|December) goal, done",
+      "هدف {t1}، انجام شد"
+    ],
+    [
       "Full month: (January|February|March|April|May|June|July|August|September|October|November|December)",
       "ماه کامل: {t1}"
     ],
