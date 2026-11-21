@@ -38,6 +38,7 @@
   :root {
     --paper: #FAF7F2; --card: #FFFFFF; --ink: #1A1A1A;
     --court: #0E4A36; --court-deep: #0B3B2B; --court-100: rgba(14,74,54,0.08);
+    --mint: #6DBE95;   /* a Library session on Five weeks (#124), the same mint the athlete app uses for it */
     --clay: #C7552F; --clay-100: rgba(199,85,47,0.10);
     /* The "warn" middle between court green (good) and clay (bad). It was ochre
        until 2026-09-26, retired with the rest of the gold: it is a muted plum now.
@@ -1393,6 +1394,24 @@
   /* Links (ported) */
   /* The Library (round 3 of the coach UX pass, 2026-10-12): one panel per kind, a fold per shelf with its count, and a compact row per item (about 44 px:
      title, kind and meta in muted text, then one Copy link and Hide / Publish). It was a card of 85 px with the whole address printed in mono, 64 times. */
+  /* Five weeks on The work (#124 The Mirror, 2026-11-21): the athlete's Progress grid. Green = a plan session (on plan), mint = a Library session,
+     split = both; an empty past day the track, a day to come an outline, today ringed. fiveWeeksPanelC(). */
+  .fwc-g { display: grid; grid-template-columns: 32px repeat(7, minmax(0, 28px)); gap: 5px; align-items: center; padding: 4px 0 2px; }
+  .fwc-dw, .fwc-wl { font-size: 12px; color: var(--muted); text-align: center; }
+  .fwc-wl { text-align: left; font-variant-numeric: tabular-nums; }
+  .fwc-wl.is-now { color: var(--ink); font-weight: 600; }
+  .fwc-c { display: grid; place-items: center; width: 100%; aspect-ratio: 1; border-radius: 8px; background: var(--track); color: #fff; font-size: 12px; font-weight: 600; }
+  .fwc-c.is-fut { background: none; box-shadow: inset 0 0 0 1px var(--line); }
+  .fwc-c.is-p { background: var(--court); }
+  .fwc-c.is-l { background: var(--mint); color: var(--court); }
+  .fwc-c.is-pl { background: linear-gradient(135deg, var(--court) 50%, var(--mint) 50%); }
+  .fwc-c.is-now { box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--ink); }
+  .fwc-c[title] { cursor: help; }
+  .fwc-k { margin: 10px 0 0; font-size: 12px; color: var(--muted); }
+  .fwc-sw { display: inline-block; width: 10px; height: 10px; margin: 0 4px 0 6px; border-radius: 999px; vertical-align: -1px; }
+  .fwc-sw:first-child { margin-left: 0; }
+  .fwc-sw.is-p { background: var(--court); }
+  .fwc-sw.is-l { background: var(--mint); }
   .lib-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px; }   /* the first panel's own top margin (--gap) is the space under it */
   .lib-count { font-size: 14px; color: var(--muted); }
   .lib-acts { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -1943,6 +1962,7 @@ const LOAD_ERR_LABEL = {
   affiliates: 'affiliate codes', chats: 'website chats', status: 'paused and former marks', library: 'the library', clogs: 'coaching logs', levels: 'Proof levels',
   court: 'Courtside, the goals and your lines', bell: 'the Bell (the crew\'s posts and answers)', bellReplies: 'the replies under the crew\'s posts', open: 'the Monthly Open',
   crewWeekly: 'the crew\'s week and Mailbag', faces: 'the crew\'s photos', cheers: 'the crew\'s cheers', partner: 'the athletes\' partner codes',
+  libDone: 'the Library sessions athletes marked done',
 };
 function paintLoadWarn() {
   const lw = $('loadwarn'), warn = loadWarnHtml();
@@ -2537,13 +2557,18 @@ async function loadLibrary() {
   S.lib = [];
   // The items are read in pages like every growing table (audit SERVER-10, 2026-10-11): one request stops at the server's row cap. All or nothing, as
   // the Spine: a short answer would show a half-empty shelf as if the rest were gone.
-  const [c, l] = await Promise.all([
+  // The sessions athletes marked done (#124 The Mirror, 2026-11-21: Amir, "how would i find out if some one did this?"): the
+  // Library tab's Done lately list and each workout's count. A failure is said in the banner, never drawn as nobody doing them.
+  const [c, l, dn] = await Promise.all([
     sb.from('library_categories').select('*').order('sort_order'),
     selectAll('library', 'slug, kind, category_id, published, updated_at, data, sort_order', ['sort_order', 'slug']),
+    selectAll('library_sessions', 'athlete_id, slug, completed_on, title, duration_min'),
   ]);
   if (!c.error) S.libCats = c.data || [];
   if (!l.error && !l.short) S.lib = l.data || [];
+  S.libDone = !dn.error && !dn.short ? (dn.data || []) : null;
   LOAD_ERR.library = c.error ? c.error.message : l.error ? l.error.message : l.short ? `only ${l.data.length} of ${l.total} library items came back` : '';
+  LOAD_ERR.libDone = dn.error ? dn.error.message : dn.short ? `only ${dn.data.length} of ${dn.total} came back` : '';
 }
 
 // Open an athlete's own app in a new tab, read-only.
@@ -5768,6 +5793,7 @@ function workTabHtml(D) {
       <button class="btn sm" onclick="retryLogs()">↻ Try again</button><span class="lw-why">${esc(D.logsErr)}</span></div>` : '';
   return `${logsWarn}
     ${metricStripHtml(metrics)}
+    ${fiveWeeksPanelC(D)}
     ${maxesPanel(D)}
     ${weightPanel(D.a)}
     ${cards.length ? cards.join('') : `<p class="empty">${D.a.tier === 'coached' || S.progSrc[athleteId] !== 'db'
@@ -5775,6 +5801,57 @@ function workTabHtml(D) {
         : 'No training programme: this is a habit-only (Proof) athlete. Their habits are under Proof.'}</p>`}
     ${earlierCyclesHtml(D, earlier)}
     ${live}`;
+}
+// ── Five weeks, the coach's copy (#124 The Mirror, round 11, 2026-11-21) ─────────────────────────────────────────────────────
+// The grid the athlete sees on Progress (program.html → Your weeks), from the same reader, get_five_weeks() (stage115; the coach
+// may read anyone's). The cycle's weeks as rows, a square per day: a plan session green, a Library session mint, both split;
+// hover a day for what was in it. Read once per athlete per store (S.stamp). A server without stage115, or a read that fails,
+// draws nothing: the day cards below are still the record.
+const _fwC = {};
+async function fiveWeeksC(id) {
+  if (DEMO) return null;
+  const hit = _fwC[id];
+  if (hit && hit.stamp === S.stamp) return hit;
+  let v;
+  try {
+    const r = await sb.rpc('get_five_weeks', { p_athlete_id: id });
+    v = { stamp: S.stamp, data: r && !r.error ? r.data : null, err: r && r.error ? r.error.message : '' };
+  } catch (e) { v = { stamp: S.stamp, data: null, err: String(e && e.message || e) }; }
+  _fwC[id] = v;
+  return v;
+}
+const FW_DOW_C = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+function fiveWeeksPanelC(D) {
+  const c = D.fw && D.fw.data;
+  if (!c || !Array.isArray(c.weeks)) return '';
+  const weeks = c.weeks.filter(w => w && /^\d{4}-\d{2}-\d{2}$/.test(String(w.from || '')));
+  if (!weeks.length) return '';
+  const byDay = {};
+  let nP = 0, nL = 0, mins = 0;
+  weeks.forEach(w => (Array.isArray(w.days) ? w.days : []).forEach(d => {
+    if (!d || !d.day) return;
+    (byDay[d.day] = byDay[d.day] || []).push(d);
+    if (d.k === 'library') nL++; else nP++;
+    if (Number(d.mins) > 0) mins += Number(d.mins);
+  }));
+  if (!nP && !nL) return '';
+  const today = todayKey();
+  const head = '<span></span>' + Array.from({ length: 7 }, (_, i) => `<span class="fwc-dw">${FW_DOW_C[pDate(addDays(weeks[0].from, i)).getDay()]}</span>`).join('');
+  const rows = weeks.map((w, wi) => `<span class="fwc-wl${w.now ? ' is-now' : ''}">W${Number(w.w) || wi + 1}</span>` + Array.from({ length: 7 }, (_, i) => {
+    const day = addDays(w.from, i);
+    if (w.to && day > String(w.to)) return '<span></span>';
+    const items = byDay[day] || [];
+    const hasP = items.some(x => x.k !== 'library'), hasL = items.some(x => x.k === 'library');
+    const cls = `fwc-c${hasP && hasL ? ' is-pl' : hasP ? ' is-p' : hasL ? ' is-l' : ''}${!items.length && day > today ? ' is-fut' : ''}${day === today ? ' is-now' : ''}`;
+    const said = items.length ? `${dayMonth(day)}: ` + items.map(x => (x.title || (x.k === 'library' ? 'Library session' : 'Plan session')) + (x.k === 'library' ? ' (Library)' : x.extra ? ' (extra)' : '') + (Number(x.mins) > 0 ? `, ${Math.round(Number(x.mins))} min` : '')).join(' · ') : '';
+    return items.length ? `<span class="${cls}" title="${esc(said)}" aria-label="${esc(said)}" role="img">${items.length > 1 ? items.length : ''}</span>` : `<span class="${cls}" aria-hidden="true"></span>`;
+  }).join('')).join('');
+  const hm = mins ? (Math.floor(mins / 60) ? `${Math.floor(mins / 60)}h ${Math.round(mins % 60)}m` : `${Math.round(mins)}m`) : '';
+  return `<section class="panel fwc">
+    <div class="phead"><span class="t hd">Five weeks</span><span class="r">${c.n ? 'Cycle ' + esc(String(c.n)) + ' · ' : ''}${nP} plan · ${nL} Library${hm ? ' · ' + hm : ''}</span></div>
+    <div class="fwc-g">${head}${rows}</div>
+    <p class="fwc-k"><span class="fwc-sw is-p"></span>Plan session <span class="fwc-sw is-l"></span>Library session · hover a day for what was in it</p>
+  </section>`;
 }
 // Sessions from before this cycle began, newest first, each with its log exactly as sent. Folded: the cycle on
 // screen is the one being coached; this is where last cycle's Day 1 went (workTabHtml()).
@@ -6014,8 +6091,8 @@ async function renderDetail(athleteId, sub) {
     }
     const lib = await exLib();
     // Their sessions' text and log (the boot read only the numbers). A failure is kept on the file and said on the
-    // work tab, never drawn as days nobody logged.
-    const full = await ensureSessionsFull(athleteId);
+    // work tab, never drawn as days nobody logged. Five weeks (#124) is read beside it, from the athlete's own reader.
+    const [full, fw] = await Promise.all([ensureSessionsFull(athleteId), fiveWeeksC(athleteId)]);
     const now = route();
     if (req !== _detailReq || now.view !== 'detail' || now.id !== athleteId) return;
     // The awaits above can span a reload of the store (assemble() builds new athlete objects): draw the current one.
@@ -6028,6 +6105,7 @@ async function renderDetail(athleteId, sub) {
       callLogs,
       lib,
       logsErr: full.ok ? '' : full.error,
+      fw,
       metrics: athleteMetrics(history, planDaysC(program).length, optionalDayIdsC(program)),
       stamp: S.stamp,
     };
@@ -8528,6 +8606,10 @@ async function renderLinks() {
     if (S.lib.length < LIB_OPEN_ALL) ['article', 'workout'].forEach(k => shelf(k).forEach(g => { if (g.items.some(l => l.published)) _libOpen.add('shelf:' + k + ':' + g.cat.id); }));
   }
   const openAttr = key => _libOpen && _libOpen.has(key) ? ' open' : '';
+  // Who did what (#124 The Mirror): every "Mark as done", grouped by session for the rows, newest first for Done lately.
+  const done = Array.isArray(S.libDone) ? S.libDone.slice().sort((a, b) => String(b.completed_on).localeCompare(String(a.completed_on))) : null;
+  const doneBy = {};
+  (done || []).forEach(x => { (doneBy[x.slug] = doneBy[x.slug] || []).push(x); });
   const row = (l) => {
     const d = l.data || {};
     const id = encodeURIComponent(d.id || '');
@@ -8535,8 +8617,11 @@ async function renderLinks() {
     const links = l.kind === 'article'
       ? [['App', app], ['Web FA', `${SITE}/fa/articles/${id}.html`], ['Web EN', `${SITE}/en/articles/${id}.html`]]
       : [['App', app]];
+    const did = l.kind === 'workout' ? (doneBy[l.slug] || []) : [];
+    const didTxt = did.length ? `done ${did.length} time${did.length === 1 ? '' : 's'} by ${new Set(did.map(x => x.athlete_id)).size} · last ${esc(prettyDate(String(did[0].completed_on)))}` : '';
     const meta = [l.kind === 'article' ? 'article' : 'workout',
       l.kind === 'article' ? `${esc(d.readMins || '?')} min read` : [d.duration, d.equipment].filter(Boolean).map(esc).join(' · '),
+      didTxt,
       l.updated_at ? 'updated ' + esc(prettyDate(String(l.updated_at).slice(0, 10))) : ''].filter(Boolean).join(' · ');
     const copy = links.length === 1
       ? `<button class="btn sm copy-btn-js" data-url="${esc(links[0][1])}" title="Copy ${esc(links[0][1])}">Copy link</button>`
@@ -8566,6 +8651,16 @@ async function renderLinks() {
       ${hidden.length ? `<details class="rawlog lib-hidden" data-lk="hidden:${kind}"${openAttr('hidden:' + kind)}><summary>Hidden · ${hidden.length}</summary>${hidden.map(row).join('')}</details>` : ''}
     </section>`;
   };
+  // Done lately: the last 30 days of Library sessions marked done, newest first, each athlete's name a link to their file.
+  const since = addDays(todayKey(), -30);
+  const recent = (done || []).filter(x => String(x.completed_on) >= since);
+  const doneLately = done == null ? '' : `<section class="panel gap-top"><div class="phead"><span class="t hd">Done lately</span>
+      <span class="r">${recent.length} in the last 30 days</span></div>
+    ${recent.length ? recent.slice(0, 40).map(x => `<div class="link-row"><div class="link-row-info">
+        <span class="link-row-title">${esc(x.title || x.slug)}</span>
+        <span class="link-row-meta"><a href="#a/${encodeURIComponent(x.athlete_id)}">${esc(nameOf(x.athlete_id))}</a> · ${esc(prettyDate(String(x.completed_on)))}${Number(x.duration_min) > 0 ? ' · ' + Math.round(Number(x.duration_min)) + ' min' : ''}</span>
+      </div></div>`).join('') : '<p class="empty">Nobody has marked a Library session done in the last 30 days.</p>'}
+    </section>`;
   const nAll = (S.lib || []).length, nHid = (S.lib || []).filter(l => !l.published).length;
   $('content').innerHTML = `<div class="lib-head">
       <span class="lib-count">${nAll} item${nAll === 1 ? '' : 's'}${nHid ? ` · ${nHid} hidden` : ''}</span>
@@ -8575,6 +8670,7 @@ async function renderLinks() {
       </span>
     </div>
     ${LOAD_ERR.library ? `<p class="empty t-clay">The library did not load: ${esc(LOAD_ERR.library)}</p>` : ''}
+    ${doneLately}
     ${section('article', 'Articles — the Playbook')}
     ${section('workout', 'Workouts — Sessions')}
     <details class="how" data-lk="how"${openAttr('how')}><summary>How this works</summary>

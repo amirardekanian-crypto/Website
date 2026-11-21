@@ -1,0 +1,26 @@
+{
+  "area": "Progress: Your weeks (#122 Five Weeks, 2026-11-21): the card, its foot and the day sheet. Formal (شما), as every new Farsi text since 2026-11-21 (docs/rules/farsi-app.md). Drafts until Amir has read them. The weekday heads are one letter each, as a Persian calendar heads its columns.",
+  "exact": {
+    "Your weeks": "هفته‌هاتون",
+    "Tap a day to see what you did.": "روی یه روز بزنید تا ببینید چی کار کردید.",
+    "plan session": "جلسهٔ برنامه",
+    "plan sessions": "جلسهٔ برنامه",
+    "Plan session": "جلسهٔ برنامه",
+    "Library session": "جلسهٔ کتابخانه",
+    "Library sessions": "جلسهٔ کتابخانه",
+    "trained": "تمرین",
+    "Sat": "ش",
+    "Sun": "ی",
+    "Mon": "د",
+    "Tue": "س",
+    "Wed": "چ",
+    "Thu": "پ",
+    "Fri": "ج"
+  },
+  "patterns": [
+    ["(.+) · Library · (\\d+) min", "{t1} · کتابخانه · {n2} دقیقه"],
+    ["(.+) · Library", "{t1} · کتابخانه"],
+    ["Plan session · (\\d+) min", "جلسهٔ برنامه · {n1} دقیقه"],
+    ["Library session · (\\d+) min", "جلسهٔ کتابخانه · {n1} دقیقه"]
+  ]
+}

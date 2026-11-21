@@ -585,7 +585,9 @@
 // v264: i18n.js (?v=8) changed (2026-11-21): a tempo (3-1-1-0) never breaks across lines in Farsi.
 // v265: i18n.js (?v=9) changed (2026-11-21, Amir): in a Farsi line the effort score is شدت, also where effortWord() turned a twin's RPE into Effort.
 // v266: i18n.js (?v=10) changed (2026-11-21, Amir: "put check in words in farsi"): a Farsi note naming the check-in's answers in English says the buttons' Farsi.
-const CACHE = 'aap-v266';
+// v267: program.html, coach.html and i18n-fa.js (?v=14) changed (2026-11-21, round 11 Five Weeks, Amir: "go with your picks"): Progress
+// gains Your weeks, the cycle's weeks as a grid of days (get_five_weeks(), stage115); Farsi words for it.
+const CACHE = 'aap-v267';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -626,7 +628,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=10',
-  '/assets/js/i18n-fa.js?v=13',
+  '/assets/js/i18n-fa.js?v=14',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).

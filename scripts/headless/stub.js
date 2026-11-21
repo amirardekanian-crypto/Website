@@ -54,6 +54,11 @@
     }
     if (name === 'get_progress') return res({ data: S.progress || null, error: null, status: 200 });
     if (name === 'get_library') return res({ data: S.library || null, error: null, status: 200 });
+    // Your weeks (#122, stage115, scripts/headless/five-weeks.js): get_five_weeks answers `fiveWeeks`; without it, a server without stage115.
+    if (name === 'get_five_weeks') {
+      if (S.fiveWeeks === undefined) return res({ data: null, error: { message: 'Could not find the function public.get_five_weeks(p_athlete_id) in the schema cache', code: 'PGRST202' }, status: 404 });
+      return res({ data: JSON.parse(JSON.stringify(S.fiveWeeks)), error: null, status: 200 });
+    }
     // Career Mode (phase 2): get_profile answers the stub's `profile` as given (none set: no answer, as an RPC the stub does not know).
     if (name === 'get_profile') return res({ data: S.profile ? JSON.parse(JSON.stringify(S.profile)) : null, error: null, status: 200 });
     // Career Mode phase 3, the shelf (stage70's split): get_awards(p_athlete_id) is the athlete's own rows, read only when the shelf opens. Like the server it

@@ -275,6 +275,17 @@ IDEAS = [
   coach="The crew sees the programme's results; the cards are a step towards share cards, which he treats as brand.",
   mvp="Direction A (Trophy Rows) for every kind, the record card with the lift only.",
   adv="The record's gain as a percent (a server change), with Amir's word on the never-a-weight rule."),
+ dict(n=125, name="Load Read", sub="The court hours a player logs reach the design run and the cycle report", layer="Grown along the way", grown="123",
+  grown_url="https://claude.ai/artifact/7yRMTQJAmuJjkLmwZ7PQo2",
+  stages=["Monitoring","Programming","Review"], needs=[], cost="None. The skills read it; no screen and no coach time.",
+  chain=["Court Log (tennis, padel, match minutes)","activity_log","Athlete brief","Design decisions","Cycle report"],
+  what="Round 11's Court Log (#123) feeds the pipeline: /program-design reads court hours per week as context, and /cycle-report says \"you played 14 hours this cycle, 4 of them in week 3\". Grew out of #123 while answering where an activity tracker should live.",
+  problem="A design run picks volume without knowing the player's court load, which for a tennis or padel player is the biggest load of the week.",
+  how="One query added to the athlete brief and to /cycle-report's read: minutes by week and kind from activity_log, beside the plan sessions.",
+  athlete="The programme bends around their tennis.",
+  coach="Better decisions from data he did not have to ask for on WhatsApp.",
+  mvp="One line in /cycle-report: court hours this cycle, by week.",
+  adv="Court minutes times effort in coach.html's load ratio, beside gym sessions."),
 ]
 
 STAGES = ["Assessment","Decision making","Exercise selection","Programming","Execution","Feedback",
@@ -302,6 +313,7 @@ STATUS = {
  91: ("Picked 25 Oct, builds with the weekly crew", "https://claude.ai/artifact/Ap56d6pvqEfExFYsFN7P1T"),
  120: ("Built and live 20 Nov", "https://claude.ai/artifact/8kYKCuynCHXZFhhgBKoQkL"),
  121: ("Built and live 20 Nov", "https://claude.ai/artifact/7bydrN3KFDsDhEtZuyGv4w"),
+ 125: ("Picked 21 Nov, builds after Court Log", "https://claude.ai/artifact/7yRMTQJAmuJjkLmwZ7PQo2"),
 }
 
 def chips(i):

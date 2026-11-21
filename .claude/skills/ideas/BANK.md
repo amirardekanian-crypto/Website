@@ -192,7 +192,7 @@ Page (six versions, every direction kept): https://claude.ai/artifact/AriVWJQskS
 | Courtside first | Amir's recognition before any athlete feature | **picked** 2026-10-20 (L11); direction A picked 2026-10-19, **built and live** (stage75, 2026-10-19) |
 | Test week is challenge week | The plan's retest week opens the matching challenge | pitched |
 | The lesson arrives when it matters | The 24 lessons matched to plan moments | pitched |
-| The Road Remembers | Each finished cycle on Progress wears what it earned | pitched (grown idea) |
+| The Road Remembers | Each finished cycle on Progress wears what it earned | **picked** 2026-11-21 (grown idea) |
 | One Week Short | In a month's last week Courtside names whoever can still make Full Month by holding this week, the WhatsApp line written (nobody has a Full Month yet; three athletes were one week short in September) | pitched 2026-10-19 (grown idea, Courtside design page https://claude.ai/artifact/L3Tt3B6YPqMWcVgnN7nt9g) |
 | Gym photos, weekly missions, the full quest system | — | **parked** 2026-10-20: "later, only if the numbers say so"; photos came back 2026-10-19 for Crew's short-lived messages (CAREER_MODE.md → round 5) |
 | The Next Mark on the finish card | The finish card names the mark the session moves you closest to ("3 sessions to 50 with Amir") | grown idea on *Your Numbers*; **built** 2026-10-19 with step 3 (the finish card's lines are the four marks) |
@@ -539,6 +539,27 @@ emblems, the record card's three options and four calls: https://claude.ai/artif
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
 | 121 | Moment Cards | #115 Trophy Lines grown into a family: every Bell moment (level, best, held weeks, achievement, mark, cycle, joined) as a card with its badge (the level medal, the achievement's emblem, the mark's emblem, a NEW BEST or CYCLE disc, the new member's face), one big fact with a clay change, who and the detail, the heart (Say hello on a join). The record's number is Amir's call: the lift only, the gain as a percent (pick, a server change), or the weight (changes the never-a-weight rule) | 112, 115 | **built** 2026-11-20, direction A Trophy Rows ("go with your picks"): the gain as a percent (stage112), a card for every level, the face with NEW and Say hello on a join |
+
+## Round 11 · 2026-11-21 · "Five Weeks" (an activity tracker in program.html)
+
+Page: https://claude.ai/artifact/7yRMTQJAmuJjkLmwZ7PQo2
+
+Brief: while building a coach view of Library sessions (First Light, the morning back snack, had just shipped), Amir asked for *"a activity
+tracker for people so they can see what kind of activity they had over the past month or 5 weeks"*: where, what, how, part of the Crew?
+Live numbers: 178 plan sessions from 22 athletes in 35 days; 5 Library sessions ever, from 2 athletes; no screen shows a Library session
+to the athlete or to coach.html, although the Done note says "Your coach can see you did it"; court time is not logged anywhere. Found:
+`crew_page()` already keeps Library titles off other people's pages ("a Library session or a rehab day's name can hint at pain"), so kinds
+stay private; the Cycle Bars (#58) already show extras as dots. Answers: Progress (direction A of three), four kinds, fills itself plus one
+Add activity, not the Crew (counts only; a court session told by choice).
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 122 | Five Weeks | A 5-week grid (the cycle's W1-W5) first on Progress: a square per day coloured by kind (plan, Library by shelf, court, other), minutes per kind, tap a day for its list; MVP from session_history + library_sessions, no new table | — | **built** 2026-11-21 (stage115, sw aap-v261; PROGRAM-APP.md → *Your weeks*) |
+| 123 | Court Log | "+ Add activity": Tennis, Padel, Match, Run, Other, minutes, Easy/Normal/Hard, today or the last 3 days; one `activity_log` table (backup + erase lists the same day); no XP at first | 122 | **picked** 2026-11-21 ("Go with your picks") |
+| 124 | The Mirror | The same grid on each athlete page in coach.html, and Library → Done lately with a count per session (what made "Your coach can see you did it" true) | 122 | **built** 2026-11-21 (stage115, sw aap-v261; PROGRAM-APP.md → *Your weeks*) |
+| 125 | Load Read | Court Log feeds /program-design (court hours as context) and /cycle-report ("14 hours this cycle"), later court minutes × effort in the load ratio | 123 | pitched (grown idea) |
+
+Cut on the page (so they are not re-pitched): steps and phone health data, calories, a streak of active days, a public minutes leaderboard.
 
 ## Grown out of deep-dives
 

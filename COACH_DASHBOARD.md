@@ -41,6 +41,19 @@ like an empty list or a success.
 
 ---
 
+## Five weeks and Done lately (2026-11-21, #124 The Mirror)
+
+Amir: *"how would i find out if some one did this?"* (a Library session marked done), then round 11's *"Go with your picks"*. The athlete's
+**Your weeks** grid (`docs/ref/program-app/62-your-weeks.md`) has its coach copy here.
+
+| Where | What it shows | Source |
+|---|---|---|
+| The work, under the metric strip | **Five weeks**: the athlete's current cycle as rows of days, a plan session green, a Library session mint, both split; hover a day for its sessions and minutes. Nothing when nothing is done yet or the server has no stage115. Read once per athlete per store. | `get_five_weeks(p_athlete_id)` (stage115), `fiveWeeksC()`, `fiveWeeksPanelC()` |
+| Library, above the shelves | **Done lately**: every Library session marked done in the last 30 days, newest first, the name a link to the file. | `library_sessions` (`S.libDone`, read with the library) |
+| Library, each workout row | *done N times by M · last <date>*. | the same |
+
+A failed read of `library_sessions` is named in the load banner (*the Library sessions athletes marked done*), never drawn as nobody doing them.
+
 ## The month's honours wait for Amir (2026-10-25)
 
 Built with stage104 (`career/PROCEDURES.md` → *Stage 104*; **not applied yet**, and the page does nothing new until it is). Amir: *"im gonna choose other honours at the end of the month, there should be reminder in coach.html for me tho. to pick most sessions most improved an full month or my pick"*; board: https://claude.ai/artifact/9JYRa93PVAYZSH4pRw2rhs.

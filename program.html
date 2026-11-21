@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=10" data-fa="/assets/js/i18n-fa.js?v=13"></script>
+<script src="/assets/js/i18n.js?v=10" data-fa="/assets/js/i18n-fa.js?v=14"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -5015,6 +5015,32 @@
   #screen-plan .tr-f { display: flex; justify-content: space-between; gap: 10px; font: 400 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: .6px; color: var(--ring); }
   #screen-plan .tr-now { color: var(--ink); font-weight: 700; }
 
+  /* ── YOUR WEEKS (#122 Five Weeks, 2026-11-21): the cycle's weeks as rows, a square per day. Progress is single-accent, so the kinds
+     are two greens: a plan session in --fill, a Library session in --mint, a day with both split corner to corner. An empty past day
+     is the ghost, a day still to come only an outline, today ringed. A day with something in it is a button. paintFiveWeeks(). */
+  #screen-plan .fw-card { margin: 0 var(--g) 12px; padding: 12px 14px 12px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); }
+  #screen-plan .fw-h { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
+  #screen-plan .fw-g { display: grid; grid-template-columns: 26px repeat(7, minmax(0, 1fr)); gap: 5px; align-items: center; }
+  #screen-plan .fw-dw, #screen-plan .fw-wl { font: 400 var(--fs-label)/1 'Space Mono', monospace; color: var(--ring); text-align: center; }
+  #screen-plan .fw-wl { text-align: left; }
+  #screen-plan .fw-wl.is-now { color: var(--ink); font-weight: 700; }
+  #screen-plan .fw-c { position: relative; display: grid; place-items: center; width: 100%; max-width: 40px; aspect-ratio: 1; justify-self: center; margin: 0; padding: 0;
+    border: 0; border-radius: 6px; background: var(--ghost); color: #fff; font: 700 var(--fs-label)/1 'Space Mono', monospace; }
+  #screen-plan .fw-c.is-fut { background: none; box-shadow: inset 0 0 0 1px var(--hair); }
+  #screen-plan .fw-c.is-p { background: var(--fill); }
+  #screen-plan .fw-c.is-l { background: var(--mint); color: var(--fill); }
+  #screen-plan .fw-c.is-pl { background: linear-gradient(135deg, var(--fill) 50%, var(--mint) 50%); }
+  #screen-plan .fw-c.is-now { box-shadow: 0 0 0 2px var(--row), 0 0 0 4px var(--ink); }
+  #screen-plan button.fw-c { cursor: pointer; }
+  #screen-plan button.fw-c:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 3px; }
+  #screen-plan .fw-f { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--hair);
+    font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  #screen-plan .fw-f b { font: 700 var(--fs-field)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
+  #screen-plan .fw-k { display: inline-block; width: 10px; height: 10px; margin-right: 5px; border-radius: 3px; vertical-align: -1px; }
+  #screen-plan .fw-k.is-p { background: var(--fill); }
+  #screen-plan .fw-k.is-l { background: var(--mint); }
+  #screen-plan .fw-tip { margin-top: 8px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+
   /* ── YOUR BODY (2026-10-20): Personal records, Body weight and the habits are three rows of ONE card, not three doors. They
      are one subject — what the body is doing — and three cards for it was the audit's "three box grids on one screen". */
   #screen-plan .body-card { margin: 0 var(--g) 12px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); overflow: hidden; }
@@ -6777,6 +6803,13 @@
        that first session it is the cover, this line, what they CAN fill in (body weight, the habits) and the plan. paintDayOne(). -->
   <div id="dayone-wrap"></div>
 
+  <!-- Your weeks (#122 Five Weeks, round 11, 2026-11-21; Amir: "an activity tracker for people so they can see what kind of activity
+       they had over the past month or 5 weeks", then "go with your picks"). The cycle's weeks as rows, a square per day: a plan session
+       in green, a Library session in mint, both split. A tap on a day lists what was in it. From get_five_weeks() (stage115), the same
+       weeks as the Player Page's bars. Private: never on the crew's screens. paintFiveWeeks(). -->
+  <h2 class="prog-sec" id="fw-title" hidden>Your weeks</h2>
+  <div id="fw-wrap"></div>
+
   <h2 class="prog-sec" id="numbers-title">Your numbers</h2>
   <div id="career-card-wrap"></div>
   <!-- Getting stronger (2026-10-20): the one thing this tab could not show — a line going up. The best lift's estimate over the
@@ -7607,6 +7640,8 @@ function _snapshot() {
     if (k && k.indexOf(prefix + 'hlwin_d') === 0) continue;
     // Hold Serve's copy of the server's held weeks (Career Mode): a cache of the server's facts, never progress.
     if (k === prefix + 'holdcache') continue;
+    // Your weeks (#122): a cache of get_five_weeks(), the server's own facts, never progress.
+    if (k === prefix + 'fwcache') continue;
     // When a day was last touched (markTouched(), 2026-11-02): this phone's clock for its own reminder and rescue, never progress.
     if (k && k.indexOf(prefix + 'lastact_d') === 0) continue;
     // The career's profile (Career Mode phase 2): a cache of get_profile(); and what a finished day earned, this phone's view of it.
@@ -18656,6 +18691,120 @@ function paintTrend() {
 }
 window.paintTrend = paintTrend;
 
+// ── YOUR WEEKS — #122 Five Weeks (round 11, 2026-11-21) ─────────────────────────────────────────────────────────────────────
+// Amir: "my aim is to have a activity tracker for people so they can see what kind of activity they had over the past month or 5
+// weeks", then "go with your picks". The cycle's weeks as rows (the weeks of career_weeks(), the same as the Player Page's bars), a
+// square per day coloured by what was done: a plan session, a Library session, or both. A tap on a day lists it. The source is
+// get_five_weeks() (stage115), which only the athlete and the coach can read; nothing here reaches the crew (a Library title can
+// hint at pain). The phone keeps a copy (<id>_fwcache, never synced) so the card still shows offline. Court and other activity
+// (#123 Court Log) will be a third kind here.
+let FW = null;
+const FW_SHELF = { strength: 'Strength', conditioning: 'Conditioning', 'on-court': 'On-Court', mobility: 'Mobility', recovery: 'Recovery', breath: 'Breath', care: 'Care' };
+function fwKey() { return ATHLETE_ID + '_fwcache'; }
+function fwOk(c) { return !!c && Array.isArray(c.weeks) && c.weeks.some(w => w && /^\d{4}-\d{2}-\d{2}$/.test(String(w.from || ''))); }
+// The phone's copy, read once when nothing better is in hand (an offline boot never reaches loadHistory()).
+function fwFromCache() {
+  if (FW != null || !ATHLETE_ID || window.IS_DEMO || window.IS_PREVIEW) return;
+  try { const c = JSON.parse(localStorage.getItem(fwKey()) || 'null'); if (fwOk(c)) FW = c; } catch (e) { /* no copy yet */ }
+}
+async function loadFiveWeeks() {
+  if (!ATHLETE_ID || window.IS_DEMO || window.IS_PREVIEW) return;
+  if (FW == null) { fwFromCache(); if (FW) paintFiveWeeks(); }
+  try {
+    const sb = await _sbReady();
+    if (!sb) return;
+    const res = await _withTimeout(sb.rpc('get_five_weeks', { p_athlete_id: ATHLETE_ID }), 8000);
+    if (!res || res.error) return;   // offline, or a server without stage115: the copy (or nothing) stays
+    FW = fwOk(res.data) ? res.data : null;
+    try { if (FW) _lsRawSet(fwKey(), JSON.stringify(FW)); else localStorage.removeItem(fwKey()); } catch (e) { /* storage full: shown this visit */ }
+    paintFiveWeeks();
+  } catch (e) { /* the copy above stays */ }
+}
+window.loadFiveWeeks = loadFiveWeeks;
+// 'YYYY-MM-DD' plus n days, by the calendar (a UTC date, so a clock change never moves a day)
+function fwAdd(iso, n) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || ''));
+  if (!m) return '';
+  const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3] + n));
+  return d.toISOString().slice(0, 10);
+}
+function fwMins(n) { n = Math.round(Number(n) || 0); const h = Math.floor(n / 60), m = n % 60; return h ? (m ? `${h}h ${m}m` : `${h}h`) : `${m}m`; }
+function fiveWeeksHTML() {
+  fwFromCache();
+  const c = FW;
+  if (!fwOk(c)) return '';
+  const weeks = c.weeks.filter(w => w && /^\d{4}-\d{2}-\d{2}$/.test(String(w.from || '')));
+  const today = ymdLocal(new Date());
+  const byDay = {};
+  let nP = 0, nL = 0, mins = 0;
+  weeks.forEach(w => (Array.isArray(w.days) ? w.days : []).forEach(d => {
+    if (!d || !d.day) return;
+    (byDay[d.day] = byDay[d.day] || []).push(d);
+    if (d.k === 'library') nL++; else nP++;
+    if (Number(d.mins) > 0) mins += Number(d.mins);
+  }));
+  if (!nP && !nL) return '';   // nothing done yet this cycle: Day one and the plan say it better than an empty grid
+  const first = weeks[0].from;
+  const dow = Array.from({ length: 7 }, (_, i) => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(fwAdd(first, i));
+    return PL_DOW[new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])).getUTCDay()];
+  });
+  const head = `<span></span>` + dow.map(d => `<span class="fw-dw">${d}</span>`).join('');
+  const rows = weeks.map((w, wi) => {
+    const now = !!w.now;
+    const cells = Array.from({ length: 7 }, (_, i) => {
+      const day = fwAdd(w.from, i);
+      if (w.to && day > String(w.to)) return '<span></span>';
+      const items = byDay[day] || [];
+      const hasP = items.some(x => x.k !== 'library'), hasL = items.some(x => x.k === 'library');
+      const cls = `fw-c${hasP && hasL ? ' is-pl' : hasP ? ' is-p' : hasL ? ' is-l' : ''}${!items.length && day > today ? ' is-fut' : ''}${day === today ? ' is-now' : ''}`;
+      if (!items.length) return `<span class="${cls}" aria-hidden="true"></span>`;
+      const said = plDay(day) + ': ' + items.map(x => x.title || (x.k === 'library' ? 'Library session' : 'Plan session')).join(', ');
+      return `<button type="button" class="${cls}" onclick="openFiveWeeksDay('${day}')" aria-label="${esc(said)}">${items.length > 1 ? items.length : ''}</button>`;
+    }).join('');
+    return `<span class="fw-wl${now ? ' is-now' : ''}">W${Number(w.w) || wi + 1}</span>${cells}`;
+  }).join('');
+  const foot = [
+    nP ? `<span><i class="fw-k is-p"></i><b>${nP}</b> <span>${nP === 1 ? 'plan session' : 'plan sessions'}</span></span>` : '',
+    nL ? `<span><i class="fw-k is-l"></i><b>${nL}</b> <span>${nL === 1 ? 'Library session' : 'Library sessions'}</span></span>` : '',
+    mins ? `<span><b>${fwMins(mins)}</b> <span>trained</span></span>` : ''
+  ].filter(Boolean).join('');
+  return `<div class="fw-card">
+    <div class="fw-h"><span>${c.n ? 'Cycle ' + esc(String(c.n)) : ''}</span><span>${weeks.length} ${weeks.length === 1 ? 'week' : 'weeks'}</span></div>
+    <div class="fw-g">${head}${rows}</div>
+    <div class="fw-f">${foot}</div>
+    <p class="fw-tip">Tap a day to see what you did.</p>
+  </div>`;
+}
+function paintFiveWeeks() {
+  const wrap = document.getElementById('fw-wrap'), head = document.getElementById('fw-title');
+  if (!wrap) return;
+  let h = '';
+  try { h = fiveWeeksHTML(); } catch (e) { h = ''; }
+  if (wrap.innerHTML !== h) wrap.innerHTML = h;
+  if (head) head.hidden = !h;
+}
+window.paintFiveWeeks = paintFiveWeeks;
+// One day's list, in the sheet the Player Page's weeks use (#hist-overlay).
+function openFiveWeeksDay(day) {
+  const ov = document.getElementById('hist-overlay');
+  if (!ov || !fwOk(FW)) return;
+  const items = [];
+  FW.weeks.forEach(w => (Array.isArray(w && w.days) ? w.days : []).forEach(d => { if (d && d.day === day) items.push(d); }));
+  if (!items.length) return;
+  const row = d => {
+    const lib = d.k === 'library';
+    const q = [lib ? (FW_SHELF[d.shelf] ? FW_SHELF[d.shelf] + ' · Library' : 'Library session') : 'Plan session', Number(d.mins) > 0 ? Math.round(Number(d.mins)) + ' min' : ''].filter(Boolean).join(' · ');
+    return `<div class="pl-row"><div><span class="t" dir="auto">${esc(d.title || (lib ? 'Library session' : 'Plan session'))}</span><span class="q">${esc(q)}</span></div>${d.extra ? '<span class="pl-xt">Extra</span>' : '<span></span>'}</div>`;
+  };
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">Your weeks</div>
+    <h2 class="readiness-title">${esc(plDay(day))}</h2>
+    <div class="pl-list">${items.map(row).join('')}</div>`;
+  ov.classList.add('visible');
+}
+window.openFiveWeeksDay = openFiveWeeksDay;
+
 function ceilingCardHtml() {
   const lifts = ceilingLifts();
 
@@ -18703,7 +18852,7 @@ function paintWeightRow() {
   const hw = document.getElementById('weight-row-wrap');
   if (hw) hw.innerHTML = weightCardHtml();
 }
-function paintNumbers() { paintCareerCard(); paintCeilingRow(); paintWeightRow(); paintTrend(); paintDayOne(); }
+function paintNumbers() { paintCareerCard(); paintCeilingRow(); paintWeightRow(); paintTrend(); paintFiveWeeks(); paintDayOne(); }
 // Day one, before the first finished session (2026-10-20): the numbers card, the trend, Personal records and the two career
 // doors are every zero in the app at once, so they wait. Body weight and the habits stay — they are the two things an athlete
 // CAN fill in before they train — and so does the plan, which is what they are here for.
@@ -20423,6 +20572,7 @@ async function markLibraryDone() {
     localStorage.setItem(_wsDoneKey(_wsCurrent.id),
       JSON.stringify({ date: new Date().toDateString() }));
     habTickOn(_wsCurrent.countsAs);   // the habit it counts as, when they track it (Today's card)
+    loadFiveWeeks();                  // Your weeks (#122): the Library square for today
     if (navigator.vibrate) navigator.vibrate([15, 40, 15]);
     renderLibraryDone();
   } catch (e) {
@@ -26131,6 +26281,7 @@ async function loadHistory() {
   if (window.IS_DEMO) {
     HIST = histFromRows(demoHistory()); buildHistAlias(); paintAllLastTime(); fillRecordsFrom(HIST); return;
   }
+  loadFiveWeeks();   // Your weeks (#122) reads the same sessions from the server's facts, so it refreshes whenever the history does
   try {
     const cached = JSON.parse(localStorage.getItem(histKey()) || 'null');
     if (Array.isArray(cached)) { HIST = histFromRows(cached); buildHistAlias(); paintAllLastTime(); fillRecordsFrom(HIST); paintWeek(); }

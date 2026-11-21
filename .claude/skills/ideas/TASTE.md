@@ -5,6 +5,13 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-11-21 · Round 11 'Five Weeks': "Go with your picks".** He asked for *"a activity tracker for people so they can see what kind of
+  activity they had over the past month or 5 weeks"* and whether it belongs to the Crew; took every pick in one line: the grid first on Progress
+  (A), the cycle's weeks, Five Weeks and The Mirror before Court Log, private with counts only for the crew, no XP for logged court time. What it
+  teaches (inferred): he started from a coach question ("how would i find out if someone did this?") and turned it into an athlete feature, so a
+  coach-visibility gap is worth pitching from the athlete side too; the privacy finding from his own server code settled the Crew question
+  without a debate.
+
 - **2026-11-20 · Moment cards: "Go with your picks".** All four calls taken at once: direction A (his own picture for every kind), the record's gain
   as a percent instead of the kg his picture showed, a card for every level, a join shown as the new member's face with NEW and Say hello. What it
   teaches (inferred): offered a privacy-safe number with the same punch, he took it over the weight; when a rule collides with a picture he likes,
