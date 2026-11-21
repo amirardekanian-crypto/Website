@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=11" data-fa="/assets/js/i18n-fa.js?v=16"></script>
+<script src="/assets/js/i18n.js?v=11" data-fa="/assets/js/i18n-fa.js?v=17"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -18760,7 +18760,16 @@ function fwMins(n) { n = Math.round(Number(n) || 0); const h = Math.floor(n / 60
 // tennis, padel, a match) and anything else the athlete logged (a run, other). Their one-letter class is the square's colour.
 const FW_KINDS = { plan: 'p', library: 'l', court: 'c', other: 'o' };
 const FW_KIND_ORDER = ['plan', 'library', 'court', 'other'];
-const ACT_KINDS = [['tennis', 'Tennis'], ['padel', 'Padel'], ['match', 'Match'], ['run', 'Run'], ['other', 'Other']];
+const ACT_KINDS = [['tennis', 'Tennis'], ['padel', 'Padel'], ['match', 'Match'], ['run', 'Running'], ['other', 'Other']];   // 'Running', not 'Run': in Farsi 'Run' is the order بدو
+const ACT_LABEL = Object.fromEntries(ACT_KINDS);
+// A day's title on the phone: a logged activity says the app's own word for its kind; a plan day its Farsi twin on a Farsi phone (stage117,
+// when the programme day has one: day names stay English like cycle names, COM-1); otherwise the server's title.
+function fwTitle(d) {
+  if (!d) return '';
+  if ((d.k === 'court' || d.k === 'other') && ACT_LABEL[d.kind]) return ACT_LABEL[d.kind];
+  if (window.AAI18N && AAI18N.fa && typeof d.title_fa === 'string' && d.title_fa.trim()) return d.title_fa;
+  return d.title || '';
+}
 const ACT_EFFORT = [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']];
 function fwKindOf(d) { return FW_KINDS[d && d.k] ? d.k : 'plan'; }
 function fiveWeeksHTML() {
@@ -18798,7 +18807,7 @@ function fiveWeeksHTML() {
         : (kinds[0] === 'plan' && kinds[1] === 'library') ? ' is-pl' : ` is-mix fa-${FW_KINDS[kinds[0]]} fb-${FW_KINDS[kinds[1]]}`;
       const cls = `fw-c${look}${!items.length && day > today ? ' is-fut' : ''}${day === today ? ' is-now' : ''}`;
       if (!items.length) return `<span class="${cls}" aria-hidden="true"></span>`;
-      const said = plDay(day) + ': ' + items.map(x => x.title || (x.k === 'library' ? 'Library session' : 'Plan session')).join(', ');
+      const said = plDay(day) + ': ' + items.map(x => fwTitle(x) || (x.k === 'library' ? 'Library session' : 'Plan session')).join(', ');
       return `<button type="button" class="${cls}" onclick="openFiveWeeksDay('${day}')" aria-label="${esc(said)}">${items.length > 1 ? items.length : ''}</button>`;
     }).join('');
     // A held week (#122, Amir 2026-11-21: "A, the tick"): the label becomes the app's own done circle, the server's week_held fact (the
@@ -18845,11 +18854,11 @@ function openFiveWeeksDay(day) {
     const k = fwKindOf(d);
     if (k === 'court' || k === 'other') {
       const q = [Number(d.mins) > 0 ? Math.round(Number(d.mins)) + ' min' : '', effort[d.effort] || ''].filter(Boolean).join(' · ');
-      return `<div class="pl-row"><div><span class="t">${esc(d.title || 'Activity')}</span><span class="q">${esc(q)}</span></div>${d.id ? `<button type="button" class="act-del" onclick="deleteActivity(this, '${esc(String(d.id))}', '${day}')">Delete</button>` : '<span></span>'}</div>`;
+      return `<div class="pl-row"><div><span class="t">${esc(fwTitle(d) || 'Activity')}</span><span class="q">${esc(q)}</span></div>${d.id ? `<button type="button" class="act-del" onclick="deleteActivity(this, '${esc(String(d.id))}', '${day}')">Delete</button>` : '<span></span>'}</div>`;
     }
     const lib = k === 'library';
     const q = [lib ? (FW_SHELF[d.shelf] ? FW_SHELF[d.shelf] + ' · Library' : 'Library session') : 'Plan session', Number(d.mins) > 0 ? Math.round(Number(d.mins)) + ' min' : ''].filter(Boolean).join(' · ');
-    return `<div class="pl-row"><div><span class="t" dir="auto">${esc(d.title || (lib ? 'Library session' : 'Plan session'))}</span><span class="q">${esc(q)}</span></div>${d.extra ? '<span class="pl-xt">Extra</span>' : '<span></span>'}</div>`;
+    return `<div class="pl-row"><div><span class="t" dir="auto">${esc(fwTitle(d) || (lib ? 'Library session' : 'Plan session'))}</span><span class="q">${esc(q)}</span></div>${d.extra ? '<span class="pl-xt">Extra</span>' : '<span></span>'}</div>`;
   };
   ov.querySelector('.readiness-modal').innerHTML = `
     <div class="readiness-eyebrow">Your weeks</div>

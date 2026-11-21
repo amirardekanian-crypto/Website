@@ -592,7 +592,9 @@
 // v269: i18n-fa.js (?v=15) changed (2026-11-21): the weekly Toss and photo themes in Farsi, through 8 February.
 // v270: program.html, coach.html and i18n-fa.js (?v=16) changed (2026-11-21, round 11 Court Log, Amir: "Build Court Log", "A, the tick"):
 // Your weeks gains Add activity (log_activity(), stage116), court time in its grid and a tick on a held week; Farsi words for it.
-const CACHE = 'aap-v270';
+// v271: program.html and i18n-fa.js (?v=17) changed (2026-11-21, Amir: "does everything works in farsi version?"): Your weeks in Farsi: hours
+// and minutes in Farsi, Running for a run (Run is the order بدو), a plan day's Farsi title when it has one (get_five_weeks(), stage117).
+const CACHE = 'aap-v271';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -633,7 +635,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=11',
-  '/assets/js/i18n-fa.js?v=16',
+  '/assets/js/i18n-fa.js?v=17',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).

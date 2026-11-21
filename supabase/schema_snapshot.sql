@@ -8277,6 +8277,10 @@ begin
                                      where e ->> 'id' = fw.pday limit 1), case when fw.pday is not null then 'Day ' || fw.pday else 'Session' end) end,
                 '\s+', ' ', 'g')), 60),
              'mins', fw.mins, 'shelf', ls.category_id,
+             'title_fa', case when fw.kind <> 'library_session' then (   -- stage117: the plan day's Farsi twin (COM-1)
+                (select nullif(btrim(e ->> 'title_fa'), '')
+                   from pdays pd, jsonb_array_elements(case when jsonb_typeof(pd.days) = 'array' then pd.days else '[]'::jsonb end) e
+                  where e ->> 'id' = fw.pday limit 1)) end,
              'extra', case when fw.kind <> 'library_session' and not fw.in_plan then true end)) as j
       from fw
       left join lateral (select l.title, l.category_id from public.library_sessions l

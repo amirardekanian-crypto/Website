@@ -57,6 +57,15 @@ hand, because an offline boot never reaches `loadHistory()`.
   `{ day, k, kind, title, mins, effort, id }`; they never count in a week's `done`. In `BACKUP_TABLES`, the snapshot and `coach_erase_person()`.
   **No XP** (Amir's pick: self-logged minutes are easy to inflate).
 
+### In Farsi (2026-11-21, Amir: *"does everything works in farsi version?"*)
+
+Checked on a Farsi phone (`aa_lang = fa`): every word on the card, the sheet and a day's list is Farsi (`scripts/i18n/fa/24-five-weeks.json`,
+formal شما), the grid runs right to left, the weekday heads are one letter, the dates Shamsi. Three fixes that day: *2h 45m* reads
+*۲ ساعت و ۴۵ دقیقه* (a pattern), the run chip says **Running** (in Farsi *Run* is the order بدو; Running is دویدن) and a logged
+activity's row takes the app's own word for its kind (`fwTitle()`), and `get_five_weeks()` returns a plan day's `title_fa` when the
+programme day has one (stage117). Today no programme day carries one: a day's name (its `focusTag`) stays English, like a cycle's name
+and an exercise's, so *Legs* in a Farsi day sheet is by design.
+
 ### coach.html (#124 The Mirror)
 
 - **The work**: a **Five weeks** panel under the metric strip (`fiveWeeksPanelC()`), the same grid from the same reader (`fiveWeeksC()`,
