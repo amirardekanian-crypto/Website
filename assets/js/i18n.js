@@ -75,17 +75,34 @@
   var R = 'U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200F, U+2066-2069, U+FB50-FDFF, U+FE70-FEFF';
   // One face per weight, not one 100-900 range: the browser picks a family's faces by weight FIRST, so a range face lost to
   // Space Mono's own 400 face and was never loaded (the loading line drew its Farsi in a system monospace, letters apart).
+  // Space Mono's own space is a monospace cell, 0.6em: between Farsi words it opened gaps ("صبح   بخیر"), so in Farsi its
+  // spaces come from Vazirmatn too (this sheet is declared after app-fonts.css, so it wins the overlap).
   var css = ['Barlow', 'Barlow Condensed', 'AA Barlow Condensed', 'Space Mono', 'Vazirmatn'].map(function (f) {
-    var out = '';
+    var out = '', rr = f === 'Space Mono' ? R + ', U+0020, U+00A0' : R;
     for (var w = 100; w <= 900; w += 100) {
-      out += "@font-face{font-family:'" + f + "';src:" + V + ';font-weight:' + w + ';font-style:normal;font-display:swap;unicode-range:' + R + '}';
+      out += "@font-face{font-family:'" + f + "';src:" + V + ';font-weight:' + w + ';font-style:normal;font-display:swap;unicode-range:' + rr + '}';
     }
     return out;
   }).join('') +
     'html.is-fa,html.is-fa body{font-family:Barlow,Vazirmatn,Tahoma,sans-serif}' +
     'html.is-fa *{letter-spacing:0!important}' +
     // An exercise name, and anything else marked as Latin, reads left to right inside the Farsi line.
-    'html.is-fa .i18n-ltr,html.is-fa [translate="no"]{unicode-bidi:isolate}';
+    'html.is-fa .i18n-ltr,html.is-fa [translate="no"]{unicode-bidi:isolate}' +
+    // A chevron drawn as a picture (a CSS mask, an <svg>) is not mirrored by the browser as a text ‹ › is: forward points
+    // left. --chev is the app's one mask chevron; svg.chev is the Note row's and the cues' (their open state rotates it).
+    "html.is-fa{--chev:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M7 1L3 5 7 9' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\")}" +
+    'html.is-fa svg.chev{transform:scaleX(-1)}' +
+    // A box marked dir="auto" takes its direction from what is typed: empty, it drew its Farsi placeholder left to right,
+    // the words in reverse order. Empty, it is right to left; typed text still finds its own direction.
+    'html.is-fa textarea:placeholder-shown,html.is-fa input[dir="auto"]:placeholder-shown{direction:rtl}' +
+    // <q> drew English quotes, which read backwards in a right-to-left line: Farsi's own guillemets.
+    "html.is-fa q{quotes:'\\00AB' '\\00BB' '\\2039' '\\203A'}" +
+    // An article's drop cap cut the first Farsi letter off its word ("پ" apart from "یشتر"): Farsi letters join, so no drop cap.
+    'html.is-fa #ar-body .ar-p.ar-lead::first-letter{float:none;font:inherit;color:inherit;margin:0;line-height:inherit}' +
+    // The video frame's corner word is CSS content, which the word lists never see.
+    "html.is-fa .ex-video::after{content:'\\0648\\06CC\\062F\\06CC\\0648'}" +
+    // A person's name takes its direction from its own first letter: "Mina S." keeps its full stop after the S.
+    'html.is-fa .cr-nm{unicode-bidi:plaintext}';
   var st = document.createElement('style'); st.id = 'i18n-fa-css'; st.textContent = css;
   (document.head || html).appendChild(st);
 
@@ -126,7 +143,13 @@
       if (t.length === 4) s.setProperty('border-radius', [t[1], t[0], t[3], t[2]].join(' '), s.getPropertyPriority('border-radius'));
       else if (t.length === 3) s.setProperty('border-radius', [t[1], t[0], t[1], t[2]].join(' '), s.getPropertyPriority('border-radius'));
     }
+    // A box centred by "left: 50%" and a transform or a negative margin (the rest games' cards, a toast, a burst) is
+    // already centred both ways: mirrored to right: 50% while its translate(-50%) stayed, Split Step's card sat off the
+    // screen. Its position and margins are left alone.
+    var L = s.getPropertyValue('left'), Rt = s.getPropertyValue('right');
+    var centred = (L === '50%' && !Rt) || (Rt === '50%' && !L);
     PAIRS.forEach(function (pr) {
+      if (centred && (pr[0] === 'left' || pr[0] === 'margin-left')) return;
       var a = s.getPropertyValue(pr[0]), b = s.getPropertyValue(pr[1]);
       if (a === b) return;
       var pa = s.getPropertyPriority(pr[0]), pb = s.getPropertyPriority(pr[1]);
@@ -217,10 +240,16 @@
   // gets the match and returns the Farsi.
   function fill(tpl, m) {
     if (typeof tpl === 'function') return tpl(m, { num: faNum, date: dateOf, t: look });
+    // A capture kept as it came (a name, an English word) sits in a first-strong isolate inside a Farsi line: "Mina S."
+    // kept its full stop on its own side, and a line that starts with one ("Chalk. توی مسیر…") still reads right to left.
+    var faT = /[\u0600-\u06FF]/.test(tpl);
     return tpl.replace(/\{([ndt])(\d)\}|\$(\d)/g, function (all, k, i, j) {
-      if (j) return m[+j] == null ? '' : m[+j];
+      if (j) { var c = m[+j] == null ? '' : m[+j]; return faT && /[A-Za-z]/.test(c) ? ISO_F + c + ISO_R : c; }
       var v = m[+i] == null ? '' : m[+i];
-      return k === 'n' ? faNum(v) : k === 'd' ? (dateOf(v) || v) : (look(v) || v);
+      if (k === 'n') return faNum(v);
+      if (k === 'd') return dateOf(v) || v;
+      var tv = look(v);
+      return tv != null ? tv : faT && /[A-Za-z]/.test(v) ? ISO_F + v + ISO_R : v;
     });
   }
   function look(core) {
@@ -240,21 +269,48 @@
       for (var pi = 0; pi < parts.length && ok; pi += 2) ok = Object.prototype.hasOwnProperty.call(ex, parts[pi]);
       if (ok) return parts.map(function (x, i) { return i % 2 ? (x === ', ' ? '، ' : ' یا ') : ex[x]; }).join('');
     }
-    // The same words with their punctuation or a symbol at either end: "Done." · "‹ Back" · "+ Log a max" · "Why?"
-    var m2 = k.match(/^([^A-Za-z0-9]*)(.*?)([.:!?…]*)$/);
+    // The same words with their punctuation or a symbol at either end: "Done." · "‹ Back" · "+ Log a max" · "Why?" ·
+    // "Squat · " (a label with the separator before the next element, as Library → Exercises draws its rows)
+    var m2 = k.match(/^([^A-Za-z0-9]*)(.*?)((?: ?·)?[.:!?…]*)$/);
     if (m2 && (m2[1] || m2[3]) && m2[2] && Object.prototype.hasOwnProperty.call(ex, m2[2])) {
       return m2[1] + ex[m2[2]] + m2[3].replace(/\?/g, '؟');
     }
     return null;
   }
+  // An arrow at either end of a line ("‹ Back", "Read it ›", "Skip →", "Start session ▶") points the way the page reads,
+  // decided from the ENGLISH, whatever the word list wrote (some entries turned it already, some did not):
+  //   ‹ › « » are mirrored by the browser itself in a right-to-left line (Unicode Bidi_Mirrored), so they keep the English
+  //   character: "›" is drawn "‹". Turning them too drew every forward chevron pointing right again.
+  //   → ← ▶ ◀ are never mirrored, so they are swapped.
+  var ENDS = '›‹→←»«▶◀';
+  var TURN = { '›': '›', '‹': '‹', '»': '»', '«': '«', '→': '←', '←': '→', '▶': '◀', '◀': '▶' };
+  function ends(en, r) {
+    var a = en.charAt(0), z = en.charAt(en.length - 1);
+    if (ENDS.indexOf(a) >= 0 && ENDS.indexOf(r.charAt(0)) >= 0) r = TURN[a] + r.slice(1);
+    if (ENDS.indexOf(z) >= 0 && ENDS.indexOf(r.charAt(r.length - 1)) >= 0) r = r.slice(0, -1) + TURN[z];
+    return r;
+  }
+  // Two numbers with a × between them read the wrong way round in a right-to-left line ("4 × 6", four sets of six, was
+  // drawn "6 × 4"): Latin ones are kept left to right as one piece (a Unicode isolate, invisible).
+  var DOSE = /\d+(?:[.,]\d+)?(?:\s*[-–]\s*\d+)?(?:\s*×\s*\d+(?:[.,]\d+)?(?:\s*[-–]\s*\d+)?)+/g;
+  var ISO_L = String.fromCharCode(0x2066), ISO_R = String.fromCharCode(0x2069);   // a left-to-right isolate, invisible
+  var RLM = String.fromCharCode(0x200F);                                          // a right-to-left mark, invisible
+  var ISO_F = String.fromCharCode(0x2068);                                        // a first-strong isolate, invisible
+  function ltrDose(s) { return s.indexOf('×') < 0 || s.indexOf('\u2066') >= 0 ? s : s.replace(DOSE, '\u2066$&\u2069'); }
   function tr(s) {
     if (!s || !/[A-Za-z]/.test(s)) return null;
     var m = s.match(/^(\s*)([\s\S]*?)(\s*)$/);
     var r = look(m[2]);
     if (r == null) return null;
-    // "‹ Back" · "Read it ›": an arrow at either end turns with the page.
-    r = r.replace(/^[›‹→←»«]|[›‹→←»«]$/g, function (c) { return FLIP[c]; });
-    return m[1] + r + m[3];
+    r = ends(norm(m[2]), r);
+    // The app's middle dot between Farsi words reads as a Persian zero beside a digit ("ویدیو · ۶ مرحله" looked like
+    // "ویدیو۶۰ مرحله"; "هفته ۱ تا ۵ · تمام" looked like "۵۰"): in a Farsi line it is a Persian comma, also at the line's
+    // end where the next piece is its own element. A right-to-left mark rides after it: a Persian digit straight after a
+    // Latin name took the name's direction ("Split Step · 1 of 4" was drawn "۴ از SPLIT STEP ،۱").
+    return m[1] + ltrDose(faDots(r)) + m[3];
+  }
+  function faDots(r) {
+    return /[\u0600-\u06FF]/.test(r) ? r.replace(/\s+·\s+/g, '،' + RLM + ' ').replace(/\s+·$/, '،' + RLM) : r;
   }
   A.t = function (s) { var r = tr(String(s == null ? '' : s)); return r == null ? s : r; };
   A.addFa = function (exact, patterns) {
@@ -267,20 +323,38 @@
   // that draws a name in a class not listed here can mark it translate="no" instead.
   var SKIP = 'script,style,textarea,code,noscript,[translate="no"],.notranslate,.i18n-ltr,' +
     '.item-name,.nm-tail,.ex-name,.tl-name,.round-name,.circ-name,.ax-name,.ax-names,.lib-ex-name,.hist-ex,.rec-lift,.pr-lift,' +
-    '.sg-name,.step-ex-name,.timer-exercise-name,.rm-name,.archive-ex-name,.pl-name,.cr-names';
+    '.sg-name,.step-ex-name,.timer-exercise-name,.rm-name,.archive-ex-name,.pl-name';
+  // (.cr-names is not skipped: it holds "Liked by" and "Sara T. and 4 others", whose words the lists have; a name in it
+  // matches nothing and stays as it is.)
   A.skip = SKIP;
   var ATTRS = ['placeholder', 'aria-label', 'title', 'alt'];
   var seen = new WeakMap();     // text node -> the text it held after we last looked
   var seenA = new WeakMap();    // element -> { attr: value after we last looked }
   function skipped(el) { return !el || (el.closest && el.closest(A.skip)); }
-  // A chevron or arrow drawn as text points the way the page reads: forward is left in Farsi.
-  var FLIP = { '›': '‹', '‹': '›', '→': '←', '←': '→', '»': '«', '«': '»' };
+  // An arrow drawn as text on its own points the way the page reads: forward is left in Farsi. Only → and ←: a lone ‹ or ›
+  // is mirrored by the browser already (see ends()), and turning it as well pointed every Home row's › the wrong way.
+  var FLIP = { '→': '←', '←': '→', '?': '؟' };
+  // Text that is a number inside a Farsi sentence: Persian digits (the tempo's lit number: "پایین 3 ثانیه" beside "۱ ثانیه مکث").
+  var SENTENCE_NUM = '.t-hot';
+  // A rest button carries its time on it: "2 min 30 s" spelled out in Farsi ("۲ دقیقه و ۳۰ ثانیه") is twice as long and
+  // ran over the Note beside it, so on the button it is a clock, "۲:۳۰".
+  var CLOCK = '.rest-t';
   function doText(n) {
     var d = n.data;
     if (seen.get(n) === d) return;
-    var core = d.trim();
-    if (FLIP[core]) { if (!skipped(n.parentElement)) n.data = d.replace(core, FLIP[core]); seen.set(n, n.data); return; }
-    if (/[A-Za-z]/.test(d) && !skipped(n.parentElement)) {
+    var core = d.trim(), p = n.parentElement;
+    if (FLIP[core]) { if (!skipped(p)) n.data = d.replace(core, FLIP[core]); seen.set(n, n.data); return; }
+    if (p && !skipped(p)) {
+      var mc = p.closest && p.closest(CLOCK) && core.match(/^(\d+) min (\d+) s$/);
+      if (mc) { n.data = d.replace(core, faNum(mc[1] + ':' + (mc[2].length < 2 ? '0' : '') + mc[2])); seen.set(n, n.data); return; }
+      if (/^\d+$/.test(core) && p.closest && p.closest(SENTENCE_NUM)) { n.data = faNum(d); seen.set(n, n.data); return; }
+      if (!/[A-Za-z]/.test(d) && d.indexOf('×') >= 0) { var dz = ltrDose(d); if (dz !== d) n.data = dz; seen.set(n, n.data); return; }
+      // A phone number ("+44 7435 363461") read its groups backwards in a right-to-left line: kept left to right.
+      if (/^\+\d[\d ()-]{5,}$/.test(core)) { n.data = d.replace(core, ISO_L + core + ISO_R); seen.set(n, n.data); return; }
+      // Farsi that came already written (a programme's Farsi twin, "هفته ۱ تا ۵") with the app's dot after it.
+      if (!/[A-Za-z]/.test(d) && d.indexOf('·') >= 0) { var fd = faDots(core); if (fd !== core) n.data = d.replace(core, fd); seen.set(n, n.data); return; }
+    }
+    if (/[A-Za-z]/.test(d) && !skipped(p)) {
       var r = tr(d);
       if (r != null) { if (r !== d) n.data = r; }
       else if (A.missing.size < 5000 && /[A-Za-z]{2}/.test(d)) A.missing.add(norm(d));
@@ -292,7 +366,9 @@
     if (v == null) return;
     var s = seenA.get(el); if (!s) seenA.set(el, s = {});
     if (s[a] === v) return;
-    if (/[A-Za-z]/.test(v) && !(a !== 'aria-label' && skipped(el))) {
+    // A textarea's typed text is never translated, but its placeholder is the app's words.
+    var own = a === 'placeholder' && (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') ? el.parentElement : el;
+    if (/[A-Za-z]/.test(v) && !(a !== 'aria-label' && skipped(own))) {
       var r = tr(v);
       if (r != null && r !== v) { el.setAttribute(a, r); v = r; }
     }

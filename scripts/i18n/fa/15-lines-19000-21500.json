@@ -196,7 +196,7 @@
     ],
     [
       "Latest · (.+)",
-      "تازه‌ترین · $1"
+      "تازه‌ترین · {t1}"
     ],
     [
       "(\\d+) min read",
@@ -303,167 +303,167 @@
       "✓ رسید به مربی · $1"
     ],
     [
-      "(d+) of 10 · Note: \"",
+      "(\\d+) of 10 · Note: \"",
       "{n1} از ۱۰ · یادداشت: \""
     ],
     [
-      "Set (d+) not ticked",
+      "Set (\\d+) not ticked",
       "ست {n1} تیک نخورده"
     ],
     [
-      "Sets (d+) and (d+) not ticked",
+      "Sets (\\d+) and (\\d+) not ticked",
       "ست‌های {n1} و {n2} تیک نخورده"
     ],
     [
-      "Sets (d+), (d+) and (d+) not ticked",
+      "Sets (\\d+), (\\d+) and (\\d+) not ticked",
       "ست‌های {n1}، {n2} و {n3} تیک نخورده"
     ],
     [
-      "Sets (d+), (d+), (d+) and (d+) not ticked",
+      "Sets (\\d+), (\\d+), (\\d+) and (\\d+) not ticked",
       "ست‌های {n1}، {n2}، {n3} و {n4} تیک نخورده"
     ],
     [
-      "Sets (d+), (d+), (d+), (d+) and (d+) not ticked",
+      "Sets (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+) not ticked",
       "ست‌های {n1}، {n2}، {n3}، {n4} و {n5} تیک نخورده"
     ],
     [
-      "Sets (d+), (d+), (d+), (d+), (d+) and (d+) not ticked",
+      "Sets (\\d+), (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+) not ticked",
       "ست‌های {n1}، {n2}، {n3}، {n4}، {n5} و {n6} تیک نخورده"
     ],
     [
-      "Sets (d+), (d+), (d+), (d+), (d+), (d+) and (d+) not ticked",
+      "Sets (\\d+), (\\d+), (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+) not ticked",
       "ست‌های {n1}، {n2}، {n3}، {n4}، {n5}، {n6} و {n7} تیک نخورده"
     ],
     [
-      "Sets (d+), (d+), (d+), (d+), (d+), (d+), (d+) and (d+) not ticked",
+      "Sets (\\d+), (\\d+), (\\d+), (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+) not ticked",
       "ست‌های {n1}، {n2}، {n3}، {n4}، {n5}، {n6}، {n7} و {n8} تیک نخورده"
     ],
     [
-      "Round (d+) not ticked",
+      "Round (\\d+) not ticked",
       "راند {n1} تیک نخورده"
     ],
     [
-      "Rounds (d+) and (d+) not ticked",
+      "Rounds (\\d+) and (\\d+) not ticked",
       "راندهای {n1} و {n2} تیک نخورده"
     ],
     [
-      "Rounds (d+), (d+) and (d+) not ticked",
+      "Rounds (\\d+), (\\d+) and (\\d+) not ticked",
       "راندهای {n1}، {n2} و {n3} تیک نخورده"
     ],
     [
-      "Rounds (d+), (d+), (d+) and (d+) not ticked",
+      "Rounds (\\d+), (\\d+), (\\d+) and (\\d+) not ticked",
       "راندهای {n1}، {n2}، {n3} و {n4} تیک نخورده"
     ],
     [
-      "Rounds (d+), (d+), (d+), (d+) and (d+) not ticked",
+      "Rounds (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+) not ticked",
       "راندهای {n1}، {n2}، {n3}، {n4} و {n5} تیک نخورده"
     ],
     [
-      "Rounds (d+), (d+), (d+), (d+), (d+) and (d+) not ticked",
+      "Rounds (\\d+), (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+) not ticked",
       "راندهای {n1}، {n2}، {n3}، {n4}، {n5} و {n6} تیک نخورده"
     ],
     [
-      "Rounds (d+), (d+), (d+), (d+), (d+), (d+) and (d+) not ticked",
+      "Rounds (\\d+), (\\d+), (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+) not ticked",
       "راندهای {n1}، {n2}، {n3}، {n4}، {n5}، {n6} و {n7} تیک نخورده"
     ],
     [
-      "Rounds (d+), (d+), (d+), (d+), (d+), (d+), (d+) and (d+) not ticked",
+      "Rounds (\\d+), (\\d+), (\\d+), (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+) not ticked",
       "راندهای {n1}، {n2}، {n3}، {n4}، {n5}، {n6}، {n7} و {n8} تیک نخورده"
     ],
     [
-      "No weight on set (d+)",
+      "No weight on set (\\d+)",
       "وزنه برای ست {n1} ثبت نشده"
     ],
     [
-      "No weight on sets (d+) and (d+)",
+      "No weight on sets (\\d+) and (\\d+)",
       "وزنه برای ست‌های {n1} و {n2} ثبت نشده"
     ],
     [
-      "No weight on sets (d+), (d+) and (d+)",
+      "No weight on sets (\\d+), (\\d+) and (\\d+)",
       "وزنه برای ست‌های {n1}، {n2} و {n3} ثبت نشده"
     ],
     [
-      "No weight on sets (d+), (d+), (d+) and (d+)",
+      "No weight on sets (\\d+), (\\d+), (\\d+) and (\\d+)",
       "وزنه برای ست‌های {n1}، {n2}، {n3} و {n4} ثبت نشده"
     ],
     [
-      "No weight on sets (d+), (d+), (d+), (d+) and (d+)",
+      "No weight on sets (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+)",
       "وزنه برای ست‌های {n1}، {n2}، {n3}، {n4} و {n5} ثبت نشده"
     ],
     [
-      "No weight on sets (d+), (d+), (d+), (d+), (d+) and (d+)",
+      "No weight on sets (\\d+), (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+)",
       "وزنه برای ست‌های {n1}، {n2}، {n3}، {n4}، {n5} و {n6} ثبت نشده"
     ],
     [
-      "No weight on sets (d+), (d+), (d+), (d+), (d+), (d+) and (d+)",
+      "No weight on sets (\\d+), (\\d+), (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+)",
       "وزنه برای ست‌های {n1}، {n2}، {n3}، {n4}، {n5}، {n6} و {n7} ثبت نشده"
     ],
     [
-      "No weight on sets (d+), (d+), (d+), (d+), (d+), (d+), (d+) and (d+)",
+      "No weight on sets (\\d+), (\\d+), (\\d+), (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+)",
       "وزنه برای ست‌های {n1}، {n2}، {n3}، {n4}، {n5}، {n6}، {n7} و {n8} ثبت نشده"
     ],
     [
-      "No effort on set (d+)",
+      "No effort on set (\\d+)",
       "شدت برای ست {n1} ثبت نشده"
     ],
     [
-      "No effort on sets (d+) and (d+)",
+      "No effort on sets (\\d+) and (\\d+)",
       "شدت برای ست‌های {n1} و {n2} ثبت نشده"
     ],
     [
-      "No effort on sets (d+), (d+) and (d+)",
+      "No effort on sets (\\d+), (\\d+) and (\\d+)",
       "شدت برای ست‌های {n1}، {n2} و {n3} ثبت نشده"
     ],
     [
-      "No effort on sets (d+), (d+), (d+) and (d+)",
+      "No effort on sets (\\d+), (\\d+), (\\d+) and (\\d+)",
       "شدت برای ست‌های {n1}، {n2}، {n3} و {n4} ثبت نشده"
     ],
     [
-      "No effort on sets (d+), (d+), (d+), (d+) and (d+)",
+      "No effort on sets (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+)",
       "شدت برای ست‌های {n1}، {n2}، {n3}، {n4} و {n5} ثبت نشده"
     ],
     [
-      "No effort on sets (d+), (d+), (d+), (d+), (d+) and (d+)",
+      "No effort on sets (\\d+), (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+)",
       "شدت برای ست‌های {n1}، {n2}، {n3}، {n4}، {n5} و {n6} ثبت نشده"
     ],
     [
-      "No effort on sets (d+), (d+), (d+), (d+), (d+), (d+) and (d+)",
+      "No effort on sets (\\d+), (\\d+), (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+)",
       "شدت برای ست‌های {n1}، {n2}، {n3}، {n4}، {n5}، {n6} و {n7} ثبت نشده"
     ],
     [
-      "No effort on sets (d+), (d+), (d+), (d+), (d+), (d+), (d+) and (d+)",
+      "No effort on sets (\\d+), (\\d+), (\\d+), (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+)",
       "شدت برای ست‌های {n1}، {n2}، {n3}، {n4}، {n5}، {n6}، {n7} و {n8} ثبت نشده"
     ],
     [
-      "No effort on round (d+)",
+      "No effort on round (\\d+)",
       "شدت برای راند {n1} ثبت نشده"
     ],
     [
-      "No effort on rounds (d+) and (d+)",
+      "No effort on rounds (\\d+) and (\\d+)",
       "شدت برای راندهای {n1} و {n2} ثبت نشده"
     ],
     [
-      "No effort on rounds (d+), (d+) and (d+)",
+      "No effort on rounds (\\d+), (\\d+) and (\\d+)",
       "شدت برای راندهای {n1}، {n2} و {n3} ثبت نشده"
     ],
     [
-      "No effort on rounds (d+), (d+), (d+) and (d+)",
+      "No effort on rounds (\\d+), (\\d+), (\\d+) and (\\d+)",
       "شدت برای راندهای {n1}، {n2}، {n3} و {n4} ثبت نشده"
     ],
     [
-      "No effort on rounds (d+), (d+), (d+), (d+) and (d+)",
+      "No effort on rounds (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+)",
       "شدت برای راندهای {n1}، {n2}، {n3}، {n4} و {n5} ثبت نشده"
     ],
     [
-      "No effort on rounds (d+), (d+), (d+), (d+), (d+) and (d+)",
+      "No effort on rounds (\\d+), (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+)",
       "شدت برای راندهای {n1}، {n2}، {n3}، {n4}، {n5} و {n6} ثبت نشده"
     ],
     [
-      "No effort on rounds (d+), (d+), (d+), (d+), (d+), (d+) and (d+)",
+      "No effort on rounds (\\d+), (\\d+), (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+)",
       "شدت برای راندهای {n1}، {n2}، {n3}، {n4}، {n5}، {n6} و {n7} ثبت نشده"
     ],
     [
-      "No effort on rounds (d+), (d+), (d+), (d+), (d+), (d+), (d+) and (d+)",
+      "No effort on rounds (\\d+), (\\d+), (\\d+), (\\d+), (\\d+), (\\d+), (\\d+) and (\\d+)",
       "شدت برای راندهای {n1}، {n2}، {n3}، {n4}، {n5}، {n6}، {n7} و {n8} ثبت نشده"
     ],
     [

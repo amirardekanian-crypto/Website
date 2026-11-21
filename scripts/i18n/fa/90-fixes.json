@@ -4,6 +4,10 @@
     "The app and your coach's notes show in the language you choose. Every cycle is written in both.": "اپ و نکته‌های مربی به زبانی که انتخاب می‌کنی نشون داده می‌شن. هر دوره به هر دو زبان نوشته می‌شه.",
     "Saved. The app is in Farsi now.": "ذخیره شد. اپ الان فارسیه.",
     "Saved. The app is in English now.": "ذخیره شد. اپ الان انگلیسیه.",
+    "‹ Back": "‹ برگشت",
+    "Performance": "عملکرد",
+    "LEVEL": "سطح",
+    "Strong": "قوی", "Fire": "آتیش", "Well done": "آفرین", "Love it": "عاشقشم",
     "One": "اول", "Two": "دوم", "Three": "سوم", "Four": "چهارم", "Five": "پنجم", "Six": "ششم"
   },
   "patterns": [
@@ -11,6 +15,9 @@
     ["(.+) · Effort (\\d+(?:\\.\\d+)?) → (\\d+(?:\\.\\d+)?) today", "{t1} · شدت $2 ← $3 امروز"],
     ["Weeks (\\d+)[–-](\\d+)", "هفته‌های {n1} تا {n2}"],
     ["(\\d+)×(\\d+)/side", "$1×$2 هر طرف"],
+    ["(\\d+) × (\\d+) secs?", "$1 × $2 ثانیه"],
+    ["(\\d+) secs? each side", "{n1} ثانیه، هر طرف"],
+    ["(\\d+) secs?", "{n1} ثانیه"],
     ["(.+) I, II and III", "{t1} I، II و III"],
     ["Month (One|Two|Three|Four|Five|Six) · (.+)", "ماه {t1} · $2"]
   ]
