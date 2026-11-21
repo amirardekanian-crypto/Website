@@ -192,7 +192,8 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     // the switches and the no
     await p.evaluate(() => openCrewSettings()); await p.waitForTimeout(300);
     // nine since stage91: a finished session is a kind, with its own switch, on by default (Amir, 2026-10-20)
-    C.check('the settings: Yes pressed and a switch per kind (9)', await p.evaluate(() => document.querySelector('#hist-overlay .acct-seg [data-ans="yes"]').getAttribute('aria-pressed') === 'true' && document.querySelectorAll('#hist-overlay .cr-sw input').length === 9));
+    C.check('the settings: Yes pressed and a switch per kind (10, with Your activity)', await p.evaluate(() => document.querySelector('#hist-overlay .acct-seg [data-ans="yes"]').getAttribute('aria-pressed') === 'true' && document.querySelectorAll('#hist-overlay .cr-sw input').length === 10));
+    C.check('…Your activity is the one switch that starts OFF (stage118, 2026-11-21), the others on', await p.evaluate(() => { const a = document.querySelector('#hist-overlay .cr-sw input[data-kind="activity"]'); return !!a && !a.checked && [...document.querySelectorAll('#hist-overlay .cr-sw input')].filter(i => i.dataset.kind !== 'activity').every(i => i.checked); }));
     await p.evaluate(() => { const i = document.querySelector('#hist-overlay .cr-sw input[data-kind="best"]'); i.checked = false; i.dispatchEvent(new Event('change')); }); await p.waitForTimeout(400);
     C.check('…a switch off: crew_kinds({ best: false })', (await calls(p, 'crew_kinds')).some(x => x.p_kinds && x.p_kinds.best === false));
     await p.evaluate(() => document.querySelector('#hist-overlay .acct-seg [data-ans="no"]').click()); await p.waitForTimeout(600);
@@ -1282,6 +1283,22 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
       C.check('her page: the pick row shows Amir\'s reason in quotes under its line, then "Amir"', d.length === 3 && w.t === 'Amir\'s Pick' && /October 2026/.test(w.q) && w.why === '“' + WHY + '”' && w.by === 'Amir' && w.qm === 'rgb(14, 74, 54)' && w.fs === '15px', JSON.stringify(d));
       C.check('...a pick with no reason and another honour are as they were (no quote, no name)', d.length === 3 && d.filter(r => r.why).length === 1 && d.filter(r => !r.why).every(r => r.by === null && r.qm === null) && d.some(r => /14 plan sessions/.test(r.q)), JSON.stringify(d));
       await ctx.close();
+    }
+    // Your activity on a page (stage118, 2026-11-21): shown only when the person turned it on; what, which day, how long; never how hard
+    {
+      const today = new Date().toISOString().slice(0, 10);
+      const pages = { [CKP]: { activity: [{ day: today, kind: 'tennis', minutes: 60, effort: 'hard' }, { day: today, kind: 'run', minutes: 30 }] } };
+      const { ctx, p } = await openCrewTab(bellP(), { stub: { crewPages: pages } });
+      await p.evaluate(ck => openPlayer(ck), CKP); await p.waitForTimeout(900);
+      const d = await p.evaluate(() => { const h = [...document.querySelectorAll('#crewplayer-body h2.prog-sec')].find(x => /activity/i.test(x.textContent)); const l = h && h.nextElementSibling;
+        return h ? { head: h.textContent, rows: [...l.querySelectorAll('.pl-row')].map(r => r.textContent.replace(/\s+/g, ' ').trim()) } : null; });
+      C.check('a shared activity: "<name>\'s activity · Last 7 days", one row each: Tennis 60 min, Running 30 min, and never how hard', !!d && /activity/.test(d.head) && /Last 7 days/.test(d.head)
+        && d.rows.length === 2 && /^Tennis/.test(d.rows[0]) && /60 min/.test(d.rows[0]) && /^Running/.test(d.rows[1]) && !/hard/i.test(d.rows.join(' ')), JSON.stringify(d));
+      await ctx.close();
+      const n = await openCrewTab(bellP(), { stub: { crewPages: { [CKP]: {} } } });
+      await n.p.evaluate(ck => openPlayer(ck), CKP); await n.p.waitForTimeout(900);
+      C.check('…and no activity section when they have not shared it', !(await n.p.evaluate(() => [...document.querySelectorAll('#crewplayer-body h2.prog-sec')].some(x => /activity/i.test(x.textContent)))));
+      await n.ctx.close();
     }
     // 77 · after Post the new post comes into view and lights for about 2 seconds
     for (const reduced of [false, true]) {

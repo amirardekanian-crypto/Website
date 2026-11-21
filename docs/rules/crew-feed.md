@@ -92,3 +92,13 @@ Amir, 2026-11-20, "build 116, 117 and 119". The build record is `docs/ref/progra
   are in `assets/news.json`, English and Farsi, in Amir's voice. Each entry shows 14 days as *Amir: <title>* and opens a sheet of short
   lines. The rule and its hook are in [`working-with-amir.md`](working-with-amir.md) → *Every change athletes notice is told*. A big
   feature also gets its card in How the app works (`APP_GUIDE`), with its Farsi.
+- **Your activity, by choice** (2026-11-21, Amir: *"let people choose if they allow other people to see their activity or no like other
+  things in the setting"*). Court Log's activity is private unless the athlete turns on **Your activity** in What the crew sees. It is the
+  one switch that is OFF until turned on (`CREW_KINDS_OFF`), because it began private. When on, a crew mate sees the last 7 days on that
+  person's page: what, which day, how long (stage118, `crew_page().activity`); never how hard, never on the Bell or a share card. This
+  replaces, for an athlete who turns it on, the stage116 line in `program-app.md` that nothing of `activity_log` reaches the crew.
+- **New notes and plan changes in the Inbox** (2026-11-21, Amir: *"i want them to recive a note for their new notes, and when clicked , goes
+  to the tab"* and *"they should also know when their whole 6 month plan changes ... by clicking it goes to the tab and shows them"*). New
+  note cards are one row that says how many (`nc`, opens the Coach tab at the first new card). A new cycle's row (`cy`) and a change to the
+  road inside a cycle (`pl`, a fingerprint of every cycle's name, weeks, focus, aims and teaser) open Progress at the Game Plan with the
+  current cycle's row open and lit (`inboxShowPlan()`). All worked out on the phone (`inboxScan()`), no server change.

@@ -7,12 +7,18 @@
     "When someone cheers you, your Inbox and your own page show who trained today and has no cheer from you yet. Pass it on with one tap. No photo yet? The app asks once, the first time someone cheers you.": "وقتی یکی تشویقت می‌کنه، صندوقت و صفحهٔ خودت نشون می‌دن کی امروز تمرین کرده و هنوز تشویقش نکردی. با یه بار زدن تو هم تشویقش کن. هنوز عکس نذاشتی؟ اپ یه بار ازت می‌پرسه، اولین باری که یکی تشویقت می‌کنه.",
     "Each week I ask the crew one question, under the green band. Tap a half to vote. You see the answers once you have voted, and you can tap the other half to change it. Last week's answer shows under it. When I set a photo theme for the week,": "هر هفته یه سؤال از تیم می‌پرسم، زیر نوار سبز. روی یه نیمه بزن تا رأی بدی. وقتی رأی دادی جواب‌ها رو می‌بینی، و می‌تونی نیمهٔ دیگه رو بزنی تا عوضش کنی. جواب هفتهٔ پیش زیرش میاد. وقتی برای هفته موضوع عکس می‌ذارم،",
     ", in the Library under Playbook, keeps every answer. Nobody is named or counted who has not joined.": "، تو کتابخانه زیر راهنمای بازی، همهٔ جواب‌ها رو نگه می‌داره. اسم کسی که عضو نشده برده نمی‌شه و شمرده نمی‌شه.",
-    "Your weeks, on Progress, shows your cycle a week to a row, with a square for each day. A plan session is green, a Library session is mint, and a held week has a tick. Tap a day to see what you did. Tennis, padel, a match or a run never shows in your plan, so add it: tap + Add activity, choose what it was, which day (today or the last 3 days), the minutes and how hard, then tap Save. Court time is dark on your weeks, anything else grey. I see it too. The crew never does.": "«هفته‌های تو»، تو پیشرفت، دوره‌ات رو هفته به هفته نشون می‌ده، با یه مربع برای هر روز. جلسهٔ برنامه سبزه، جلسهٔ کتابخانه سبز روشن، و هفتهٔ نگه‌داشته یه تیک داره. روی یه روز بزن تا ببینی چی کار کردی. تنیس، پدل، مسابقه یا دویدن هیچ‌وقت تو برنامه‌ات نیست، پس اضافه‌اش کن: «+ اضافه کردن فعالیت» رو بزن، انتخاب کن چی بوده، کدوم روز (امروز یا ۳ روز گذشته)، چند دقیقه و چقدر سخت، بعد «ذخیره» رو بزن. زمین روی هفته‌هات تیره است، بقیه خاکستری. من هم می‌بینمش. تیم هیچ‌وقت نمی‌بینه.",
     "The app speaks English and Farsi. Tap your initials, then Language, to switch. Everything I write for you comes in both languages, and the names of the exercises stay in English.": "اپ انگلیسی و فارسی حرف می‌زنه. روی حرف‌های اول اسمت بزن، بعد «زبان»، تا عوضش کنی. هر چیزی که برات می‌نویسم به هر دو زبان میاد، و اسم حرکت‌ها انگلیسی می‌مونه.",
     "Your weeks and your own activity": "هفته‌های تو و فعالیت خودت",
     "Language": "زبان",
     "Pass it on.": "تو هم تشویق کن.",
-    "trained today.": "امروز تمرین کردن."
+    "trained today.": "امروز تمرین کردن.",
+    "Your weeks, on Progress, shows your cycle a week to a row, with a square for each day. A plan session is green, a Library session is mint, and a held week has a tick. Tap a day to see what you did. Tennis, padel, a match or a run never shows in your plan, so add it: tap + Add activity, choose what it was, which day (today or the last 3 days), the minutes and how hard, then tap Save. Court time is dark on your weeks, anything else grey. I see it too. The crew sees it only if you turn on Your activity: tap your initials, then What the crew sees.": "«هفته‌های تو»، تو پیشرفت، دوره‌ات رو هفته به هفته نشون می‌ده، با یه مربع برای هر روز. جلسهٔ برنامه سبزه، جلسهٔ کتابخانه سبز روشن، و هفتهٔ نگه‌داشته یه تیک داره. روی یه روز بزن تا ببینی چی کار کردی. تنیس، پدل، مسابقه یا دویدن هیچ‌وقت تو برنامه‌ات نیست، پس اضافه‌اش کن: «+ اضافه کردن فعالیت» رو بزن، انتخاب کن چی بوده، کدوم روز (امروز یا ۳ روز گذشته)، چند دقیقه و چقدر سخت، بعد «ذخیره» رو بزن. زمین روی هفته‌هات تیره است، بقیه خاکستری. من هم می‌بینمش. تیم فقط وقتی می‌بینه که «فعالیت تو» رو روشن کنی: روی حرف‌های اول اسمت بزن، بعد «تیم چی می‌بینه».",
+    "Your activity": "فعالیت تو",
+    "Tennis, padel and runs you add on Your weeks: what, which day, how long. Never how hard. Off unless you turn it on.": "تنیس، پدل و دویدنی که تو «هفته‌های تو» اضافه می‌کنی: چی، کدوم روز، چقدر. هیچ‌وقت اینکه چقدر سخت بوده. خاموشه مگر اینکه روشنش کنی.",
+    "Last 7 days": "۷ روز گذشته",
+    "See its aims and your plan": "هدف‌هاش و برنامه‌ات رو ببین",
+    "updated your plan": "برنامه‌ات رو به‌روز کرد",
+    "See what changed and why": "ببین چی عوض شده و چرا"
   },
   "patterns": [
     [
@@ -26,6 +32,14 @@
     [
       "Cheer (.+)",
       "تشویق "
+    ],
+    [
+      "(.+)'s activity",
+      "فعالیت $1"
+    ],
+    [
+      "(\\d+) new notes from",
+      "{n1} یادداشت جدید از"
     ]
   ]
 }

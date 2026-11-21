@@ -6159,7 +6159,7 @@ declare v_me text := public.crew_who(); v_k jsonb;
 begin
   if p_kinds is null or jsonb_typeof(p_kinds) <> 'object' then raise exception 'crew:kinds'; end if;
   select coalesce(jsonb_object_agg(k.key, k.value), '{}'::jsonb) into v_k
-    from jsonb_each(p_kinds) k where k.key = any (public.crew_kind_list()) and jsonb_typeof(k.value) = 'boolean';
+    from jsonb_each(p_kinds) k where k.key = any (public.crew_kind_list() || array['activity']) and jsonb_typeof(k.value) = 'boolean';   -- stage118: activity
   update public.crew_consent c set kinds = c.kinds || v_k, updated_at = now() where c.athlete_id = v_me;
   if not found then raise exception 'crew:not_asked'; end if;
   return public.crew_me(v_me);
@@ -6285,7 +6285,8 @@ AS $function$
   -- stage96: ck and fv
   select case when p_id is null then null else jsonb_build_object(
     'answer', c.answer,
-    'kinds', (select jsonb_object_agg(k.kind, coalesce((c.kinds ->> k.kind)::boolean, true)) from unnest(public.crew_kind_list()) k(kind)),
+    'kinds', (select jsonb_object_agg(k.kind, coalesce((c.kinds ->> k.kind)::boolean, true)) from unnest(public.crew_kind_list()) k(kind))
+               || jsonb_build_object('activity', coalesce((c.kinds ->> 'activity')::boolean, false)),   -- stage118: off unless chosen
     'name', coalesce((select nullif(btrim(o.display_name), '') from public.leaderboard_optin o where o.athlete_id = p_id), c.name, public.crew_default_name(p_id)),
     'on_board', exists (select 1 from public.leaderboard_optin o where o.athlete_id = p_id),
     'under13', coalesce(c.under13, false),
@@ -6608,6 +6609,15 @@ begin
   if v_own and not coalesce(c.under13, false) and to_regprocedure('public.crew_referral(text)') is not null then
     execute 'select public.crew_referral($1)' into v_ref using v_subj;
     if v_ref is not null then v_out := v_out || jsonb_build_object('referral', v_ref); end if;
+  end if;
+  -- stage118: their own activity, when they chose to show it (kind, day, minutes; never how hard)
+  if v_member and coalesce((c.kinds ->> 'activity')::boolean, false) then
+    v_out := v_out || jsonb_build_object('activity', (select coalesce(jsonb_agg(jsonb_build_object('day', a.day, 'kind', a.kind, 'minutes', a.minutes)
+                                                                                  order by a.day desc, a.created_at desc), '[]'::jsonb)
+                                                         from public.activity_log a where a.athlete_id = v_subj and a.day >= current_date - 6));
+  end if;
+  if v_own then
+    v_out := v_out || jsonb_build_object('kinds', coalesce(v_out -> 'kinds', '{}'::jsonb) || jsonb_build_object('activity', coalesce((c.kinds ->> 'activity')::boolean, false)));
   end if;
   return v_out || jsonb_build_object('at', now());
 end $function$;

@@ -6215,6 +6215,43 @@ S['courtside-goal'] = async (b) => {
   return r;
 };
 
+// 2026-11-21: Amir ticks a goal at the end of a CYCLE, which often lands in the next month. In the first 7 days of a month the header
+// shows last month's goal too, with its own ✓ Mark done; from the 8th it is gone (the athlete's app keeps the tick in Your moments).
+S['courtside-goal-late'] = async (b) => {
+  const r = { id: 'courtside-goal-late', title: 'An athlete\'s header, 1st to 7th: last month\'s goal with its own Mark done and Undo; gone from the 8th', checks: [] };
+  const { page, log } = await L.openCoach(b, { fixedTime: '2026-12-03T10:00:00Z', seed: { court: true }, hash: 'today' });
+  await L.settle(page, 400);
+  await page.evaluate(() => { window.__DB.career_goals.push({ athlete_id: 'ben_test', month: '2026-11-01', line: 'RPE on every main lift.', done_at: null, created_at: '2026-11-01T09:00:00Z', updated_at: '2026-11-01T09:00:00Z' }); });
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 800);
+  await L.go(page, 'a/ben_test');
+  const lines = () => page.locator('.dethead .det-goal').evaluateAll(els => els.map(el => el.innerText.replace(/\s+/g, ' ').trim()));
+  let ls = await lines();
+  check(r, 'on 3 December Ben\'s header shows "November goal", its line and ✓ Mark done, then December\'s goal as before', ls.length === 2 && /^November goal RPE on every main lift\. ✓ Mark done$/.test(ls[0]) && /^December goal Squat three times a week and log every set\. ✓ Mark done Edit From you today: /.test(ls[1]), ls);
+  let n0 = await L.nCalls(page);
+  await page.locator('.dethead .det-goal').first().locator('button', { hasText: '✓ Mark done' }).click(); await L.settle(page, 500);
+  let gd = rpcs(await L.callsSince(page, n0), 'coach_goal_done');
+  check(r, 'its Mark done ticks NOVEMBER (p_month 2026-11-01), not December', gd.length === 1 && gd[0].payload.p_month === '2026-11-01' && gd[0].payload.p_done === true && gd[0].payload.p_athlete_id === 'ben_test', gd.map(c => c.payload));
+  ls = await lines();
+  check(r, 'it then reads "✓ Done 3 Dec" with Undo, and December\'s goal is still open', /^November goal RPE on every main lift\. ✓ Done 3 Dec Undo$/.test(ls[0]) && /December goal .* ✓ Mark done Edit/.test(ls[1]) && (await L.db(page)).career_goals.some(g => g.athlete_id === 'ben_test' && g.month === '2026-12-01' && !g.done_at), ls);
+  n0 = await L.nCalls(page);
+  await page.locator('.dethead .det-goal').first().locator('button', { hasText: 'Undo' }).click(); await L.settle(page, 500);
+  gd = rpcs(await L.callsSince(page, n0), 'coach_goal_done');
+  check(r, 'Undo unticks November', gd.length === 1 && gd[0].payload.p_month === '2026-11-01' && gd[0].payload.p_done === false, gd.map(c => c.payload));
+  await L.go(page, 'a/eli_new');
+  check(r, 'someone with no goal last month gets one line, as before', (await lines()).length === 1, await lines());
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  const o = await L.openCoach(b, { fixedTime: '2026-12-08T10:00:00Z', seed: { court: true }, hash: 'today' });
+  await L.settle(o.page, 400);
+  await o.page.evaluate(() => { window.__DB.career_goals.push({ athlete_id: 'ben_test', month: '2026-11-01', line: 'RPE on every main lift.', done_at: null, created_at: '2026-11-01T09:00:00Z', updated_at: '2026-11-01T09:00:00Z' }); });
+  await o.page.evaluate(() => hardRefresh()); await L.settle(o.page, 800);
+  await L.go(o.page, 'a/ben_test');
+  const l8 = await o.page.locator('.dethead .det-goal').evaluateAll(els => els.map(el => el.innerText.replace(/\s+/g, ' ').trim()));
+  check(r, 'on 8 December last month\'s goal is gone from the header', l8.length === 1 && /^December goal/.test(l8[0]), l8);
+  await o.ctx.close();
+  return r;
+};
+
 S['courtside-from-amir'] = async (b) => {
   const r = { id: 'courtside-from-amir', title: 'An athlete\'s header: "From Amir…" (one line a day, kept for their app) and Take back', checks: [] };
   // Tehran at 01:30 on the 10th is still the 9th in UTC: the day sent is the page's own, not the server's

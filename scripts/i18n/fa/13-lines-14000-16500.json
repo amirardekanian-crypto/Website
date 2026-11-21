@@ -62,6 +62,7 @@
     "Not yet": "هنوز نه",
     "Now": "الان",
     "Honours": "افتخارها",
+    "Goals": "هدف‌ها",
     "Latest": "تازه‌ترین",
     "All achievements": "همهٔ دستاوردها",
     "Show": "نمایش",
@@ -256,6 +257,26 @@
     [
       "(January|February|March|April|May|June|July|August|September|October|November|December) · from Amir",
       "{t1} · از طرف امیر"
+    ],
+    [
+      "(January|February|March|April|May|June|July|August|September|October|November|December) goal, done",
+      "هدف {t1}، انجام شد"
+    ],
+    [
+      "(January|February|March|April|May|June|July|August|September|October|November|December) goal, Done (.+)",
+      "هدف {t1}، انجام شد {d2}"
+    ],
+    [
+      "(January|February|March|April|May|June|July|August|September|October|November|December) goal",
+      "هدف {t1}"
+    ],
+    [
+      "From Amir · Done (.+)",
+      "از طرف امیر · انجام شد {d1}"
+    ],
+    [
+      "Done (\\d{1,2} (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(?: \\d{4})?)",
+      "انجام شد {d1}"
     ],
     [
       "Full month: (January|February|March|April|May|June|July|August|September|October|November|December)",

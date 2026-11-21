@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=12" data-fa="/assets/js/i18n-fa.js?v=19"></script>
+<script src="/assets/js/i18n.js?v=12" data-fa="/assets/js/i18n-fa.js?v=20"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -12259,7 +12259,7 @@ const APP_GUIDE = [
   { icon: 'check-circle', key: 'hold', title: 'Hold Serve: weeks in a row you trained',
     body: `<p>A week is <strong>held</strong> when you finish every session in it. Stopping a session early still counts. Library sessions don't.</p><p>Hold weeks in a row and the count beside <strong>This Week</strong> on Home goes up — the count next to it says what is left this week. Miss a week and it starts again from the next week you hold. The time between cycles never counts against you.</p><p>The weeks are your plan's own weeks, the same ones <strong>This Week</strong> counts. The number is worked out on my side, so after a week ends it can take until your next session to update.</p>` },
   { icon: 'activity', key: 'weeks', title: 'Your weeks and your own activity',   // 2026-11-21: Five Weeks (#122) and Court Log (#123), told in the guide by the What's new rule
-    body: `<p>Your weeks, on Progress, shows your cycle a week to a row, with a square for each day. A plan session is green, a Library session is mint, and a held week has a tick. Tap a day to see what you did. Tennis, padel, a match or a run never shows in your plan, so add it: tap + Add activity, choose what it was, which day (today or the last 3 days), the minutes and how hard, then tap Save. Court time is dark on your weeks, anything else grey. I see it too. The crew never does.</p>` },
+    body: `<p>Your weeks, on Progress, shows your cycle a week to a row, with a square for each day. A plan session is green, a Library session is mint, and a held week has a tick. Tap a day to see what you did. Tennis, padel, a match or a run never shows in your plan, so add it: tap + Add activity, choose what it was, which day (today or the last 3 days), the minutes and how hard, then tap Save. Court time is dark on your weeks, anything else grey. I see it too. The crew sees it only if you turn on Your activity: tap your initials, then What the crew sees.</p>` },
   { icon: 'compass', key: 'lang', title: 'Language',   // 2026-11-21: Settings → Language for every athlete
     body: `<p>The app speaks English and Farsi. Tap your initials, then Language, to switch. Everything I write for you comes in both languages, and the names of the exercises stay in English.</p>` },
   { icon: 'activity', key: 'share', title: 'Share a win',
@@ -14540,15 +14540,24 @@ function csAchRowHTML() {
 // a goal they have to do. not their cycle outcome"). It sat in the middle of the card above, between the four numbers and the
 // doors, where it read as one more statistic. It is a job he set: his label in clay (DS-01 — it asks for something), his line in
 // ink, and a ring that fills green when he ticks it off in Courtside. One line, at most 140 characters, from career_goals.
+// A goal ticked after its month (Amir ticks at the end of a CYCLE, which is not the end of a month; 2026-11-21: "when its ticked,
+// it will be for end of the cycle, how they can see they have done it?") stays on the card for 7 days from the tick, above this
+// month's own goal, so the tick is seen. After that it lives on in Achievements → Goals (cabGoals(), from momentsList()'s kind 'goal').
+const GOAL_LATE_DAYS = 7;
+function goalLateDone() {
+  const my = MOM_T && MOM_T.my, cur = my && my.goal && my.goal.month, now = Date.now();
+  return ((my && my.goals) || []).filter(g => g && g.line && g.done_at && g.month !== cur
+      && now - new Date(g.done_at).getTime() < GOAL_LATE_DAYS * 864e5)
+    .sort((a, b) => String(b.month).localeCompare(String(a.month)))[0] || null;
+}
 function goalCardHTML() {
-  const g = MOM_T && MOM_T.my && MOM_T.my.goal;
-  if (!g || !g.line) return '';
-  const mon = momMonth(g.month, true);
-  return `<div class="goal-card${g.done_at ? ' is-done' : ''}">
+  const cur = MOM_T && MOM_T.my && MOM_T.my.goal;
+  const card = g => `<div class="goal-card${g.done_at ? ' is-done' : ''}">
     <span class="goal-ring" aria-hidden="true"></span>
-    <span class="goal-b"><span class="goal-k">${esc(mon)} · ${g.done_at ? 'done' : 'from Amir'}</span><span class="goal-l">${esc(g.line)}</span>`
-    + (g.done_at && !window.IS_PREVIEW ? '<button type="button" class="mo-share" onclick="shareGoal()">Share</button>' : '')
+    <span class="goal-b"><span class="goal-k">${esc(momMonth(g.month, true))} · ${g.done_at ? 'done' : 'from Amir'}</span><span class="goal-l">${esc(g.line)}</span>`
+    + (g.done_at && !window.IS_PREVIEW ? `<button type="button" class="mo-share" onclick="shareGoal('${esc(String(g.month).slice(0, 10))}')">Share</button>` : '')
     + `</span></div>`;
+  return [goalLateDone(), cur].filter(g => g && g.line).map(card).join('');
 }
 // "2026-09-01" → "September" (long) or "Sep".
 function momMonth(d, long) {
@@ -14605,6 +14614,13 @@ function momentsList() {
     const sort = nx ? nx.getFullYear() + '-' + String(nx.getMonth() + 1).padStart(2, '0') + '-01' : h.month;
     const hv = h.honour === 'sessions' && n > 0 ? { n } : h.honour === 'improved' && pct > 0 ? { pct, lift: v.lift ? String(v.lift) : '' } : {};
     out.push({ day: h.month, sort, kind: 'honour', w, s, honour: true, hKind: h.honour, hv });
+  });
+  // Every goal Amir ticked, on the day he ticked it (2026-11-21: the card shows a month's goal only during that month and 7 days after
+  // a late tick, so this is where a done goal lives on). The title names the goal's month; the day is the tick's.
+  ((my && my.goals) || []).forEach(g => {
+    if (!g || !g.line || !g.done_at || !g.month) return;
+    const day = ymdLocal(new Date(g.done_at));
+    out.push({ day, sort: day, kind: 'goal', w: momMonth(g.month, true) + ' goal, done', s: g.line, goalMonth: String(g.month).slice(0, 10) });
   });
   const saw = new Set(((my && my.saw) || []).filter(x => typeof x === 'string'));
   out.forEach(x => { x.saw = !!(x.award_id && saw.has(x.award_id)); });
@@ -14924,6 +14940,38 @@ function cabHonours() {
   try { l = momentsList().filter(x => x.kind === 'honour' && CAB_HON_NAME[x.hKind]); } catch (e) { l = []; }
   return l.map(x => ({ key: 'hon:' + String(x.day).slice(0, 7) + ':' + x.hKind, x, month: String(x.day).slice(0, 7), name: CAB_HON_NAME[x.hKind], mon: momMonth(x.day, true) + ' ' + String(x.day).slice(0, 4) }));
 }
+// Goals done (2026-11-21, Amir: "when its ticked ... how they can see they have done it?"): every goal Amir ticked, newest first, in
+// the cabinet beside the honours. Your moments, where momentsList() first put them, has had no door since 2026-10-25, so this is
+// where a done goal lives on after the 7 days the Progress card keeps a late tick (goalLateDone()). Green and white, like an honour.
+function cabGoals() {
+  let l = [];
+  try { l = momentsList().filter(x => x.kind === 'goal' && x.goalMonth); } catch (e) { l = []; }
+  return l.map(x => ({ key: 'goal:' + x.goalMonth.slice(0, 7), x, name: momMonth(x.goalMonth, true) + ' goal', done: 'Done ' + cabDay(x.day) }));
+}
+const CAB_GOAL_SVG = '<svg viewBox="0 0 112 112" aria-hidden="true"><circle cx="56" cy="56" r="40" fill="none" stroke="#fff" stroke-width="5"/>'
+  + '<path d="M38 57l12 12 24-26" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function cabGoalCard(g) {
+  return `<button type="button" class="cab-card cab-hon" data-k="${esc(g.key)}" onclick="openGoalDone(this.dataset.k)" aria-label="${esc(g.name + ', ' + g.done).replace(/"/g, '&quot;')}">`
+    + `<span class="cab-em">${CAB_GOAL_SVG}</span><span class="cab-cn">${esc(g.name)}<small>${esc(g.done)}</small></span></button>`;
+}
+function openGoalDone(key) {
+  const ov = document.getElementById('hist-overlay'), g = cabGoals().find(x => x.key === String(key || ''));
+  if (!ov || !g) return;
+  const sp = hlMomentSpec(g.x);
+  ov.querySelector('.readiness-modal').innerHTML = `<div class="cab-sh">
+    <div class="cab-sh-em is-hon" role="img" aria-label="${esc(g.name).replace(/"/g, '&quot;')}">${CAB_GOAL_SVG.replace('viewBox', 'width="210" height="210" viewBox')}</div>
+    <p class="cab-sh-kind">From Amir · ${esc(g.done)}</p>
+    <h2 class="readiness-title">${esc(g.name)}</h2>
+    <p class="cab-sh-p" dir="auto">${esc(g.x.s)}</p>
+    ${sp && !window.IS_PREVIEW && !window.IS_DEMO ? `<button type="button" class="cab-go" data-k="${esc(g.key)}" onclick="cabGoalShare(this.dataset.k)">Share it</button>` : ''}</div>`;
+  ov.classList.add('visible');
+}
+window.openGoalDone = openGoalDone;
+function cabGoalShare(key) {
+  const g = cabGoals().find(x => x.key === String(key || '')), sp = g && hlMomentSpec(g.x);
+  if (sp) openShareSheet([sp], 0);
+}
+window.cabGoalShare = cabGoalShare;
 function cabHonCard(h) {
   const E = cabE();
   return `<button type="button" class="cab-card cab-hon" data-k="${esc(h.key)}" onclick="openHonour(this.dataset.k)" aria-label="${esc(h.name + ', ' + h.mon).replace(/"/g, '&quot;')}">`
@@ -14976,6 +15024,8 @@ function cabHTML(items) {
   }
   const hon = (f === 'all' || f === 'won') ? cabHonours() : [];
   if (hon.length) h += `<div class="cab-h"><h2 class="cab-t">Honours</h2><span class="cab-n">${hon.length}</span></div><div class="cab-latest">${hon.map(cabHonCard).join('')}</div>`;
+  const gl = (f === 'all' || f === 'won') ? cabGoals() : [];
+  if (gl.length) h += `<div class="cab-h"><h2 class="cab-t">Goals</h2><span class="cab-n">${gl.length}</span></div><div class="cab-latest">${gl.map(cabGoalCard).join('')}</div>`;
   if (latest.length) h += `<div class="cab-h"><h2 class="cab-t">Latest</h2></div><div class="cab-latest">${latest.map(cabCard).join('')}</div>`;
   const chips = [['all', 'All'], ['won', 'Won'], ['todo', 'To win'], ['consistency', 'Consistency'], ['commitment', 'Commitment'], ['progress', 'Progress'], ['resilience', 'Resilience']];
   h += `<div class="cab-h"><h2 class="cab-t">All achievements</h2></div><div class="cab-filter" role="group" aria-label="Show">`
@@ -17357,6 +17407,7 @@ function playerHTML(key, p, note) {
   if (tiles) b += `<h2 class="prog-sec">${own ? 'Your numbers' : esc(first) + "'s numbers"}</h2>${tiles}`;
   if (own) b += playerPartnerHTML(p);      // Bring a partner (step 9): your page only, right after the numbers
   b += playerCycleHTML(key, p, own, mk);   // This cycle (step 4): the week bars, with the extra sessions as dots
+  b += playerActivityHTML(p, own, first);   // their own activity, only when they chose to show it (stage118, 2026-11-21)
   b += playerFactsHTML(key, p, own);       // Player facts (step 5)
   const tro = plTrophies(p), medals = plMedals(lvN);
   if (tro.length) {
@@ -17729,6 +17780,15 @@ function playerActionsHTML(key, p) {
 }
 // "Cheers this week": the last 7 days' cheers, newest first: the face, the name (Coach for Amir), the word, the day. The number is the tile's (`cheers.total`, every cheer
 // sent with the clap button since joining, no likes); a season count beside it would say the same thing twice, so the heading carries none.
+// Your activity on a page (2026-11-21, stage118): the last 7 days of what the person added on Your weeks, only when they turned on "Your activity" in
+// What the crew sees. What, which day, how long; never how hard. Your own page shows it too while it is on, so you see what the crew sees.
+function playerActivityHTML(p, own, first) {
+  const a = Array.isArray(p.activity) ? p.activity : null;
+  if (!a || !a.length) return '';
+  const rows = a.slice(0, 7).map(r => `<div class="pl-row"><div><span class="t">${esc(ACT_LABEL[r.kind] || plCap(String(r.kind || 'Activity')))}</span>`
+    + `<span class="q">${esc(plDay(r.day))} · ${Number(r.minutes) || 0} min</span></div></div>`).join('');
+  return `<h2 class="prog-sec">${own ? 'Your activity' : esc(first) + "'s activity"}<span class="prog-sec-n">Last 7 days</span></h2><div class="pl-list">${rows}</div>`;
+}
 function playerCheerRow(r, own) {
   const mineCk = crewMe().ck, pp = r.coach ? { amir: true, who: 'Amir' } : { ck: r.ck || null, fv: r.fv == null ? null : r.fv, who: r.who || '', me: !!(mineCk && r.ck === mineCk) };
   const q = [r.word ? `<span dir="auto">${esc(r.word)}</span>` : '', esc(crewDayWord(r.day))].filter(Boolean).join(' · ');
@@ -18067,7 +18127,11 @@ const CREW_KINDS = [
   ['session', 'A session finished', 'One line a day, naming whoever trained'],
   ['level', 'A new level'], ['week', 'A week held', 'And how many in a row'], ['mark', 'A mark', '8 weeks held, 50 sessions with Amir, 10 bests…'],
   ['achievement', 'An achievement'], ['best', 'A personal best', 'The lift and its weight'], ['cycle', 'A cycle finished'],
-  ['honour', "The month's honours"], ['open', 'The Monthly Open']];
+  ['honour', "The month's honours"], ['open', 'The Monthly Open'],
+  // Your activity (2026-11-21; Amir: "let people choose if they allow other people to see their activity or no like other things in the setting"): what you add
+  // on Your weeks (Court Log). OFF until you turn it on, unlike every other switch here, because it was private when it began (stage118).
+  ['activity', 'Your activity', 'Tennis, padel and runs you add on Your weeks: what, which day, how long. Never how hard. Off unless you turn it on.']];
+const CREW_KINDS_OFF = ['activity'];   // switches that are off until the athlete turns them on
 // ── Reminders (stage84, 2026-10-19) ──────────────────────────────────────────────────────────────
 // Amir: "the push should be automatically on, unless they want to turn off in their app settings."
 // So every kind is on from the moment the phone allows it, and this panel is where they come off.
@@ -18314,7 +18378,7 @@ function openCrewSettings() {
   const ov = document.getElementById('hist-overlay');
   if (!ov || !BELL) return;
   const me = crewMe(), yes = me.answer === 'yes', kinds = me.kinds || {};
-  const sw = CREW_KINDS.map(([k, w, s]) => `<label class="cr-sw"><span>${esc(w)}${s ? `<small>${esc(s)}</small>` : ''}</span><input type="checkbox" data-kind="${k}" ${kinds[k] === false ? '' : 'checked'}></label>`).join('');
+  const sw = CREW_KINDS.map(([k, w, s]) => `<label class="cr-sw"><span>${esc(w)}${s ? `<small>${esc(s)}</small>` : ''}</span><input type="checkbox" data-kind="${k}" ${(CREW_KINDS_OFF.indexOf(k) >= 0 ? kinds[k] === true : kinds[k] !== false) ? 'checked' : ''}></label>`).join('');
   ov.querySelector('.readiness-modal').innerHTML = `
     <div class="readiness-eyebrow">Crew</div>
     <h2 class="readiness-title">What the crew sees</h2>
@@ -27780,6 +27844,7 @@ function hlMomentSpec(x) {
   const first = hlFirst();
   if (x.kind === 'mark' && x.markKey && x.markN > 0) return { kind: 'mark', key: x.markKey, n: x.markN, next: x.markNext || 0, date: x.day, first };
   if (x.kind === 'achievement') return { kind: 'achievement', name: x.w, caption: x.s || '', meaning: x.meaning || '', date: x.day, first, emblem: x.aid ? { k: 'ach', id: x.aid } : undefined };
+  if (x.kind === 'goal' && x.goalMonth) return hlGoalSpec(x.goalMonth);
   if (x.kind === 'honour' && x.hKind) return Object.assign({ kind: 'honour', honour: x.hKind, monthIso: x.day, date: x.sort, first }, x.hv || {});
   return null;
 }
@@ -27807,12 +27872,14 @@ function hlPlayerSpec() {
 function sharePlayerCard() { const s = hlPlayerSpec(); if (s) openShareSheet([s], 0); }
 window.sharePlayerCard = sharePlayerCard;
 // The month's goal, ticked (L10): Amir's own line, in his words, with DONE on it.
-function hlGoalSpec() {
-  const g = MOM_T && MOM_T.my && MOM_T.my.goal;
+// Any month's goal, not only this month's (2026-11-21: a goal ticked at the end of a cycle is often last month's).
+function hlGoalSpec(month) {
+  const my = MOM_T && MOM_T.my, m = month ? String(month).slice(0, 10) : '';
+  const g = !m ? my && my.goal : ((my && my.goals) || []).concat(my && my.goal ? [my.goal] : []).find(x => x && String(x.month).slice(0, 10) === m);
   if (!g || !g.line || !g.done_at) return null;
-  return { kind: 'goal', first: hlFirst(), month: momMonth(g.month, true), text: g.line, date: String(g.done_at).slice(0, 10) };
+  return { kind: 'goal', first: hlFirst(), month: momMonth(g.month, true), text: g.line, date: ymdLocal(new Date(g.done_at)) };
 }
-function shareGoal() { const s = hlGoalSpec(); if (s) openShareSheet([s], 0); }
+function shareGoal(month) { const s = hlGoalSpec(month); if (s) openShareSheet([s], 0); }
 window.shareGoal = shareGoal;
 // A new level, offered on the finished card when the session took them up one.
 function shareLevel(lv) {
@@ -28433,18 +28500,24 @@ function inboxScan() {
   try { wnote = cyc ? weekNoteNow(cyc) : null; } catch (e) { wnote = null; }
   const wn = wnote ? idx + '|' + wnote.wk + '|' + inboxHash(wnote.text) : '';
   const cards = ((DATA.notes && DATA.notes.cards) || []).map(c => String((c && c.title) || '') + '|' + String((c && c.date) || ''));
+  // The plan (2026-11-21, Amir: "they should also know when their whole 6 month plan changes ... by clicking it goes to the tab and shows them"):
+  // a fingerprint of every cycle's name, weeks, focus, aims and teaser, so a change Amir makes to the road is noticed like a new note.
+  const rm = inboxHash(JSON.stringify((DATA.cycles || []).map(c => c ? [c.name, c.weeks, c.focus, c.outcomes, c.teaser, c.aims] : null)));
   const rec = all[ATHLETE_ID];
   const now = new Date().toISOString();
   if (!rec || typeof rec !== 'object') {
-    all[ATHLETE_ID] = { wn, nc: cards, cy: idx, rows: [] };
+    all[ATHLETE_ID] = { wn, nc: cards, cy: idx, rm, rows: [] };
   } else {
     const rows = (Array.isArray(rec.rows) ? rec.rows : []).filter(r => r && Date.now() - Date.parse(r.at) < 7 * 86400000);
     const put = row => { const i = rows.findIndex(r => r.k === row.k); if (i >= 0) rows.splice(i, 1); rows.unshift(row); };
     if (wn && wn !== rec.wn) put({ k: 'wn', at: now });
-    const known = Array.isArray(rec.nc) ? rec.nc : [], fresh = cards.findIndex(c => known.indexOf(c) < 0);
-    if (fresh >= 0) put({ k: 'nc', at: now, i: fresh, title: ((DATA.notes.cards[fresh] || {}).title) || '' });
-    if (Number.isInteger(rec.cy) && idx > rec.cy) put({ k: 'cy', at: now, name: (cyc && cyc.name) || '' });
-    all[ATHLETE_ID] = { wn, nc: cards, cy: idx, rows };
+    // New notes (2026-11-21, Amir: "i want them to recive a note for their new notes, and when clicked, goes to the tab"): one row that says how many
+    const known = Array.isArray(rec.nc) ? rec.nc : [], freshAll = cards.map((c, i) => known.indexOf(c) < 0 ? i : -1).filter(i => i >= 0), fresh = freshAll.length ? freshAll[0] : -1;
+    if (fresh >= 0) put({ k: 'nc', at: now, i: fresh, n: freshAll.length, title: ((DATA.notes.cards[fresh] || {}).title) || '' });
+    const advanced = Number.isInteger(rec.cy) && idx > rec.cy;
+    if (advanced) put({ k: 'cy', at: now, name: (cyc && cyc.name) || '' });
+    else if (rec.rm && rm !== rec.rm) put({ k: 'pl', at: now });   // the road changed inside a cycle: its own row (a new cycle's row already says to look at the plan)
+    all[ATHLETE_ID] = { wn, nc: cards, cy: idx, rm, rows };
   }
   try { _lsRawSet(INBOX_KNOWN, JSON.stringify(all)); } catch (e) { /* storage full: nothing is lost, the next open compares again */ }
 }
@@ -28610,8 +28683,9 @@ function inboxSpec(r, i) {
     case 'news': t = `<b>Amir</b>: ${esc(r.title || '')}`; q = r.first || ''; face = { amir: true, who: 'Amir' }; break;   // What's new (2026-11-21)
     case 'answer': t = '<b>Amir</b> answered your question'; q = String(r.q || ''); face = { amir: true, who: 'Amir' }; break;
     case 'wn': t = '<b>Amir</b> wrote your week note'; face = { amir: true, who: 'Amir' }; break;
-    case 'nc': t = 'A new note from <b>Amir</b>'; q = String(r.title || ''); face = { amir: true, who: 'Amir' }; break;
-    case 'cy': t = `Your new cycle is here${r.name ? ': <b>' + esc(r.name) + '</b>' : ''}`; face = { amir: true, who: 'Amir' }; break;
+    case 'nc': t = Number(r.n) > 1 ? `${Number(r.n)} new notes from <b>Amir</b>` : 'A new note from <b>Amir</b>'; q = String(r.title || ''); face = { amir: true, who: 'Amir' }; break;
+    case 'cy': t = `Your new cycle is here${r.name ? ': <b>' + esc(r.name) + '</b>' : ''}`; q = 'See its aims and your plan'; face = { amir: true, who: 'Amir' }; break;
+    case 'pl': t = '<b>Amir</b> updated your plan'; q = 'See what changed and why'; face = { amir: true, who: 'Amir' }; break;
     default: return null;
   }
   const p = crewPersonOf(face);
@@ -28688,10 +28762,22 @@ function inboxGo(i) {
       setTimeout(() => { const b = document.getElementById('cn-h-' + Number(r.i)); if (b) { if (b.getAttribute('aria-expanded') !== 'true') b.click(); try { b.scrollIntoView({ block: 'center' }); } catch (e) { b.scrollIntoView(); } } }, 60);
       break;
     }
-    case 'cy': goTo('home'); break;
+    case 'cy': case 'pl': inboxShowPlan(); break;   // the Game Plan on Progress, the current cycle's row open with its aims (2026-11-21; it opened Home before)
   }
 }
 window.inboxGo = inboxGo;
+// Progress, scrolled to the Game Plan, the current cycle's row opened and lit: its aims, its focus and what comes next are in it.
+function inboxShowPlan() {
+  goTo('plan');
+  setTimeout(() => {
+    const row = document.querySelector('#road-wrap .road-row.is-now') || document.querySelector('#road-wrap .road-row');
+    if (!row) return;
+    const head = row.querySelector('button.road-head[aria-expanded="false"]');
+    if (head) head.click();
+    try { row.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) { row.scrollIntoView(); }
+    crewLight('#road-wrap .road-row.is-now', 'stay');
+  }, 120);
+}
 // Your own cheers (Cheers this week on your page), newest first, with the newest row lit. The one place both Land on It (step 1) and the Inbox's cheer rows use.
 function crewShowMyCheers(from) {
   if (!crewPagesOn()) { goTo('crew'); return; }

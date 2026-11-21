@@ -3879,6 +3879,12 @@ function goalLineHtml(a) {
       ? `<span class="gdone">✓ Done ${esc(dayMonth(dkey(new Date(g.done_at))))}</span><button class="btn sm quiet" onclick="goalDone(${idq}, false)">Undo</button>`
       : `<button class="btn sm" onclick="goalDone(${idq}, true)">✓ Mark done</button>`}<button class="btn sm quiet" onclick="goalEdit(${idq})">Edit</button>`;
   else goal = `<span class="gk">No ${esc(mn)} goal yet</span><button class="btn sm" onclick="goalEdit(${idq})">Write one</button>`;
+  // Last month's goal, in the first 7 days of this one (2026-11-21, Amir ticks at the end of a CYCLE, which often lands in the next
+  // month). The server takes a tick for last month (coach_goal_done); the athlete's card shows a late tick for 7 days, then Your moments.
+  const pm = lastMonthKey(), pg = Number(todayKey().slice(8, 10)) <= 7 ? (S.goals[a.id] || {})[pm] : null;
+  if (pg && _goalEdit !== a.id) goal = `<span class="gk">${esc(monthName(pm))} goal</span><span class="gl" dir="auto">${esc(pg.line)}</span>${pg.done_at
+      ? `<span class="gdone">✓ Done ${esc(dayMonth(dkey(new Date(pg.done_at))))}</span><button class="btn sm quiet" onclick="goalDone(${idq}, false, '${pm}')">Undo</button>`
+      : `<button class="btn sm" onclick="goalDone(${idq}, true, '${pm}')">✓ Mark done</button>`}</div><div class="det-goal">` + goal;
   if (_fromEdit === a.id) {
     return `<div class="det-goal" id="goalLine">${goal}</div>
       <div class="from-box"><span class="t-sm muted">From Amir · one line, kept for their app (they see it once the app update ships) · <span id="fromCount">${_fromDraft.length}</span>/90</span>
@@ -3906,8 +3912,8 @@ async function goalSave(id) {
   toast(r.data ? 'Goal saved' : 'Goal cleared');
   render();
 }
-async function goalDone(id, done) {
-  const m = monthOf(todayKey());
+async function goalDone(id, done, month) {
+  const m = month || monthOf(todayKey());
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   const r = await sb.rpc('coach_goal_done', { p_athlete_id: id, p_month: m, p_done: done });
   if (r.error) { fail('The goal was not changed: ' + r.error.message); return; }
