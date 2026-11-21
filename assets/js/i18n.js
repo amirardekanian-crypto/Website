@@ -310,7 +310,7 @@
     // "ویدیو۶۰ مرحله"; "هفته ۱ تا ۵ · تمام" looked like "۵۰"): in a Farsi line it is a Persian comma, also at the line's
     // end where the next piece is its own element. A right-to-left mark rides after it: a Persian digit straight after a
     // Latin name took the name's direction ("Split Step · 1 of 4" was drawn "۴ از SPLIT STEP ،۱").
-    return m[1] + faDose(faDots(faMixed(r))) + m[3];
+    return m[1] + faDose(faDots(faMixed(faEffort(r)))) + m[3];
   }
   function faDots(r) {
     return /[\u0600-\u06FF]/.test(r) ? r.replace(/\s+·\s+/g, '،' + RLM + ' ').replace(/\s+·$/, '،' + RLM) : r;
@@ -353,6 +353,11 @@
   var NBSP = String.fromCharCode(0xA0), WJ = String.fromCharCode(0x2060);
   var TEMPO = /[0-9۰-۹](?:-[0-9۰-۹]){2,}/, TEMPO_G = /[0-9۰-۹](?:-[0-9۰-۹]){2,}/g;
   var LATIN_RUN = new RegExp("\\(?[A-Za-z][A-Za-z0-9'’&.\\-]*(?:[ " + NBSP + "]+[A-Za-z0-9][A-Za-z0-9'’&.\\-]*)*\\)?", 'g');
+  // In a Farsi line, the effort score is شدت (Amir, 2026-11-21: "effort should be changed to sheddat in demo and elsewhere").
+  // The programmes' Farsi says RPE; the app's effortWord() turns RPE into "Effort" before drawing, inside Farsi too
+  // ("Effort یعنی چی", "از هر effort یکی کم کن"). Here it becomes the Farsi word.
+  var EFFORT = /\b[Ee]ffort\b/g;
+  function faEffort(s) { return /[\u0600-\u06FF]/.test(s) && /ffort/.test(s) ? s.replace(EFFORT, 'شدت') : s; }
   function faMixed(s) {
     if (!/[\u0600-\u06FF]/.test(s) || !/[A-Za-z]/.test(s) || s.indexOf(ISO_L) >= 0 || s.indexOf(ISO_F) >= 0) return s;
     function wrap(t) {
@@ -393,7 +398,7 @@
       if (r != null) { if (r !== d) n.data = r; }
       else {
         if (A.missing.size < 5000 && /[A-Za-z]{2}/.test(d)) A.missing.add(norm(d));
-        if (!(p && p.closest && p.closest('[dir="auto"]'))) { var mx = faMixed(d); if (mx !== d) n.data = mx; }
+        if (!(p && p.closest && p.closest('[dir="auto"]'))) { var mx = faMixed(faEffort(d)); if (mx !== d) n.data = mx; }
       }
     }
     // A tempo ("3-1-1-0", "۳-۱-۱") never breaks at its hyphens: the help sheet put "3-1-1-" at a line's end and "0" on the
