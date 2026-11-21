@@ -576,7 +576,8 @@
 // v259: i18n.js (?v=4) and i18n-fa.js (?v=11) changed (2026-11-21, the Farsi app walked screen by screen): chevrons and arrows point the way
 // the page reads, Latin doses stay left to right, a Persian comma for the dot beside a digit, Space Mono's wide space, the rest pill's clock,
 // the rest games' centred cards, and the words that were left in English.
-const CACHE = 'aap-v259';
+// v260: i18n-fa.js (?v=12) changed (2026-11-21): Farsi for First Light's block titles and focus tag (workouts/care/morning-back.json).
+const CACHE = 'aap-v260';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -617,7 +618,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=4',
-  '/assets/js/i18n-fa.js?v=11',
+  '/assets/js/i18n-fa.js?v=12',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).
