@@ -1,0 +1,246 @@
+{
+  "id": "morning-back",
+  "title": "First Light",
+  "category": "care",
+  "countsAs": "mobility",
+  "duration": "14 min",
+  "equipment": "Bodyweight",
+  "focusTag": "Morning Back Stiffness",
+  "intro": [
+    "Mornings are when a sore back feels stiffest. You have been still all night and the discs in your spine have soaked up water, so they are fuller and less happy to bend. That stiff feeling is not something stuck that needs stretching. It is your back being careful, and what settles it is easy movement.",
+    "So we start in bed with slow breathing and small movements, get onto all fours to move the spine and hips through the easy middle of their range, switch the deep trunk muscles on with short holds, then stand up and walk. Do it every morning, straight out of bed. It takes about 14 minutes and you need a bit of floor and a wall. Steady Spine is the longer session for the days you train."
+  ],
+  "before": [
+    {
+      "label": "Back red flags",
+      "text": "Pain down a leg, numbness, weakness in a leg or foot, or numbness between your legs. If your bladder or bowel control changes, get seen the same day."
+    },
+    {
+      "label": "While you train",
+      "text": "A bit of ache is fine. Sharp pain isn't, and neither is pain that builds through a set or feels worse the next morning. If it builds, stop that exercise. If it's sharp, stop the session."
+    },
+    {
+      "label": "Keep it small",
+      "text": "This wakes your back up, it doesn't stretch it. Leave toe touches and pulling your knees to your chest for later in the day. If one move makes your back feel worse, skip it and carry on."
+    }
+  ],
+  "blocks": [
+    {
+      "title": "Still in Bed",
+      "icon": "🛏️",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "90/90 Breathing",
+          "exId": "90-90-breathing",
+          "note": "Do it in bed with your knees bent and feet flat, no bench needed.",
+          "rx": { "reps": 6 }
+        },
+        {
+          "type": "simple",
+          "name": "Supine Pelvic Tilt",
+          "exId": "supine-pelvic-tilt",
+          "rx": { "reps": 10 }
+        },
+        {
+          "type": "simple",
+          "name": "Supine Knee Rock",
+          "exId": "supine-knee-rock",
+          "rx": { "reps": 6, "side": true }
+        }
+      ]
+    },
+    {
+      "title": "On All Fours",
+      "icon": "🧘",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Cat-Cow",
+          "exId": "cat-cow",
+          "rx": { "reps": 8 }
+        },
+        {
+          "type": "simple",
+          "name": "Quadruped Thoracic Rotation",
+          "exId": "quadruped-thoracic-rotation",
+          "rx": { "reps": 5, "side": true }
+        },
+        {
+          "type": "simple",
+          "name": "Half-Kneeling Hip Flexor Rock",
+          "exId": "half-kneeling-hip-flexor-rock",
+          "rx": { "reps": 6, "side": true }
+        }
+      ]
+    },
+    {
+      "title": "Switch On",
+      "icon": "🧱",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Bird Dog",
+          "exId": "bird-dog",
+          "note": "Stop every set well before you tire, because this is a wake-up and not a workout.",
+          "rx": { "sets": 2, "reps": 4, "side": true, "tempo": "1-0-1-8", "rest": 20 }
+        },
+        {
+          "type": "standard",
+          "name": "Kneeling Side Plank",
+          "exId": "kneeling-side-plank",
+          "rx": { "sets": 2, "reps": 2, "side": true, "tempo": "1-0-1-8", "rest": 20 }
+        },
+        {
+          "type": "standard",
+          "name": "Glute Bridge",
+          "exId": "glute-bridge",
+          "rx": { "sets": 2, "reps": 8, "rest": 20 }
+        }
+      ]
+    },
+    {
+      "title": "Up and Out",
+      "icon": "🚶",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Wall Hip Hinge",
+          "exId": "wall-hip-hinge",
+          "note": "This is how you bend for the rest of the morning, for socks, teeth and the dishwasher.",
+          "rx": { "reps": 6 }
+        },
+        {
+          "type": "simple",
+          "name": "Walk",
+          "exId": "walk",
+          "note": "Around the house is fine, at an easy pace.",
+          "rx": { "time": "2 min" }
+        }
+      ]
+    }
+  ],
+  "fa": {
+    "id": "morning-back",
+    "title": "First Light",
+    "category": "care",
+    "countsAs": "mobility",
+    "duration": "14 min",
+    "equipment": "Bodyweight",
+    "focusTag": "خشکی کمر صبح‌ها",
+    "intro": [
+      "صبح‌ها وقتیه که کمر دردناک از همه وقت خشک‌تره. کل شب بی‌حرکت بودی و دیسک‌های ستون فقراتت آب جذب کردن، پس پرترن و کمتر دوست دارن خم بشن. این حس خشکی یه چیز گیرکرده نیست که بخواد کش بیاد. کمرته که داره احتیاط می‌کنه، و چیزی که آرومش می‌کنه حرکت راحته.",
+      "پس توی تخت با نفس آروم و حرکت‌های کوچیک شروع می‌کنیم، بعد چهار دست و پا می‌شیم تا ستون فقرات و لگن رو توی وسط راحت دامنه‌شون حرکت بدیم، با نگه داشتن‌های کوتاه عضله‌های عمقی مرکز بدن رو روشن می‌کنیم، و آخر بلند می‌شیم و راه می‌ریم. هر روز صبح انجامش بده، همون موقع که از تخت اومدی بیرون. حدود ۱۴ دقیقه طول می‌کشه و فقط یه کم زمین و یه دیوار لازم داری. Steady Spine جلسه‌ی بلندتره برای روزهایی که تمرین می‌کنی."
+    ],
+    "before": [
+      {
+        "label": "علامت‌های خطر کمر",
+        "text": "دردی که تا پا میاد پایین، بی‌حسی، ضعف توی پا یا کف پا، یا بی‌حسی بین پاها. اگه کنترل مثانه یا روده‌ت عوض شد، همون روز باید دکتر ببینی."
+      },
+      {
+        "label": "موقع تمرین",
+        "text": "یه کم درد کشیدنی اشکالی نداره. درد تیز نه، دردی که وسط ست بیشتر می‌شه یا صبح بعد بدتره هم نه. اگه بیشتر شد، همون حرکت رو ول کن. اگه تیز بود، کل جلسه رو تموم کن."
+      },
+      {
+        "label": "کوچیک نگهش دار",
+        "text": "این کمرت رو بیدار می‌کنه، کشش نمی‌ده. دست زدن به نوک پا و کشیدن زانوها به سینه رو بذار برای بعدتر توی روز. اگه یه حرکت کمرت رو بدتر کرد، ردش کن و ادامه بده."
+      }
+    ],
+    "blocks": [
+      {
+        "title": "Still in Bed",
+        "icon": "🛏️",
+        "exercises": [
+          {
+            "type": "simple",
+            "name": "90/90 Breathing",
+            "exId": "90-90-breathing",
+            "note": "توی تخت انجامش بده، زانوها خم و کف پاها روی تخت، نیمکت لازم نیست.",
+            "rx": { "reps": 6 }
+          },
+          {
+            "type": "simple",
+            "name": "Supine Pelvic Tilt",
+            "exId": "supine-pelvic-tilt",
+            "rx": { "reps": 10 }
+          },
+          {
+            "type": "simple",
+            "name": "Supine Knee Rock",
+            "exId": "supine-knee-rock",
+            "rx": { "reps": 6, "side": true }
+          }
+        ]
+      },
+      {
+        "title": "On All Fours",
+        "icon": "🧘",
+        "exercises": [
+          {
+            "type": "simple",
+            "name": "Cat-Cow",
+            "exId": "cat-cow",
+            "rx": { "reps": 8 }
+          },
+          {
+            "type": "simple",
+            "name": "Quadruped Thoracic Rotation",
+            "exId": "quadruped-thoracic-rotation",
+            "rx": { "reps": 5, "side": true }
+          },
+          {
+            "type": "simple",
+            "name": "Half-Kneeling Hip Flexor Rock",
+            "exId": "half-kneeling-hip-flexor-rock",
+            "rx": { "reps": 6, "side": true }
+          }
+        ]
+      },
+      {
+        "title": "Switch On",
+        "icon": "🧱",
+        "exercises": [
+          {
+            "type": "standard",
+            "name": "Bird Dog",
+            "exId": "bird-dog",
+            "note": "هر ست رو خیلی قبل از خسته شدن تموم کن، چون این بیدار شدنه، نه تمرین.",
+            "rx": { "sets": 2, "reps": 4, "side": true, "tempo": "1-0-1-8", "rest": 20 }
+          },
+          {
+            "type": "standard",
+            "name": "Kneeling Side Plank",
+            "exId": "kneeling-side-plank",
+            "rx": { "sets": 2, "reps": 2, "side": true, "tempo": "1-0-1-8", "rest": 20 }
+          },
+          {
+            "type": "standard",
+            "name": "Glute Bridge",
+            "exId": "glute-bridge",
+            "rx": { "sets": 2, "reps": 8, "rest": 20 }
+          }
+        ]
+      },
+      {
+        "title": "Up and Out",
+        "icon": "🚶",
+        "exercises": [
+          {
+            "type": "simple",
+            "name": "Wall Hip Hinge",
+            "exId": "wall-hip-hinge",
+            "note": "بقیه‌ی صبح همین‌جوری خم شو، برای جوراب پوشیدن، مسواک زدن و ماشین ظرف‌شویی.",
+            "rx": { "reps": 6 }
+          },
+          {
+            "type": "simple",
+            "name": "Walk",
+            "exId": "walk",
+            "note": "توی خونه هم اشکالی نداره، با سرعت راحت.",
+            "rx": { "time": "2 min" }
+          }
+        ]
+      }
+    ]
+  }
+}

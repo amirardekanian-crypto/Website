@@ -308,6 +308,13 @@
           "file": "workouts/care/lower-back.json"
         },
         {
+          "id": "morning-back",
+          "title": "First Light",
+          "duration": "14 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/care/morning-back.json"
+        },
+        {
           "id": "racket-arm",
           "title": "Racket Arm",
           "duration": "12 min",
