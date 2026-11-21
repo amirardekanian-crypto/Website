@@ -250,7 +250,7 @@
       if (j) { var c = m[+j] == null ? '' : m[+j]; return faT && /[A-Za-z]/.test(c) ? ISO_F + c + ISO_R : c; }
       var v = m[+i] == null ? '' : m[+i];
       if (k === 'n') return faNum(v);
-      if (k === 'd') return dateOf(v) || v;
+      if (k === 'd') return dateOf(v) || look(v) || v;   // a month alone ("October") is its Shamsi month in the word lists
       var tv = look(v);
       return tv != null ? tv : faT && /[A-Za-z]/.test(v) ? ISO_F + v + ISO_R : v;
     });
@@ -293,13 +293,13 @@
     if (ENDS.indexOf(z) >= 0 && ENDS.indexOf(r.charAt(r.length - 1)) >= 0) r = r.slice(0, -1) + TURN[z];
     return r;
   }
-  // Two numbers with a × between them read the wrong way round in a right-to-left line ("4 × 6", four sets of six, was
-  // drawn "6 × 4"): Latin ones are kept left to right as one piece (a Unicode isolate, invisible).
+  // Sets and reps are in Persian digits (Amir, 2026-11-21: "sets and reps should go to farsi"). "4 × 6" in Latin digits
+  // read the wrong way round in a right-to-left line; "۴ × ۶" starts on the right with the sets, as Farsi reads it.
   var DOSE = /\d+(?:[.,]\d+)?(?:\s*[-–]\s*\d+)?(?:\s*×\s*\d+(?:[.,]\d+)?(?:\s*[-–]\s*\d+)?)+/g;
   var ISO_L = String.fromCharCode(0x2066), ISO_R = String.fromCharCode(0x2069);   // a left-to-right isolate, invisible
   var RLM = String.fromCharCode(0x200F);                                          // a right-to-left mark, invisible
   var ISO_F = String.fromCharCode(0x2068);                                        // a first-strong isolate, invisible
-  function ltrDose(s) { return s.indexOf('×') < 0 || s.indexOf('\u2066') >= 0 ? s : s.replace(DOSE, '\u2066$&\u2069'); }
+  function faDose(s) { return s.indexOf('×') < 0 ? s : s.replace(DOSE, function (m) { return faNum(m); }); }
   function tr(s) {
     if (!s || !/[A-Za-z]/.test(s)) return null;
     var m = s.match(/^(\s*)([\s\S]*?)(\s*)$/);
@@ -310,7 +310,7 @@
     // "ویدیو۶۰ مرحله"; "هفته ۱ تا ۵ · تمام" looked like "۵۰"): in a Farsi line it is a Persian comma, also at the line's
     // end where the next piece is its own element. A right-to-left mark rides after it: a Persian digit straight after a
     // Latin name took the name's direction ("Split Step · 1 of 4" was drawn "۴ از SPLIT STEP ،۱").
-    return m[1] + ltrDose(faDots(faMixed(r))) + m[3];
+    return m[1] + faDose(faDots(faMixed(r))) + m[3];
   }
   function faDots(r) {
     return /[\u0600-\u06FF]/.test(r) ? r.replace(/\s+·\s+/g, '،' + RLM + ' ').replace(/\s+·$/, '،' + RLM) : r;
@@ -339,6 +339,7 @@
   var FLIP = { '→': '←', '←': '→', '?': '؟' };
   // Text that is a number inside a Farsi sentence: Persian digits (the tempo's lit number: "پایین 3 ثانیه" beside "۱ ثانیه مکث").
   var SENTENCE_NUM = '.t-hot';
+  var RX_NUM = '.nl-dose,.nl-rpe,.round-detail,.step-pill';
   // A rest button carries its time on it: "2 min 30 s" spelled out in Farsi ("۲ دقیقه و ۳۰ ثانیه") is twice as long and
   // ran over the Note beside it, so on the button it is a clock, "۲:۳۰".
   var CLOCK = '.rest-t';
@@ -378,7 +379,9 @@
       var mc = p.closest && p.closest(CLOCK) && core.match(/^(\d+) min (\d+) s$/);
       if (mc) { n.data = d.replace(core, faNum(mc[1] + ':' + (mc[2].length < 2 ? '0' : '') + mc[2])); seen.set(n, n.data); return; }
       if (/^\d+$/.test(core) && p.closest && p.closest(SENTENCE_NUM)) { n.data = faNum(d); seen.set(n, n.data); return; }
-      if (!/[A-Za-z]/.test(d) && d.indexOf('×') >= 0) { var dz = ltrDose(d); if (dz !== d) n.data = dz; seen.set(n, n.data); return; }
+      if (!/[A-Za-z]/.test(d) && d.indexOf('×') >= 0) { var dz = faDose(d); if (dz !== d) n.data = dz; seen.set(n, n.data); return; }
+      // The prescription's own numbers (a circuit row's "8", the effort's "7/10"): Persian digits, as the sets and reps.
+      if (!/[A-Za-z]/.test(d) && /\d/.test(d) && p.closest && p.closest(RX_NUM)) { n.data = faNum(d); seen.set(n, n.data); return; }
       // A phone number ("+44 7435 363461") read its groups backwards in a right-to-left line: kept left to right.
       if (/^\+\d[\d ()-]{5,}$/.test(core)) { n.data = d.replace(core, ISO_L + core + ISO_R); seen.set(n, n.data); return; }
       // Farsi that came already written (a programme's Farsi twin, "هفته ۱ تا ۵") with the app's dot after it.

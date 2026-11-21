@@ -580,7 +580,9 @@
 // v261: i18n.js (?v=5) changed (2026-11-21): the check-in's Farsi answers no longer touch the edges of their boxes.
 // v262: i18n.js (?v=6) changed (2026-11-21): a short English run in a Farsi line stays whole and in order (Step-Off Landing), and the
 // check-in's last question answers 3 with معمولی (Amir).
-const CACHE = 'aap-v262';
+// v263: i18n.js (?v=7) and i18n-fa.js (?v=13) changed (2026-11-21, Amir): sets and reps in Persian digits, read from the right (sets first);
+// month names in Shamsi; the Crew's Bell is زنگ inside sentences too.
+const CACHE = 'aap-v263';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -620,8 +622,8 @@ const SHELL = [
   '/assets/js/between-sets.js',
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
-  '/assets/js/i18n.js?v=6',
-  '/assets/js/i18n-fa.js?v=12',
+  '/assets/js/i18n.js?v=7',
+  '/assets/js/i18n-fa.js?v=13',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).
