@@ -108,7 +108,7 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
       pinCss: (() => { const e = document.querySelector('.cr-post.amir .cr-pin'); if (!e) return null; const c = getComputedStyle(e);
         return { tag: e.tagName, bg: c.backgroundColor, bw: c.borderTopWidth, bs: c.borderTopStyle, bc: c.borderTopColor, color: c.color, cursor: c.cursor }; })(),
       first: (document.querySelector('#crew-body .cr-post, #crew-body .cr-line') || {}).className || '',
-      line: ((document.querySelector('.cr-line .cr-lw') || {}).firstChild || {}).textContent || '',
+      line: (() => { const w = document.querySelector('.cr-line .cr-lw'); if (!w) return ''; const c = w.cloneNode(true); c.querySelectorAll('small, .cr-sayhi').forEach(x => x.remove()); return c.textContent; })(),   // each part is its own span since 2026-11-21 (the Farsi phone translates each alone)
       hon: [...document.querySelectorAll('.cr-hon > div')].map(d => [...d.children].map(c => c.textContent.trim()).join(' ')).join('|'),
       board: [...document.querySelectorAll('.cr-br')].map(d => d.textContent.replace(/\s+/g, ' ').trim()).join('|'),
       text: document.getElementById('screen-crew').innerText,
