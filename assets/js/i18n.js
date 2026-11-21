@@ -102,7 +102,10 @@
     // The video frame's corner word is CSS content, which the word lists never see.
     "html.is-fa .ex-video::after{content:'\\0648\\06CC\\062F\\06CC\\0648'}" +
     // A person's name takes its direction from its own first letter: "Mina S." keeps its full stop after the S.
-    'html.is-fa .cr-nm{unicode-bidi:plaintext}';
+    'html.is-fa .cr-nm{unicode-bidi:plaintext}' +
+    // The check-in's answers: the box has 2 px each side, and Farsi words are wider ("خیلی پراسترس", "آماده نیستم" sat 2 px
+    // from the edge). 6 px each side, so a two-word answer breaks onto its second line as the design allows (two lines at 11 px).
+    'html.is-fa .readiness-opt{padding-left:6px;padding-right:6px}html.is-fa .readiness-opt-lab{max-width:100%}';
   var st = document.createElement('style'); st.id = 'i18n-fa-css'; st.textContent = css;
   (document.head || html).appendChild(st);
 
