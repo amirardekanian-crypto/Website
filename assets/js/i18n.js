@@ -351,6 +351,7 @@
   // "Landing)" at the start of the next, brackets turned round. Longer runs keep their own order but may still wrap.
   // What people type (an element marked dir="auto") is left as it is.
   var NBSP = String.fromCharCode(0xA0), WJ = String.fromCharCode(0x2060);
+  var TEMPO = /[0-9۰-۹](?:-[0-9۰-۹]){2,}/, TEMPO_G = /[0-9۰-۹](?:-[0-9۰-۹]){2,}/g;
   var LATIN_RUN = new RegExp("\\(?[A-Za-z][A-Za-z0-9'’&.\\-]*(?:[ " + NBSP + "]+[A-Za-z0-9][A-Za-z0-9'’&.\\-]*)*\\)?", 'g');
   function faMixed(s) {
     if (!/[\u0600-\u06FF]/.test(s) || !/[A-Za-z]/.test(s) || s.indexOf(ISO_L) >= 0 || s.indexOf(ISO_F) >= 0) return s;
@@ -395,6 +396,10 @@
         if (!(p && p.closest && p.closest('[dir="auto"]'))) { var mx = faMixed(d); if (mx !== d) n.data = mx; }
       }
     }
+    // A tempo ("3-1-1-0", "۳-۱-۱") never breaks at its hyphens: the help sheet put "3-1-1-" at a line's end and "0" on the
+    // next. An invisible word joiner after each hyphen keeps it whole.
+    // After the words are looked up, so a sentence holding one still finds its translation.
+    if (TEMPO.test(n.data) && n.data.indexOf(WJ) < 0 && !skipped(p)) n.data = n.data.replace(TEMPO_G, function (m) { return m.replace(/-/g, '-' + WJ); });
     seen.set(n, n.data);
   }
   function doAttr(el, a) {
