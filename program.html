@@ -14542,7 +14542,7 @@ function csAchRowHTML() {
 // ink, and a ring that fills green when he ticks it off in Courtside. One line, at most 140 characters, from career_goals.
 // A goal ticked after its month (Amir ticks at the end of a CYCLE, which is not the end of a month; 2026-11-21: "when its ticked,
 // it will be for end of the cycle, how they can see they have done it?") stays on the card for 7 days from the tick, above this
-// month's own goal, so the tick is seen. After that it lives on in Your moments (momentsList(), kind 'goal').
+// month's own goal, so the tick is seen. After that it lives on in Achievements → Goals (cabGoals(), from momentsList()'s kind 'goal').
 const GOAL_LATE_DAYS = 7;
 function goalLateDone() {
   const my = MOM_T && MOM_T.my, cur = my && my.goal && my.goal.month, now = Date.now();
@@ -14940,6 +14940,38 @@ function cabHonours() {
   try { l = momentsList().filter(x => x.kind === 'honour' && CAB_HON_NAME[x.hKind]); } catch (e) { l = []; }
   return l.map(x => ({ key: 'hon:' + String(x.day).slice(0, 7) + ':' + x.hKind, x, month: String(x.day).slice(0, 7), name: CAB_HON_NAME[x.hKind], mon: momMonth(x.day, true) + ' ' + String(x.day).slice(0, 4) }));
 }
+// Goals done (2026-11-21, Amir: "when its ticked ... how they can see they have done it?"): every goal Amir ticked, newest first, in
+// the cabinet beside the honours. Your moments, where momentsList() first put them, has had no door since 2026-10-25, so this is
+// where a done goal lives on after the 7 days the Progress card keeps a late tick (goalLateDone()). Green and white, like an honour.
+function cabGoals() {
+  let l = [];
+  try { l = momentsList().filter(x => x.kind === 'goal' && x.goalMonth); } catch (e) { l = []; }
+  return l.map(x => ({ key: 'goal:' + x.goalMonth.slice(0, 7), x, name: momMonth(x.goalMonth, true) + ' goal', done: 'Done ' + cabDay(x.day) }));
+}
+const CAB_GOAL_SVG = '<svg viewBox="0 0 112 112" aria-hidden="true"><circle cx="56" cy="56" r="40" fill="none" stroke="#fff" stroke-width="5"/>'
+  + '<path d="M38 57l12 12 24-26" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function cabGoalCard(g) {
+  return `<button type="button" class="cab-card cab-hon" data-k="${esc(g.key)}" onclick="openGoalDone(this.dataset.k)" aria-label="${esc(g.name + ', ' + g.done).replace(/"/g, '&quot;')}">`
+    + `<span class="cab-em">${CAB_GOAL_SVG}</span><span class="cab-cn">${esc(g.name)}<small>${esc(g.done)}</small></span></button>`;
+}
+function openGoalDone(key) {
+  const ov = document.getElementById('hist-overlay'), g = cabGoals().find(x => x.key === String(key || ''));
+  if (!ov || !g) return;
+  const sp = hlMomentSpec(g.x);
+  ov.querySelector('.readiness-modal').innerHTML = `<div class="cab-sh">
+    <div class="cab-sh-em is-hon" role="img" aria-label="${esc(g.name).replace(/"/g, '&quot;')}">${CAB_GOAL_SVG.replace('viewBox', 'width="210" height="210" viewBox')}</div>
+    <p class="cab-sh-kind">From Amir · ${esc(g.done)}</p>
+    <h2 class="readiness-title">${esc(g.name)}</h2>
+    <p class="cab-sh-p" dir="auto">${esc(g.x.s)}</p>
+    ${sp && !window.IS_PREVIEW && !window.IS_DEMO ? `<button type="button" class="cab-go" data-k="${esc(g.key)}" onclick="cabGoalShare(this.dataset.k)">Share it</button>` : ''}</div>`;
+  ov.classList.add('visible');
+}
+window.openGoalDone = openGoalDone;
+function cabGoalShare(key) {
+  const g = cabGoals().find(x => x.key === String(key || '')), sp = g && hlMomentSpec(g.x);
+  if (sp) openShareSheet([sp], 0);
+}
+window.cabGoalShare = cabGoalShare;
 function cabHonCard(h) {
   const E = cabE();
   return `<button type="button" class="cab-card cab-hon" data-k="${esc(h.key)}" onclick="openHonour(this.dataset.k)" aria-label="${esc(h.name + ', ' + h.mon).replace(/"/g, '&quot;')}">`
@@ -14992,6 +15024,8 @@ function cabHTML(items) {
   }
   const hon = (f === 'all' || f === 'won') ? cabHonours() : [];
   if (hon.length) h += `<div class="cab-h"><h2 class="cab-t">Honours</h2><span class="cab-n">${hon.length}</span></div><div class="cab-latest">${hon.map(cabHonCard).join('')}</div>`;
+  const gl = (f === 'all' || f === 'won') ? cabGoals() : [];
+  if (gl.length) h += `<div class="cab-h"><h2 class="cab-t">Goals</h2><span class="cab-n">${gl.length}</span></div><div class="cab-latest">${gl.map(cabGoalCard).join('')}</div>`;
   if (latest.length) h += `<div class="cab-h"><h2 class="cab-t">Latest</h2></div><div class="cab-latest">${latest.map(cabCard).join('')}</div>`;
   const chips = [['all', 'All'], ['won', 'Won'], ['todo', 'To win'], ['consistency', 'Consistency'], ['commitment', 'Commitment'], ['progress', 'Progress'], ['resilience', 'Resilience']];
   h += `<div class="cab-h"><h2 class="cab-t">All achievements</h2></div><div class="cab-filter" role="group" aria-label="Show">`

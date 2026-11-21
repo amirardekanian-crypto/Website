@@ -2,6 +2,28 @@
   "_about": "What's new in the app, shown in every athlete's Inbox for 14 days (program.html, newsRows/openNews). Newest first. Each entry: id (unique), at (ISO time), en and fa: { title, items: [one short line each], sign }. Written in Amir's voice (COM-3) in both languages (COM-1). THE RULE (docs/rules/working-with-amir.md): a change to program.html that an athlete would notice ships with its entry here in the same commit; .githooks/commit-msg blocks a program.html commit without this file unless the message says [no news].",
   "items": [
     {
+      "id": "2026-11-21-goals",
+      "at": "2026-11-21T16:00:00Z",
+      "en": {
+        "title": "Your monthly goal",
+        "items": [
+          "Some months I'll give you one goal. It sits at the top of Progress, one line from me.",
+          "When you've done it, I tick it and the ring goes green.",
+          "Every goal you finish stays in Achievements, under Goals. Tap one to share it."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "هدف ماهانه‌ات",
+        "items": [
+          "بعضی ماه‌ها یه هدف برات می‌ذارم. بالای «پیشرفت» هست، یه خط از طرف من.",
+          "وقتی انجامش دادی، تیکش می‌زنم و دایره سبز می‌شه.",
+          "هر هدفی که تموم کنی تو «دستاوردها»، زیر «هدف‌ها» می‌مونه. روش بزن تا به اشتراک بذاری."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-21-week",
       "at": "2026-11-21T12:00:00Z",
       "en": {

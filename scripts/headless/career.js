@@ -627,7 +627,7 @@ async function trainingLight(browser, C) {
     const lt = await openRW(browser, { stub: { myMoments: myMomentsFx({ goals: [
       { month: monthStart(0), line: 'Four sessions a week, no gaps.', done_at: null },
       { month: monthStart(-1), line: 'RPE on every main lift.', done_at: late },
-      { month: monthStart(-2), line: 'Weigh in every Monday.', done_at: old }] }) } });
+      { month: monthStart(-2), line: 'Weigh in every Monday.', done_at: old }] }), achievements: achFx() } });
     await waitRow(lt.p);
     await goProgress(lt.p);
     await momentsReady(lt.p);
@@ -638,6 +638,16 @@ async function trainingLight(browser, C) {
     C.check('every ticked goal is a moment: "<Month> goal, done", Amir’s line, the tick’s day, shareable; an unticked goal is not',
       lg.moments.length === 2 && lg.moments.some(m => m[0] === monthName(monthStart(-1)) + ' goal, done' && m[1] === 'RPE on every main lift.' && m[3])
       && lg.moments.some(m => m[0] === monthName(monthStart(-2)) + ' goal, done') && !lg.moments.some(m => /Four sessions/.test(m[1])), JSON.stringify(lg.moments));
+    // Your moments has no door, so a done goal lives on in Achievements → Goals: one green card per ticked goal, newest first; a tap opens his line and Share it
+    await lt.p.evaluate(() => goTo('achievements')); await lt.p.waitForTimeout(400);
+    const cg = await lt.p.evaluate(() => { const t = [...document.querySelectorAll('#ach-body .cab-t')].map(e => e.textContent.trim());
+      const cards = [...document.querySelectorAll('#ach-body .cab-card[data-k^="goal:"]')].map(c => c.querySelector('.cab-cn').textContent.replace(/\s+/g, ' ').trim());
+      const first = document.querySelector('#ach-body .cab-card[data-k^="goal:"]'); if (first) first.click();
+      const sh = document.querySelector('#hist-overlay.visible .cab-sh');
+      return { t, cards, sheet: sh ? sh.innerText.replace(/\s+/g, ' ').trim() : null, share: !!(sh && sh.querySelector('.cab-go')) }; });
+    C.check('Achievements → Goals: a card for each ticked goal, newest first, "<Month> goal / Done <day>"; a tap opens Amir’s line with Share it',
+      cg.t.includes('Goals') && cg.cards.length === 2 && cg.cards[0].startsWith(monthName(monthStart(-1)) + ' goalDone ') && cg.cards[1].startsWith(monthName(monthStart(-2)) + ' goal')
+      && !!cg.sheet && /RPE on every main lift\./.test(cg.sheet) && cg.share, JSON.stringify(cg));
     C.check('a late goal: no page errors', lt.p.errs.length === 0, JSON.stringify(lt.p.errs));
     await lt.ctx.close();
     const n0 = await openRW(browser, { stub: { myMoments: myMomentsFx({ goal: null, notes: [], honours: [], saw: [] }) } });

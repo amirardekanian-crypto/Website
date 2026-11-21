@@ -27,7 +27,9 @@ changed: the server, the XP and the levels are exactly as before.
   late** (2026-11-21: Amir ticks at the end of a cycle, often in the next month): any month's goal ticked in the last 7 days shows as
   its own done card above this month's (`goalLateDone()`, `GOAL_LATE_DAYS`, from `get_my_moments().goals`), with Share
   (`shareGoal(month)`). **Every ticked goal is a moment** (kind `goal`, *October goal, done*, his line, on the tick's day; shareable
-  through `hlMomentSpec()`), so a tick is never lost when the month turns. Tests: `career.js` (a goal ticked late). Then **Your moments** (`momentsHTML()`, `#moments-title` with
+  through `hlMomentSpec()`), and since Your moments has no door, **Achievements → Goals** shows them (`cabGoals()`, after Honours:
+  a green card each, *October goal / Done 19 Nov*; a tap opens his line and **Share it**, `openGoalDone()`), so a tick is never lost
+  when the month turns. Told in the Inbox (`news.json` → `2026-11-21-goals`). Tests: `career.js` (a goal ticked late). Then **Your moments** (`momentsHTML()`, `#moments-title` with
   the count): newest first, six shown and *Show all N*: each mark reached (`get_awards()` badges' `days`, one row per tier: *8 weeks
   held in a row*), each achievement with its line (a name in capitals reads as a name), each of Amir's lines (*From Amir*, his words in
   clay, *Reply on WhatsApp* under it: `coachWhatsAppUrl()` with the line quoted; WhatsApp only, no reply box), and each honour (*Most
