@@ -42,7 +42,9 @@
     "Yes, add it": "بله، ثبتش کنید",
     "Something else": "یه چیز دیگه",
     "Not today": "امروز نه",
-    "Filled in from your last one. Change anything.": "از آخرین فعالیت شما پر شده. هر چیزی رو می‌تونید عوض کنید."
+    "Filled in from your last one. Change anything.": "از آخرین فعالیت شما پر شده. هر چیزی رو می‌تونید عوض کنید.",
+    "Yesterday:": "دیروز:",
+    "Open it": "بازش کنید"
   },
   "patterns": [
     [
@@ -72,6 +74,14 @@
     [
       "like (yesterday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)",
       "مثل {t1}"
+    ],
+    [
+      "Added to your weeks\\. A hard one: (.+), tonight or tomorrow, (.+)\\.",
+      "به هفته‌هاتون اضافه شد. سنگین بود: $1، امشب یا فردا، {t2}."
+    ],
+    [
+      "Added to your weeks\\. A hard one: (.+), tonight or tomorrow\\.",
+      "به هفته‌هاتون اضافه شد. سنگین بود: $1، امشب یا فردا."
     ]
   ]
 }

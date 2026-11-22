@@ -5723,6 +5723,8 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
     else if (rd && rd.skipped) meta.push('readiness skipped');
     const plan = planLabelC(rd);
     if (plan) meta.push(plan);
+    // #127 Yesterday on Court (2026-11-22): what the athlete had logged the day before, carried on the check-in (readiness.yday).
+    if (rd && Array.isArray(rd.yday) && rd.yday.length) meta.push('the day before: ' + rd.yday.map(ydayWordC).join(' + '));
   }
   // Say both when both are true — a day can have work skipped AND work done at
   // the wrong dose, and only naming the worse of the two hides half the story.
@@ -5826,6 +5828,13 @@ function workTabHtml(D) {
 // hover a day for what was in it. Read once per athlete per store (S.stamp). A server without stage115, or a read that fails,
 // draws nothing: the day cards below are still the record.
 const _fwC = {};
+// One logged activity in words, for the session card's "the day before" (#127): "Padel 90 min, hard".
+const ACT_WORD_C = { tennis: 'Tennis', match: 'Match', padel: 'Padel', beach_tennis: 'Beach tennis', pickleball: 'Pickleball', squash: 'Squash',
+  badminton: 'Badminton', run: 'Running', cycling: 'Cycling', swim: 'Swimming', football: 'Football', gym: 'Gym', other: 'Other' };
+function ydayWordC(a) {
+  const mins = Math.round(Number(a && a.mins) || 0);
+  return (ACT_WORD_C[a && a.kind] || 'Activity') + (mins > 0 ? ' ' + mins + ' min' : '') + (a && a.effort ? ', ' + a.effort : '');
+}
 async function fiveWeeksC(id) {
   if (DEMO) return null;
   const hit = _fwC[id];

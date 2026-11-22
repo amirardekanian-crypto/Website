@@ -575,8 +575,8 @@ lasted after the game stopped; BE FIT (Patel 2017) a shared stake with lifelines
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
 | 126 | Played Today? | An evening row on Home's Today card and a "Same as last time" chip on Add activity: the athlete's last activity saved again in one tap (Garmin/Apple ask after a workout; we ask at the right time) | 123 | **built** 2026-11-22 (Amir: "Build 126 first"; cache aap-v280; the chip became the sheet opening on the last activity) |
-| 127 | Yesterday on Court | The pre-session check-in shows yesterday's logged activity in one line; coach.html shows it on the session beside its RPE; information only (REC-7) | 123, 126 | pitched (top 3) |
-| 128 | Cool Down Call | After a hard activity of 60+ min the save message offers one Library recovery session for the next morning | 123 | pitched |
+| 127 | Yesterday on Court | The pre-session check-in shows yesterday's logged activity in one line; coach.html shows it on the session beside its RPE; information only (REC-7) | 123, 126 | **built** 2026-11-22 (Amir: "build 127 and 128"; cache aap-v283; carried as readiness.yday, no server change) |
+| 128 | Cool Down Call | After a hard activity of 60+ min the save message offers one Library recovery session for the next morning | 123 | **built** 2026-11-22 (with 127; the pick is LIB_PICKS.sore, The Morning After) |
 | 129 | The 150 | One line on Your weeks: this week's active minutes the WHO way (hard minutes count double) from plan sessions, Library and Court Log; later a Move habit (Heart Points, AZM) | 122, 123 | pitched (top 3) |
 | 130 | Your Number | A personal Steps target (recent usual +10%, 6,000-12,000, rises Mondays when met 5 of 7); MVP coach.html suggests, Amir sets; XP weight is a rulebook call (D20) (Adams 2017, Apple Move goal) | — | pitched (needs his call) |
 | 131 | Court Told | Court Log save offers Tell the crew with a stamp (kind, minutes, day; never effort), for those who share activity (stage118) (Strava upload and kudos) | 123, the Race | pitched |
