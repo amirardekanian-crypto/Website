@@ -7,14 +7,16 @@
       "en": {
         "title": "Team, fixed in Farsi",
         "items": [
-          "On a Farsi phone, every win on Team now reads in Farsi, with Farsi numbers and the full day name."
+          "On a Farsi phone, every win on Team now reads in Farsi, with Farsi numbers and the full day name.",
+          "Your own achievement cards on Team show what you did in one short line. Tap the badge for the full rule."
         ],
         "sign": "Amir"
       },
       "fa": {
         "title": "صفحهٔ تیم، درست شد",
         "items": [
-          "توی نسخهٔ فارسی، همهٔ موفقیت‌های صفحهٔ تیم حالا فارسی نوشته می‌شن، با عددهای فارسی و اسم کامل روز."
+          "توی نسخهٔ فارسی، همهٔ موفقیت‌های صفحهٔ تیم حالا فارسی نوشته می‌شن، با عددهای فارسی و اسم کامل روز.",
+          "کارت دستاوردهای خودتون توی تیم، کاری که کردید رو توی یه خط کوتاه نشون می‌ده. برای قانون کاملش روی نشان بزنید."
         ],
         "sign": "امیر"
       }

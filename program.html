@@ -16471,7 +16471,9 @@ function crewMcFace(it, lead, first) {
     }
     case 'achievement': {
       const d = achDetailOf(p);
-      return { badge: d ? d.svg : E.ach(String(p.id || ''), won), big: esc(momName(p.name || p.id || 'An achievement')), sub: d && d.rule ? esc(d.rule) : 'a new achievement', door: true };
+      // Short (Amir, 2026-11-21: "fix all"): the catalogue's one-line caption on your own card. It speaks to you ("Your first personal best"),
+      // so someone else's card says "a new achievement". The full rule is one tap away, on the badge.
+      return { badge: d ? d.svg : E.ach(String(p.id || ''), won), big: esc(momName(p.name || p.id || 'An achievement')), sub: it.me && d && d.caption ? esc(d.caption) : 'a new achievement', door: true };
     }
     case 'mark': {
       const d = achDetailOf(p), mk = careerMarks()[p.item], n = Number(p.at) || 0;
@@ -16563,7 +16565,8 @@ function achDetailOf(part) {
   if (part.k === 'achievement' && (part.id || part.name)) {
     const id = String(part.id || part.name).replace(/^achievement:/, ''), cat = achItems().find(x => String(x.id) === id), info = E.info(id);
     return { svg: E.ach(id, { won: true }), name: momName((cat && cat.name) || part.name || id), ownKey: id,
-      kind: [rwMeaningWord((cat && cat.meaning) || ''), E.stepName(info ? info.tier : 0)].filter(Boolean).join(' · '), rule: cat ? String(cat.rule || cat.caption || '') : '' };
+      kind: [rwMeaningWord((cat && cat.meaning) || ''), E.stepName(info ? info.tier : 0)].filter(Boolean).join(' · '), rule: cat ? String(cat.rule || cat.caption || '') : '',
+      caption: cat ? String(cat.caption || '') : '' };
   }
   if (part.k === 'mark' && part.item && part.at) {
     const mk = careerMarks()[part.item], i = mk ? mk.at.indexOf(Number(part.at)) : -1, mi = i >= 0 ? E.markInfo(part.item, i) : null;

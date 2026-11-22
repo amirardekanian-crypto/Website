@@ -602,7 +602,8 @@
 // v275: program.html and i18n.js (?v=13) changed (2026-11-22, Amir: "see why tara doesnt have farsi name in crew"): a name that reaches the
 // phone after Crew is drawn (someone who joined the crew after this phone saved its names) is put in Farsi inside sentences too, not only
 // where it stands alone. And the bump today's monthly-goal commits (Achievements → Goals, the late tick) went out without.
-const CACHE = 'aap-v275';
+// v276: program.html changed (2026-11-22): your own achievement card on Team shows its one-line caption; someone else's says a new achievement.
+const CACHE = 'aap-v276';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

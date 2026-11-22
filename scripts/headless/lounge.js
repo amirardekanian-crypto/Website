@@ -2199,7 +2199,9 @@ const on = n => !ONLY.length || ONLY.includes(n);
 
     // Farsi: the athlete's language is the intake form's (`athlete.lang`); the message points at the Farsi form. The words are a DRAFT for Amir to read.
     const PF = H.fixture(); PF.athlete.lang = 'fa';
-    const fa = await ptOpen({ opts: { prog: PF }, stub: { partner: REF1() } });
+    // This phone chose English (aa_lang): a Farsi programme alone now opens the app in Farsi (athlete.lang, 2026-11-20), and the check is that the MESSAGE
+    // follows the athlete's language while the page stays in the phone's.
+    const fa = await ptOpen({ opts: { prog: PF, init: H.NO_EMBLEMS + " localStorage.setItem('aa_lang', 'en');" }, stub: { partner: REF1() } });
     s = await ptCard(fa.p);
     const ft = s && s.wa ? waText(s.wa.href) : '';
     C.check('an athlete whose language is Farsi: the message is the Farsi draft, with the code and the link to form-fa.html on their own lines', /form-fa\.html\?code=ALEX24/.test(ft) && /\nALEX24\n/.test(ft) && /[؀-ۿ]/.test(ft) && /۱۰٪/.test(ft) && !/Train with Amir/.test(ft), JSON.stringify(ft));
