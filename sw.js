@@ -611,7 +611,8 @@
 // says "N active days" ("N روز فعال"), not a bare "N days" that read like the window.
 // v280: program.html and i18n-fa.js (?v=24) changed (2026-11-22, Amir: "Build 126 first"): Played today? on Home's Today card (the last
 // activity again in one tap, after 5 pm), and Add activity opens on the last activity.
-const CACHE = 'aap-v280';
+// v281: i18n.js (?v=14) and i18n-fa.js (?v=25) changed (2026-11-22): the Farsi sweep of every screen: Farsi numbers in Your weeks and Progress, week rows numbered without ه, distance and minute doses, an English sentence keeps its full stop.
+const CACHE = 'aap-v281';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -651,8 +652,8 @@ const SHELL = [
   '/assets/js/between-sets.js',
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
-  '/assets/js/i18n.js?v=13',
-  '/assets/js/i18n-fa.js?v=24',
+  '/assets/js/i18n.js?v=14',
+  '/assets/js/i18n-fa.js?v=25',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).
