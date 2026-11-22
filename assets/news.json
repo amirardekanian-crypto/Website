@@ -2,6 +2,46 @@
   "_about": "What's new in the app, shown in every athlete's Inbox for 14 days (program.html, newsRows/openNews). Newest first. Each entry: id (unique), at (ISO time), en and fa: { title, items: [one short line each], sign }. Written in Amir's voice (COM-3) in both languages (COM-1). THE RULE (docs/rules/working-with-amir.md): a change to program.html that an athlete would notice ships with its entry here in the same commit; .githooks/commit-msg blocks a program.html commit without this file unless the message says [no news].",
   "items": [
     {
+      "id": "2026-11-22-yesterday-cooldown",
+      "at": "2026-11-22T21:00:00Z",
+      "en": {
+        "title": "Your check-in knows what you played",
+        "items": [
+          "If you logged an activity yesterday, the check-in before your session says so, and I see it next to that session.",
+          "After a hard activity of an hour or more, the app offers The Morning After, a short recovery session for tonight or tomorrow."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "چک‌این شما می‌دونه دیروز چی بازی کردید",
+        "items": [
+          "اگه دیروز فعالیتی ثبت کرده باشید، چک‌این قبل از جلسه اون رو نشون می‌ده و من هم کنار همون جلسه می‌بینمش.",
+          "بعد از یه فعالیت سنگین یک ساعته یا بیشتر، اپ The Morning After رو پیشنهاد می‌ده، یه جلسهٔ ریکاوری کوتاه برای امشب یا فردا."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
+      "id": "2026-11-22-steps-any-week",
+      "at": "2026-11-22T21:00:00Z",
+      "en": {
+        "title": "Your activity counts toward Steps, any week",
+        "items": [
+          "Tennis, padel or a run you add now counts toward Steps before your programme starts and after it ends too.",
+          "Outside a cycle, Your weeks shows your last 5 weeks, so you can keep tracking."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "فعالیتتون همیشه به قدم‌ها اضافه می‌شه",
+        "items": [
+          "تنیس، پدل یا دویدنی که ثبت می‌کنید، قبل از شروع برنامه و بعد از تموم شدنش هم به قدم‌هاتون اضافه می‌شه.",
+          "بیرون از یه دوره، «هفته‌های شما» پنج هفتهٔ اخیرتون رو نشون می‌ده تا بتونید ادامه بدید."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-22-played-today",
       "at": "2026-11-22T20:00:00Z",
       "en": {

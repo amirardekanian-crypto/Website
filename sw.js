@@ -612,7 +612,12 @@
 // v280: program.html and i18n-fa.js (?v=24) changed (2026-11-22, Amir: "Build 126 first"): Played today? on Home's Today card (the last
 // activity again in one tap, after 5 pm), and Add activity opens on the last activity.
 // v281: i18n.js (?v=14) and i18n-fa.js (?v=25) changed (2026-11-22): the Farsi sweep of every screen: Farsi numbers in Your weeks and Progress, week rows numbered without ه, distance and minute doses, an English sentence keeps its full stop.
-const CACHE = 'aap-v281';
+// v282: program.html changed (2026-11-22, Amir: "yes and even after"): Steps counts Court Log outside a cycle, from get_five_weeks()'s
+// acts (stage122), and Your weeks shows the last 5 weeks before a programme starts and after it ends.
+// v283: program.html and i18n-fa.js (?v=26) changed (2026-11-22, Amir: "build 127 and 128"): the check-in says what you logged yesterday
+// (readiness.yday, shown on coach.html's session card), and a hard hour or more offers The Morning After when it is saved.
+// v284: program.html and i18n.js (?v=15) changed (2026-11-22, Amir: "the name of the training Days and the name of the Cycles should be only in english"): day and cycle names stay English on a Farsi phone.
+const CACHE = 'aap-v284';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -652,8 +657,8 @@ const SHELL = [
   '/assets/js/between-sets.js',
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
-  '/assets/js/i18n.js?v=14',
-  '/assets/js/i18n-fa.js?v=25',
+  '/assets/js/i18n.js?v=15',
+  '/assets/js/i18n-fa.js?v=26',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).

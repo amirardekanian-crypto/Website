@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=14" data-fa="/assets/js/i18n-fa.js?v=25"></script>
+<script src="/assets/js/i18n.js?v=15" data-fa="/assets/js/i18n-fa.js?v=26"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -5061,6 +5061,7 @@
     color: var(--green-ink); font: 600 var(--fs-body)/1 'Barlow', sans-serif; cursor: pointer; }
   #screen-plan .fw-add:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   /* The Add activity sheet and a logged activity's row, in #hist-overlay (the shared sheet). */
+  .readiness-yday { margin: -4px 0 14px; padding: 8px 12px; border-radius: 10px; background: var(--tint); font: 500 var(--fs-small)/1.45 'Barlow', sans-serif; color: var(--ink); }   /* #127 */
   .act-from { margin: 6px 0 0; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }   /* #126 */
   .act-sec { margin: 14px 0 6px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
   .act-row { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -7396,6 +7397,7 @@
     <div class="readiness-eyebrow">Before you start</div>
     <h2 class="readiness-title">Readiness check</h2>
     <p class="readiness-sub">Ten seconds, and honest answers. On a lower day the app eases today's targets for you, and you can still train as written.</p>
+    <p class="readiness-yday" id="readiness-yday" hidden></p>
     <div class="readiness-questions" id="readiness-questions"></div>
     <div class="readiness-actions">
       <button type="button" class="readiness-begin" id="readiness-begin" disabled onclick="beginSession()">Begin session ▶</button>
@@ -19080,15 +19082,25 @@ function moveCreditOf(acts, target) {
   return { steps: Math.min(raw, Math.round((Number(target) || 10000) * MOVE_CAP)), raw: raw };
 }
 // Day → { steps, kinds } from Your weeks' copy (FW, which the phone keeps offline). Worked out again only when FW changes.
-let _mvFor = null, _mvMap = {};
+// stage122 (2026-11-22; Amir: "yes and even after / because people may not renew program, but want to use the tracker"): from
+// FW.acts, every Court Log row of the last 70 days whatever the weeks, so the credit is the server's before a cycle starts and after
+// the last one ends. A copy from before stage122 has no acts: the weeks' rows, as before.
+let _mvFor = null, _mvLen = -1, _mvMap = {};
+function moveActs() {
+  if (!fwOk(FW)) return [];
+  if (Array.isArray(FW.acts)) return FW.acts.filter(Boolean);
+  const out = [];
+  FW.weeks.forEach(w => (Array.isArray(w && w.days) ? w.days : []).forEach(d => { if (d && (d.k === 'court' || d.k === 'other')) out.push(d); }));
+  return out;
+}
 function moveCreditMap() {
-  try { if (FW === _mvFor) return _mvMap; } catch (e) { return {}; }   // a paint before this part of the script has run (FW not set up yet)
-  _mvFor = FW; _mvMap = {};
+  try { if (FW === _mvFor && (!FW || !Array.isArray(FW.acts) || FW.acts.length === _mvLen)) return _mvMap; } catch (e) { return {}; }   // a paint before this part of the script has run (FW not set up yet)
+  _mvFor = FW; _mvLen = FW && Array.isArray(FW.acts) ? FW.acts.length : -1; _mvMap = {};
   if (!fwOk(FW)) return _mvMap;
   const H = window.AAHabits, sh = H && H.byId ? H.byId('steps') : null, target = (sh && sh.target) || 10000, by = {};
-  FW.weeks.forEach(w => (Array.isArray(w && w.days) ? w.days : []).forEach(d => {
-    if (d && (d.k === 'court' || d.k === 'other') && String(d.day) >= MOVE_FROM) (by[d.day] = by[d.day] || []).push(d);
-  }));
+  moveActs().forEach(d => {
+    if (d && d.day && String(d.day) >= MOVE_FROM) (by[d.day] = by[d.day] || []).push(d);
+  });
   Object.keys(by).forEach(day => {
     const c = moveCreditOf(by[day], target);
     if (c.steps > 0) _mvMap[day] = { steps: c.steps, kinds: [...new Set(by[day].map(a => a.kind))] };
@@ -19103,12 +19115,13 @@ function moveCreditOn(day) { return moveCreditMap()[day] || null; }
 // until tomorrow (<id>_played_no, never synced). The demo and the coach's preview never show it.
 const PLAYED_FROM_HOUR = 17;
 function actLast() {
+  fwFromCache();   // the phone's copy, if Progress has not been drawn yet this visit
   if (!fwOk(FW)) return null;
   let best = null;
-  FW.weeks.forEach(w => (Array.isArray(w && w.days) ? w.days : []).forEach(d => {
-    if (d && (d.k === 'court' || d.k === 'other') && MOVE_MET[d.kind] && Number(d.mins) > 0 && ['easy', 'normal', 'hard'].indexOf(d.effort) >= 0
+  moveActs().forEach(d => {   // stage122: the last 70 days, not only the weeks on the card
+    if (d && MOVE_MET[d.kind] && Number(d.mins) > 0 && ['easy', 'normal', 'hard'].indexOf(d.effort) >= 0
         && (!best || String(d.day) >= String(best.day))) best = d;
-  }));
+  });
   return best;
 }
 function playedKey() { return ATHLETE_ID + '_played_no'; }
@@ -19148,6 +19161,43 @@ function playedNo() {
   paintTodayCard();
 }
 window.playedYes = playedYes; window.playedNo = playedNo;
+// ── YESTERDAY ON COURT — #127 (round 12, 2026-11-22; Amir: "build 127 and 128") ───────────────────────────────────────────────────
+// The check-in says what the athlete logged yesterday, and the stored check-in carries it (readiness.yday: [{ kind, mins, effort }]),
+// so coach.html's session card can say "the day before: Padel 90 min, hard". A heavy session after 90 minutes of hard padel explains
+// itself. Information only (REC-7): no target moves because of it.
+function ydayActs() {
+  try {
+    fwFromCache();   // the phone's copy, if Progress has not been drawn yet this visit
+    if (!fwOk(FW)) return [];
+    const t = new Date(), y = ymdLocal(new Date(t.getFullYear(), t.getMonth(), t.getDate() - 1)), out = [];
+    FW.weeks.forEach(w => (Array.isArray(w && w.days) ? w.days : []).forEach(d => {
+      if (d && d.day === y && (d.k === 'court' || d.k === 'other') && Number(d.mins) > 0)
+        out.push({ kind: String(d.kind || 'other'), mins: Math.round(Number(d.mins)), effort: ['easy', 'normal', 'hard'].indexOf(d.effort) >= 0 ? d.effort : 'normal' });
+    }));
+    return out;
+  } catch (e) { return []; }
+}
+function ydayLineHtml(acts) {
+  const eff = { easy: 'Easy', normal: 'Normal', hard: 'Hard' };
+  return '<span>Yesterday:</span> ' + acts.map(a => `<span>${esc(ACT_LABEL[a.kind] || 'Activity')}</span> · <span>${a.mins} min</span> · <span>${esc(eff[a.effort])}</span>`).join('<br>');
+}
+// ── COOL DOWN CALL — #128 (round 12, 2026-11-22; Amir: "build 127 and 128") ────────────────────────────────────────────────────────
+// A hard activity of an hour or more: the saved message offers the day-after session (LIB_PICKS.sore, the one a sore check-in
+// offers), for tonight or tomorrow. One tap opens it; its ← comes back to Home. Nothing is stored and nothing is pushed.
+const COOL_MIN = 60;
+async function coolDownCall(act) {
+  try {
+    if (!act || act.effort !== 'hard' || !(Number(act.minutes) >= COOL_MIN)) return false;
+    await ensureLibManifests();
+    const w = libPickItem(LIB_PICKS.sore.id);
+    if (!w || !w.file) return false;
+    aaToast(`Added to your weeks. A hard one: ${w.title}, tonight or tomorrow${w.duration ? ', ' + w.duration : ''}.`, {
+      action: 'Open it',
+      run: () => { _wsReturn = { day: null, y: window.scrollY }; openWorkout(w.file); }
+    });
+    return true;
+  } catch (e) { return false; }
+}
 // A day's title on the phone: a logged activity says the app's own word for its kind; otherwise the server's title. A plan day's name
 // stays English on a Farsi phone too, like an exercise's (Amir, 2026-11-22), so stage117's `title_fa` is not read.
 function fwTitle(d) {
@@ -19317,9 +19367,12 @@ async function saveActivity() {
     _act = null;
     if (!quick) document.getElementById('hist-overlay').classList.remove('visible');
     aaToast('Added to your weeks.');
+    coolDownCall(res.data || {});   // #128: a hard hour or more offers the day-after session instead
     if (FW && fwOk(FW)) {   // shown at once, before the server's own answer replaces it
       const r = res.data || {}, wk = FW.weeks.find(w => w && day >= String(w.from) && day <= String(w.to));
-      if (wk) { (wk.days = wk.days || []).push({ day, k: ACT_COURT.indexOf(r.kind) >= 0 ? 'court' : 'other', kind: r.kind, title: plCap(String(r.kind || 'activity')), mins: r.minutes, effort: r.effort, id: r.id }); paintFiveWeeks(); }
+      if (wk) (wk.days = wk.days || []).push({ day, k: ACT_COURT.indexOf(r.kind) >= 0 ? 'court' : 'other', kind: r.kind, title: plCap(String(r.kind || 'activity')), mins: r.minutes, effort: r.effort, id: r.id });
+      if (Array.isArray(FW.acts) && r.id && !FW.acts.some(a => a && String(a.id) === String(r.id))) FW.acts = FW.acts.concat([{ day, kind: r.kind, mins: r.minutes, effort: r.effort, id: r.id }]);   // stage122: Steps follows at once
+      paintFiveWeeks();
     }
     loadFiveWeeks();
     try { paintTodayCard(); } catch (e2) { /* the card paints itself next time */ }   // #126: Played today? goes once the day has one
@@ -19342,7 +19395,10 @@ function deleteActivity(btn, id, day) {
       if (!sb) throw new Error('offline');
       const res = await _withTimeout(sb.rpc('delete_activity', { p_athlete_id: ATHLETE_ID, p_id: id }), 10000);
       if (!res || res.error) throw (res && res.error) || new Error('no answer');
-      if (FW && fwOk(FW)) FW.weeks.forEach(w => { if (w && Array.isArray(w.days)) w.days = w.days.filter(d => !(d && String(d.id) === id)); });
+      if (FW && fwOk(FW)) {
+        FW.weeks.forEach(w => { if (w && Array.isArray(w.days)) w.days = w.days.filter(d => !(d && String(d.id) === id)); });
+        if (Array.isArray(FW.acts)) FW.acts = FW.acts.filter(a => !(a && String(a.id) === id));   // stage122
+      }
       paintFiveWeeks();
       openFiveWeeksDay(day);
       loadFiveWeeks();
@@ -21848,6 +21904,10 @@ let _readinessSel = {};       // key → 1..5 selections for the open modal
 function openReadiness(day) {
   _readinessDay = day;
   _readinessSel = {};
+  // #127 Yesterday on Court: what the athlete logged yesterday, said above the questions. Information only (REC-7): it changes no
+  // target. The same list rides on the stored check-in (readiness.yday), so coach.html can show it on the session.
+  const yd = document.getElementById('readiness-yday'), acts = ydayActs();
+  if (yd) { yd.innerHTML = acts.length ? ydayLineHtml(acts) : ''; yd.hidden = !acts.length; }
   const wrap = document.getElementById('readiness-questions');
   wrap.innerHTML = READINESS_QUESTIONS.map(q => `
     <div class="readiness-q" data-key="${q.key}">
@@ -21909,6 +21969,8 @@ function beginSession() {
     composite,
     skipped: false,
   };
+  const yday = ydayActs();
+  if (yday.length) readiness.yday = yday;   // #127: what they played the day before, for coach.html
   const plan = readinessPlan(readiness, readinessBase());
   if (plan) Object.assign(readiness, plan, { asWritten: false });
   localStorage.setItem(readinessKey(day), JSON.stringify(readiness));
@@ -21927,6 +21989,8 @@ function skipReadiness() {
     sleep: null, energy: null, soreness: null, stress: null, overall: null,
     composite: null, skipped: true,
   };
+  const yday = ydayActs();
+  if (yday.length) readiness.yday = yday;   // #127: a skipped check-in still says what they played the day before
   localStorage.setItem(readinessKey(day), JSON.stringify(readiness));
   closeReadinessModal();
   startTimerNow(day);

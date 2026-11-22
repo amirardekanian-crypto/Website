@@ -83,6 +83,11 @@ reference is [`../../HABITS.md`](../../HABITS.md). These are the rules for the h
   logged, Home's Today card carries one row under Steps: the athlete's last activity (`actLast()`, from Your weeks' copy) saved
   again in one tap through `log_activity()`; *Something else* opens Add activity, which opens on the last activity; *Not today*
   hides it until tomorrow (`<id>_played_no`, never synced). Never a push, never in the demo or the coach's preview.
+- **The check-in says what was played yesterday, and it moves nothing** (#127, 2026-11-22, Amir: *"build 127 and 128"*). Yesterday's
+  Court Log rows show above the questions (`ydayActs()`), ride on the stored check-in as `readiness.yday` and show on coach.html's
+  session card as "the day before: Padel 90 min, hard" (`ydayWordC()`). ⚠️ Information only (REC-7): `readinessPlan()` never reads it.
+- **A hard hour offers the day-after session** (#128, same day). A hard activity of 60 minutes or more says so in its saved message
+  and offers `LIB_PICKS.sore` (The Morning After, the session a sore check-in offers), whose ← comes back to Home (`coolDownCall()`).
 
 ---
 

@@ -202,6 +202,25 @@ const calls = (p, n) => p.evaluate(n => (window.__STUB.calls || []).filter(c => 
     await ctx.close();
   }
 
+  // ── 8. outside a cycle (stage122): the last 5 weeks, no "Cycle N", and Steps worked from `acts`, not the weeks ──
+  // An activity today that sits in no week of the answer (the old fault: a cycle starting next week) still counts toward Steps.
+  {
+    const fw = { n: null, from: at(-34), to: at(0), current: false,
+      weeks: [1, 2, 3, 4, 5].map(k => ({ w: k, from: at(-34 + (k - 1) * 7), to: at(-28 + (k - 1) * 7), plan: 0, done: 0, held: false, now: k === 5, days: [] })),
+      acts: [{ day: at(0), kind: 'tennis', mins: 60, effort: 'normal', id: 'a-today' }] };
+    fw.weeks[4].to = at(-1);   // today in no week, on purpose
+    const { ctx, p } = await open(browser, { fiveWeeks: fw });
+    const c = await card(p);
+    C.check('outside a cycle: five rows and no "Cycle N" in the head', c.shown && c.rows === 5 && !/Cycle/.test(c.head) && /5 weeks/.test(c.head), JSON.stringify(c));
+    const mv = await p.evaluate(d => ({ credit: moveCreditOn(d), last: actLast() }), at(0));
+    C.check('outside a cycle: 60 min of tennis today counts toward Steps from acts (7,000, the 70% cap)', !!mv.credit && mv.credit.steps === 7000, JSON.stringify(mv));
+    C.check('outside a cycle: Played today? finds the last activity in acts', !!mv.last && mv.last.id === 'a-today', JSON.stringify(mv.last));
+    const old = await p.evaluate(d => { const keep = FW; FW = JSON.parse(JSON.stringify(keep)); delete FW.acts; const r = moveCreditOn(d); FW = keep; return r; }, at(0));
+    C.check('a copy from before stage122 (no acts) still reads the weeks, and gives nothing for a day outside them', old === null, JSON.stringify(old));
+    C.check('outside a cycle: no page errors', p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+
   await browser.close();
   process.exit(C.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
