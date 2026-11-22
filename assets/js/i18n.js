@@ -389,9 +389,10 @@
     ['.cr-when,.cr-lnwhen', { Mon: 'دوشنبه', Tue: 'سه‌شنبه', Wed: 'چهارشنبه', Thu: 'پنجشنبه', Fri: 'جمعه', Sat: 'شنبه', Sun: 'یکشنبه' }],
     // ...and "You" before it means you liked it: "تو، دیروز" read as "you, yesterday".
     ['.cr-kww', { 'You': 'لایک شما' }]];
-  // A count standing alone on the Team screen (a heart's count, a vote's percent, last week's tally, the +6 face): Persian digits,
+  // A count standing alone beside Farsi words (the Team screen first, 2026-11-21) (a heart's count, a vote's percent, last week's tally, the +6 face): Persian digits,
   // and the Persian percent sign (2026-11-21: "57%" and "1" sat beside "۷ رأی" and "۳ جلسه").
-  var COUNT = '.cr-mcd,.cr-ht b,.cr-half .n,.cr-tosslast .tn,.cr-face';
+  var COUNT = '.cr-mcd,.cr-ht b,.cr-half .n,.cr-tosslast .tn,.cr-face,.fw-f b,.cyc-k';
+  // (2026-11-22) Your weeks' legend ("1 هفتهٔ کامل") and Progress's "1 از ۱۰ جلسه": the number is its own element beside Farsi words.
   // A short English run inside a Farsi line ("«استپ‌آف لندینگ» (Step-Off Landing)", "Back Squat", "Effort ۷") is kept as one
   // left-to-right piece that never breaks across lines: split by the line's end, "(Step-Off" sat at the end of one line and
   // "Landing)" at the start of the next, brackets turned round. Longer runs keep their own order but may still wrap.
@@ -460,7 +461,16 @@
       if (r != null) { if (r !== d) n.data = r; }
       else {
         if (A.missing.size < 5000 && /[A-Za-z]{2}/.test(d)) A.missing.add(norm(d));
-        if (!(p && p.closest && p.closest('[dir="auto"]'))) { var mx = faMixed(faEffort(d)); if (mx !== d) n.data = mx; }
+        if (!(p && p.closest && p.closest('[dir="auto"]'))) {
+          var mx = faMixed(faEffort(d));
+          // An English sentence with no Farsi words for it (a goal or a note Amir wrote in English) ends in a full stop or a
+          // bracket, which a right-to-left line moved to its start (".Four sessions a week, no gaps", 2026-11-22). Kept as one
+          // left-to-right piece, its stop stays at its end; the line still sits on the right.
+          if (mx === d && !/[\u0600-\u06FF]/.test(d) && /[A-Za-z]{2}/.test(d) && /[.!?:;)\]'"…]\s*$/.test(d) && d.indexOf(ISO_F) < 0 && d.indexOf(ISO_L) < 0) {
+            var mm = d.match(/^(\s*)([\s\S]*?)(\s*)$/); mx = mm[1] + ISO_F + mm[2] + ISO_R + mm[3];
+          }
+          if (mx !== d) n.data = mx;
+        }
       }
     }
     // A tempo ("3-1-1-0", "۳-۱-۱") never breaks at its hyphens: the help sheet put "3-1-1-" at a line's end and "0" on the
