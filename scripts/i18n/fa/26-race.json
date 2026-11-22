@@ -25,6 +25,7 @@
     ["You lead (the last 7 days|the last 30 days|this season)\\.", "شما در {t1} اول هستید."],
     ["Level with (.+)\\.", "هم‌امتیاز با $1."],
     ["takes (\\d+)(?:st|nd|rd|th)\\.", "رتبهٔ {n1} رو می‌گیره."],
+    ["(\\d+) active days?", "{n1} روز فعال"],
     ["(\\d+) days?", "{n1} روز"],
     ["(\\d+) of the last 7 days", "{n1} روز از ۷ روز گذشته"],
     ["up (\\d+)", "{n1} پله بالاتر"],

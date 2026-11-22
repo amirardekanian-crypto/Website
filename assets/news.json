@@ -10,7 +10,8 @@
           "The board moved up. It sits right under the week now, not at the bottom.",
           "Three races: the last 7 days, the last 30 days and the season. The 7 days starts fresh all the time, so anyone can win it.",
           "The dots under each name are the last 7 days. A full dot is a day with points. Consistency shows.",
-          "Under the board it tells you who is just ahead and how many points you need to pass them."
+          "Under the board it tells you who is just ahead and how many points you need to pass them.",
+          "In the month and the season, the line under each name now says active days: the days that person earned points."
         ],
         "sign": "Amir"
       },
@@ -20,7 +21,8 @@
           "جدول رفت بالا. الان درست زیر هفته‌ست، نه ته صفحه.",
           "سه تا مسابقه: ۷ روز گذشته، ۳۰ روز گذشته و کل فصل. ۷ روز همیشه از نو حساب می‌شه، پس هر کسی می‌تونه ببره.",
           "نقطه‌های زیر هر اسم ۷ روز گذشته‌ان. نقطهٔ پر یعنی اون روز امتیاز گرفتید. اینجا پیوستگی دیده می‌شه.",
-          "زیر جدول می‌گه کی درست جلوی شماست و چند امتیاز لازم دارید تا ازش رد بشید."
+          "زیر جدول می‌گه کی درست جلوی شماست و چند امتیاز لازم دارید تا ازش رد بشید.",
+          "توی ماه و فصل، زیر هر اسم نوشته چند روز فعال بوده: روزهایی که امتیاز گرفته."
         ],
         "sign": "امیر"
       }

@@ -16708,7 +16708,7 @@ function crewBoardHTML(all, s, race) {
     const wk = typeof r.wk === 'string' && /^[01]{7}$/.test(r.wk) ? r.wk : '';
     const sub = s === 'week' && wk
       ? `<span class="cr-dots" aria-label="${wk.replace(/0/g, '').length} of the last 7 days">${[...wk].map(c => `<i${c === '1' ? ' class="y"' : ''}></i>`).join('')}</span>`
-      : (r.days != null && s !== 'week' ? `<span class="cr-dn">${Number(r.days) || 0} day${Number(r.days) === 1 ? '' : 's'}</span>` : '');
+      : (r.days != null && s !== 'week' ? `<span class="cr-dn">${Number(r.days) || 0} active day${Number(r.days) === 1 ? '' : 's'}</span>` : '');
     const nt = `<span class="nt">${nm}${arrow}${sub}</span>`;
     const n = crewPagesOn() && (p.ck || p.me) ? `<span class="n wf">${crewFace(p, 'line')}${nt}</span>` : `<span class="n">${nt}</span>`;
     const inner = `<span class="p">${Number(r.pos) || ''}</span>${n}<span class="x">${Number(r.xp || 0).toLocaleString('en-GB')}</span>${dr ? '<span class="c" aria-hidden="true">›</span>' : ''}`;
