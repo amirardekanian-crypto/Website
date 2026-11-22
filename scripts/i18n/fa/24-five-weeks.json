@@ -37,7 +37,12 @@
     "That did not save. Try again.": "ذخیره نشد. دوباره امتحان کنید.",
     "That did not delete. Try again when you have signal.": "پاک نشد. وقتی آنتن داشتید دوباره امتحان کنید.",
     "week held": "هفتهٔ کامل",
-    "weeks held": "هفتهٔ کامل"
+    "weeks held": "هفتهٔ کامل",
+    "Played today?": "امروز بازی کردید؟",
+    "Yes, add it": "بله، ثبتش کنید",
+    "Something else": "یه چیز دیگه",
+    "Not today": "امروز نه",
+    "Filled in from your last one. Change anything.": "از آخرین فعالیت شما پر شده. هر چیزی رو می‌تونید عوض کنید."
   },
   "patterns": [
     [
@@ -63,6 +68,10 @@
     [
       "Library session · (\\d+) min",
       "جلسهٔ کتابخانه · {n1} دقیقه"
+    ],
+    [
+      "like (yesterday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)",
+      "مثل {t1}"
     ]
   ]
 }

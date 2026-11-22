@@ -79,6 +79,10 @@ reference is [`../../HABITS.md`](../../HABITS.md). These are the rules for the h
   + and number box edit the typed number. ⚠️ **The MET table exists twice** (`activity_met()` and `MOVE_MET`):
   `scripts/check_twins.js` holds them equal. Forward only from 2026-11-22 (D20). It pays through Steps only, so Court Log itself
   still pays nothing. The table and its sources: [`../ref/move-credit.md`](../ref/move-credit.md).
+- **Played today? asks, it never pushes** (#126, 2026-11-22, Amir: *"Build 126 first"*). After 5 pm, on a day with no activity
+  logged, Home's Today card carries one row under Steps: the athlete's last activity (`actLast()`, from Your weeks' copy) saved
+  again in one tap through `log_activity()`; *Something else* opens Add activity, which opens on the last activity; *Not today*
+  hides it until tomorrow (`<id>_played_no`, never synced). Never a push, never in the demo or the coach's preview.
 
 ---
 
