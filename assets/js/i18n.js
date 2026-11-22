@@ -328,17 +328,27 @@
   A.names = {};
   A.nameOf = function (s) { var k = norm(s || ''); return Object.prototype.hasOwnProperty.call(A.names, k) ? A.names[k] : s; };
   A.addNames = function (map) {
-    var fresh = false;
+    var fresh = {}, any = false;
     Object.keys(map || {}).forEach(function (k) {
       var v = map[k];
-      if (typeof v === 'string' && /[؀-ۿ]/.test(v) && A.names[norm(k)] !== v) { A.names[norm(k)] = v; fresh = true; }
+      if (typeof v === 'string' && /[؀-ۿ]/.test(v) && A.names[norm(k)] !== v) { A.names[norm(k)] = v; fresh[norm(k)] = v; any = true; }
     });
-    // Names that arrived after the screen was drawn: each text that is exactly a name takes its Farsi now.
-    if (fresh && document.body) {
-      var tw = document.createTreeWalker(document.body, 4, null), n;
+    // Names that arrived after the screen was drawn: each text that is exactly a name takes its Farsi now. So does a name
+    // INSIDE a sentence (2026-11-21, Amir: "see why tara doesnt have farsi name in crew"): someone who joined the crew after
+    // this phone saved its names was drawn as "Tara به تیم پیوست", and only a text that was the name alone was redone.
+    // A name inside a Farsi sentence always sits in an isolate (fill() and faMixed()), so that is what is looked for.
+    if (any && document.body) {
+      var tw = document.createTreeWalker(document.body, 4, null), n, ISO_IN = /[⁦⁨]([^⁩]+)⁩/g;
       while ((n = tw.nextNode())) {
+        if (nameKept(n.parentElement)) continue;
         var c = n.data.trim();
-        if (c && Object.prototype.hasOwnProperty.call(A.names, norm(c)) && !nameKept(n.parentElement)) { n.data = n.data.replace(c, A.names[norm(c)]); seen.set(n, n.data); }
+        if (c && Object.prototype.hasOwnProperty.call(A.names, norm(c))) { n.data = n.data.replace(c, A.names[norm(c)]); seen.set(n, n.data); continue; }
+        if (n.data.indexOf(ISO_R) < 0) continue;
+        var d2 = n.data.replace(ISO_IN, function (all, w) {
+          var k = norm(w.split(NBSP).join(' ').split(WJ).join(''));
+          return Object.prototype.hasOwnProperty.call(fresh, k) ? fresh[k] : all;
+        });
+        if (d2 !== n.data) { n.data = d2; seen.set(n, d2); }
       }
     }
   };

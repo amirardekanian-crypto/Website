@@ -599,7 +599,10 @@
 // v273: program.html and i18n-fa.js (?v=19) changed (2026-11-21): Your activity, a switch in What the crew sees (off until turned on, stage118);
 // the Inbox counts new notes, and a new cycle or a changed plan opens the Game Plan.
 // v274: program.html, i18n.js (?v=12) and i18n-fa.js (?v=20) changed (2026-11-21): Team in Farsi, each piece of a moment card translated alone, Farsi counts and day names.
-const CACHE = 'aap-v274';
+// v275: program.html and i18n.js (?v=13) changed (2026-11-22, Amir: "see why tara doesnt have farsi name in crew"): a name that reaches the
+// phone after Crew is drawn (someone who joined the crew after this phone saved its names) is put in Farsi inside sentences too, not only
+// where it stands alone. And the bump today's monthly-goal commits (Achievements → Goals, the late tick) went out without.
+const CACHE = 'aap-v275';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -639,7 +642,7 @@ const SHELL = [
   '/assets/js/between-sets.js',
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
-  '/assets/js/i18n.js?v=12',
+  '/assets/js/i18n.js?v=13',
   '/assets/js/i18n-fa.js?v=20',
 ];
 
