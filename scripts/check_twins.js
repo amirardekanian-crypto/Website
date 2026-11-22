@@ -1237,6 +1237,31 @@ run('the week\'s plan days (planDayIds, planDaysC / career_weeks() since stage10
     (cw.match(/is distinct from 'true'::jsonb/g) || []).length, 4);
 });
 
+/* ── Court Log counts toward Steps (stage121, 2026-11-22) ───────────────────────────────────────────────────── */
+// program.html MOVE_MET / moveCreditOf() shows the credit; the server's activity_met() / move_steps_credit() pays it. The table must be
+// the same cell for cell, and the arithmetic the same (minutes x MET / 3.5, each to the nearest 100, the day capped at 70% of the target,
+// from the same first day).
+const A_MOVE = sandbox(null, [constSrc(A_SRC, 'MOVE_MET', 'program.html'), lineSrc(A_SRC, 'const MOVE_FROM', 'program.html')]
+  .concat(fromA('moveMet', 'moveCreditOf')), ['MOVE_MET', 'MOVE_FROM', 'MOVE_CAP', 'moveCreditOf']);
+run('the Steps credit of an activity (MOVE_MET, moveCreditOf / activity_met(), move_steps_credit() in stage121)', () => {
+  const sql = read('supabase/schema_snapshot.sql');   // the live functions (stage121 put them there)
+  const body = sql.slice(sql.indexOf('-- MOVE_MET_BEGIN'), sql.indexOf('-- MOVE_MET_END'));
+  const S = {};
+  for (const m of body.matchAll(/\('([a-z_]+)', '(easy|normal|hard)', ([\d.]+)\)/g)) (S[m[1]] = S[m[1]] || [0, 0, 0])[['easy', 'normal', 'hard'].indexOf(m[2])] = Number(m[3]);
+  expect('the same kinds, in the phone and the server', null, Object.keys(A_MOVE.MOVE_MET).sort(), Object.keys(S).sort());
+  Object.keys(S).forEach(k => expect('MET of ' + k + ' (easy, normal, hard)', k, A_MOVE.MOVE_MET[k], S[k]));
+  const kinds = /array\[([^\]]+)\]/.exec(sql.slice(sql.indexOf('FUNCTION public.activity_kinds()')))[1].match(/'([a-z_]+)'/g).map(x => x.slice(1, -1));
+  expect('activity_kinds() is the table\'s kinds', null, kinds.slice().sort(), Object.keys(S).sort());
+  expect('the first day', null, A_MOVE.MOVE_FROM, (/date '(\d{4}-\d{2}-\d{2})'/.exec(sql.slice(sql.indexOf('FUNCTION public.move_credit_from()'))) || [])[1]);
+  expect('the server rounds each activity to 100 steps per 3.5 MET-minutes', null, /round\(a\.minutes \* coalesce\(public\.activity_met\(a\.kind, a\.effort\), 0\) \/ 3\.5\) \* 100/.test(sql), true);
+  expect('the server caps the day at 70% of the target', null, /least\(per\.raw, round\(tgt\.t \* 0\.7\)::integer\)/.test(sql) && A_MOVE.MOVE_CAP === 0.7, true);
+  const sqlCredit = (acts, t) => { const raw = acts.reduce((n, a) => n + Math.round(a.mins * S[a.kind][['easy', 'normal', 'hard'].indexOf(a.effort)] / 3.5) * 100, 0); return { steps: Math.min(raw, Math.round(t * 0.7)), raw }; };
+  [[], [{ kind: 'tennis', mins: 60, effort: 'normal' }], [{ kind: 'padel', mins: 30, effort: 'easy' }], [{ kind: 'cycling', mins: 45, effort: 'hard' }, { kind: 'gym', mins: 20, effort: 'easy' }],
+   [{ kind: 'pickleball', mins: 5, effort: 'normal' }], [{ kind: 'beach_tennis', mins: 90, effort: 'hard' }]].forEach(acts =>
+    [10000, 8000].forEach(t => same('moveCreditOf vs the server\'s arithmetic', [acts, t], A_MOVE.moveCreditOf(acts, t), sqlCredit(acts, t))));
+  expect('an hour of normal tennis is 11,700 steps, capped at 7,000', null, A_MOVE.moveCreditOf([{ kind: 'tennis', mins: 60, effort: 'normal' }], 10000), { steps: 7000, raw: 11700 });
+});
+
 /* ── report ───────────────────────────────────────────────────────────────── */
 if (failures.length || chipsFailures.length) {
   console.error('\ncheck_twins: ' + (failures.length + chipsFailures.length) + ' problem' + (failures.length + chipsFailures.length === 1 ? '' : 's') + ' (of ' + checks + ' checks):\n');

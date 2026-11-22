@@ -331,7 +331,10 @@
     "Delete this entry": "حذف این ثبت",
     "Delete?": "حذف؟",
     "Every entry names the set it came from.": "هر ثبت اسم ستی رو که ازش اومده می‌گه.",
-    "Heavier sets closer to failure give the sharper numbers.": "ست‌های سنگین‌تر و نزدیک‌تر به ناتوانی عددهای دقیق‌تری می‌دن."
+    "Heavier sets closer to failure give the sharper numbers.": "ست‌های سنگین‌تر و نزدیک‌تر به ناتوانی عددهای دقیق‌تری می‌دن.",
+    "Cycling": "دوچرخه‌سواری",
+    "Swimming": "شنا",
+    "Football": "فوتبال"
   },
   "patterns": [
     [

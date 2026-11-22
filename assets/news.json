@@ -2,6 +2,30 @@
   "_about": "What's new in the app, shown in every athlete's Inbox for 14 days (program.html, newsRows/openNews). Newest first. Each entry: id (unique), at (ISO time), en and fa: { title, items: [one short line each], sign }. Written in Amir's voice (COM-3) in both languages (COM-1). THE RULE (docs/rules/working-with-amir.md): a change to program.html that an athlete would notice ships with its entry here in the same commit; .githooks/commit-msg blocks a program.html commit without this file unless the message says [no news].",
   "items": [
     {
+      "id": "2026-11-22-steps-credit",
+      "at": "2026-11-22T12:00:00Z",
+      "en": {
+        "title": "Your tennis now counts toward Steps",
+        "items": [
+          "Add an activity on Your weeks and it adds steps to your Steps habit for that day. An hour of tennis is worth nearly 12,000 steps of work.",
+          "It can fill up to 7,000 of your 10,000. The rest is walking, because moving through the day matters too.",
+          "The number you type is still your own steps. The Steps row shows what your activity added, like +7,000 from Tennis.",
+          "New on the list: beach tennis, pickleball, squash, badminton, cycling, swimming, football and gym."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "حالا تنیس شما هم جزو قدم‌ها حساب می‌شه",
+        "items": [
+          "وقتی یه فعالیت توی هفته‌های شما ثبت می‌کنید، برای همون روز به عادت قدم‌هاتون قدم اضافه می‌شه. یه ساعت تنیس حدوداً به اندازهٔ ۱۲ هزار قدم کاره.",
+          "تا ۷ هزار قدم از ۱۰ هزار تا رو می‌تونه پر کنه. بقیه‌ش پیاده‌رویه، چون تحرک توی طول روز هم مهمه.",
+          "عددی که می‌نویسید همچنان قدم‌های خودتونه. ردیف قدم‌ها نشون می‌ده فعالیتتون چقدر اضافه کرده، مثلاً ۷٬۰۰۰ قدم از تنیس.",
+          "به لیست اضافه شد: تنیس ساحلی، پیکل‌بال، اسکواش، بدمینتون، دوچرخه‌سواری، شنا، فوتبال و باشگاه."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-21-team-farsi",
       "at": "2026-11-21T19:00:00Z",
       "en": {

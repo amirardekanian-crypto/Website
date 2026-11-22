@@ -670,7 +670,8 @@
     "Every number here is worked out on my side, from what you logged. Your phone does the same arithmetic so you are not left waiting, but my side is the one that counts.": "هر عددی اینجا طرف من از روی چیزی که ثبت کردی حساب می‌شه. گوشیت همین حساب رو می‌کنه که منتظر نمونی، ولی طرف من همونیه که حساب می‌شه.",
     "While something says": "تا وقتی یه چیزی می‌گه",
     ", my side has not confirmed it yet. It usually catches up by your next session.": "، طرف من هنوز تأییدش نکرده. معمولاً تا جلسهٔ بعدیت می‌رسه.",
-    "If a number looks wrong, message me. I can see every day you have logged.": "اگه عددی غلط به نظر میاد، بهم پیام بده. من هر روزی که ثبت کردی رو می‌بینم."
+    "If a number looks wrong, message me. I can see every day you have logged.": "اگه عددی غلط به نظر میاد، بهم پیام بده. من هر روزی که ثبت کردی رو می‌بینم.",
+    "your activity": "فعالیت شما"
   },
   "patterns": [
     [
@@ -984,6 +985,10 @@
     [
       "(\\d+) of (\\d+) (weeks? held|sessions? with Amir|personal bests?|comebacks?)",
       "{n1} از {n2} {t3}"
+    ],
+    [
+      "\\+([\\d,]+) from (.+)",
+      "{n1} قدم از {t2}"
     ]
   ],
   "split": [

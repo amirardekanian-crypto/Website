@@ -72,6 +72,14 @@ reference is [`../../HABITS.md`](../../HABITS.md). These are the rules for the h
   section whose numbers have not loaded draws no price list rather than drawing zeros. Detail:
   [`PROGRAM-APP.md`](../../PROGRAM-APP.md) → *The ladders come back*.
 
+- **Court Log counts toward Steps** (stage121, 2026-11-22, Amir: *"lets do option 1"*). Each logged activity is worth
+  `round(minutes × MET ÷ 3.5) × 100` steps, a day's credit is capped at 70% of the target, and Steps for the day is the typed
+  number plus the credit. ⚠️ **The typed number is never changed**: the server adds the credit as it reads the log
+  (`hab_log_credited()`, inside `career_observe_proof()`), and the phone reads the log through `HAB_VIEW`, never saving it; the −,
+  + and number box edit the typed number. ⚠️ **The MET table exists twice** (`activity_met()` and `MOVE_MET`):
+  `scripts/check_twins.js` holds them equal. Forward only from 2026-11-22 (D20). It pays through Steps only, so Court Log itself
+  still pays nothing. The table and its sources: [`../ref/move-credit.md`](../ref/move-credit.md).
+
 ---
 
 *What is left before `habits.html` can be deleted: point proof.html, the WhatsApp links, the

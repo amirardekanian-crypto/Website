@@ -603,7 +603,9 @@
 // phone after Crew is drawn (someone who joined the crew after this phone saved its names) is put in Farsi inside sentences too, not only
 // where it stands alone. And the bump today's monthly-goal commits (Achievements → Goals, the late tick) went out without.
 // v276: program.html changed (2026-11-22): your own achievement card on Team shows its one-line caption; someone else's says a new achievement.
-const CACHE = 'aap-v276';
+// v277: program.html and i18n-fa.js (?v=21) changed (2026-11-22, Amir: "lets do option 1"): Court Log counts toward Steps (stage121), the
+// Steps row says what an activity added, and eight new activity kinds on Add activity.
+const CACHE = 'aap-v277';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -644,7 +646,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=13',
-  '/assets/js/i18n-fa.js?v=20',
+  '/assets/js/i18n-fa.js?v=21',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).
