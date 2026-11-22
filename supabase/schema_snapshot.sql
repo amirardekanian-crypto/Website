@@ -8554,15 +8554,18 @@ declare
   v_me  text := public.current_athlete_id();
   v_out jsonb := '{}'::jsonb;
   r     record;
+  v_key text;
+  v_nm  text;
 begin
   if v_me is null then return v_out; end if;
   for r in
     select p.athlete_id,
            btrim(coalesce(p.data->'athlete'->>'firstName', '')) f, btrim(coalesce(p.data->'athlete'->>'lastName', '')) l,
            btrim(coalesce(p.data->'athlete'->'name_fa'->>'first', '')) ff, btrim(coalesce(p.data->'athlete'->'name_fa'->>'last', '')) fl,
-           btrim(coalesce(c.name, '')) shown
+           array_remove(array[nullif(btrim(coalesce(c.name, '')), ''), nullif(btrim(coalesce(lb.display_name, '')), '')], null) shown
       from public.programs p
       left join public.crew_consent c on c.athlete_id = p.athlete_id
+      left join public.leaderboard_optin lb on lb.athlete_id = p.athlete_id
      where p.athlete_id = v_me or c.answer = 'yes'
   loop
     if r.ff = '' or r.f = '' then continue; end if;
@@ -8571,7 +8574,18 @@ begin
       v_out := v_out || jsonb_build_object(r.f || ' ' || r.l, r.ff || ' ' || r.fl,
                                            r.f || ' ' || left(r.l, 1) || '.', r.ff || ' ' || left(r.fl, 1) || '.');
     end if;
-    -- The name shown in the crew is one of those three forms; one an athlete typed some other way stays as typed.
+    -- A name shown in the crew or on the board, typed its own way ("Behnam.z"): matched to one of the three forms without case or marks.
+    foreach v_nm in array r.shown loop
+      if v_out ? v_nm then continue; end if;
+      v_key := regexp_replace(lower(v_nm), '[^[:alnum:]]', '', 'g');
+      if v_key = regexp_replace(lower(r.f), '[^[:alnum:]]', '', 'g') then
+        v_out := v_out || jsonb_build_object(v_nm, r.ff);
+      elsif r.l <> '' and r.fl <> '' and v_key = regexp_replace(lower(r.f || left(r.l, 1)), '[^[:alnum:]]', '', 'g') then
+        v_out := v_out || jsonb_build_object(v_nm, r.ff || ' ' || left(r.fl, 1) || '.');
+      elsif r.l <> '' and r.fl <> '' and v_key = regexp_replace(lower(r.f || r.l), '[^[:alnum:]]', '', 'g') then
+        v_out := v_out || jsonb_build_object(v_nm, r.ff || ' ' || r.fl);
+      end if;
+    end loop;
   end loop;
   return v_out;
 end $function$;

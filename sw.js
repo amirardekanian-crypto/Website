@@ -599,7 +599,8 @@
 // v273: program.html and i18n-fa.js (?v=19) changed (2026-11-21): Your activity, a switch in What the crew sees (off until turned on, stage118);
 // the Inbox counts new notes, and a new cycle or a changed plan opens the Game Plan.
 // v274: program.html, i18n.js (?v=12) and i18n-fa.js (?v=20) changed (2026-11-21): Team in Farsi, each piece of a moment card translated alone, Farsi counts and day names.
-const CACHE = 'aap-v274';
+// v275: program.html changed (2026-11-22): your own achievement card on Team shows its one-line caption; someone else's says a new achievement.
+const CACHE = 'aap-v275';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
