@@ -24,7 +24,7 @@ already shipped. Line numbers drift, so search by function name.
   the prescribed number) + RPE + done; a per-exercise note; a per-session note (`snote_`); the check-in
   (sleep, energy, soreness, stress, overall), which since 2026-09-26 sets today's targets (REC-2:
   `level`, `sore`, `drop`, `asWritten`, stored with the session); session RPE + duration (session load =
-  RPE × minutes). **No structured pain field** (pain is free text). **No court or match log.** Goes to
+  RPE × minutes). **No structured pain field** (pain is free text). **Court Log** since 2026-11-21 (`activity_log`, stage116: 13 kinds, minutes, easy/normal/hard, today or 3 days back; on Your weeks and coach.html's Five weeks; counts toward Steps through MET since 2026-11-22, stage121); match results are still not logged. Goes to
   `session_history` via `save_session` (a structured `log` since 2026-09-24) and `athlete_progress` via
   `save_progress`. A session stays live 6 h past midnight; an unfinished day is asked about on the next
   open.
@@ -46,7 +46,7 @@ that keeps time from a timestamp; one finish that sends itself) · Personal Reco
 
 **Built since the map:** #1 The Spine, #2 The Quality Map, #4 Because, #5 The Card Remembers, #12 as
 the `/cycle-report` skill, and the Fresh Eyes work (PROGRAM-APP.md has each). **Gaps still open:** cycle
-outcomes are never checked in the app; court and match load are invisible; the Library meets the
+outcomes are never checked in the app; court load is self-logged (Court Log) and read as information only (REC-7), match results invisible; the Library meets the
 programme at only two moments (LIB-01, 2026-09-27: a sore check-in offers The Morning After, a finished
 week offers Green Light); a flagged pain is never asked about again.
 

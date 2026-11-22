@@ -561,6 +561,33 @@ Add activity, not the Crew (counts only; a court session told by choice).
 
 Cut on the page (so they are not re-pitched): steps and phone health data, calories, a streak of active days, a public minutes leaderboard.
 
+## Round 12 · 2026-11-22 · "On the Move" (Court Log, Your weeks and the steps credit)
+
+Page: https://claude.ai/artifact/6JxP2kxQN4WNCNuwui6Z13
+
+Brief: straight after the steps credit went live (stage121), Amir: *"for this activity tracker and our activity, do you have any new ideas?
+does other fitness apps do anything fun with them that works better on people?"*. Live numbers: 2 Court Log entries ever (a day old); 9 of
+94 steps days reached 10,000 in 28 days; 151 sessions by 22 athletes in 28 days; 19 in the crew, the Race (a 7-day board) being built in
+another session. Research: the big apps credit other sport as minutes at an intensity (Heart Points, AZM, Garmin Intensity Minutes), not
+steps; adaptive step goals beat a fixed 10,000 by about 1,030 steps a day at day 110 (Adams 2017); in STEP UP (Patel 2019) only competition
+lasted after the game stopped; BE FIT (Patel 2017) a shared stake with lifelines, goal days 53% vs 32%.
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 126 | Played Today? | An evening row on Home's Today card and a "Same as last time" chip on Add activity: the athlete's last activity saved again in one tap (Garmin/Apple ask after a workout; we ask at the right time) | 123 | pitched (build first) |
+| 127 | Yesterday on Court | The pre-session check-in shows yesterday's logged activity in one line; coach.html shows it on the session beside its RPE; information only (REC-7) | 123, 126 | pitched (top 3) |
+| 128 | Cool Down Call | After a hard activity of 60+ min the save message offers one Library recovery session for the next morning | 123 | pitched |
+| 129 | The 150 | One line on Your weeks: this week's active minutes the WHO way (hard minutes count double) from plan sessions, Library and Court Log; later a Move habit (Heart Points, AZM) | 122, 123 | pitched (top 3) |
+| 130 | Your Number | A personal Steps target (recent usual +10%, 6,000-12,000, rises Mondays when met 5 of 7); MVP coach.html suggests, Amir sets; XP weight is a rulebook call (D20) (Adams 2017, Apple Move goal) | — | pitched (needs his call) |
+| 131 | Court Told | Court Log save offers Tell the crew with a stamp (kind, minutes, day; never effort), for those who share activity (stage118) (Strava upload and kudos) | 123, the Race | pitched |
+| 132 | Crew Hours | One shared weekly crew total (plan sessions for all, Court Log from sharers) under the Race card, faces of who added (STEP UP collaboration arm) | 131, the Race | pitched |
+| 133 | Your Usual | Your weeks' foot compares this week's court and other minutes with the athlete's own 4-week usual; silent until 3 weeks of logs (Strava weekly range) | 122, 123 | pitched |
+
+Cut on the page (so they are not re-pitched): reading Apple Health or Health Connect (impossible from the web; Google Fit's server route
+closed 30 June 2026), an athlete-facing strain or load score (round 5), calories, an active-day streak and a minutes leaderboard (round 11),
+badges or tiers for activity (Career Mode cuts), a BE FIT team stake with lifelines (= #61 Doubles, cut; revisit past 20 in the crew), and
+readiness moving the steps target (Oura; against REC-7).
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |
