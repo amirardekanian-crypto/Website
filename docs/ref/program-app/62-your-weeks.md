@@ -30,8 +30,18 @@ Next: **#125 Load Read** (court hours into `/program-design` and `/cycle-report`
 `get_five_weeks(p_athlete_id)` (`supabase/stage115_five_weeks.sql`) returns `{ n, from, to, current, weeks: [{ w, from, to, plan, done,
 held, now, days: [{ day, k: 'plan'|'library', title, mins?, shelf?, extra? }] }] }`. It reads `career_facts` (`session_finished`,
 `session_finished_early`, `library_session`, not voided) exactly as `crew_page()` reads them for your own page, the plan day's title from the
-programme and a Library session's title and shelf from `library_sessions`. Between cycles it returns the last cycle. Only the athlete
-(`current_athlete_id()`) and the coach (`is_coach()`) can read it.
+programme and a Library session's title and shelf from `library_sessions`. Only the athlete (`current_athlete_id()`) and the coach
+(`is_coach()`) can read it.
+
+**Outside a cycle** (stage122, 2026-11-22; Amir: *"yes and even after / because people may not renew program, but want to use the
+tracker"*): a cycle's weeks only while today is inside them (`career_weeks()` calls the programme's `currentCycleIndex` current for ever,
+also a cycle that starts next week or ended months ago). Before it starts, between cycles and after the last one, the 5 weeks ending with
+this one, on the weekday the athlete's weeks start on, so a week that is also a cycle's keeps its plan count and its held tick; `n` is null
+(no *Cycle N* in the head) and a plan session there is never *Extra*. The answer also carries **`acts`**, every Court Log row of the last
+70 days (from stage121's first day) whatever the weeks, `{ day, kind, mins, effort, id }`: the phone works the Steps credit from it
+(`moveActs()` → `moveCreditMap()`) and *Played today?* its last activity (`actLast()`), so Steps on the phone is the server's number in or
+out of a cycle. Before stage122 the credit came from the weeks' rows, and an activity outside the cycle's weeks counted on the server
+and not on the phone.
 
 The phone keeps the last answer as `<id>_fwcache` (never synced: `_snapshot()` skips it). `loadFiveWeeks()` runs at the start of every
 `loadHistory()` and after a Library session is marked done (`markLibraryDone()`); `fwFromCache()` reads the copy when nothing better is in

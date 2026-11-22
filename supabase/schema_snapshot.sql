@@ -8361,11 +8361,26 @@ begin
   end if;
 
   with cw as (select * from public.career_weeks(p_athlete_id)),
+  -- stage122: in a cycle means today is inside the current cycle's weeks (career_weeks() calls the programme's currentCycleIndex
+  -- current for ever, also a cycle that starts next week or ended in September)
+  incyc as (select exists (select 1 from cw c where c.is_current and current_date between c.wfrom and c.wto) as yes),
+  -- the weekday the athlete's weeks start on, and the start of the week holding today
+  anc as (
+    select coalesce((select max(c.cstart) from cw c where c.is_current),
+                    (select max(c.cstart) from cw c where c.cstart <= current_date),
+                    (select min(c.cstart) from cw c),
+                    (current_date - (extract(isodow from current_date)::int - 1))) as a),
+  roll as (
+    select current_date - ((((current_date - anc.a) % 7) + 7) % 7) as this_from from anc),
   w as (
-    select * from cw where cw.is_current
+    select cw.cycle_num, cw.week, cw.week as cweek, cw.wfrom, cw.wto, cw.plan, true as is_current
+      from cw, incyc where cw.is_current and incyc.yes
     union all
-    select * from cw where not exists (select 1 from cw c2 where c2.is_current)
-                       and cw.cycle_index = (select max(c3.cycle_index) from cw c3 where c3.cstart <= current_date)),
+    -- outside a cycle, the 5 weeks ending with this one; a week that is also a cycle's keeps its plan and its held tick
+    select m.cycle_num, gs.k, m.week, roll.this_from - (5 - gs.k) * 7, roll.this_from - (5 - gs.k) * 7 + 6, coalesce(m.plan, '{}'::text[]), false
+      from roll cross join incyc cross join generate_series(1, 5) gs(k)
+      left join cw m on m.wfrom = roll.this_from - (5 - gs.k) * 7
+     where not incyc.yes),
   pdays as (select p.data -> 'workouts' -> 'days' as days from public.programs p where p.athlete_id = p_athlete_id),
   f as (
     select cf.day as d, cf.ref, cf.kind,
@@ -8377,7 +8392,7 @@ begin
        and cf.kind in ('session_finished', 'session_finished_early', 'library_session')
        and cf.day between (select min(w1.wfrom) from w w1) and (select max(w2.wto) from w w2)),
   fw as (
-    select w.week, f.*,
+    select w.week, cardinality(w.plan) as nplan, f.*,
            (f.pday is not null and f.pday = any (w.plan)
             and row_number() over (partition by w.week, f.pday order by f.d, f.ref) = 1) as in_plan
       from f join w on f.d between w.wfrom and w.wto),
@@ -8397,7 +8412,7 @@ begin
                 (select nullif(btrim(e ->> 'title_fa'), '')
                    from pdays pd, jsonb_array_elements(case when jsonb_typeof(pd.days) = 'array' then pd.days else '[]'::jsonb end) e
                   where e ->> 'id' = fw.pday limit 1)) end,
-             'extra', case when fw.kind <> 'library_session' and not fw.in_plan then true end)) as j
+             'extra', case when fw.kind <> 'library_session' and not fw.in_plan and fw.nplan > 0 then true end)) as j   -- stage122: nplan
       from fw
       left join lateral (select l.title, l.category_id from public.library_sessions l
                           where fw.kind = 'library_session' and l.athlete_id = p_athlete_id and l.slug = fw.slug and l.completed_on = fw.d
@@ -8414,14 +8429,22 @@ begin
     select it.week, count(*) filter (where it.in_plan) as done, jsonb_agg(it.j order by it.d, it.sk) as days
       from items it group by it.week)
   select jsonb_build_object(
-           'n', max(w.cycle_num), 'from', max(w.cstart), 'to', max(w.cend), 'current', bool_or(w.is_current),
+           'n', case when bool_or(w.is_current) then max(w.cycle_num) end,
+           'from', min(w.wfrom), 'to', max(w.wto), 'current', bool_or(w.is_current),
            'weeks', coalesce(jsonb_agg(jsonb_build_object(
                       'w', w.week, 'from', w.wfrom, 'to', w.wto, 'plan', cardinality(w.plan), 'done', coalesce(wk.done, 0),
-                      'held', exists (select 1 from public.career_facts h
-                                       where h.athlete_id = p_athlete_id and h.kind = 'week_held' and h.void_at is null
-                                         and h.ref = 'c' || w.cycle_num || '|w' || w.week),
+                      'held', w.cycle_num is not null and w.cweek is not null
+                              and exists (select 1 from public.career_facts h
+                                           where h.athlete_id = p_athlete_id and h.kind = 'week_held' and h.void_at is null
+                                             and h.ref = 'c' || w.cycle_num || '|w' || w.cweek),
                       'now', current_date between w.wfrom and w.wto,
-                      'days', coalesce(wk.days, '[]'::jsonb)) order by w.week), '[]'::jsonb))
+                      'days', coalesce(wk.days, '[]'::jsonb)) order by w.week), '[]'::jsonb),
+           -- stage122: the Court Log rows the Steps credit is worked from, whatever the weeks
+           'acts', coalesce((select jsonb_agg(jsonb_build_object('day', a.day, 'kind', a.kind, 'mins', a.minutes, 'effort', a.effort, 'id', a.id)
+                                              order by a.day, a.created_at)
+                               from public.activity_log a
+                              where a.athlete_id = p_athlete_id
+                                and a.day >= greatest(public.move_credit_from(), current_date - 70)), '[]'::jsonb))
     into v_out
     from w left join wk on wk.week = w.week
   having count(*) > 0;

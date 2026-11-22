@@ -19067,15 +19067,25 @@ function moveCreditOf(acts, target) {
   return { steps: Math.min(raw, Math.round((Number(target) || 10000) * MOVE_CAP)), raw: raw };
 }
 // Day → { steps, kinds } from Your weeks' copy (FW, which the phone keeps offline). Worked out again only when FW changes.
-let _mvFor = null, _mvMap = {};
+// stage122 (2026-11-22; Amir: "yes and even after / because people may not renew program, but want to use the tracker"): from
+// FW.acts, every Court Log row of the last 70 days whatever the weeks, so the credit is the server's before a cycle starts and after
+// the last one ends. A copy from before stage122 has no acts: the weeks' rows, as before.
+let _mvFor = null, _mvLen = -1, _mvMap = {};
+function moveActs() {
+  if (!fwOk(FW)) return [];
+  if (Array.isArray(FW.acts)) return FW.acts.filter(Boolean);
+  const out = [];
+  FW.weeks.forEach(w => (Array.isArray(w && w.days) ? w.days : []).forEach(d => { if (d && (d.k === 'court' || d.k === 'other')) out.push(d); }));
+  return out;
+}
 function moveCreditMap() {
-  try { if (FW === _mvFor) return _mvMap; } catch (e) { return {}; }   // a paint before this part of the script has run (FW not set up yet)
-  _mvFor = FW; _mvMap = {};
+  try { if (FW === _mvFor && (!FW || !Array.isArray(FW.acts) || FW.acts.length === _mvLen)) return _mvMap; } catch (e) { return {}; }   // a paint before this part of the script has run (FW not set up yet)
+  _mvFor = FW; _mvLen = FW && Array.isArray(FW.acts) ? FW.acts.length : -1; _mvMap = {};
   if (!fwOk(FW)) return _mvMap;
   const H = window.AAHabits, sh = H && H.byId ? H.byId('steps') : null, target = (sh && sh.target) || 10000, by = {};
-  FW.weeks.forEach(w => (Array.isArray(w && w.days) ? w.days : []).forEach(d => {
-    if (d && (d.k === 'court' || d.k === 'other') && String(d.day) >= MOVE_FROM) (by[d.day] = by[d.day] || []).push(d);
-  }));
+  moveActs().forEach(d => {
+    if (d && d.day && String(d.day) >= MOVE_FROM) (by[d.day] = by[d.day] || []).push(d);
+  });
   Object.keys(by).forEach(day => {
     const c = moveCreditOf(by[day], target);
     if (c.steps > 0) _mvMap[day] = { steps: c.steps, kinds: [...new Set(by[day].map(a => a.kind))] };
@@ -19092,10 +19102,10 @@ const PLAYED_FROM_HOUR = 17;
 function actLast() {
   if (!fwOk(FW)) return null;
   let best = null;
-  FW.weeks.forEach(w => (Array.isArray(w && w.days) ? w.days : []).forEach(d => {
-    if (d && (d.k === 'court' || d.k === 'other') && MOVE_MET[d.kind] && Number(d.mins) > 0 && ['easy', 'normal', 'hard'].indexOf(d.effort) >= 0
+  moveActs().forEach(d => {   // stage122: the last 70 days, not only the weeks on the card
+    if (d && MOVE_MET[d.kind] && Number(d.mins) > 0 && ['easy', 'normal', 'hard'].indexOf(d.effort) >= 0
         && (!best || String(d.day) >= String(best.day))) best = d;
-  }));
+  });
   return best;
 }
 function playedKey() { return ATHLETE_ID + '_played_no'; }
@@ -19307,7 +19317,9 @@ async function saveActivity() {
     aaToast('Added to your weeks.');
     if (FW && fwOk(FW)) {   // shown at once, before the server's own answer replaces it
       const r = res.data || {}, wk = FW.weeks.find(w => w && day >= String(w.from) && day <= String(w.to));
-      if (wk) { (wk.days = wk.days || []).push({ day, k: ACT_COURT.indexOf(r.kind) >= 0 ? 'court' : 'other', kind: r.kind, title: plCap(String(r.kind || 'activity')), mins: r.minutes, effort: r.effort, id: r.id }); paintFiveWeeks(); }
+      if (wk) (wk.days = wk.days || []).push({ day, k: ACT_COURT.indexOf(r.kind) >= 0 ? 'court' : 'other', kind: r.kind, title: plCap(String(r.kind || 'activity')), mins: r.minutes, effort: r.effort, id: r.id });
+      if (Array.isArray(FW.acts) && r.id && !FW.acts.some(a => a && String(a.id) === String(r.id))) FW.acts = FW.acts.concat([{ day, kind: r.kind, mins: r.minutes, effort: r.effort, id: r.id }]);   // stage122: Steps follows at once
+      paintFiveWeeks();
     }
     loadFiveWeeks();
     try { paintTodayCard(); } catch (e2) { /* the card paints itself next time */ }   // #126: Played today? goes once the day has one
@@ -19330,7 +19342,10 @@ function deleteActivity(btn, id, day) {
       if (!sb) throw new Error('offline');
       const res = await _withTimeout(sb.rpc('delete_activity', { p_athlete_id: ATHLETE_ID, p_id: id }), 10000);
       if (!res || res.error) throw (res && res.error) || new Error('no answer');
-      if (FW && fwOk(FW)) FW.weeks.forEach(w => { if (w && Array.isArray(w.days)) w.days = w.days.filter(d => !(d && String(d.id) === id)); });
+      if (FW && fwOk(FW)) {
+        FW.weeks.forEach(w => { if (w && Array.isArray(w.days)) w.days = w.days.filter(d => !(d && String(d.id) === id)); });
+        if (Array.isArray(FW.acts)) FW.acts = FW.acts.filter(a => !(a && String(a.id) === id));   // stage122
+      }
       paintFiveWeeks();
       openFiveWeeksDay(day);
       loadFiveWeeks();

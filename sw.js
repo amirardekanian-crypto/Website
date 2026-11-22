@@ -612,7 +612,9 @@
 // v280: program.html and i18n-fa.js (?v=24) changed (2026-11-22, Amir: "Build 126 first"): Played today? on Home's Today card (the last
 // activity again in one tap, after 5 pm), and Add activity opens on the last activity.
 // v281: i18n.js (?v=14) and i18n-fa.js (?v=25) changed (2026-11-22): the Farsi sweep of every screen: Farsi numbers in Your weeks and Progress, week rows numbered without ه, distance and minute doses, an English sentence keeps its full stop.
-const CACHE = 'aap-v281';
+// v282: program.html changed (2026-11-22, Amir: "yes and even after"): Steps counts Court Log outside a cycle, from get_five_weeks()'s
+// acts (stage122), and Your weeks shows the last 5 weeks before a programme starts and after it ends.
+const CACHE = 'aap-v282';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
