@@ -183,7 +183,7 @@ stale copy reached athletes.
 | ID | Rule | Stage | Check |
 |---|---|---|---|
 | COM-1 | Every in-app athlete text is written in both languages: English in its field, Farsi in `<key>_fa`, both in Amir's voice; names and numbers never twin. | engage · assemble · edit | warn (no twin, a twin with no Farsi, a list's length, Farsi in an English field) |
-| COM-2 | One WhatsApp handoff message ships with every programme, in the athlete's own language (Farsi: Persian numerals, Persian date first). | engage | |
+| COM-2 | One WhatsApp handoff message ships with every programme, in English, plus a Farsi version for every Iranian athlete (Persian numerals, Persian date first). | engage | |
 | COM-3 | Everything an athlete reads sounds like Amir typed it: plain words, short sentences; no em-dashes, semicolons, triads or brochure lines. | engage · report | warn (em-dash, a roadmap semicolon) |
 | COM-4 | 5–10 personal Becauses (`why`) a cycle, on exercises chosen for this athlete: the body part not the diagnosis, the next step not the failure. | engage | ✓ |
 | COM-5 | Notes name days as Day N and their on-screen names, never internal labels like "the Control day". | engage | |
@@ -957,10 +957,11 @@ same ID. Read a rule's story and its history before changing it.
   It starts with each athlete's next cycle; the current cycles of the Farsi athletes and the demo were given their
   Farsi on 2026-11-20 on Amir's word, and nothing older is translated (PRC-1). `check_program.py` warns on a missing
   twin, a twin with no Farsi, a list twin of another length and Farsi in an English field.
-- `COM-2` **The WhatsApp handoff message is PIPELINE OUTPUT, and it is written in the ATHLETE'S OWN
-  LANGUAGE — not English, and not on request.** Every finished programme ships with ONE message (two until
+- `COM-2` **The WhatsApp handoff message is PIPELINE OUTPUT: English for everyone, and English AND Farsi
+  for every Iranian athlete, not on request.** Every finished programme ships with ONE message (two until
   2026-10-11): what changed and why, the week, this cycle's actions pointed into the app (COM-17), what they
-  will have by the end, then dates and questions. Farsi for Iran-based athletes, English otherwise. In Farsi
+  will have by the end, then dates and questions. Every Iranian athlete gets both versions, whatever their app language and wherever they live; everyone else
+  gets English. In Farsi
   use Persian numerals and put the **Persian calendar date first** with the Gregorian in brackets. It never
   enters the programme; the in-app text follows COM-1. Owned by /program-engage PART 5.
 - `COM-3` `COM-4` **⚠️ EVERY word an athlete reads must sound like AMIR wrote it — not like AI wrote it.**

@@ -297,6 +297,7 @@ the principles (their *How to add*).
   - Amir, 2026-08-08: "this actually should be part of our program writing pipeline."
   - 2026-08-08
   - 2026-10-11: one message, not two (with COM-17).
+  - 2026-11-22, Amir: "every athlete, which is iranian, gets both english and farsi version. thats a rule" (after an Iranian athlete abroad, with an English app, got an English-only handoff). Rewritten to: English for everyone, English and Farsi for every Iranian athlete.
 - `COM-3` `COM-4` **⚠️ EVERY word an athlete reads must sound like AMIR wrote it — not like AI wrote it.**
   - Amir, 2026-07-30, verbatim: "write in a friendly human voice, dont let them think ai wrote these, let them think i wrote them, and my english is not very high level."
 - `COM-5` **Notes speak in the athlete's app language — day numbers + on-screen names, never design-side shorthand.**

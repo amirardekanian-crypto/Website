@@ -34,7 +34,7 @@ engage is run standalone without that context, read the spec and the athlete's c
 (the latest Debrief and cycle entry) first; there is no separate brief to pull any more.
 
 All athlete-facing **in-app** text is written in **both languages, for every athlete** (COM-1): PARTS 1–4 in
-English, then PART 6 gives each its Farsi twin. `athlete.lang` decides only PART 5's language (COM-2). Every rule
+English, then PART 6 gives each its Farsi twin. PART 5 is English, plus Farsi for an Iranian athlete (COM-2). Every rule
 below holds in both. Tone: direct, confident, coach-to-athlete, no filler.
 
 > This is **Prompt 2**. Its PARTs below are the message / teaser / notes / completion
@@ -251,11 +251,12 @@ For each training day in the program spec (Day 1…N), tied to that day's focus 
 it serves the goal. Triumphant, not cheesy; one breath of recovery guidance is fine.
 Per day: `DAY [n] — [focus]` · `Title:` (2–4 words) · `Message:` (1–2 sentences).
 
-## PART 5 — THE WHATSAPP HANDOFF MESSAGE (always produced, in the ATHLETE'S OWN LANGUAGE)
+## PART 5 — THE WHATSAPP HANDOFF MESSAGE (always produced: English, plus Farsi for every Iranian athlete)
 *(Amir, 2026-08-08: "this actually should be part of our program writing pipeline.")* The in-app
 text is in both languages (PART 1–4 and PART 6, COM-1). This one message is what Amir pastes into WhatsApp to hand the
-programme over, so it is written in **the athlete's own language** — Farsi for Iran-based /
-Farsi-speaking athletes, English otherwise (COM-2). It lives in chat + a scratch file, **never** in
+programme over, so it is written in **English, and every Iranian athlete also gets the same message in Farsi**,
+whatever their app language and wherever they live (COM-2, Amir 2026-11-22). In the Farsi version, screen and card
+names follow the athlete's app language, so they match what they see. It lives in chat + a scratch file, **never** in
 `data/<id>.json`.
 
 **It points into the app; it never rewrites it (COM-17, Amir 2026-10-11).** The cards, the Coach's Notes

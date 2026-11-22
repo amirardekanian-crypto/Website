@@ -145,8 +145,8 @@ One chat message, only what the data can't answer:
 - **Calls and WhatsApp:** what did the athlete say, and what did you answer? (His answers become
   decisions; keep his wording.)
 - **Anything sent outside the app** (weigh-ins, videos, test results).
-- **Language of the message** if the log's last Debrief doesn't say (Farsi on WhatsApp for
-  athletes in Iran; the programme app itself stays English).
+- **Whether the athlete is Iranian** if the log doesn't say: an Iranian athlete gets the message in English
+  and Farsi, everyone else in English (COM-2).
 - Anything specific he wants celebrated.
 - **Court time** (REC-7), when Q5 has any: the numbers, and what you'd suggest for the next cycle, as a question. He decides;
   the Debrief records his answer as the decision, or the hours as a fact.
