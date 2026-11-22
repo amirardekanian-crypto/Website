@@ -947,7 +947,8 @@ same ID. Read a rule's story and its history before changing it.
 - `COM-1` **Every in-app athlete text is written in BOTH languages, for every athlete.** Until 2026-11-20 it was
   English only. Now the app runs in Farsi too, and Amir answered *"Yes, both always"*: every text /program-engage
   writes (the message and outcomes, the teaser, week notes, Coach's Notes, Becauses, completion text, the notes cards,
-  and the Farsi of each day's `focusTag` and the cycle's tagline and aims) has its English in the field and its Farsi
+  and the Farsi of the cycle's tagline and aims; never a day's `focusTag` or a cycle's name, which stay English like
+  exercise names, Amir 2026-11-22) has its English in the field and its Farsi
   beside it in `<key>_fa` (SCHEMA.md → *Programme texts in two languages*). A string twins a string, a list twins a
   list of the same length, and the twin says the same thing, no more. Both are Amir's voice (COM-3); the Farsi is his
   Farsi (formal شما for every text written since 2026-11-21, Amir: *"from now on, formal voice"*, *"Only new

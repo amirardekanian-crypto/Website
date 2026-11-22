@@ -62,6 +62,7 @@
     t: function (s) { return s; },
     addFa: function () {},
     names: {}, nameOf: function (s) { return s; }, addNames: function () {},   // the real ones are set in Farsi only (section 3)
+    keep: {}, keepNames: function () {},
     skip: '',
   };
   if (!A.fa) return;
@@ -256,13 +257,14 @@
       var v = m[+i] == null ? '' : m[+i];
       if (k === 'n') return faNum(v);
       if (k === 'd') return dateOf(v) || look(v) || v;   // a month alone ("October") is its Shamsi month in the word lists
-      var tv = look(v);
+      var tv = A.keep[norm(v)] ? null : look(v);
       return tv != null ? tv : faT && /[A-Za-z]/.test(v) ? ISO_F + v + ISO_R : v;
     });
   }
   function look(core) {
     var k = norm(core);
     if (!k || k.length < 2) return null;   // a lone letter is a circuit's A, B, C, never a word
+    if (A.keep[k]) return null;            // a day's or a cycle's name (keepNames)
     var ex = A.exact;
     if (Object.prototype.hasOwnProperty.call(ex, k)) return ex[k];
     if (Object.prototype.hasOwnProperty.call(A.names, k)) return A.names[k];
@@ -352,6 +354,18 @@
       }
     }
   };
+  // Names that stay English (Amir, 2026-11-22: "the name of the training Days and the name of the Cycles should be only in english
+  // like exercise names"): program.html's faKeepNames() hands over the programme's day and cycle names, and no word list turns one
+  // into Farsi, on its own or inside a sentence. Some are words in the lists ("Rebound", "Bedrock", "Torque").
+  A.keep = {};
+  A.keepNames = function (list) {
+    var fresh = false;
+    (list || []).forEach(function (s) { var k = norm(s || ''); if (k && !A.keep[k]) { A.keep[k] = 1; fresh = true; } });
+    if (fresh && document.body) {   // drawn before the names came: put each one back as written
+      var tw = document.createTreeWalker(document.body, 4, null), n;
+      while ((n = tw.nextNode())) { var o = orig.get(n); if (o && A.keep[norm(o)]) { n.data = o; seen.set(n, n.data); } }
+    }
+  };
   A.addFa = function (exact, patterns) {
     Object.keys(exact || {}).forEach(function (k) { if (exact[k]) A.exact[norm(k)] = exact[k]; });
     (patterns || []).forEach(function (p) { A.patterns.push([p[0] instanceof RegExp ? p[0] : new RegExp('^' + p[0] + '$'), p[1]]); });
@@ -368,6 +382,7 @@
   A.skip = SKIP;
   var ATTRS = ['placeholder', 'aria-label', 'title', 'alt'];
   var seen = new WeakMap();     // text node -> the text it held after we last looked
+  var orig = new WeakMap();     // text node -> the English it held before we changed it (keepNames() puts a name back)
   var seenA = new WeakMap();    // element -> { attr: value after we last looked }
   function skipped(el) { return !el || (el.closest && el.closest(A.skip)); }
   // Where a name stays as it is: code, what someone typed (dir="auto", inputs), and an exercise's name.
@@ -433,6 +448,8 @@
     var d = n.data;
     if (seen.get(n) === d) return;
     var core = d.trim(), p = n.parentElement;
+    if (core && /[A-Za-z]/.test(core)) orig.set(n, core);
+    if (core && A.keep[norm(core)]) { seen.set(n, d); return; }   // a day's or a cycle's name stays as written
     // A person's name, wherever it stands (a crew face, a page's name, the greeting), but never in what someone types.
     if (core && Object.prototype.hasOwnProperty.call(A.names, norm(core)) && !nameKept(p)) {
       n.data = d.replace(core, A.names[norm(core)]); seen.set(n, n.data); return;

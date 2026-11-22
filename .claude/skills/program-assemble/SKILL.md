@@ -265,8 +265,9 @@ count and what landed on the cards differ, which is how a dropped or invented on
   never carry a previous cycle's `why` over**, because a reason from Cycle 1 is stale by Cycle 3.
 - **Every text in both languages** (COM-1, 2026-11-20): engage's PART 6 `FA:` lines go beside their English as
   `<key>_fa` (`note_fa`, `why.text_fa`, a week note's `text_fa` / `title_fa`, `completionTitle_fa` /
-  `completionMessage_fa`, `focusTag_fa`, the cycles' `tagline_fa` / `focuses_fa`, and the `_fa` keys inside the
-  message, teaser and notes), for every athlete; `place_words.py` places them. Never write or change `athlete.lang`
+  `completionMessage_fa`, the cycles' `tagline_fa` / `focuses_fa`, and the `_fa` keys inside the
+  message, teaser and notes), for every athlete. **Never a `focusTag_fa` or a cycle `name_fa`**: a day's and a cycle's name stay
+  English on every phone, like an exercise's (Amir, 2026-11-22); `place_words.py` places them. Never write or change `athlete.lang`
   (the athlete sets it). The full check warns on a missing or odd twin: send it back to engage.
   Then run the full check (Step 3) and fix everything it flags.
 

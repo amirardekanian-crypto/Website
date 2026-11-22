@@ -345,7 +345,8 @@ const lit = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); r
         faces: h.map(x => x.querySelectorAll('.cr-fl').length), btn: h.map(x => x.tagName).join(), ft: t.querySelector('.ft').textContent, theme: t.querySelector('.cr-theme p').textContent, post: (t.querySelector('.cr-theme button') || {}).textContent,
         h: h.map(x => Math.round(x.getBoundingClientRect().height)), w: h.map(x => Math.round(x.getBoundingClientRect().width)) };
     });
-    C.check('the Toss card sits right under the green band, before the honours', s.t && /(^|,)cr-week,cr-toss(,|$)/.test(s.order), s.order);
+    // the Race (stage120, 2026-11-22, Amir "A, the race card") sits between the band and the Toss when the server sends one
+    C.check('the Toss card sits right under the green band (or the Race under it), before the honours', s.t && /(^|,)cr-week,(cr-race,)?cr-toss(,|$)/.test(s.order), s.order);
     C.check('…"This week", the question, two halves with their words, the numbers waiting for the vote (Vote to See, 116)', s.k === 'This week' && s.q === 'Pull-ups or chin-ups?' && s.labels.join() === 'Pull-ups,Chin-ups' && s.counts.join() === ',', JSON.stringify(s));
     C.check('…no faces before the vote', s.faces.join() === '0,0', s.faces.join());
     C.check('…two buttons side by side', s.btn === 'BUTTON,BUTTON' && Math.abs(s.w[0] - s.w[1]) <= 2, s.btn + ' ' + s.w);

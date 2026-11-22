@@ -8,8 +8,8 @@ the same exercise's warm-up card. The words file (engage's output) holds: messag
 Every text in both languages (COM-1, 2026-11-20; SCHEMA.md → Programme texts in two languages): message / teaser / notes
 carry their own `<key>_fa` twins and are copied whole; notes_by_exid_fa {exId: text}, why_by_exid_fa {exId: text} (into
 why.text_fa), weeknotes_fa {"1": text}, weeknote_titles_fa {"3": title}, title_fa / message_fa in a completion entry,
-focustags_fa {"<day id>": text}, and cycle_fa / next_cycle_fa {tagline, focuses} for the two cycles' tagline_fa / focuses_fa. Words go on WORKING cards only (a prep block's card never
-gets them), an exId on two working cards stops the run, a Because never goes on a circuit, and the run stops if the
+and cycle_fa / next_cycle_fa {tagline, focuses} for the two cycles' tagline_fa / focuses_fa. Words go on WORKING cards only (a prep block's card never
+gets them), a Farsi day name (focustags_fa) stops the run (day and cycle names stay English, Amir 2026-11-22), an exId on two working cards stops the run, a Because never goes on a circuit, and the run stops if the
 workouts differ from the build in anything but the words.
 
   python scripts/place_words.py <built.json> <words.json> <out.json>
@@ -53,10 +53,10 @@ def place(data, w):
                 key = 'completion' + k.capitalize() + '_fa'
                 if c.get(k + '_fa'): d[key] = c[k + '_fa']
                 else: d.pop(key, None)
-        ft = (w.get('focustags_fa') or {}).get(str(d['id']))
-        if ft:
-            if not d.get('focusTag'): raise SystemExit(f"a Farsi focusTag for Day {d['id']}, which has none")
-            d['focusTag_fa'] = ft
+        if (w.get('focustags_fa') or {}).get(str(d['id'])):
+            # A day's name stays English on every phone, like an exercise's (Amir, 2026-11-22): engage writes no Farsi for it.
+            raise SystemExit(f"a Farsi focusTag for Day {d['id']}: a day's name stays English (Amir, 2026-11-22). Drop focustags_fa from the words file")
+        d.pop('focusTag_fa', None)
     cyc = data['cycles'][data.get('currentCycleIndex') or 0]
     if w.get('message'): cyc['message'] = w['message']
     for k, text in (w.get('weeknotes') or {}).items():
