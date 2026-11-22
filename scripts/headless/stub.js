@@ -403,6 +403,9 @@
     // that sets `noCrewBoard` answers "no such function", which is how the app falls back to leaderboard_top.
     if (name === 'crew_board') {
       if (S.noCrewBoard) return res({ data: null, error: { message: 'Could not find the function public.crew_board', code: 'PGRST202' }, status: 404 });
+      // The Race (stage120): `crewBoards` { week, month, season } answers by p_scope; `noRace` answers a period as a server before stage120 would.
+      if (S.noRace && params && params.p_scope) return res({ data: null, error: { message: 'Could not find the function public.crew_board(p_limit, p_scope) in the schema cache', code: 'PGRST202' }, status: 404 });
+      if (S.crewBoards && S.crewBoards[(params && params.p_scope) || 'season']) return res({ data: JSON.parse(JSON.stringify(S.crewBoards[(params && params.p_scope) || 'season'])), error: null, status: 200 });
       if (S.crewBoard) return res({ data: JSON.parse(JSON.stringify(S.crewBoard)), error: null, status: 200 });
       if (S.board) return res({ data: S.board.map(function (r) { var o = { pos: r.pos, who: r.display_name, points: r.xp, level: r.level, is_me: r.is_me }; if (r.ck) { o.ck = r.ck; o.fv = r.fv === undefined ? null : r.fv; } return o; }), error: null, status: 200 });
       return res({ data: [], error: null, status: 200 });

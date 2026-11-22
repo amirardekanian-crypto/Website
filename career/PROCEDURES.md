@@ -77,7 +77,8 @@ files: a procedure never hard-codes a number (GAME-10).
 | 36 | [Stage 105: marks on the Player Page, the comebacks number (2026-10-26, applied)](../docs/ref/career-procedures/36-stage-105-marks-on-the-player-page-and-the-comebacks-number.md) | 4 KB |
 | 37 | [Stage 106: the spare, and every finished session counts (2026-10-26, applied; brought to the repo 2026-11-03)](../docs/ref/career-procedures/37-stage-106-the-spare.md) | 3 KB |
 | 38 | [Stage 109: an optional day (2026-11-18, applied)](../docs/ref/career-procedures/38-stage-109-the-optional-day.md) | 4 KB |
+| 39 | [Stage 120: the Race on Crew (2026-11-22, applied)](../docs/ref/career-procedures/39-stage-120-the-race.md) | 2 KB |
 
 ---
 
-*38 sections, split 2026-10-19. Every word is where it was; only the file changed. A reference written "`PROCEDURES.md` → *Section*" is the row with that name.*
+*39 sections, split 2026-10-19. Every word is where it was; only the file changed. A reference written "`PROCEDURES.md` → *Section*" is the row with that name.*

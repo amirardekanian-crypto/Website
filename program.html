@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=13" data-fa="/assets/js/i18n-fa.js?v=21"></script>
+<script src="/assets/js/i18n.js?v=13" data-fa="/assets/js/i18n-fa.js?v=22"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -6140,6 +6140,29 @@
   :where(#screen-crew, #screen-crewboard, #screen-crewwho, #screen-crewplayer) .cr-br.dr { grid-template-columns: 30px minmax(0, 1fr) auto 10px; }
   :where(#screen-crew, #screen-crewboard, #screen-crewwho, #screen-crewplayer) .cr-br .c { font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
   /* the crew list: the initials circle in place of a position number */
+  /* THE RACE (stage120, Amir 2026-11-22, direction A): the board as a card under the week. Three tabs in the court green, seven dots
+     of the last 7 days under each name, a small ▲/▼, first place's face in a clay ring, and one line of who to catch. No gold. */
+  .cr-seg { display: flex; gap: 0; margin: 0 var(--g) 10px; padding: 3px; border-radius: 999px; background: var(--sand); }
+  .cr-seg button { flex: 1; min-height: 36px; padding: 0 6px; border: 0; border-radius: 999px; background: none; color: var(--grey);
+    font: 600 var(--fs-small)/1 'Barlow', sans-serif; cursor: pointer; }
+  .cr-seg button.on { background: var(--fill); color: #fff; }
+  .cr-seg button:focus-visible { outline: 2px solid var(--fill); outline-offset: 2px; }
+  #screen-crewboard .cr-seg-wrap { padding-top: 22px; }
+  .cr-race .cr-brd { padding: 2px 12px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); }
+  .cr-race .cr-br.me { margin: 0 -12px; padding: 8px 12px; border-radius: 0; }
+  .cr-race .cr-br.me:last-child { border-radius: 0 0 11px 11px; }
+  .cr-race button.cr-br.me { width: calc(100% + 24px); }   /* edge to edge of the card (button.cr-br.me above is the plain board's +16) */
+  :where(#screen-crew, #screen-crewboard) .cr-br .nt { display: flex; flex-wrap: wrap; align-items: center; column-gap: 6px; row-gap: 3px; }
+  .cr-mv { font: 700 var(--fs-label)/1 'Space Mono', monospace; color: var(--grey); }
+  .cr-mv.up { color: var(--green-ink); }
+  .cr-dots { display: flex; flex-basis: 100%; gap: 3px; }
+  .cr-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--hair); }
+  .cr-dots i.y { background: var(--fill); }
+  body[data-dark] .cr-dots i.y { background: var(--mint); }
+  .cr-dn { flex-basis: 100%; font: 400 var(--fs-small)/1.2 'Barlow', sans-serif; color: var(--grey); }
+  .cr-br.p1 .cr-fl { box-shadow: 0 0 0 2px var(--clay); }
+  .cr-chase { margin: 10px var(--g) 0; font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .cr-chase b { font-weight: 700; color: var(--clay-ink); }
   #screen-crewwho .cr-br .p.ini { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--tint); font: 700 var(--fs-small)/1 'Barlow', sans-serif; }
   :where(#screen-crewboard, #screen-crewwho) .cr-note { margin: 10px var(--g) 0; font: 400 var(--fs-small)/1.5 'Barlow', sans-serif; color: var(--grey); text-wrap: pretty; }
   /* the composer sheet (openCrewPost(), in the one sheet) */
@@ -7166,8 +7189,8 @@
 <div id="screen-crewboard" class="screen">
   <div class="ceil-head">
     <button class="nav-back" onclick="goTo('crew')" aria-label="Back to Crew">←</button>
-    <div class="ceil-kick">The crew</div>
-    <h1 class="ceil-title">This season</h1>
+    <div class="ceil-kick">The race</div>
+    <h1 class="ceil-title">Last 7 days</h1>
   </div>
   <div id="crewboard-body"></div>
 </div>
@@ -7689,8 +7712,9 @@ function _snapshot() {
     // Crew (stage81): a cache of get_bell(), and the newest post of Amir's opened on this phone. Neither is progress.
     if (k === prefix + 'crewcache' || k === prefix + 'crewseen' || k === prefix + 'crewseen_at') continue;   // _at: when Crew was last on this phone's screen (Land on It, 2026-10-25)
     // The crew's board (loadCrewBoard()): a cache of crew_board(), other athletes' names and points. Never progress, and
-    // never this athlete's to keep in their own row.
-    if (k === prefix + 'crewboard') continue;
+    // never this athlete's to keep in their own row. The Race (stage120) keeps its 7-day and 30-day copies and yesterday's places
+    // beside it, every one under a name that starts the same: crewboard_week, crewboard_month, crewboard_rank.
+    if (k && k.indexOf(prefix + 'crewboard') === 0) continue;
     // The Player Pages (Players' Lounge): a cache of crew_page(), other athletes' numbers. Never progress, never this athlete's to keep in their own row.
     if (k === prefix + 'crewpages') continue;
     // The one-time note that your like signs an achievement (Players' Lounge, step 6): said once on THIS phone, never pulled onto another or kept in the row.
@@ -7802,7 +7826,7 @@ async function syncFromCloud(athleteId, key, isLive) {
       if (k === prefix + 'snapAt' || k === prefix + 'lastEditAt') return;  // bookkeeping, not data
       if (k === prefix + 'drops'  || k === prefix + 'skey')       return;  // ditto — see _snapshot()
       if (k === prefix + 'csq' || k === prefix + 'autofiled')     return;  // this phone's own; old blobs still hold a queue
-      if (k === prefix + 'crewboard')                             return;  // a cache; old blobs still hold one (_snapshot())
+      if (k.indexOf(prefix + 'crewboard') === 0)                  return;  // a cache (and the Race's copies); old blobs still hold one (_snapshot())
       if (k === prefix + 'crewpages')                             return;  // other people's pages: a cache, never pulled
       if (k === prefix + 'signnote')                              return;  // said once on this phone (Players' Lounge, step 6)
       if (dropped.indexOf(k) >= 0)                                return;  // deleted here, the delete not sent yet
@@ -15457,7 +15481,7 @@ function loadCrewCache() {
     const o = JSON.parse(localStorage.getItem(crewKey()) || 'null');
     if (o && o.athlete_id === ATHLETE_ID && Array.isArray(o.items)) BELL = o;
   } catch (e) { /* no copy yet */ }
-  loadCrewBoard();   // the board is kept beside the feed, so the bottom of Crew works with no signal
+  loadCrewBoard(); loadCrewBoard(crewScopeNow());   // the board is kept beside the feed, so the Race works with no signal
   setCrewTab(); paintCrewTell(); paintSessionShare();
   try { syncDarkToggle(); } catch (e) { /* your face on the account button */ }
 }
@@ -15578,35 +15602,82 @@ function openCrew() {
 // 78 bytes, and season points move whenever anybody ticks a habit, so a board inside it would break that saving every day.
 // What it answers is kept on the phone under its own key, so the bottom of Crew is no longer the one block that needs signal.
 var _boardPlain = false;   // this server has no crew_board(): ask leaderboard_top() from now on
-function crewBoardKey() { return ATHLETE_ID + '_crewboard'; }
-function loadCrewBoard() {
-  if (!crewAllowed() || CREW_BOARD) return;
+// ── THE RACE (stage120, 2026-11-22) ──────────────────────────────────────────────────────────────────────────────────────────
+// Amir: *"the aim of having leaderboard was for people in the community to be able to challenge themselves against other people and
+// see how consistent they are, how much point they got, in the past 7 days, in the past month and in the whole season / but the
+// leaderbord is too far down"*; he picked direction A, the race card. The board is three: the last 7 days, the last 30 days and the
+// season, each crew_board(p_scope). CREW_BOARD stays the SEASON's rows (the level beside a name and the page doors read it);
+// CREW_RACE holds the other two. Each has its own copy on the phone, and the tab you picked is this phone's (aa_crew_scope).
+var CREW_RACE = { week: null, month: null };
+var _raceOff = false;      // this server's crew_board() takes no period (before stage120, or rolled back): the season alone, no tabs
+var CREW_SCOPE = (() => { try { const s = localStorage.getItem('aa_crew_scope'); return s === 'month' || s === 'season' ? s : 'week'; } catch (e) { return 'week'; } })();
+function crewScopeNow() { return _raceOff || _boardPlain ? 'season' : CREW_SCOPE; }
+function crewRows(s) { return (s || 'season') === 'season' ? CREW_BOARD : CREW_RACE[s]; }
+function crewBoardKey(s) { return ATHLETE_ID + '_crewboard' + (s && s !== 'season' ? '_' + s : ''); }
+function loadCrewBoard(s) {
+  s = s || 'season';
+  if (!crewAllowed() || crewRows(s)) return;
   try {
-    const o = JSON.parse(localStorage.getItem(crewBoardKey()) || 'null');
-    if (Array.isArray(o)) CREW_BOARD = o;
+    const o = JSON.parse(localStorage.getItem(crewBoardKey(s)) || 'null');
+    if (Array.isArray(o)) { if (s === 'season') CREW_BOARD = o; else CREW_RACE[s] = o; }
   } catch (e) { /* no copy yet */ }
 }
-async function refreshCrewBoard() {
+// The arrows: where each person stood the last day this phone saw the board, against where they stand now. One small copy,
+// { day, prev: {scope: {key: pos}}, cur: {...} }; the first answer of a new day moves cur to prev. Key: the crew key, else the name.
+function crewRankKey() { return ATHLETE_ID + '_crewboard_rank'; }
+function crewRankNote(s, rows) {
+  let o = null;
+  try { o = JSON.parse(localStorage.getItem(crewRankKey()) || 'null'); } catch (e) { /* none yet */ }
+  if (!o || typeof o !== 'object') o = { day: '', prev: {}, cur: {} };
+  const today = ymdLocal(new Date());
+  if (o.day !== today) { o.prev = Object.assign({}, o.prev || {}, o.cur || {}); o.cur = {}; o.day = today; }
+  const m = {};
+  rows.forEach(r => { if (r) m[r.ck || r.who] = Number(r.pos) || 0; });
+  o.cur = Object.assign({}, o.cur || {}, { [s]: m });
+  try { _lsRawSet(crewRankKey(), JSON.stringify(o)); } catch (e) { /* storage full: no arrows */ }
+}
+function crewMoved(s, r) {
+  try {
+    const o = JSON.parse(localStorage.getItem(crewRankKey()) || 'null');
+    // drawn from the phone's copy before today's first answer: the last day's places are still under cur, and they are "before"
+    const p = o && (o.day !== ymdLocal(new Date()) ? Object.assign({}, o.prev || {}, o.cur || {}) : (o.prev || {}))[s];
+    const was = p ? Number(p[r.ck || r.who]) : 0;
+    return was ? was - (Number(r.pos) || 0) : 0;   // up is positive
+  } catch (e) { return 0; }
+}
+async function refreshCrewBoard(scope) {
   if (!crewAllowed()) return;
+  const s = scope || crewScopeNow();
   _boardAt = Date.now();
   try {
     const sb = await _sbReady();
     if (!sb) return;
     let rows = null;
     if (!_boardPlain) {
-      const r = await _withTimeout(sb.rpc('crew_board', { p_limit: 25 }), 10000);
+      const args = s === 'season' ? { p_limit: 25 } : { p_limit: 25, p_scope: s };
+      const r = await _withTimeout(sb.rpc('crew_board', args), 10000);
+      if (r && r.error && s !== 'season' && /p_scope|function|schema cache/i.test(String(r.error.message || ''))) {
+        _raceOff = true;                                               // the period is not on this server: back to the season
+        if (onCrew()) renderCrew();
+        return refreshCrewBoard('season');
+      }
       if (r && r.error && crewMissingErr(r)) _boardPlain = true;        // stage91 is not on this server
       else if (!r || r.error || !Array.isArray(r.data)) return;         // no signal, or a refusal: the copy stands
-      else rows = r.data.map(x => ({ pos: x.pos, who: x.who, xp: x.points, level: x.level, is_me: x.is_me, ck: x.ck, fv: x.fv }));   // ck and fv: stage96 (a door to the page, the face)
+      else rows = r.data.map(x => ({ pos: x.pos, who: x.who, xp: x.points, level: x.level, is_me: x.is_me, ck: x.ck, fv: x.fv, days: x.days, wk: x.wk }));   // ck and fv: stage96 (a door to the page, the face); days and wk: stage120
     }
     if (!rows) {
+      if (s !== 'season') return refreshCrewBoard('season');
       const r = await _withTimeout(sb.rpc('leaderboard_top', { p_athlete_id: ATHLETE_ID, p_key: null, p_scope: 'season', p_limit: 10 }), 10000);
       if (!r || r.error || !Array.isArray(r.data)) return;
       rows = r.data.map(x => ({ pos: x.pos, who: x.display_name, xp: x.xp, level: x.level, is_me: x.is_me }));
     }
-    const sig = JSON.stringify(rows), same = sig === JSON.stringify(CREW_BOARD);
-    CREW_BOARD = rows;
-    try { _lsRawSet(crewBoardKey(), sig); } catch (e) { /* storage full: shown this visit */ }
+    const sig = JSON.stringify(rows), same = sig === JSON.stringify(crewRows(s));
+    if (s === 'season') CREW_BOARD = rows; else CREW_RACE[s] = rows;
+    crewRankNote(s, rows);
+    try { _lsRawSet(crewBoardKey(s), sig); } catch (e) { /* storage full: shown this visit */ }
+    // The season's rows are still what a server before stage96 gives the level beside a name from (crewLevelOf()), so a phone that has
+    // never held them asks for them once, after the board on the screen.
+    if (s !== 'season' && !CREW_BOARD) setTimeout(() => refreshCrewBoard('season'), 0);
     // The whole screen, not just the rows: a first board also decides whether *The whole board ›* is there at all, and
     // patching #crew-board alone left the door off until the next open. The feed is redrawn from the same copy, and a photo
     // already downloaded is in CREW_PHOTOS, so nothing is fetched twice. A board that came back the same is not redrawn:
@@ -16618,19 +16689,75 @@ window.openCrewAch = openCrewAch;
 // level is lifetime and the number that sorts is this SEASON's, and the season was two days old, so a level-29 athlete sat
 // below a level-14 one with both numbers on the same row. The LV chip is gone and the block is titled *This season*, which is
 // what it has always ranked. The level still has a home — the ring on Home, and beside a name on *In the crew*.
-function crewBoardHTML(all) {
-  if (!Array.isArray(CREW_BOARD) || !CREW_BOARD.length) {
+// The Race (stage120) draws its rows here too: under each name, the last 7 days as seven dots on the 7-day board (a filled dot is a day
+// they earned anything, today last), or "N days" on the other two; ▲/▼ beside a name when they moved since the last day this phone saw
+// the board; first place's face in a clay ring (Clay means look here; never a medal, NO GOLD). `all` is the whole board's page; `race`
+// is the card on the tab: the top three, then you (and only you) if you are not in them.
+function crewBoardHTML(all, s, race) {
+  s = s || 'season';
+  const board = crewRows(s);
+  if (!Array.isArray(board) || !board.length) {
     return `<p class="cr-quiet">${navigator.onLine === false ? 'The board shows here when you are back online.' : 'The board shows here once you have signal.'}</p>`;
   }
-  const rows = all ? CREW_BOARD : CREW_BOARD.slice(0, 5).concat(CREW_BOARD.slice(5).filter(r => r.is_me));
+  const top = race ? 3 : 5;
+  const rows = all ? board : board.filter(r => Number(r.pos) <= top).concat(board.filter(r => Number(r.pos) > top && r.is_me));
   return rows.map(r => {
     // A row that is a door wears the small › that every other door row on Crew has (round 7, 2026-10-25, "80"); a plain row (no key, under 13) has none.
-    const p = crewPersonOf(r), dr = crewCanDoor(p), cls = 'cr-br' + (r.is_me ? ' me' : '') + (dr ? ' dr' : ''), nm = esc(r.is_me ? 'You' : r.who || '');
-    const n = crewPagesOn() && (p.ck || p.me) ? `<span class="n wf">${crewFace(p, 'line')}<span class="nt">${nm}</span></span>` : `<span class="n">${nm}</span>`;
+    const p = crewPersonOf(r), dr = crewCanDoor(p), cls = 'cr-br' + (r.is_me ? ' me' : '') + (dr ? ' dr' : '') + (Number(r.pos) === 1 && Number(r.xp) > 0 ? ' p1' : ''), nm = esc(r.is_me ? 'You' : r.who || '');
+    const mv = crewMoved(s, r), arrow = mv ? `<span class="cr-mv${mv > 0 ? ' up' : ''}" aria-label="${mv > 0 ? 'up ' + mv : 'down ' + (-mv)}">${mv > 0 ? '▲' + mv : '▼' + (-mv)}</span>` : '';
+    const wk = typeof r.wk === 'string' && /^[01]{7}$/.test(r.wk) ? r.wk : '';
+    const sub = s === 'week' && wk
+      ? `<span class="cr-dots" aria-label="${wk.replace(/0/g, '').length} of the last 7 days">${[...wk].map(c => `<i${c === '1' ? ' class="y"' : ''}></i>`).join('')}</span>`
+      : (r.days != null && s !== 'week' ? `<span class="cr-dn">${Number(r.days) || 0} day${Number(r.days) === 1 ? '' : 's'}</span>` : '');
+    const nt = `<span class="nt">${nm}${arrow}${sub}</span>`;
+    const n = crewPagesOn() && (p.ck || p.me) ? `<span class="n wf">${crewFace(p, 'line')}${nt}</span>` : `<span class="n">${nt}</span>`;
     const inner = `<span class="p">${Number(r.pos) || ''}</span>${n}<span class="x">${Number(r.xp || 0).toLocaleString('en-GB')}</span>${dr ? '<span class="c" aria-hidden="true">›</span>' : ''}`;
     return crewDoor(p, cls, inner) || `<div class="${cls}">${inner}</div>`;
   }).join('');
 }
+const CREW_SCOPE_WORDS = { week: ['7 days', 'Last 7 days', 'the last 7 days'], month: ['Month', 'Last 30 days', 'the last 30 days'], season: ['Season', 'This season', 'this season'] };
+function crewOrdinal(n) { const v = n % 100; return n + (v >= 11 && v <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'); }
+// The one line under the rows that makes it a race: who is just above you and by how much, or that you lead and by how much.
+function crewChaseHTML(s) {
+  const board = crewRows(s) || [], me = board.find(r => r && r.is_me);
+  if (!me) return '';
+  const pos = Number(me.pos) || 0, xp = Number(me.xp) || 0, n = v => Number(v || 0).toLocaleString('en-GB');
+  if (pos === 1) {
+    const two = board.find(r => r && Number(r.pos) === 2);
+    if (!xp) return '';
+    return `<p class="cr-chase">You lead ${CREW_SCOPE_WORDS[s][2]}.${two ? ` ${esc(String(two.who || '').split(/\s+/)[0])} is <b>${n(xp - Number(two.xp || 0))} points</b> behind you.` : ''}</p>`;
+  }
+  const up = board.find(r => r && Number(r.pos) === pos - 1);
+  if (!up) return '';
+  const gap = Number(up.xp || 0) - xp, first = esc(String(up.who || '').split(/\s+/)[0]);
+  return gap > 0
+    ? `<p class="cr-chase"><b>${n(gap)} points</b> behind ${first} for ${crewOrdinal(pos - 1)}.</p>`
+    : `<p class="cr-chase">Level with ${first}. <b>One more point</b> takes ${crewOrdinal(pos - 1)}.</p>`;
+}
+function crewSegHTML(s) {
+  return `<div class="cr-seg" role="tablist" aria-label="Which race">${['week', 'month', 'season'].map(k =>
+    `<button type="button" role="tab" data-scope="${k}" aria-selected="${k === s}" class="${k === s ? 'on' : ''}" onclick="crewPickScope('${k}')">${CREW_SCOPE_WORDS[k][0]}</button>`).join('')}</div>`;
+}
+// The card on the tab, under the crew's week (Amir, 2026-11-22: direction A). The whole board is its door.
+function crewRaceHTML() {
+  if (!crewAllowed()) return '';
+  const s = crewScopeNow(), board = crewRows(s);
+  const tabs = _raceOff || _boardPlain ? '' : crewSegHTML(s);
+  const more = Array.isArray(board) && board.length > 3 ? `<button type="button" class="cr-me-row" onclick="goTo('crewboard')"><span>The whole board</span><span aria-hidden="true">›</span></button>` : '';
+  return `<section class="cr-race" id="crew-race"><h2 class="prog-sec">The race<span class="prog-sec-n">${CREW_SCOPE_WORDS[s][1]}</span></h2>${tabs}`
+    + `<div class="cr-brd" id="crew-board">${crewBoardHTML(false, s, true)}</div>${crewChaseHTML(s)}${more}</section>`;
+}
+function crewPickScope(s) {
+  if (!CREW_SCOPE_WORDS[s] || s === CREW_SCOPE) return;
+  CREW_SCOPE = s;
+  try { localStorage.setItem('aa_crew_scope', s); } catch (e) { /* this visit only */ }
+  loadCrewBoard(s);
+  const card = document.getElementById('crew-race');
+  if (card && onCrew()) { card.outerHTML = crewRaceHTML(); crewWireFaces(document.getElementById('crew-race')); }
+  if (onCrewPage()) renderCrewPage();
+  refreshCrewBoard(s);
+}
+window.crewPickScope = crewPickScope;
 // The level beside a name on *In the crew*, from the board's copy on this phone when it holds one. Nothing is asked for it.
 // Players' Lounge (2026-10-24): the level now comes with the person (`lv` on every member of get_bell()'s crew list), so two Ali B.s no
 // longer share one. Only a server without stage96 sends no `lv` at all, and then it is the board's copy by name, as it always was.
@@ -16651,6 +16778,7 @@ function renderCrew() {
   if (!me.answer && !me.under13) h += crewAskHTML();
   h += crewIntroHTML();         // "Your page is here", once, for a member who joined before pages existed (Players' Lounge)
   h += crewWeekHTML();          // the week first (direction B): never an empty room
+  h += crewRaceHTML();          // the Race (stage120, Amir 2026-11-22, direction A): under the week, where it is seen, not 440 px down the feed
   h += crewTossHTML();          // this week's question and photo theme (Home Crowd step 3, idea 85 A): under the band, the Pick card after it
   h += crewPickHTML();          // Amir's Pick, for a week (idea 92, round 7, 2026-10-25): under the band, above the honours
   h += crewHonoursHTML();
@@ -16696,11 +16824,7 @@ function renderCrew() {
   closeLines();
   h += feed || `<p class="cr-quiet">Quiet so far this week.${me.can_post ? ' Share a photo from training and get it going.' : ''}</p>`;
   // (the foot row "What the crew sees of you ›" that sat here is gone, round 7, 2026-10-25, "78 One door, one name": the Profile group in your initials is its one place)
-  // The board is a DOOR now, not 440 px of tail: the top five, then the page (2026-10-20).
-  h += `<h2 class="prog-sec">This season</h2><div class="cr-brd" id="crew-board">${crewBoardHTML()}</div>`;
-  if (Array.isArray(CREW_BOARD) && CREW_BOARD.length > 5) {
-    h += `<button type="button" class="cr-me-row" onclick="goTo('crewboard')"><span>The whole board</span><span aria-hidden="true">›</span></button>`;
-  }
+  // (the board that sat here, *This season* under the whole feed, is the Race at the top since stage120, 2026-11-22: crewRaceHTML())
   el.innerHTML = h;
   crewWirePhotos(el);
   crewWireFaces(el);
@@ -16717,8 +16841,14 @@ window.renderCrew = renderCrew;
 function renderCrewPage() {
   const b = document.getElementById('crewboard-body');
   if (b && document.getElementById('screen-crewboard').classList.contains('active')) {
-    b.innerHTML = `<div class="cr-brd" style="margin-top:22px">${crewBoardHTML(true)}</div>`
-      + `<p class="cr-note">Points for this season only. Everything you train and every habit you tick adds to it. Nothing on Crew earns a point.</p>`;
+    const s = crewScopeNow(), t = document.querySelector('#screen-crewboard .ceil-title');
+    if (t) t.textContent = CREW_SCOPE_WORDS[s][1];
+    const notes = { week: 'Points from the last 7 days. The dots are those 7 days, today last: a filled dot is a day with points.',
+      month: 'Points from the last 30 days, and how many of those days had points.',
+      season: 'Points for this season only, and how many days of it had points.' };
+    b.innerHTML = (_raceOff || _boardPlain ? '' : `<div class="cr-seg-wrap">${crewSegHTML(s)}</div>`)
+      + `<div class="cr-brd" style="margin-top:${_raceOff || _boardPlain ? 22 : 6}px">${crewBoardHTML(true, s)}</div>`
+      + `<p class="cr-note">${notes[s]} Everything you train and every habit you tick adds to it. Nothing on Crew earns a point.</p>`;
     crewWireFaces(b);
   }
   const w = document.getElementById('crewwho-body');

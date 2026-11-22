@@ -740,7 +740,7 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
     C.check('…yesterday\'s says yesterday, and names only those who trained', s.sess[1] === 'Mina S. trained yesterday1 session', JSON.stringify(s.sess));
     C.check('…and it carries no Like: there is nothing here anyone earned', !s.sessReact);
     C.check('the feed runs under day headings', /Today/.test(s.days) && /Yesterday/.test(s.days), s.days);
-    C.check('the board is titled This season, not Season board', s.secs.join(' ').includes('This season') && !s.secs.join(' ').includes('Season board'), s.secs.join(' | '));
+    C.check('the board is titled The race (stage120), not Season board', s.secs.join(' ').includes('The race') && !s.secs.join(' ').includes('Season board'), s.secs.join(' | '));
     C.check('no page errors', !p.errs.length, p.errs.join(' | '));
     // 320 px, where the band's numbers and the faces have the least room
     await p.setViewportSize({ width: 320, height: 720 }); await p.waitForTimeout(300);
@@ -781,9 +781,9 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
       asked: (window.__STUB.params || []).filter(x => x[0] === 'crew_board').length,
       kept: localStorage.getItem(ID + '_crewboard'),
     }), H.ID);
-    C.check('the board on the tab: five rows, the athlete\'s own carried in beneath them', s.rows === 6 && s.me, s.rows + ' rows');
+    C.check('the board on the tab (the Race, stage120): three rows, the athlete\'s own carried in beneath them', s.rows === 4 && s.me, s.rows + ' rows');
     C.check('…and the rest behind a door', s.door.includes('The whole board'), s.door.join(' | '));
-    C.check('…it asks crew_board, the crew only, never leaderboard_top', s.asked === 1 && !(await calls(p, 'leaderboard_top')).length);
+    C.check('…it asks crew_board, the crew only, never leaderboard_top', s.asked >= 1 && s.asked <= 2 && !(await calls(p, 'leaderboard_top')).length, s.asked + ' asks');   // the Race's 7 days, then the season once (stage120)
     C.check('…and keeps it on the phone, so the bottom of Crew needs no signal', !!s.kept && /Athlete 1/.test(s.kept));
     await p.evaluate(() => goTo('crewboard')); await p.waitForTimeout(400);
     const bd = await p.evaluate(() => ({
@@ -791,7 +791,7 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
       rows: [...document.querySelectorAll('#crewboard-body .cr-br')].length,
       lv: /LV/.test((document.getElementById('crewboard-body') || {}).textContent || ''),
     }));
-    C.check('the whole board is a page titled This season, with every row and no LV chip', bd.title === 'This season' && bd.rows === 8 && !bd.lv, JSON.stringify(bd));
+    C.check('the whole board is a page titled by its period (Last 7 days first), with every row and no LV chip', bd.title === 'Last 7 days' && bd.rows === 8 && !bd.lv, JSON.stringify(bd));
     C.check('no page errors', !p.errs.length, p.errs.join(' | '));
     await ctx.close();
   }

@@ -747,15 +747,18 @@ const on = n => !ONLY.length || ONLY.includes(n);
     const b = withFaces(fvs);
     const brd = [{ pos: 1, who: 'Reza K.', points: 6240, level: 22, is_me: false, ck: CK.reza, fv: null }, { pos: 2, who: 'Alex R.', points: 5910, level: 19, is_me: true, ck: CK.alex, fv: null },
       { pos: 3, who: 'Mina S.', points: 5100, level: 14, is_me: false, ck: CK.mina, fv: null }, { pos: 4, who: 'Sara T.', points: 4000, level: 12, is_me: false, ck: CK.sara, fv: null },
-      { pos: 5, who: 'Omid P.', points: 100, level: 5, is_me: false, ck: CK.omid, fv: 77 }];
+      { pos: 30, who: 'Omid P.', points: 100, level: 5, is_me: false, ck: CK.omid, fv: 77 }];
+    // Since the Race (stage120) the card on the tab holds only the top three and you, near the top: the far row is the whole board's 30th
+    for (let i = 5; i < 30; i++) brd.splice(i - 1, 0, { pos: i, who: 'Player ' + i, points: 3000 - i * 50, level: 5, is_me: false, ck: null, fv: null });
     const a = await open(browser, { stub: { bell: b, crewBoard: brd } });
     await putFaces(a.p, [[CK.omid, '#2A5C8A', 77]]);
-    await goCrew(a.p); await a.p.waitForTimeout(1000);
-    const far = await a.p.evaluate(ck => { const e = document.querySelector('#crew-board [data-fc="' + ck + '"]'); return e ? Math.round(e.getBoundingClientRect().top + scrollY) - innerHeight : null; }, CK.omid);
+    await goCrew(a.p); await a.p.waitForTimeout(600);
+    await a.p.evaluate(() => goTo('crewboard')); await a.p.waitForTimeout(1000);
+    const far = await a.p.evaluate(ck => { const e = document.querySelector('#crewboard-body [data-fc="' + ck + '"]'); return e ? Math.round(e.getBoundingClientRect().top + scrollY) - innerHeight : null; }, CK.omid);
     const early = (await faceKeys(a.p)).flat();
     C.check('a face far below the screen is not asked for yet (the board\'s last row, ' + far + ' px past the fold)', far !== null && far > 300 && !early.includes(CK.omid), JSON.stringify([far, early.length]));
     await a.p.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await a.p.waitForTimeout(1200);
-    C.check('…scrolled to, it is', (await faceKeys(a.p)).flat().includes(CK.omid) && !!(await picOf(a.p, '#crew-board [data-fc="' + CK.omid + '"]')).img);
+    C.check('…scrolled to, it is', (await faceKeys(a.p)).flat().includes(CK.omid) && !!(await picOf(a.p, '#crewboard-body [data-fc="' + CK.omid + '"]')).img);
     await a.ctx.close();
   }
   if (on(13)) {
@@ -2986,8 +2989,11 @@ const on = n => !ONLY.length || ONLY.includes(n);
       return { label: b.getAttribute('aria-label'), face: Math.round(b.querySelector('.cr-fl').getBoundingClientRect().width), hits: [hit(cx - 21, cy), hit(cx + 21, cy), hit(cx, cy - 21), hit(cx, cy + 21)], name: !!b.parentElement.querySelector('.cr-nb') }; });
     C.check('a moment line\'s face is a door like its name ("Mina S., their page"), 24 px drawn and a 44 px target', !!lf && lf.label === 'Mina S., their page' && lf.face === 24 && lf.hits.every(Boolean) && lf.name, JSON.stringify(lf));
     const chev = await a.p.evaluate(() => ({ tab: [...document.querySelectorAll('#crew-board .cr-br')].map(r => [r.tagName, !!r.querySelector('.c'), (r.querySelector('.c') || {}).textContent || '']), cols: getComputedStyle(document.querySelector('#crew-board button.cr-br')).gridTemplateColumns.split(' ').length, rowH: Math.round(document.querySelector('#crew-board button.cr-br').getBoundingClientRect().height) }));
-    C.check('the season board: a row that is a door wears the small ›, a plain row (no key) has none', chev.tab.length === 4 && chev.tab.filter(r => r[0] === 'BUTTON' && r[1] && r[2] === '›').length === 3 && chev.tab[3][0] === 'DIV' && !chev.tab[3][1] && chev.cols === 4 && chev.rowH <= 56, JSON.stringify(chev));
+    // the Race (stage120): the card on the tab holds the top three (all doors here); the plain fourth row is checked on the whole board below.
+    // A row is a little taller now (the seven dots under the name), so 64 px, not 56.
+    C.check('the board on the tab: a row that is a door wears the small ›', chev.tab.length === 3 && chev.tab.filter(r => r[0] === 'BUTTON' && r[1] && r[2] === '›').length === 3 && chev.cols === 4 && chev.rowH <= 64, JSON.stringify(chev));
     await a.p.evaluate(() => goTo('crewboard')); await a.p.waitForTimeout(400);
+    C.check('…and on the whole board a plain row (no key) has none', await a.p.evaluate(() => { const r = [...document.querySelectorAll('#crewboard-body .cr-br')]; return r.length === 4 && r[3].tagName === 'DIV' && !r[3].querySelector('.c'); }));
     C.check('…and the whole-board page the same', await a.p.evaluate(() => [...document.querySelectorAll('#crewboard-body .cr-br')].every(r => r.tagName === 'BUTTON' ? !!r.querySelector('.c') : !r.querySelector('.c')) && document.querySelectorAll('#crewboard-body button.cr-br .c').length === 3));
     await a.p.evaluate(() => goTo('crew')); await a.p.waitForTimeout(300);
     // the hit areas

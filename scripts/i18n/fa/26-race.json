@@ -1,0 +1,33 @@
+{
+  "area": "Crew, the Race (stage120, 2026-11-22): the board card under the week, its three tabs, the line of who to catch, the whole board's page. Formal شما (2026-11-21). Drafts until Amir has read them.",
+  "exact": {
+    "The race": "مسابقه",
+    "7 days": "۷ روز",
+    "Month": "ماه",
+    "Season": "فصل",
+    "Last 7 days": "۷ روز گذشته",
+    "Last 30 days": "۳۰ روز گذشته",
+    "This season": "این فصل",
+    "the last 7 days": "۷ روز گذشته",
+    "the last 30 days": "۳۰ روز گذشته",
+    "this season": "این فصل",
+    "Which race": "کدوم بازه",
+    "One more point": "یک امتیاز دیگه",
+    "behind you.": "پشت سر شماست.",
+    "Points from the last 7 days. The dots are those 7 days, today last: a filled dot is a day with points. Everything you train and every habit you tick adds to it. Nothing on Crew earns a point.": "امتیازهای ۷ روز گذشته. نقطه‌ها همون ۷ روزن و آخری امروزه: نقطهٔ پر یعنی اون روز امتیاز گرفتید. هر تمرینی که می‌کنید و هر عادتی که تیک می‌زنید بهش اضافه می‌شه. چیزی توی تیم امتیاز نمی‌ده.",
+    "Points from the last 30 days, and how many of those days had points. Everything you train and every habit you tick adds to it. Nothing on Crew earns a point.": "امتیازهای ۳۰ روز گذشته، و اینکه چند روزش امتیاز داشت. هر تمرینی که می‌کنید و هر عادتی که تیک می‌زنید بهش اضافه می‌شه. چیزی توی تیم امتیاز نمی‌ده.",
+    "Points for this season only, and how many days of it had points. Everything you train and every habit you tick adds to it. Nothing on Crew earns a point.": "فقط امتیازهای این فصل، و اینکه چند روزش امتیاز داشت. هر تمرینی که می‌کنید و هر عادتی که تیک می‌زنید بهش اضافه می‌شه. چیزی توی تیم امتیاز نمی‌ده."
+  },
+  "patterns": [
+    ["([\\d,]+) points", "{n1} امتیاز"],
+    ["behind (.+) for (\\d+)(?:st|nd|rd|th)\\.", "عقب‌تر از $1 برای رتبهٔ {n2}."],
+    ["You lead (the last 7 days|the last 30 days|this season)\\. (.+) is", "شما در {t1} اول هستید. $2"],
+    ["You lead (the last 7 days|the last 30 days|this season)\\.", "شما در {t1} اول هستید."],
+    ["Level with (.+)\\.", "هم‌امتیاز با $1."],
+    ["takes (\\d+)(?:st|nd|rd|th)\\.", "رتبهٔ {n1} رو می‌گیره."],
+    ["(\\d+) days?", "{n1} روز"],
+    ["(\\d+) of the last 7 days", "{n1} روز از ۷ روز گذشته"],
+    ["up (\\d+)", "{n1} پله بالاتر"],
+    ["down (\\d+)", "{n1} پله پایین‌تر"]
+  ]
+}

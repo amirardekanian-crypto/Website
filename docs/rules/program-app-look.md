@@ -117,7 +117,7 @@ Reference, section by section: [`PROGRAM-APP.md`](../../PROGRAM-APP.md).
   day for the whole crew**, naming only members whose switch is on, on by default and **with no notification** (Amir: *"unless if 20 ppl train, we wil
   have 20 bells"*); that line is folded on the session's **day**, never the row's write time, or a back-pay announces 39 sessions in an afternoon; the
   **board on Crew is `crew_board()`, crew members only** — `leaderboard_top()` is the whole board and is what coach.html and habits.html mean by it, so
-  it is never changed for this — and it shows **one** number, this season's, with no lifetime LV chip beside it.
+  it is never changed for this — and it shows **one** number per tab (7 days · Month · Season, stage120), with no lifetime LV chip.
   **Nobody is moved off a screen they are reading, and the phone's copy is never deleted to save it** (2026-10-20): a missing-function answer hides the
   tab on the SECOND in a row, keeps `<id>_crewcache`, and leaves whoever is on Crew where they are until they move.
   **A post can be replied to; a moment cannot** (stage92, 2026-10-20, Amir: *"replies and likes like instagram"* and *"dont need the likes on

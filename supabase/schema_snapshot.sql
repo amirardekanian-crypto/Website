@@ -8,7 +8,7 @@
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
 -- The extensions the live project has: pg_cron (pg_catalog), pg_net (extensions), pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 78 tables, 338 functions, 11 sequences.
+-- 78 tables, 339 functions, 11 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -1316,6 +1316,49 @@ AS $function$
                        else 'iso_weeks' end)
 $function$;
 
+CREATE OR REPLACE FUNCTION public.career_board_periods(p_athlete text, p_log jsonb, p_cfg jsonb, p_paid jsonb, p_hb jsonb, p_season date, p_today date)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE
+ SET search_path TO 'public'
+AS $function$
+declare
+  v_mfrom date := greatest(p_today - 29, p_season);
+  v_wfrom date := greatest(p_today - 6, p_season);
+  v_days date[] := '{}';
+  r record; d date;
+  m_d bigint; m_b bigint; m_r numeric; v_wk text; v_wn int; v_mn int; v_sn int;
+begin
+  m_d := public.hab_xp(p_log, v_mfrom, p_today, p_paid);
+  m_b := public.hab_bonus_xp(p_log, p_cfg, p_season, v_mfrom, p_today, p_hb);
+  if p_log is not null and jsonb_typeof(p_log) = 'object' then
+    for r in select key, value from jsonb_each(p_log) loop
+      if jsonb_typeof(r.value) <> 'object' then continue; end if;
+      begin d := r.key::date; exception when others then continue; end;
+      if d < p_season or d > p_today then continue; end if;
+      if exists (select 1 from jsonb_each(r.value) v where jsonb_typeof(v.value) = 'number' and (v.value #>> '{}')::numeric > 0) then
+        v_days := v_days || d;
+      end if;
+    end loop;
+  end if;
+  with fp as (
+    select x.day, x.xp, x.career_only from public.career_facts_paid(p_athlete) x where x.day between p_season and p_today
+  ),
+  ad as (
+    select distinct z.d from (select unnest(v_days) as d union all select fp.day from fp where fp.xp > 0 and not fp.career_only) z
+  )
+  select coalesce((select sum(fp.xp) from fp where fp.day >= v_mfrom and not fp.career_only), 0),
+         (select string_agg(case when exists (select 1 from ad where ad.d = g.d::date) then '1' else '0' end, '' order by g.d)
+            from generate_series(p_today - 6, p_today, interval '1 day') as g(d)),
+         (select count(*) from ad where ad.d >= v_wfrom)::int,
+         (select count(*) from ad where ad.d >= v_mfrom)::int,
+         (select count(*) from ad)::int
+    into m_r, v_wk, v_wn, v_mn, v_sn;
+  return jsonb_build_object(
+    'month', jsonb_build_object('from', v_mfrom, 'points', (m_d + m_b + round(m_r))::bigint, 'days', v_mn),
+    'active', jsonb_build_object('wk', v_wk, 'week', v_wn, 'month', v_mn, 'season', v_sn));
+end $function$;
+
 CREATE OR REPLACE FUNCTION public.career_bonus_rules(p_habit_rules jsonb, p_rules jsonb)
  RETURNS jsonb
  LANGUAGE sql
@@ -1580,7 +1623,8 @@ begin
     'season', jsonb_build_object('name', v_name, 'starts_on', v_start, 'points', v_sxp,
                                  'parts', jsonb_build_object('habits', jsonb_build_object('daily', s_d, 'bonus', s_b, 'xp', s_d + s_b),
                                                              'facts', s_f, 'facts_xp', round(s_r)::bigint, 'xp', v_sxp)),
-    'week', jsonb_build_object('from', v_wfrom, 'points', (w_d + w_b + round(w_r))::bigint));
+    'week', jsonb_build_object('from', v_wfrom, 'points', (w_d + w_b + round(w_r))::bigint))
+    || public.career_board_periods(p_athlete, v_log, v_cfg, v_paid, v_hb, v_s, v_today);   -- stage120: month and active days
 end $function$;
 
 CREATE OR REPLACE FUNCTION public.career_cycle_wins(p_athlete text, p_from date, p_to date, p_plan text[], p_rules jsonb)
@@ -5965,17 +6009,18 @@ begin
   return jsonb_build_object('ok', true, 'id', v_id);
 end $function$;
 
-CREATE OR REPLACE FUNCTION public.crew_board(p_limit integer DEFAULT 25)
- RETURNS TABLE(pos integer, who text, points bigint, level integer, is_me boolean, ck uuid, fv bigint)
+CREATE OR REPLACE FUNCTION public.crew_board(p_limit integer DEFAULT 25, p_scope text DEFAULT 'season'::text)
+ RETURNS TABLE(pos integer, who text, points bigint, level integer, is_me boolean, ck uuid, fv bigint, days integer, wk text)
  LANGUAGE plpgsql
  SECURITY DEFINER
  SET search_path TO 'public'
 AS $function$
--- stage96: ck and fv
+-- stage96: ck and fv. stage120: p_scope, days, wk and the row above you.
 declare
   v_me text := public.current_athlete_id();
   v_coach boolean := public.is_coach();
   v_report boolean := coalesce(auth.jwt() ->> 'role', '') in ('', 'service_role');
+  v_scope text := case when p_scope in ('week', 'month') then p_scope else 'season' end;
 begin
   if v_me is null and not (v_coach or v_report) then
     raise exception 'not signed in';
@@ -5988,17 +6033,20 @@ begin
   ),
   scored as (
     select m.athlete_id as aid, m.name, m.crew_key as ckey,
-           coalesce((sc.score #>> '{season,points}')::bigint, 0) as x,
-           coalesce((sc.score #>> '{career,level}')::int, 1) as lv
+           coalesce((sc.score #>> array[v_scope, 'points'])::bigint, 0) as x,
+           coalesce((sc.score #>> '{career,level}')::int, 1) as lv,
+           (sc.score #>> array['active', v_scope])::int as dn,
+           sc.score #>> '{active,wk}' as w
       from mem m left join sc on sc.aid = m.athlete_id
   ),
   ranked as (
     select row_number() over (order by s.x desc, lower(s.name) asc) as rn, s.*
       from scored s
-  )
-  select r.rn::int, r.name, r.x, r.lv, (r.aid is not distinct from v_me), r.ckey, public.crew_face_v(r.aid)
+  ),
+  mine as (select r.rn from ranked r where r.aid is not distinct from v_me)
+  select r.rn::int, r.name, r.x, r.lv, (r.aid is not distinct from v_me), r.ckey, public.crew_face_v(r.aid), r.dn, r.w
     from ranked r
-   where r.rn <= greatest(1, p_limit) or r.aid is not distinct from v_me
+   where r.rn <= greatest(1, p_limit) or r.aid is not distinct from v_me or r.rn = (select m.rn - 1 from mine m)
    order by r.rn;
 end $function$;
 
@@ -12073,6 +12121,8 @@ revoke all on function public.career_badge_eval(p_id text, p_body jsonb, p_m jso
 grant execute on function public.career_badge_eval(p_id text, p_body jsonb, p_m jsonb, p_ctx jsonb) to service_role;
 revoke all on function public.career_badge_run(p_body jsonb) from public, anon, authenticated, service_role;
 grant execute on function public.career_badge_run(p_body jsonb) to service_role;
+revoke all on function public.career_board_periods(p_athlete text, p_log jsonb, p_cfg jsonb, p_paid jsonb, p_hb jsonb, p_season date, p_today date) from public, anon, authenticated, service_role;
+grant execute on function public.career_board_periods(p_athlete text, p_log jsonb, p_cfg jsonb, p_paid jsonb, p_hb jsonb, p_season date, p_today date) to service_role;
 revoke all on function public.career_bonus_rules(p_habit_rules jsonb, p_rules jsonb) from public, anon, authenticated, service_role;
 grant execute on function public.career_bonus_rules(p_habit_rules jsonb, p_rules jsonb) to service_role;
 revoke all on function public.career_canon(p jsonb) from public, anon, authenticated, service_role;
@@ -12351,8 +12401,8 @@ revoke all on function public.crew_answer(p_answer text, p_name text) from publi
 grant execute on function public.crew_answer(p_answer text, p_name text) to authenticated, service_role;
 revoke all on function public.crew_ask(p_body text, p_ok_name boolean) from public, anon, authenticated, service_role;
 grant execute on function public.crew_ask(p_body text, p_ok_name boolean) to authenticated, service_role;
-revoke all on function public.crew_board(p_limit integer) from public, anon, authenticated, service_role;
-grant execute on function public.crew_board(p_limit integer) to authenticated, service_role;
+revoke all on function public.crew_board(p_limit integer, p_scope text) from public, anon, authenticated, service_role;
+grant execute on function public.crew_board(p_limit integer, p_scope text) to authenticated, service_role;
 revoke all on function public.crew_cheer(p_subject uuid, p_word text) from public, anon, authenticated, service_role;
 grant execute on function public.crew_cheer(p_subject uuid, p_word text) to authenticated, service_role;
 revoke all on function public.crew_cheer_count(p_athlete text) from public, anon, authenticated, service_role;
