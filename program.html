@@ -8380,17 +8380,30 @@ function readPlanCopy(id) {
 }
 // A programme's Farsi twins (`<key>_fa` beside `<key>`, a string or a list of strings) take their key's place: boot() calls it
 // on a Farsi phone only. An empty twin leaves the English. Names, rx and numbers never have a twin.
+// A day's name (`focusTag`) and a cycle's `name` are names, like an exercise's: English on every phone (Amir, 2026-11-22: "the name
+// of the training Days and the name of the Cycles should be only in english like exercise names"). A `focusTag_fa` already written
+// is never shown.
+const FA_KEEP_KEYS = new Set(['focusTag', 'name']);
 function faTwins(d) {
   if (Array.isArray(d)) { d.forEach(faTwins); return d; }
   if (!d || typeof d !== 'object') return d;
   Object.keys(d).forEach(k => {
-    if (/_fa$/.test(k)) return;
+    if (/_fa$/.test(k) || FA_KEEP_KEYS.has(k)) return;
     const t = d[k + '_fa'];
     const ok = typeof t === 'string' ? t.trim() !== '' : Array.isArray(t) && t.some(x => typeof x === 'string' && x.trim());
     if (ok) d[k] = t;
     else if (d[k] && typeof d[k] === 'object') faTwins(d[k]);
   });
   return d;
+}
+// ...and the word lists never turn one into Farsi either ("Rebound", "Bedrock" and "Torque" are cycle names and words in the lists):
+// every day's and cycle's name in this programme is handed to the Farsi layer to leave as it is, wherever it is drawn.
+function faKeepNames() {
+  if (!window.AAI18N || !AAI18N.keepNames || !DATA) return;
+  const out = [];
+  ((DATA.workouts && DATA.workouts.days) || []).forEach(d => { if (d && d.focusTag) out.push(String(d.focusTag), String(d.focusTag).replace(/\s*·\s*Optional$|^Optional\s*·\s*/i, '')); });
+  (DATA.cycles || []).forEach(c => { if (c && c.name) out.push(String(c.name)); });
+  AAI18N.keepNames(out);
 }
 function savePlanCopy(id, data) {
   if (!id || window.IS_DEMO || window.IS_PREVIEW || !data || typeof data !== 'object') return;
@@ -8873,7 +8886,7 @@ setTimeout(() => bootStuck('nothing answered in ' + Math.round(BOOT_CEILING_MS /
   // cycle message, the teaser, the day's last words, the Coach tab's cards). On a Farsi phone each `_fa` takes its key's place
   // here, once, before anything is drawn, so every screen reads it with no change of its own; an English phone never looks.
   // After the plan copy and PLAN_OFFLINE.raw are taken above, so the phone's copy and the "plan updated" check stay the server's.
-  if (DATA && window.AAI18N && AAI18N.fa) { faTwins(DATA); loadNamesFa(); }
+  if (DATA && window.AAI18N && AAI18N.fa) { faTwins(DATA); loadNamesFa(); faKeepNames(); }
 
   // Two real causes, each with its own words (REL-01). It used to blame a link for both.
   if (!DATA) {
@@ -19135,12 +19148,11 @@ function playedNo() {
   paintTodayCard();
 }
 window.playedYes = playedYes; window.playedNo = playedNo;
-// A day's title on the phone: a logged activity says the app's own word for its kind; a plan day its Farsi twin on a Farsi phone (stage117,
-// when the programme day has one: day names stay English like cycle names, COM-1); otherwise the server's title.
+// A day's title on the phone: a logged activity says the app's own word for its kind; otherwise the server's title. A plan day's name
+// stays English on a Farsi phone too, like an exercise's (Amir, 2026-11-22), so stage117's `title_fa` is not read.
 function fwTitle(d) {
   if (!d) return '';
   if ((d.k === 'court' || d.k === 'other') && ACT_LABEL[d.kind]) return ACT_LABEL[d.kind];
-  if (window.AAI18N && AAI18N.fa && typeof d.title_fa === 'string' && d.title_fa.trim()) return d.title_fa;
   return d.title || '';
 }
 const ACT_EFFORT = [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']];

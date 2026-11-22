@@ -1190,8 +1190,9 @@ The system adapts to your programming — not the other way around.
 **`<key>_fa`** (2026-11-20, Amir: *"people with current cycle should have both languages"*). A text the athlete reads may
 carry its Farsi beside its English: `note_fa`, `why.text_fa`, a week note's `text_fa` / `title_fa`, the cycle message's
 `paragraphs_fa` / `outcomes_fa`, the teaser's `paragraphs_fa` / `subtitle_fa`, a cycle's `tagline_fa` / `focuses_fa` /
-`weeks_fa`, a day's `focusTag_fa` / `completionTitle_fa` / `completionMessage_fa`, `notes.greeting_fa` and each card's
-`title_fa` / `body_fa`. A string twins a string, a list twins a list of the same length. On a Farsi phone program.html's
+`weeks_fa`, a day's `completionTitle_fa` / `completionMessage_fa`, `notes.greeting_fa` and each card's
+`title_fa` / `body_fa`. **A day's name (`focusTag`) and a cycle's `name` never have a twin** (Amir, 2026-11-22: they stay
+English like exercise names); a `focusTag_fa` written before that day is never shown. A string twins a string, a list twins a list of the same length. On a Farsi phone program.html's
 `faTwins()` puts each twin in its key's place before anything is drawn; an English phone reads `<key>`. Names, `exId`,
 `rx`, ids and numbers never have a twin.
 **Every cycle from 2026-11-20 on, for every athlete** (Amir: *"Yes, both always"*; COM-1): /program-engage writes both,

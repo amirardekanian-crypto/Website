@@ -337,8 +337,10 @@ that's the calendar the athlete actually lives by.
 After the English of PARTS 1–4 is final, write the Farsi of **every** text, for every athlete whatever their
 `athlete.lang`: the message paragraphs and outcomes, the teaser (paragraphs, subtitle when there is one), each week
 note's text and title, each Coach's Note, each Because, each day's completion title and message, each notes card's
-title and body (HTML, the same tags as the English) and the greeting, plus the Farsi of each day's `focusTag` and of
-the current and next cycle's tagline and aims (the roadmap's English stays as locked; only its Farsi is added).
+title and body (HTML, the same tags as the English) and the greeting, plus the Farsi of the current and next cycle's
+tagline and aims (the roadmap's English stays as locked; only its Farsi is added). **Never the Farsi of a day's name
+(`focusTag`) or a cycle's name**: they stay English on every phone, like exercise names (Amir, 2026-11-22: *"the name of
+the training Days and the name of the Cycles should be only in english like exercise names"*).
 SCHEMA.md → *Programme texts in two languages* has the keys.
 - **The same text, not more.** One twin per English text, item for item (three paragraphs, three twins). When the
   English changes, the twin changes with it.

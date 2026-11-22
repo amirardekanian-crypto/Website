@@ -71,7 +71,8 @@ const card = p => p.evaluate(() => {
     await p.click('#crew-race .cr-seg button[data-scope="month"]'); await p.waitForTimeout(700);
     const m = await card(p);
     C.check('Month: the tab is picked and the board is the 30 days', m && m.tabs === '7 days|Month*|Season' && /^1 You/.test(m.rows[0]) && /Last 30 days/i.test(m.head), m && (m.tabs + ' ' + m.rows[0]));
-    C.check('…"N days" under a name in place of dots', m && m.dn[0] === '30 days' && !m.dots.join(''), m && m.dn.join());
+    // "N active days", not "N days" (Amir, 2026-11-22: "change it to active days"; a bare "30 days" read like the window)
+    C.check('…"N active days" under a name in place of dots', m && m.dn[0] === '30 active days' && !m.dots.join(''), m && m.dn.join());
     C.check('…and when you lead, who is behind you', m && /You lead the last 30 days\. Dennis is 2,144 points behind you\./.test(m.chase), m && m.chase);
     const kept = await p.evaluate(ID => ({ scope: localStorage.getItem('aa_crew_scope'), week: !!localStorage.getItem(ID + '_crewboard_week'), month: !!localStorage.getItem(ID + '_crewboard_month'), rank: localStorage.getItem(ID + '_crewboard_rank') }), H.ID);
     C.check('the pick and each board are kept on the phone', kept.scope === 'month' && kept.week && kept.month && !!kept.rank, JSON.stringify(kept).slice(0, 200));

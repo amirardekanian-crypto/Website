@@ -64,7 +64,8 @@ formal شما), the grid runs right to left, the weekday heads are one letter, t
 *۲ ساعت و ۴۵ دقیقه* (a pattern), the run chip says **Running** (in Farsi *Run* is the order بدو; Running is دویدن) and a logged
 activity's row takes the app's own word for its kind (`fwTitle()`), and `get_five_weeks()` returns a plan day's `title_fa` when the
 programme day has one (stage117). Today no programme day carries one: a day's name (its `focusTag`) stays English, like a cycle's name
-and an exercise's, so *Legs* in a Farsi day sheet is by design.
+and an exercise's, so *Legs* in a Farsi day sheet is by design. Since 2026-11-22 (Amir: *"the name of the training Days and the
+name of the Cycles should be only in english like exercise names"*) `fwTitle()` no longer reads `title_fa` at all.
 
 ### coach.html (#124 The Mirror)
 

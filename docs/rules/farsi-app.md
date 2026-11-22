@@ -13,6 +13,11 @@ written from: [`scripts/i18n/BRIEF.md`](../../scripts/i18n/BRIEF.md).
   is a reload. **Exercise names stay English** (Amir: *"the name of the exercises will be in english"*): the engine
   skips the elements that hold a name (`AAI18N.skip`); a new place that draws a name gets one of those classes or
   `translate="no"`.
+- **A training day's name and a cycle's name stay English too, like exercise names** (Amir, 2026-11-22: *"the name of the
+  training Days and the name of the Cycles should be only in english like exercise names"*). `faTwins()` never puts a
+  `focusTag_fa` or a cycle `name_fa` in place, `fwTitle()` reads no `title_fa`, and `faKeepNames()` hands every day and cycle
+  name in the programme to `AAI18N.keepNames()`, so no word list turns one into Farsi ("Rebound", "Bedrock" are words in the
+  lists). /program-engage writes no Farsi for them, `place_words.py` stops on a `focustags_fa`, `check_program.py` warns on one.
 - **program.html stays written in English, and nothing in it is wrapped.** In Farsi `i18n.js` swaps each text node and
   each `placeholder` / `aria-label` / `title` / `alt` it has words for, as the app draws it, and mirrors every left/right
   rule of the page's style sheets in place (rtlcss's way). In English it sets nothing and returns. A new screen in

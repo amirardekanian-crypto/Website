@@ -232,7 +232,7 @@ def text_fields(data):
 def twin_pairs(data):
     """(label, English, its Farsi twin) for each text the pipeline writes this cycle, in both languages (COM-1, 2026-11-20;
     SCHEMA.md → Programme texts in two languages): the current cycle (message, week notes, tagline, aims), the next one
-    (teaser, tagline, aims), each day (focusTag, completion text), each card's Coach's Note and Because, the notes cards."""
+    (teaser, tagline, aims), each day's completion text (never its focusTag: names stay English, Amir 2026-11-22), each card's Coach's Note and Because, the notes cards."""
     cycles = data.get('cycles') or []
     i = data.get('currentCycleIndex') or 0
     cur = cycles[i] if i < len(cycles) and isinstance(cycles[i], dict) else {}
@@ -252,7 +252,7 @@ def twin_pairs(data):
     for c in cycles[i + 2:]:
         if isinstance(c, dict): yield from keys(c, ('tagline', 'focuses'), f"cycle {c.get('num')}")
     for d in (data.get('workouts') or {}).get('days') or []:
-        yield from keys(d, ('focusTag', 'completionTitle', 'completionMessage'), f"Day {d.get('id')}")
+        yield from keys(d, ('completionTitle', 'completionMessage'), f"Day {d.get('id')}")   # never focusTag: a day's name stays English (2026-11-22)
     for d, b, ex, it in exercises(data):
         o = it or ex
         yield from keys(o, ('note',), f"Day {d.get('id')} {o.get('name')}")
@@ -272,6 +272,13 @@ def check_twins(data):
     has = lambda v: bool(v) and (any(str(x).strip() for x in v) if isinstance(v, list) else bool(str(v).strip()))
     flat = lambda v: ' '.join(map(str, v)) if isinstance(v, list) else str(v or '')
     missing = []
+    # A day's and a cycle's name stay English on every phone, like an exercise's (Amir, 2026-11-22): a twin for one is never shown.
+    for d in (data.get('workouts') or {}).get('days') or []:
+        if isinstance(d, dict) and has(d.get('focusTag_fa')):
+            warn(f"Day {d.get('id')}.focusTag_fa: a day's name stays English (Amir, 2026-11-22); drop the twin", 'COM-1')
+    for c in data.get('cycles') or []:
+        if isinstance(c, dict) and has(c.get('name_fa')):
+            warn(f"cycle {c.get('num')}.name_fa: a cycle's name stays English (Amir, 2026-11-22); drop the twin", 'COM-1')
     for w, en, tw in twin_pairs(data):
         if has(en) and not has(tw): missing.append(w); continue
         if has(tw) and not has(en):
