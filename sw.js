@@ -607,8 +607,12 @@
 // Steps row says what an activity added, and eight new activity kinds on Add activity.
 // v278: program.html and i18n-fa.js (?v=22) changed (2026-11-22, Amir: "A, the race card"): the Race on Crew (stage120), the board under the
 // week with 7 days, Month and Season, seven dots of active days, the line of who to catch, arrows since the last day the phone saw it.
-// v279: i18n.js (?v=14) and i18n-fa.js (?v=23) changed (2026-11-22): the Farsi sweep of every screen: Farsi numbers in Your weeks and Progress, week rows numbered without ه, distance and minute doses, an English sentence keeps its full stop.
-const CACHE = 'aap-v279';
+// v279: program.html and i18n-fa.js (?v=23) changed (2026-11-22, Amir: "change it to active days"): the line under each name on the Race
+// says "N active days" ("N روز فعال"), not a bare "N days" that read like the window.
+// v280: program.html and i18n-fa.js (?v=24) changed (2026-11-22, Amir: "Build 126 first"): Played today? on Home's Today card (the last
+// activity again in one tap, after 5 pm), and Add activity opens on the last activity.
+// v281: i18n.js (?v=14) and i18n-fa.js (?v=25) changed (2026-11-22): the Farsi sweep of every screen: Farsi numbers in Your weeks and Progress, week rows numbered without ه, distance and minute doses, an English sentence keeps its full stop.
+const CACHE = 'aap-v281';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -649,7 +653,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=14',
-  '/assets/js/i18n-fa.js?v=23',
+  '/assets/js/i18n-fa.js?v=25',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).

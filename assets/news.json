@@ -2,6 +2,26 @@
   "_about": "What's new in the app, shown in every athlete's Inbox for 14 days (program.html, newsRows/openNews). Newest first. Each entry: id (unique), at (ISO time), en and fa: { title, items: [one short line each], sign }. Written in Amir's voice (COM-3) in both languages (COM-1). THE RULE (docs/rules/working-with-amir.md): a change to program.html that an athlete would notice ships with its entry here in the same commit; .githooks/commit-msg blocks a program.html commit without this file unless the message says [no news].",
   "items": [
     {
+      "id": "2026-11-22-played-today",
+      "at": "2026-11-22T20:00:00Z",
+      "en": {
+        "title": "Add your tennis in one tap",
+        "items": [
+          "In the evening, Home asks \"Played today?\" under Steps, with your last activity ready. Tap Yes, add it and it's on your weeks.",
+          "Something else opens Add activity, now filled in from your last one. Not today hides it until tomorrow."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "تنیس‌تون رو با یه لمس ثبت کنید",
+        "items": [
+          "عصرها صفحهٔ اصلی زیر قدم‌ها می‌پرسه «امروز بازی کردید؟» و آخرین فعالیتتون آماده‌ست. «بله، ثبتش کنید» رو بزنید تا توی هفته‌هاتون بیاد.",
+          "«یه چیز دیگه» صفحهٔ ثبت فعالیت رو باز می‌کنه که حالا از آخرین فعالیتتون پر شده. «امروز نه» تا فردا مخفیش می‌کنه."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-22-the-race",
       "at": "2026-11-22T18:00:00Z",
       "en": {

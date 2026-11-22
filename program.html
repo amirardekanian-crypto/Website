@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=14" data-fa="/assets/js/i18n-fa.js?v=23"></script>
+<script src="/assets/js/i18n.js?v=14" data-fa="/assets/js/i18n-fa.js?v=25"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -4875,6 +4875,18 @@
   #home-overview .hb-name { min-width: 0; font: 600 var(--fs-field)/1.25 'Barlow', sans-serif; }
   #home-overview .hb-row.is-done .hb-name { color: var(--grey); }
   #home-overview .hb-mv { color: var(--ink); }   /* stage121: what Court Log added to Steps */
+  /* #126 Played today?: the row under Steps, the clay rim for "not done yet", one green button, two quiet links under it. */
+  #home-overview .pt-main { cursor: default; }
+  #home-overview .pt-wrap .hb-ic { background: transparent; color: var(--clay); box-shadow: inset 0 0 0 2px var(--clay); }
+  #home-overview .hb-sub.pt-sub { white-space: normal; overflow: visible; }
+  #home-overview .pt-yes { flex: none; min-height: 36px; padding: 0 14px; border: 0; border-radius: 99px; background: var(--fill); color: #fff;
+    font: 600 var(--fs-small)/1 'Barlow', sans-serif; cursor: pointer; }
+  #home-overview .pt-yes:disabled { opacity: .6; cursor: default; }
+  #home-overview .pt-yes:focus-visible, #home-overview .pt-more button:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  #home-overview .pt-more { display: flex; gap: 18px; padding: 0 16px 10px 70px; margin-top: -4px; }
+  #home-overview .pt-more button { border: 0; background: none; padding: 4px 0; color: var(--grey); font: 500 var(--fs-small)/1.2 'Barlow', sans-serif;
+    cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  @media (max-width: 360px) { #home-overview .pt-more { padding-left: 58px; } }
   #home-overview .hb-sub { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   /* ONE PIP PER STEP, NEVER A STRAIGHT BAR (Amir, on water and protein: "its not a straight bar"). The meter counts the
@@ -5049,6 +5061,7 @@
     color: var(--green-ink); font: 600 var(--fs-body)/1 'Barlow', sans-serif; cursor: pointer; }
   #screen-plan .fw-add:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   /* The Add activity sheet and a logged activity's row, in #hist-overlay (the shared sheet). */
+  .act-from { margin: 6px 0 0; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }   /* #126 */
   .act-sec { margin: 14px 0 6px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
   .act-row { display: flex; flex-wrap: wrap; gap: 8px; }
   .act-min { display: flex; align-items: center; gap: 10px; }
@@ -12954,7 +12967,7 @@ function todayCardHtml() {
   const k = H.AKEY(), isToday = k === H.TKEY();
   const v = H.verdict(k);
   const list = H.rosterOn(k);
-  const rows = list.map(hb => habRowHtml(hb, k)).join('');
+  const rows = list.map(hb => habRowHtml(hb, k) + (hb.id === 'steps' ? playedRowHtml(k) : '')).join('');   // #126 under Steps
   const streak = H.dayStreak();
   // ⚠️ THE HEADLINE AND THE RING COUNT THE SAME THING (2026-10-20). They did not: the headline said what the GATE still wants
   // (dayToGo(), weighted, and a day counts with one missing), so a card showing two ticks of five said "1 to go" and the three
@@ -19070,6 +19083,58 @@ function moveCreditMap() {
   return _mvMap;
 }
 function moveCreditOn(day) { return moveCreditMap()[day] || null; }
+// ── PLAYED TODAY? — #126 (round 12 'On the Move', 2026-11-22; Amir: "Build 126 first") ──────────────────────────────────────────
+// Court Log had 2 entries on its first day: the sheet sits four taps deep and the athlete has to remember. Garmin and Apple see a
+// workout and ask; a web app cannot see one, so it asks at the right time instead. After 5 pm, on a day with nothing logged, Home's
+// Today card carries one row under Steps: the athlete's last activity, saved again in one tap. Never a push. "Not today" hides it
+// until tomorrow (<id>_played_no, never synced). The demo and the coach's preview never show it.
+const PLAYED_FROM_HOUR = 17;
+function actLast() {
+  if (!fwOk(FW)) return null;
+  let best = null;
+  FW.weeks.forEach(w => (Array.isArray(w && w.days) ? w.days : []).forEach(d => {
+    if (d && (d.k === 'court' || d.k === 'other') && MOVE_MET[d.kind] && Number(d.mins) > 0 && ['easy', 'normal', 'hard'].indexOf(d.effort) >= 0
+        && (!best || String(d.day) >= String(best.day))) best = d;
+  }));
+  return best;
+}
+function playedKey() { return ATHLETE_ID + '_played_no'; }
+function playedRowHtml(k) {
+  try {
+    if (!ATHLETE_ID || window.IS_DEMO || window.IS_PREVIEW || !window.AAHabits) return '';
+    const H = window.AAHabits;
+    if (k !== H.TKEY() || new Date().getHours() < PLAYED_FROM_HOUR) return '';
+    const last = actLast();
+    if (!last) return '';
+    if (FW.weeks.some(w => (Array.isArray(w && w.days) ? w.days : []).some(d => d && d.day === k && (d.k === 'court' || d.k === 'other')))) return '';
+    try { if (localStorage.getItem(playedKey()) === k) return ''; } catch (e) { /* no storage: show it */ }
+    const yest = H.fmtKey(H.addDays(H.today(), -1));
+    // "like Friday" within the week; an older one says nothing about when (a date there reads badly in both languages).
+    const when = last.day === yest ? 'yesterday' : (Date.parse(k) - Date.parse(last.day) <= 6 * 86400000 ? H.dayLong(last.day) : '');
+    const busy = !!(_act && _act.quick && _act.busy);
+    const eff = { easy: 'Easy', normal: 'Normal', hard: 'Hard' }[last.effort];
+    return `<div class="hb-wrap pt-wrap">
+    <div class="hb-row pt-row">
+      <div class="hb-main pt-main"><span class="hb-ic" aria-hidden="true">${window.ICON('activity', 2)}</span><span class="hb-b"><span class="hb-name">Played today?</span>
+        <span class="hb-sub pt-sub"><span>${esc(ACT_LABEL[last.kind] || 'Activity')}</span> · <span>${Math.round(Number(last.mins))} min</span> · <span>${esc(eff)}</span>${when ? ` · <span>like ${esc(when)}</span>` : ''}</span></span></div>
+      <button type="button" class="pt-yes" onclick="playedYes()"${busy ? ' disabled' : ''}>${busy ? 'Saving…' : 'Yes, add it'}</button>
+    </div>
+    <div class="pt-more"><button type="button" onclick="openActivitySheet()">Something else</button><button type="button" onclick="playedNo()">Not today</button></div>
+  </div>`;
+  } catch (e) { return ''; }
+}
+function playedYes() {
+  const last = actLast();
+  if (!last || !window.AAHabits || (_act && _act.busy)) return;
+  _act = { kind: last.kind, day: window.AAHabits.TKEY(), mins: Math.round(Number(last.mins)), effort: last.effort, key: crewNewKey(), busy: false, err: '', quick: true };
+  saveActivity();
+  paintTodayCard();
+}
+function playedNo() {
+  try { localStorage.setItem(playedKey(), window.AAHabits.TKEY()); } catch (e) { /* storage blocked: it comes back on the next paint */ }
+  paintTodayCard();
+}
+window.playedYes = playedYes; window.playedNo = playedNo;
 // A day's title on the phone: a logged activity says the app's own word for its kind; a plan day its Farsi twin on a Farsi phone (stage117,
 // when the programme day has one: day names stay English like cycle names, COM-1); otherwise the server's title.
 function fwTitle(d) {
@@ -19191,7 +19256,11 @@ function actDays() {
 }
 function openActivitySheet() {
   if (!ATHLETE_ID || window.IS_DEMO || window.IS_PREVIEW) return;
-  _act = { kind: 'tennis', day: ymdLocal(new Date()), mins: 60, effort: 'normal', key: crewNewKey(), busy: false, err: '' };
+  // #126 (2026-11-22): the sheet opens on the athlete's last activity, so the usual hour of padel is one tap on Save. Tennis, 60,
+  // Normal only for a first one.
+  const last = actLast();
+  _act = { kind: last ? last.kind : 'tennis', day: ymdLocal(new Date()), mins: last ? Math.round(Number(last.mins)) : 60,
+    effort: last ? last.effort : 'normal', fromLast: !!last, key: crewNewKey(), busy: false, err: '' };
   paintActivitySheet();
   document.getElementById('hist-overlay').classList.add('visible');
 }
@@ -19204,6 +19273,7 @@ function paintActivitySheet() {
     <div class="readiness-eyebrow">Your weeks</div>
     <h2 class="readiness-title">Add activity</h2>
     <p class="readiness-sub">Training outside your plan. It shows on your weeks and Amir sees it.</p>
+    ${_act.fromLast ? '<p class="act-from">Filled in from your last one. Change anything.</p>' : ''}
     <div class="act-sec">What</div><div class="act-row">${ACT_KINDS.map(([v, l]) => chip('kind', v, l)).join('')}</div>
     <div class="act-sec">When</div><div class="act-row">${actDays().map(([v, l]) => chip('day', v, l)).join('')}</div>
     <div class="act-sec">Minutes</div>
@@ -19231,18 +19301,23 @@ async function saveActivity() {
     if (!sb) throw new Error('offline');
     const res = await _withTimeout(sb.rpc('log_activity', { p_athlete_id: ATHLETE_ID, p_id: _act.key, p_day: _act.day, p_kind: _act.kind, p_minutes: mins, p_effort: _act.effort }), 10000);
     if (!res || res.error) throw (res && res.error) || new Error('no answer');
-    const day = _act.day;
+    const day = _act.day, quick = !!_act.quick;
     _act = null;
-    document.getElementById('hist-overlay').classList.remove('visible');
+    if (!quick) document.getElementById('hist-overlay').classList.remove('visible');
     aaToast('Added to your weeks.');
     if (FW && fwOk(FW)) {   // shown at once, before the server's own answer replaces it
       const r = res.data || {}, wk = FW.weeks.find(w => w && day >= String(w.from) && day <= String(w.to));
       if (wk) { (wk.days = wk.days || []).push({ day, k: ACT_COURT.indexOf(r.kind) >= 0 ? 'court' : 'other', kind: r.kind, title: plCap(String(r.kind || 'activity')), mins: r.minutes, effort: r.effort, id: r.id }); paintFiveWeeks(); }
     }
     loadFiveWeeks();
+    try { paintTodayCard(); } catch (e2) { /* the card paints itself next time */ }   // #126: Played today? goes once the day has one
   } catch (e) {
     const m = String((e && e.message) || '');
-    if (_act) { _act.busy = false; _act.err = MSG[m] || (/offline|fetch|no answer|timed? ?out/i.test(m) ? 'No signal. Try again when you have one.' : 'That did not save. Try again.'); paintActivitySheet(); }
+    if (_act) {
+      _act.busy = false; _act.err = MSG[m] || (/offline|fetch|no answer|timed? ?out/i.test(m) ? 'No signal. Try again when you have one.' : 'That did not save. Try again.');
+      if (_act.quick) { aaToast(_act.err); _act = null; try { paintTodayCard(); } catch (e2) { /* next paint */ } }   // #126: no sheet is open
+      else paintActivitySheet();
+    }
   }
 }
 window.saveActivity = saveActivity;
