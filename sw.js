@@ -617,7 +617,9 @@
 // v283: program.html and i18n-fa.js (?v=26) changed (2026-11-22, Amir: "build 127 and 128"): the check-in says what you logged yesterday
 // (readiness.yday, shown on coach.html's session card), and a hard hour or more offers The Morning After when it is saved.
 // v284: program.html and i18n.js (?v=15) changed (2026-11-22, Amir: "the name of the training Days and the name of the Cycles should be only in english"): day and cycle names stay English on a Farsi phone.
-const CACHE = 'aap-v284';
+// v285: program.html changed (2026-11-23, Amir: "can you fix this for ever?"): the same name twice in a day (Saeed's warm-up bike and finisher bike) keeps
+// two set logs, so one tick no longer ticks both, and the report holds only as many sets as the card has (no "skipped" rows from another day's bike).
+const CACHE = 'aap-v285';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

@@ -179,5 +179,20 @@ costs more than one tap.
   - The session rating keeps its own scale, 1–10 (Foster's session RPE), in the same buttons.
   - The readiness check is not RPE and keeps its large labelled 1–5 answers (they work: 90%).
 
+- **The same name twice in one day keeps two set logs (2026-11-23, Amir: "can you fix this for ever?").**
+  The set log is kept per exercise name (`setLogKey()`). Saeed's Day 1 has a 5 min Stationary Bike to
+  warm up and a 10 min one at the end, so the two cards shared one log: a tick on the warm-up ticked the
+  finisher too. His Day 3 bike is 3 rounds, the shared log kept that length, and his report said
+  "Set 2: skipped · Set 3: skipped" under both bikes for sets neither card had. Now:
+  - a second card of a name on its day carries `data-occ="2"` and keeps its log under **"&lt;name&gt; (2)"**
+    (a third "(3)"). `logNameOf(card)` and `exLogName(day, ex)` are the name every set-log read and
+    write takes: the cards, the day's count and Still to log, Guided, Done's copy, the carry, Reset, the
+    midnight sweep and the record. The first card keeps the plain name, so nothing already stored moved;
+    the history, the records, the Spine and the report still use the real name. A circuit keeps one name.
+  - `buildSessionData()` writes only as many sets as the card has, so a log left longer by the same
+    name on another day never reaches the record as "skipped".
+  - coach.html's live view shows the second card as "Stationary Bike (2)". Five live programmes had a
+    day like this on 2026-11-23. `node scripts/headless/same-name.js` (13 checks).
+
 ---
 *One section of the reference. The index is [`PROGRAM-APP.md`](../../../PROGRAM-APP.md); the rules are in [`docs/rules/`](../../../docs/README.md).*

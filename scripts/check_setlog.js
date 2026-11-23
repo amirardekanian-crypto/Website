@@ -52,6 +52,8 @@ Object.assign(P, {
 vm.runInContext([
   slice(prog, 'program.html', 'function parseDurationToSec(', 'function renderNumLine(rx, rest) {'),   // rxOf, plannedReps
   slice(prog, 'program.html', 'function setReps(s, planned) {', 'function saveSetLogValue('),
+  // setLogKey() and the card's own log name (exLogName(), 2026-11-23: the same name twice in a day keeps two logs).
+  slice(prog, 'program.html', 'function setLogKey(exName) {', 'function doneLogKey(day) {'),
   // A finished day's own copy (closeSessionAtDone(), 2026-10-13): buildSessionData() reads it first. None is stored here.
   slice(prog, 'program.html', 'function doneLogKey(day) {', 'function loadSetLog('),
   slice(prog, 'program.html', 'function normDigits(v) {', 'const ONE_RM_MAX_EFFECTIVE'),   // ends on code, not a comment a docs pass may reword

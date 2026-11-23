@@ -2,6 +2,26 @@
   "_about": "What's new in the app, shown in every athlete's Inbox for 14 days (program.html, newsRows/openNews). Newest first. Each entry: id (unique), at (ISO time), en and fa: { title, items: [one short line each], sign }. Written in Amir's voice (COM-3) in both languages (COM-1). THE RULE (docs/rules/working-with-amir.md): a change to program.html that an athlete would notice ships with its entry here in the same commit; .githooks/commit-msg blocks a program.html commit without this file unless the message says [no news].",
   "items": [
     {
+      "id": "2026-11-23-same-exercise-twice",
+      "at": "2026-11-23T12:00:00Z",
+      "en": {
+        "title": "Same exercise twice in a day? Tick each one",
+        "items": [
+          "When a day has the same exercise twice, like a bike to warm up and a bike at the end, each one now has its own tick.",
+          "Ticking the first one no longer ticks the second, and I get the right report for both."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "یه حرکت دو بار توی یه روز؟ هر کدوم رو جدا تیک بزنید",
+        "items": [
+          "وقتی یه روز یه حرکت رو دو بار داره، مثلاً دوچرخه برای گرم کردن و دوچرخه برای آخر جلسه، حالا هر کدوم تیک خودش رو داره.",
+          "تیک زدن اولی دیگه دومی رو تیک نمی‌زنه، و گزارش هر دو درست به دست من می‌رسه."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-22-yesterday-cooldown",
       "at": "2026-11-22T21:00:00Z",
       "en": {
