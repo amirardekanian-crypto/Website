@@ -12,7 +12,9 @@ const FILES = ['program.html', 'coach.html', 'habits.html', 'assets/js/chips.js'
   // the cap and the spare: CAREER_SPARE_FROM and the spare's "twice" are held to career_derive() in the snapshot (stage106)
   'supabase/schema_snapshot.sql',
   // the Steps credit's third copy: the headless stub's court kinds and the first day of its `acts` (2026-11-23)
-  'scripts/headless/stub.js']
+  'scripts/headless/stub.js',
+  // the habit config merge: program.html's habLoad() runs against the engine's defaultCfg() (coach.html habCfgOfC, 2026-11-23)
+  'assets/js/habits-core.js']
   .concat(['rulebook', 'badges', 'achievements', 'titles', 'missions', 'quests', 'recognition'].map(n => 'career/' + n + '.toml'));
 // No GIT_* variable reaches a git command in the temp folder, or the guard run on it. The pre-commit hook runs this test inside
 // `git commit`, which exports GIT_DIR and GIT_INDEX_FILE. On 2026-10-17 the temp folder's `git init` then re-initialised the REAL

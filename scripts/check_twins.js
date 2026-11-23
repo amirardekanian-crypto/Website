@@ -1273,6 +1273,54 @@ run('the Steps credit of an activity (MOVE_MET, moveCreditOf / activity_met(), m
   expect('get_five_weeks() still sends `acts` (the stub builds it when a test gives none)', null, /'acts', coalesce/.test(fwSql), /fwOut\.acts = \[\]/.test(STUB_SRC));
 });
 
+/* ── The coach's habit grid copies two things from the athlete app (2026-11-23) ───────────────────────────────── */
+// 1. The Steps credit: coach.html MOVE_MET_C / moveCreditOfC() is held to program.html's MOVE_MET / moveCreditOf() (and so, through the block
+//    below, to the server's activity_met() / move_steps_credit()). activity_log rows say `minutes`, the phone's copy `mins`: the vectors are mapped.
+const D_MOVE = sandbox(null, [constSrc(D_SRC, 'MOVE_MET_C', 'coach.html'), lineSrc(D_SRC, 'const MOVE_FROM_C', 'coach.html')]
+  .concat(fromD('moveMetC', 'moveCreditOfC')), ['MOVE_MET_C', 'MOVE_FROM_C', 'MOVE_CAP_C', 'moveCreditOfC']);
+run('the Steps credit, coach.html copy (MOVE_MET_C, MOVE_FROM_C, MOVE_CAP_C, moveCreditOfC / program.html moveCreditOf)', () => {
+  same('the MET table', null, A_MOVE.MOVE_MET, D_MOVE.MOVE_MET_C);
+  same('the first day', null, A_MOVE.MOVE_FROM, D_MOVE.MOVE_FROM_C);
+  same('the cap', null, A_MOVE.MOVE_CAP, D_MOVE.MOVE_CAP_C);
+  const kinds = Object.keys(A_MOVE.MOVE_MET).concat(['nothing_known']);
+  const efforts = ['easy', 'normal', 'hard', 'brutal'];
+  const vecs = [[]];
+  kinds.forEach(k => efforts.forEach(e => [0, 5, 20, 45, 60, 90, 150].forEach(m => vecs.push([{ kind: k, mins: m, effort: e }]))));
+  vecs.push([{ kind: 'tennis', mins: 60, effort: 'hard' }, { kind: 'gym', mins: 20, effort: 'easy' }, { kind: 'run', mins: 30, effort: 'normal' }], [{ kind: 'padel', effort: 'easy' }]);
+  vecs.forEach(acts => [10000, 8000, 7500, 0, undefined].forEach(t =>
+    same('moveCreditOf vs moveCreditOfC', [acts, t], A_MOVE.moveCreditOf(acts, t), D_MOVE.moveCreditOfC(acts.map(a => ({ kind: a.kind, minutes: a.mins, effort: a.effort })), t))));
+});
+// 2. The habit config the engine is handed: program.html habLoad() merges the saved config over defaultCfg() with `on` per key; coach.html habCfgOfC()
+//    must do exactly that. habLoad() is run as it stands (localStorage stubbed) beside habCfgOfC(), both on the real engine (assets/js/habits-core.js).
+const H_CORE_SRC = read('assets/js/habits-core.js');
+function cfgViaApp(raw, log) {
+  const ctx = vm.createContext({ console });
+  ctx.window = ctx;
+  vm.runInContext(H_CORE_SRC, ctx);
+  const store = { 'x_test_hab_log': JSON.stringify(log) };
+  if (raw !== undefined) store['x_test_hab_cfg'] = JSON.stringify(raw);
+  ctx.localStorage = { getItem: k => (k in store ? store[k] : null) };
+  vm.runInContext(['let HAB_CFG = null, HAB_LOG = {}, HAB_VIEW = {}, HAB_UI = { day: null };', "const ATHLETE_ID = 'x_test';", 'function habViewOf(l) { return l; }',
+    lineSrc(A_SRC, 'const habKeyCfg', 'program.html'), lineSrc(A_SRC, 'const habKeyLog', 'program.html')].concat(fromA('habOn', 'habLoad')).join('\n') + '\nhabLoad();', ctx);
+  return vm.runInContext('HAB_CFG', ctx);
+}
+function cfgViaCoach(raw, log) {
+  const ctx = vm.createContext({ console });
+  ctx.window = ctx;
+  vm.runInContext(H_CORE_SRC, ctx);
+  vm.runInContext(fromD('habCfgOfC').join('\n'), ctx);
+  ctx.raw = raw === undefined ? null : JSON.parse(JSON.stringify(raw)); ctx.log = log;
+  vm.runInContext('var H = window.AAHabits; var cfg = habCfgOfC(H, raw); H.bind(cfg, log, { day: null }); H.anchorRoster();', ctx);
+  return vm.runInContext('cfg', ctx);
+}
+run('the habit config merge (program.html habLoad / coach.html habCfgOfC)', () => {
+  const log = { '2026-11-10': { steps: 5000 } };
+  [undefined, {}, { onboarded: true }, { on: { mobility: true } }, { on: { supps: false, breathe: true } },
+   { on: { mobility: true, c1: true }, custom: [{ id: 'c1', name: '📖 Read' }], roster: [{ from: '2026-11-12', ids: ['steps', 'sleep', 'fuel', 'water', 'strength', 'mobility', 'c1'] }] },
+   { roster: [{ from: '2026-11-20', ids: ['steps'] }] }, { dark: true, v: 3, on: {} }]
+    .forEach(raw => same('the config handed to the engine', raw, cfgViaApp(raw, log), cfgViaCoach(raw, log)));
+});
+
 /* ── Your Number: Steps scored against the athlete's own target (stage125, 2026-11-23) ─────────────────────── */
 // program.html stepsScored() (HAB_VIEW) and the server's hab_log_credited() must score a day the same way: the credit capped at 70% of
 // that day's target, then (typed + credit) x global target / the day's target, rounded; unchanged when there is no credit and no target.

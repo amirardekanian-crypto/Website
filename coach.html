@@ -35,6 +35,8 @@
 <!-- Chip semantics, shared with program.html so the editor and the athlete app
      can never disagree about what a prescription says. See chips-selftest.html. -->
 <script src="/assets/js/chips.js?v=20261011b"></script>
+<!-- The habit engine: what a habit is and when it is met (the athlete app loads the same file). The habit grid and Athletes -> Habits draw what it answers. -->
+<script defer src="/assets/js/habits-core.js?v=1" onload="window.habEngineReady && habEngineReady()" onerror="window.habEngineFailed && habEngineFailed()"></script>
 <style>
   :root {
     --paper: #FAF7F2; --card: #FFFFFF; --ink: #1A1A1A;
@@ -860,6 +862,21 @@
   .hidrow .hw { font-size: 14px; }
   .hidrow .acts { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
   .hidrow .hwho { flex-basis: 100%; font-size: 14px; color: var(--muted); }
+  /* Tidy up (2026-11-23): a quiet fold above the roster for people with no session in 4 weeks; one hairline row each. */
+  .tidy { margin: 0 0 12px; }
+  .tidy > summary { padding: 4px 0; }
+  .tidy-rows { margin-top: 8px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+  .tidyrow { display: flex; align-items: center; gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--rule); flex-wrap: wrap; }
+  .tidyrow:last-child { border-bottom: 0; }
+  .tidyrow .t-who { flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; }
+  .tidyrow .t-nm { font-weight: 600; font-size: 14px; text-decoration: none; }
+  .tidyrow .t-nm:hover { color: var(--court); }
+  .tidyrow .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+  /* No video yet (Exercises, Coverage): a name and its line, the link box and Save on a row. */
+  .nv-row { align-items: center; }
+  .nv-row .nv-id { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+  .nv-row .nv-in { flex: 2 1 240px; width: auto; min-width: 0; }
+  #noVideo .nv-cardio { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
   /* ── Roster ── */
   .controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
   .controls input[type=search], .controls select { font-size: 14px; min-height: 36px; padding: 0 12px; border: 1px solid var(--line);
@@ -1449,6 +1466,48 @@
   .fwc-sw:first-child { margin-left: 0; }
   .fwc-sw.is-p { background: var(--court); }
   .fwc-sw.is-l { background: var(--mint); }
+  /* Habits and court on The work, and Athletes -> Habits (2026-11-23, Amir picked "The Grid"). habGridPanelC(), renderHabitsView(). One engine (assets/js/habits-core.js)
+     says what a habit is and when it is met; these classes only draw it. met = green, under = pale green, none = grey, a day the habit did not exist = no box. */
+  #habGrid, .hv-box { --hg-mid: rgba(14,74,54,0.28); }
+  .hg-wrap, .hv-wrap { max-width: 100%; overflow-x: auto; }
+  .hg { border-collapse: separate; border-spacing: 4px; }
+  .hg th, .hg td { padding: 0; font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .hg-l { text-align: left; white-space: nowrap; font-size: 14px; padding-right: 8px; position: sticky; left: 0; background: var(--card); z-index: 1; }
+  .hg-l .e { margin-right: 4px; }
+  .hg-d { font-size: 12px; color: var(--muted); text-align: center; min-width: 34px; }
+  .hg-d.today { color: var(--ink); font-weight: 600; box-shadow: inset 0 -2px 0 var(--ink); }
+  .hg-c { min-width: 34px; height: 28px; border-radius: 8px; text-align: center; font-size: 12px; font-variant-numeric: tabular-nums; background: var(--track); color: var(--muted); }
+  .hg-c.x { background: none; }
+  .hg-c.met { background: var(--court); color: #fff; }
+  .hg-c.under { background: var(--court-100); color: var(--court); }
+  .hg-c.court { background: var(--hg-mid); color: var(--court); }
+  .hg-c.court.hard { background: var(--court); color: #fff; }
+  .hg-c.court.x { background: none; }
+  .hg-c[title] { cursor: help; }
+  .hg-s { text-align: left; white-space: nowrap; font-size: 14px; padding-left: 8px; font-variant-numeric: tabular-nums; }
+  .hg-k { margin: 10px 0 0; font-size: 12px; color: var(--muted); }
+  .hg-sw { display: inline-block; width: 10px; height: 10px; margin: 0 4px 0 6px; border-radius: 999px; vertical-align: -1px; background: var(--track); }
+  .hg-sw:first-child { margin-left: 0; }
+  .hg-sw.met { background: var(--court); } .hg-sw.under { background: var(--court-100); box-shadow: inset 0 0 0 1px var(--hg-mid); } .hg-sw.court { background: var(--hg-mid); }
+  .hv { border-collapse: collapse; width: 100%; min-width: 760px; }
+  .hv th, .hv td { text-transform: none; letter-spacing: 0; padding: 8px 12px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--rule); font-size: 14px; }
+  .hv thead th { font-size: 12px; font-weight: 600; color: var(--muted); padding-top: 8px; padding-bottom: 8px; }
+  .hv-sort { font-size: 12px; font-weight: 600; color: var(--muted); min-height: 32px; padding: 0 12px; margin: 0 -12px; border-radius: 999px; }
+  .hv-sort:hover { color: var(--court); }
+  .hv-sort.on { color: var(--court); background: var(--court-100); }
+  .hv tbody tr { cursor: pointer; }
+  .hv tbody tr:hover { background: rgba(14,74,54,.05); }
+  .hv-n { position: sticky; left: 0; background: var(--card); z-index: 1; white-space: nowrap; }
+  .hv-n a { display: inline-flex; align-items: center; gap: 12px; font-weight: 600; color: var(--ink); text-decoration: none; }
+  .hv-n .ava { flex: none; width: 28px; height: 28px; border-radius: 999px; background: var(--court); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; line-height: 1; overflow: hidden; }
+  .hv-m { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .hv-m .v { display: block; }
+  .hv-strip { display: inline-flex; gap: 2px; margin-top: 4px; }
+  .hv-strip i { width: 5px; height: 12px; border-radius: 999px; background: var(--track); }
+  .hv-strip i.met { background: var(--court); } .hv-strip i.under { background: var(--hg-mid); } .hv-strip i.x { background: none; }
+  .hv-quiet { padding: 12px 16px; }
+  .hv-quiet p { margin: 8px 0 0 23px; font-size: 14px; line-height: 1.6; color: var(--muted); }
+  .hv-quiet a { color: var(--ink); }
   .lib-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px; }   /* the first panel's own top margin (--gap) is the space under it */
   .lib-count { font-size: 14px; color: var(--muted); }
   .lib-acts { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -1850,6 +1909,10 @@ const S = {
   ready: false,
   freshAt: 0,      // ms: when the lists last came back whole (loadAll, a quiet refresh); the strip's "updated ... ago"
   freshBad: false, // the last quiet refresh failed: the strip says "could not update"
+  actAth: {},      // athlete_id -> their activity_log rows, last 14 days (court time, read when the file opens; ↻ Refresh empties it)
+  actAll: null,    // everyone's activity_log rows, last 7 days (read when Athletes -> Habits first opens); null until then or when the read failed
+  actErr: { one: '', all: '' },   // why either read failed, for the banner (LOAD_ERR.activity)
+  demoAct: [],     // demo mode's court time (demoStore)
   prog: [],        // athlete_progress rows
   hist: [],        // session_history rows, LIGHT: no `summary` and no `log` (see loadHistory); an athlete's are merged in when their file opens. HIDDEN sessions are not in it
   histHidden: [],  // the rows the coach hid (stage60): kept apart so every number leaves them out; the athlete's File lists them and syncGapsOf() counts them as present
@@ -1992,7 +2055,7 @@ async function loadAll() {
   LOAD_ERR.intake = intake && intake.error ? intake.error.message : intake && intake.short ? `only ${intake.data.length} of ${intake.total} intake forms came back` : '';
   LOAD_ERR.affiliates = affs && affs.error ? affs.error.message : '';
   LOAD_ERR.status = stat && stat.error ? stat.error.message : '';
-  await Promise.all([loadLogins(), loadCoachingLogs(), loadLibrary(), loadPrograms()]);
+  await Promise.all([loadLogins(), loadCoachingLogs(), loadLibrary(), loadPrograms(), loadStepsTgtC()]);
   assemble();
   S.ready = true;
   S.freshAt = Date.now(); S.freshBad = false;
@@ -2008,6 +2071,7 @@ const LOAD_ERR_LABEL = {
   court: 'Courtside, the goals and your lines', bell: 'the Bell (the crew\'s posts and answers)', bellReplies: 'the replies under the crew\'s posts', open: 'the Monthly Open',
   crewWeekly: 'the crew\'s week and Mailbag', faces: 'the crew\'s photos', cheers: 'the crew\'s cheers', partner: 'the athletes\' partner codes',
   libDone: 'the Library sessions athletes marked done',
+  activity: 'the court time athletes logged', habits: 'the habit engine', stepsTgt: 'the athletes\' own Steps targets',
 };
 function paintLoadWarn() {
   const lw = $('loadwarn'), warn = loadWarnHtml();
@@ -2111,13 +2175,21 @@ document.addEventListener('focusout', ev => {
 // up as data/<id>.json, a file that has been gone from the live site since 2026-09-07;
 // on a failed read that turned every athlete into a 404 or, on a local server, into a
 // stale local file shown as their live programme.)
+// The page reads only these parts of a programme. The rest (notes ~400 KB, programHistory ~94 KB) is never drawn, so it
+// is not downloaded: the boot copy is TRIMMED (non-enumerable _trim) and nothing may ever write S.programs[id] back; every
+// write reads the live row whole first (✎ save, restore) or writes a copy that was read whole (Undo's `before`).
+const PROG_COLS = 'athlete_id, updated_at, updated_by, athlete:data->athlete, sport:data->sport, currentCycleIndex:data->currentCycleIndex, cycles:data->cycles, workouts:data->workouts';
+const PROG_KEYS = ['athlete', 'sport', 'currentCycleIndex', 'cycles', 'workouts'];
 async function loadPrograms() {
-  const r = await selectAll('programs', 'athlete_id, data, updated_at, updated_by');
+  const r = await selectAll('programs', PROG_COLS);
   LOAD_ERR.programs = r.error ? r.error.message : '';
   if (r.error) return;   // keep what was loaded before: an error must not empty the roster
   S.programs = {}; S.progSrc = {}; S.progMeta = {};
   (r.data || []).forEach(row => {
-    S.programs[row.athlete_id] = row.data;
+    const p = {};
+    PROG_KEYS.forEach(k => { if (row[k] != null) p[k] = row[k]; });
+    Object.defineProperty(p, '_trim', { value: true, enumerable: false });
+    S.programs[row.athlete_id] = p;
     S.progSrc[row.athlete_id] = 'db';
     S.progMeta[row.athlete_id] = { updated_at: row.updated_at, updated_by: row.updated_by };
   });
@@ -3175,6 +3247,7 @@ function fixLegacyHash() {
 }
 function routeOf(h) {
   if (Object.prototype.hasOwnProperty.call(LEGACY_ADDR, h)) h = LEGACY_ADDR[h];
+  if (h === 'athletes/habits') return { view: 'athletes', sub: 'habits' };   // Athletes, the Habits switch; #athletes stays the roster
   const ex = /^(exercises|leads|buyers)(?:\/(.*))?$/.exec(h);
   if (ex) return { view: ex[1], sub: ({ exercises: EX_SUBS, leads: LEAD_SUBS, buyers: BUYER_SUBS })[ex[1]].indexOf(ex[2]) >= 0 ? ex[2] : '' };
   if (h.startsWith('a/')) {
@@ -3229,6 +3302,7 @@ async function hardRefresh() {
   loadLevels._done = false; resetBoard(); S.assess = null; S.course = null; S.spine = null;
   LOAD_ERR.assess = LOAD_ERR.course = LOAD_ERR.spine = '';
   S.callLogs = {};   // cached per athlete for the page's life: a failed read stuck as "No call logs yet"
+  S.actAth = {}; S.actAll = null; S.actErr = { one: '', all: '' }; LOAD_ERR.activity = '';   // court time is read again (the file's grid, Athletes -> Habits)
   S.game = {}; S.gameOff = false;   // their game lines (stage96) are read again when a file is opened
   try { await loadAll(); } catch (e) { $('content').innerHTML = `<p class="empty">Could not load: ${esc(e.message)}</p>`; return; }
   render();
@@ -4867,21 +4941,51 @@ window.setRosterFilter = setRosterFilter;
 
 // Why this person is in front of you, in plain words: reasonsOf(), the one rule (above).
 function rosterReasons(a) { return a.reasons || []; }
+// Tidy up (2026-11-23; Amir): the people on the roster who have not finished a session in 28 days, one fold above the table. Paused and Former are the SAME
+// save the File's Status panel sends (setAthleteStatus, so the same refusals and the same refetch); Keep active only hides them here for 28 days on this device.
+const TIDY_DAYS = 28;
+let _tidyOpen = false;   // the fold stays as the coach left it across a redraw
+function tidyKeepRead() { try { const o = JSON.parse(localStorage.getItem('coach.tidyKeep') || '{}'); return o && typeof o === 'object' && !Array.isArray(o) ? o : {}; } catch (e) { return {}; } }
+function tidyKeepActive(id) { try { localStorage.setItem('coach.tidyKeep', JSON.stringify(Object.assign(tidyKeepRead(), { [id]: todayKey() }))); } catch (e) { /* no storage: nothing is hidden */ } renderAthletes(); }
+window.tidyKeepActive = tidyKeepActive;
+function tidyCandidates() {
+  const t = todayKey(), kept = tidyKeepRead();
+  return Object.values(S.ath || {}).filter(a => !SYSTEM_IDS.includes(a.id) && a.id !== AMIR_ATHLETE_ID && a.tier === 'coached' && S.programs && S.programs[a.id]
+      && a.status === 'active' && (!a.lastSession || daysBetween(a.lastSession, t) > TIDY_DAYS)
+      && !(typeof kept[a.id] === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(kept[a.id]) && daysBetween(kept[a.id], t) < TIDY_DAYS))
+    .sort((x, y) => (x.lastSession ? 0 : 1) - (y.lastSession ? 0 : 1) || String(x.lastSession || '').localeCompare(String(y.lastSession || '')) || x.name.localeCompare(y.name));
+}
+function tidyFoldHtml() {
+  const list = tidyCandidates();
+  if (!list.length) return '';
+  const t = todayKey();
+  const row = a => {
+    const c = a.cycle && a.cycle.end ? ` · cycle ${daysBetween(t, a.cycle.end) < 0 ? 'ended' : 'ends'} ${esc(dayMonth(a.cycle.end))}` : '';
+    const line = a.lastSession ? `last session ${esc(prettyDate(a.lastSession))} · ${tierText(a)}` : `never trained · ${tierText(a)}`;
+    return `<div class="tidyrow" data-tidy="${esc(a.id)}">${avaHtml('pface', a.id, a.name)}
+      <span class="t-who"><a class="t-nm" href="#a/${encodeURIComponent(a.id)}">${esc(a.name)}</a><span class="muted t-sm">${line}${c}</span></span>
+      <span class="acts"><button class="btn sm" onclick="setAthleteStatus(${jsq(a.id)}, 'paused')">Paused</button><button class="btn sm" onclick="setAthleteStatus(${jsq(a.id)}, 'former')">Former</button><button class="btn sm quiet" onclick="tidyKeepActive(${jsq(a.id)})">Keep active</button></span>
+    </div>`;
+  };
+  return `<details class="tidy" id="tidyFold"${_tidyOpen ? ' open' : ''} ontoggle="_tidyOpen=this.open"><summary>${list.length} ${list.length === 1 ? "hasn't" : "haven't"} trained in 4 weeks <span class="muted">· tidy up</span></summary><div class="tidy-rows">${list.map(row).join('')}</div></details>`;
+}
 function renderAthletes() {
+  _rView = route().sub === 'habits' ? 'habits' : 'training';   // the address says which view; the switch only changes the address
   const list = Object.values(S.ath);
   const counts = {};
   R_FILTERS.forEach(f => counts[f.id] = list.filter(f.test).length);
   $('content').innerHTML = `
     <div class="controls">
       <input type="search" id="searchBox" aria-label="Search the roster" placeholder="Search name, id, board name, email…" oninput="_rSearch=this.value;renderRoster()" value="${esc(_rSearch)}">
-      <select id="sortSel" aria-label="Sort the roster" onchange="_rSort=this.value;renderRoster()">
+      ${_rView === 'habits' ? '' : `<select id="sortSel" aria-label="Sort the roster" onchange="_rSort=this.value;renderRoster()">
         <option value="attention"${_rSort === 'attention' ? ' selected' : ''}>Sort: needs attention</option>
         <option value="recent"${_rSort === 'recent' ? ' selected' : ''}>Sort: recently active</option>
         <option value="name"${_rSort === 'name' ? ' selected' : ''}>Sort: name</option>
-      </select>
+      </select>`}
     </div>
-    <div class="controls rfilters">${R_FILTERS.filter(f => counts[f.id] > 0 || ['all', 'needs'].includes(f.id) || f.id === _rFilter).map(f =>
+    <div class="controls rfilters">${rosterViewSwitchHtml()}${R_FILTERS.filter(f => counts[f.id] > 0 || ['all', 'needs'].includes(f.id) || f.id === _rFilter).map(f =>
       `<button class="rf ${_rFilter === f.id ? 'on' : ''}" onclick="setRosterFilter('${f.id}')">${f.label}<span class="c">${counts[f.id]}</span></button>`).join('')}</div>
+    ${tidyFoldHtml()}
     <div class="roster" id="rosterBox"></div>
     <p class="empty" style="margin-top:12px">${counts.all} people${counts.paused ? ` (${counts.paused} paused)` : ''}${counts.former ? ` · ${counts.former} former, not counted` : ''}.${S.ath.demo ? ' The public demo is not counted: <a href="#a/demo">open it</a>.' : ''}</p>`;
   renderRoster();
@@ -4919,6 +5023,7 @@ function rosterCycleHtml(a) {
   return `<b>C${n}</b><span class="muted"> · wk ${w.wk}/${w.total} · </span>${warn ? `<span class="warn">${end}</span>` : `<span class="muted">${end}</span>`}`;
 }
 function renderRoster() {
+  if (_rView === 'habits') { renderHabitsView(); return; }
   const q = normQ(_rSearch);
   const sort = _rSort || 'attention';
   const filt = R_FILTERS.find(f => f.id === _rFilter) || R_FILTERS[0];
@@ -4987,6 +5092,294 @@ function renderRoster() {
     `<p class="empty">${q ? `No one matches “${esc(q)}” here.` : `Nobody in ${esc(filt.label)} right now.`}</p>`;
 }
 window.renderRoster = renderRoster;
+
+// ── Habits and court time, in the coach's file and across everyone (2026-11-23; Amir picked direction A, "The Grid") ─────────────────────────────
+// What a habit IS and when it is MET is the engine's, assets/js/habits-core.js, the file the athlete's app loads: nothing here retypes it (a second copy is how the
+// coach and the athlete end up disagreeing). The engine holds one athlete at a time, so every draw binds it to one athlete, asks, and binds the next. Court time is
+// public.activity_log (the coach may read it), read once per athlete when the file opens and once for everyone when Athletes -> Habits first opens; both are cached
+// for the page's life and read again by ↻ Refresh. A read that fails is named in the banner (LOAD_ERR.activity) and is never drawn as "no court time".
+// Steps are the number that COUNTS, as the athlete sees it: what they typed plus the Court Log's step credit (stage121, moveCreditOfC), and court time also has its own row.
+const HAB_SPAN = 14;
+const HAB_CORE4 = ['sleep', 'steps', 'fuel', 'water'];   // Athletes -> Habits: the four count habits that get a column
+const HAB_COLS = { sleep: 'Sleep', steps: 'Steps', fuel: 'Protein', water: 'Water' };
+let _rView = 'training', _hSort = 'sleep', _actAllBusy = false;
+function habEngine() {
+  const H = window.AAHabits;
+  if (H && H.bind) { if (LOAD_ERR.habits) LOAD_ERR.habits = ''; return H; }
+  return null;
+}
+// The engine is a deferred script: it can arrive after the first draw (the demo draws at once), so a draw that found it missing is done again when it comes.
+window.habEngineReady = function () { if (S.ready) render(); };
+window.habEngineFailed = function () { LOAD_ERR.habits = 'the script did not load'; if (S.ready) render(); };
+// A COPY of what the athlete's app does in program.html habLoad(): `on` merges per key over the defaults, never wholesale (a habit added to the catalogue later must
+// arrive OFF). scripts/check_twins.js runs habLoad() and this on the same configs; change one, change the other.
+function habCfgOfC(H, raw) {
+  let cfg = H.defaultCfg();
+  if (raw && typeof raw === 'object' && !Array.isArray(raw)) { cfg = Object.assign(cfg, raw); cfg.on = Object.assign(H.defaultCfg().on, raw.on || {}); }
+  return cfg;
+}
+// A COPY of program.html's Steps credit (stage121, "Move credit"): Steps for a day is what the athlete typed PLUS this, so it is the number that counts.
+// One activity = round(minutes x MET / 3.5) x 100 steps, a day's credit capped at 70% of the Steps target, only from MOVE_FROM_C. The server's copy is
+// public.activity_met() / move_steps_credit(); scripts/check_twins.js holds all three equal. (activity_log rows say `minutes`, the phone's copy `mins`.)
+const MOVE_MET_C = {
+  tennis: [5.0, 6.8, 8.0], match: [6.8, 8.0, 8.5], padel: [5.0, 6.0, 7.0], beach_tennis: [5.0, 6.0, 7.5], pickleball: [4.0, 4.5, 6.0],
+  squash: [6.0, 7.3, 10.0], badminton: [5.5, 7.0, 9.0], run: [7.5, 9.3, 11.0], cycling: [4.0, 6.8, 10.0], swim: [5.8, 8.0, 9.8],
+  football: [5.0, 7.0, 9.5], gym: [3.5, 5.0, 6.0], other: [3.5, 5.0, 7.5]
+};
+const MOVE_FROM_C = '2026-11-22', MOVE_CAP_C = 0.7;
+function moveMetC(kind, effort) { const r = MOVE_MET_C[kind], i = ['easy', 'normal', 'hard'].indexOf(effort); return r && i >= 0 ? r[i] : 0; }
+function moveCreditOfC(acts, target) {
+  const raw = (acts || []).reduce((n, a) => n + Math.round((Number(a.minutes) || 0) * moveMetC(a.kind, a.effort) / 3.5) * 100, 0);
+  return { steps: Math.min(raw, Math.round((Number(target) || 10000) * MOVE_CAP_C)), raw: raw };
+}
+// Your Number (stage125): an athlete's own Steps target, one row per change (athlete_id, from_day, steps), read once with the lists. A day's target is the
+// last row from that day or before, else everyone's (the engine's). Steps on that day is met at THEIR number, and the activity credit is capped at 70% of
+// it, exactly as program.html stepsScored() and the server's hab_log_credited() score it (met there means (typed + credit) x global / target >= global).
+async function loadStepsTgtC() {
+  if (DEMO) { S.stepsTgt = {}; LOAD_ERR.stepsTgt = ''; return; }
+  const r = await selectAll('steps_targets', 'athlete_id, from_day, steps', ['athlete_id', 'from_day']);
+  const missing = r.error && (/^(42P01|PGRST205)$/.test(String(r.error.code || '')) || /does not exist|Could not find the table/i.test(r.error.message || ''));
+  LOAD_ERR.stepsTgt = r.error && !missing ? (r.error.message || 'no answer') : r.short ? `only ${r.data.length} of ${r.total} came back` : '';
+  if (r.error && !missing) return;   // keep what was read before; the banner says why
+  const by = {};
+  (r.data || []).forEach(x => { (by[x.athlete_id] = by[x.athlete_id] || []).push({ from: String(x.from_day), steps: Number(x.steps) }); });
+  Object.values(by).forEach(l => l.sort((a, b) => a.from.localeCompare(b.from)));
+  S.stepsTgt = by;
+}
+function stepsTargetOnC(id, d, global) {
+  const l = (S.stepsTgt || {})[id];
+  let t = global;
+  if (l) l.forEach(x => { if (x.from <= d && x.steps > 0) t = x.steps; });
+  return t;
+}
+let _habWho = null;   // the athlete the engine is bound to (habBind): their own Steps target
+const habTgtC = (h, d) => h.id === 'steps' && _habWho ? stepsTargetOnC(_habWho, d, h.target) : h.target;
+// The number that COUNTS for a habit on a day, as the athlete sees it: typed, and for Steps plus the day's activity credit (`by`: day -> activity rows;
+// null when the court time did not load, then the typed number stands and the banner says why).
+function habValC(H, h, d, by) {
+  const v = H.valOf(d, h.id);
+  return h.id === 'steps' && by && by[d] && d >= MOVE_FROM_C ? v + moveCreditOfC(by[d], habTgtC(h, d)).steps : v;
+}
+const habDoneC = (H, h, d, by) => h.id === 'steps' ? habValC(H, h, d, by) >= habTgtC(h, d) : H.isDone(h, d);
+// "2,000 walked + 7,000 from Tennis" (program.html's own line); '' on a day with no credit.
+function habStepsTitleC(H, h, d, by) {
+  if (h.id !== 'steps' || !by || !by[d] || d < MOVE_FROM_C) return '';
+  const c = moveCreditOfC(by[d], habTgtC(h, d)).steps;
+  if (c <= 0) return '';
+  const kinds = [...new Set(by[d].map(r => r.kind))];
+  const from = kinds.length === 1 ? (ACT_WORD_C[kinds[0]] || 'Activity') : 'your activity';
+  const raw = H.valOf(d, h.id);
+  return raw > 0 ? `${H.fmtVal(h, raw)} walked + ${H.fmtVal(h, c)} from ${from}` : `+${H.fmtVal(h, c)} from ${from}`;
+}
+// Bind the engine to one athlete: their config merged over the defaults (habCfgOfC), their log, today.
+function habBind(H, a) {
+  const cfg = habCfgOfC(H, jparse(a.blob && a.blob[a.id + '_hab_cfg']));
+  const lg = jparse(a.blob && a.blob[a.id + '_hab_log']);
+  const log = lg && typeof lg === 'object' && !Array.isArray(lg) ? lg : {};
+  H.bind(cfg, log, { day: null });
+  H.anchorRoster();
+  _habWho = a.id;
+  return { cfg, log };
+}
+// For each day, the ids of the habits that existed THAT day (a habit switched on midweek did not exist on Monday: no box, not a miss).
+function habOnSets(H, days) {
+  const on = {};
+  days.forEach(d => { on[d] = new Set(H.rosterOn(d).map(x => x.id)); });
+  return on;
+}
+// One habit over some days: how many days it existed, how many it was met on, the average of the days it was logged, and a state for each day.
+function habStat(H, h, days, onSet, by) {
+  let n = 0, met = 0, sum = 0, logged = 0;
+  const st = [];
+  days.forEach(d => {
+    if (!onSet[d].has(h.id)) { st.push('x'); return; }
+    n++;
+    const v = habValC(H, h, d, by);
+    if (habDoneC(H, h, d, by)) { met++; st.push('met'); } else st.push(v > 0 ? 'under' : 'none');
+    if (v > 0) { sum += v; logged++; }
+  });
+  return { n, met, logged, avg: logged ? sum / logged : null, st };
+}
+// A value in a cell: 10k, 7.5k, 6.5, 3, ✓.
+function habShort(h, v) {
+  if (h.kind === 'check') return '✓';
+  if (h.unit === 'steps') return (Math.round(v / 100) / 10) + 'k';
+  return h.dec ? String(Math.round(v * 10) / 10) : String(Math.round(v));
+}
+// An average: 6.6 h, 10k, 2.7.
+function habAvgText(h, v) {
+  if (v == null) return '—';
+  if (h.unit === 'steps') return (Math.round(v / 100) / 10) + 'k';
+  const x = Math.round(v * 10) / 10;
+  return h.unit === 'hours' ? x + ' h' : String(x);
+}
+// A habit met on fewer than three of the days it existed (or on fewer than it had, when it had fewer than three) is the one that asks something of you.
+const habLow = s => s.n > 0 && s.met < Math.min(3, s.n);
+function habMins(m) {
+  m = Math.round(m);
+  if (m < 60) return m + ' min';
+  return Math.floor(m / 60) + ' h' + (m % 60 ? ' ' + (m % 60) : '');
+}
+const actDay = r => String(r.day).slice(0, 10);
+function actTitle(rows) {
+  return rows.map(r => `${ACT_WORD_C[r.kind] || 'Other'} ${Math.round(Number(r.minutes) || 0)} min${r.effort ? ' · ' + r.effort : ''}`).join('; ');
+}
+function actErrPaint() { LOAD_ERR.activity = S.actErr.one || S.actErr.all || ''; }
+// One athlete's court time over the last 14 days; null when the read failed (the banner says so).
+const _actIn = {};
+function activityOf(id) {
+  if (DEMO) return Promise.resolve((S.demoAct || []).filter(r => r.athlete_id === id));
+  if (S.actAth[id]) return Promise.resolve(S.actAth[id]);
+  if (!_actIn[id]) _actIn[id] = activityRead(id).finally(() => { delete _actIn[id]; });   // two draws asking at once share one read
+  return _actIn[id];
+}
+async function activityRead(id) {
+  let r;
+  try { r = await selectAll('activity_log', 'id,athlete_id,day,kind,minutes,effort', null, q => q.eq('athlete_id', id).gte('day', addDays(todayKey(), -(HAB_SPAN - 1)))); }
+  catch (e) { r = { data: null, error: e }; }
+  if (r.error || r.short) {
+    S.actErr.one = r.error ? (r.error.message || 'no answer') : `only ${r.data.length} of ${r.total} entries came back`;
+    actErrPaint();
+    return null;
+  }
+  S.actErr.one = ''; actErrPaint();
+  return (S.actAth[id] = r.data || []);
+}
+// Everyone's court time over the last 7 days, once, the first time Athletes -> Habits opens.
+async function loadActAll() {
+  if (DEMO || S.actAll || _actAllBusy || S.actErr.all) return;
+  _actAllBusy = true;
+  let r;
+  try { r = await selectAll('activity_log', 'id,athlete_id,day,kind,minutes,effort', null, q => q.gte('day', addDays(todayKey(), -6))); }
+  catch (e) { r = { data: null, error: e }; }
+  _actAllBusy = false;
+  if (r.error || r.short) S.actErr.all = r.error ? (r.error.message || 'no answer') : `only ${r.data.length} of ${r.total} entries came back`;
+  else { S.actErr.all = ''; S.actAll = r.data || []; }
+  actErrPaint();
+  const rt = route();
+  if (rt.view === 'athletes' && rt.sub === 'habits' && $('rosterBox')) renderRoster();
+}
+// ── In the file: the grid under Five weeks ──
+function habGridPanelC(D) {
+  const H = habEngine();
+  if (!H || !D.a) return '';
+  const t = todayKey();
+  const days = Array.from({ length: HAB_SPAN }, (_, i) => addDays(t, i - (HAB_SPAN - 1)));
+  const { log } = habBind(H, D.a);
+  const hasLog = d => { const e = log[d]; return !!e && typeof e === 'object' && Object.keys(e).length > 0; };
+  const acts = Array.isArray(D.act) ? D.act : null;   // null: the read failed, the banner says so, and no Court row is drawn
+  const byDay = {};
+  (acts || []).forEach(r => { const d = actDay(r); if (d >= days[0] && d <= t) (byDay[d] = byDay[d] || []).push(r); });
+  const haveCourt = days.some(d => byDay[d]);
+  if (!days.some(hasLog) && !haveCourt) return '';
+  const onSet = habOnSets(H, days);
+  const hs = H.all().filter(h => days.some(d => onSet[d].has(h.id)));
+  const d7 = days.slice(-7);
+  const head = '<th class="hg-l" scope="col"></th>' + days.map(d => {
+    const q = pDate(d);
+    return `<th class="hg-d${d === t ? ' today' : ''}" scope="col" title="${esc(dayMonth(d))}">${'SMTWTFS'[q.getDay()]}</th>`;
+  }).join('') + '<th class="hg-s" scope="col"></th>';
+  const courtRow = haveCourt ? (() => {
+    let week = 0;
+    const cells = days.map(d => {
+      const es = byDay[d];
+      if (!es) return '<td class="hg-c court x"></td>';
+      const mins = es.reduce((n, r) => n + (Number(r.minutes) || 0), 0);
+      if (d7.indexOf(d) >= 0) week += mins;
+      return `<td class="hg-c court${es.some(r => r.effort === 'hard') ? ' hard' : ''}" title="${esc(actTitle(es))}">${Math.round(mins)}</td>`;
+    }).join('');
+    return `<tr><th class="hg-l" scope="row"><span class="e">🎾</span><span>Court</span></th>${cells}<td class="hg-s">${week ? esc(habMins(week)) + ' this week' : '—'}</td></tr>`;
+  })() : '';
+  const rows = hs.map(h => {
+    const st = habStat(H, h, d7, onSet, acts && byDay);
+    const cells = days.map(d => {
+      if (!onSet[d].has(h.id)) return '<td class="hg-c x"></td>';
+      const v = habValC(H, h, d, acts && byDay);
+      const cls = habDoneC(H, h, d, acts && byDay) ? ' met' : v > 0 ? ' under' : '';
+      const tip = `${dayMonth(d)}: ${habStepsTitleC(H, h, d, acts && byDay) || (v > 0 ? H.fmtVal(h, v) + (h.kind === 'check' ? '' : ' ' + h.unit) : 'nothing logged')}`;
+      return `<td class="hg-c${cls}" title="${esc(tip)}">${v > 0 ? esc(habShort(h, v)) : ''}</td>`;
+    }).join('');
+    // Session counts sessions and is never clay: 3 a week is a good week, not "3 of 7" (the plan's own count is on the metric strip).
+    const isSess = h.id === 'strength';
+    const sum = !st.n ? '' : isSess ? `${st.met} session${st.met === 1 ? '' : 's'}` : h.kind === 'check' ? `${st.met} of ${st.n}` : `${habAvgText(h, st.avg)} · ${st.met}/${st.n}`;
+    const em = H.splitEmoji(h.name)[0], nm = H.splitEmoji(H.shortName(h))[1];
+    return `<tr><th class="hg-l" scope="row">${em ? `<span class="e">${esc(em)}</span>` : ''}<span${h.core ? '' : ' dir="auto"'}>${esc(nm)}</span></th>${cells}<td class="hg-s${!isSess && habLow(st) ? ' tone-clay' : ''}">${esc(sum)}</td></tr>`;
+  }).join('');
+  return `<section class="panel" id="habGrid">
+    <div class="phead"><span class="t hd">Habits and court · last 14 days</span><span class="r">7-day average</span></div>
+    <div class="hg-wrap"><table class="hg"><thead><tr>${head}</tr></thead><tbody>${courtRow}${rows}</tbody></table></div>
+    <p class="hg-k"><span class="hg-sw met"></span>met <span class="hg-sw under"></span>logged, under <span class="hg-sw"></span>not logged <span class="hg-sw court"></span>court minutes (dark = hard)</p>
+  </section>`;
+}
+// ── Across everyone: Athletes -> Habits ──
+function setRosterView(v) { location.hash = v === 'habits' ? 'athletes/habits' : 'athletes'; }
+window.setRosterView = setRosterView;
+function setHabSort(k) { _hSort = k; renderRoster(); }
+window.setHabSort = setHabSort;
+function rosterViewSwitchHtml() {
+  const b = (v, label) => `<button type="button" class="seg${_rView === v ? ' active' : ''}" aria-pressed="${_rView === v ? 'true' : 'false'}" onclick="setRosterView('${v}')">${label}</button>`;
+  return `<span class="segs" role="group" aria-label="What the roster shows">${b('training', 'Training')}${b('habits', 'Habits')}</span>`;
+}
+// One athlete over the last 7 days: the four count habits, every other habit as met/possible, the court minutes, and whether they logged anything at all.
+function habWeek(H, a, days, acts, courtOk) {
+  const { log } = habBind(H, a);
+  const by = {};
+  if (courtOk) acts.forEach(r => { (by[actDay(r)] = by[actDay(r)] || []).push(r); });   // null when the court time did not load: Steps stay as typed
+  const onSet = habOnSets(H, days);
+  const core = {};
+  HAB_CORE4.forEach(id => { core[id] = habStat(H, H.byId(id), days, onSet, courtOk ? by : null); });
+  let met = 0, poss = 0;
+  // Session is left out: it is a check against every day, so 3 sessions a week reads as 3/7 and would sink everyone (the Training view has the sessions).
+  H.all().filter(h => HAB_CORE4.indexOf(h.id) < 0 && h.id !== 'strength').forEach(h => { const s = habStat(H, h, days, onSet, null); met += s.met; poss += s.n; });
+  const court = acts.reduce((n, r) => n + (Number(r.minutes) || 0), 0);
+  const any = court > 0 || days.some(d => { const e = log[d]; return !!e && typeof e === 'object' && Object.keys(e).some(k => Number(e[k]) > 0); });
+  return { a, core, met, poss, court, any };
+}
+function habSortVal(w, k) {
+  if (k === 'name') return w.a.name.toLowerCase();
+  if (k === 'court') return -w.court;                                    // highest first
+  if (k === 'other') return w.poss ? w.met / w.poss : Infinity;
+  const s = w.core[k];
+  return !s.n ? Infinity : s.avg == null ? -1 : s.avg;                  // lowest first; nothing logged is the lowest, a habit that is off goes last
+}
+function renderHabitsView() {
+  const box = $('rosterBox');
+  if (!box) return;
+  const H = habEngine();
+  if (!H) { box.innerHTML = '<p class="empty">The habit engine did not load, so the habits cannot be drawn. Tap ↻ Try again at the top of the page.</p>'; return; }
+  if (!DEMO && !S.actAll && !S.actErr.all) { box.innerHTML = '<div class="loading"><div class="spinner"></div>Reading court time…</div>'; loadActAll(); return; }
+  const courtOk = DEMO || !!S.actAll;
+  const t = todayKey();
+  const days = Array.from({ length: 7 }, (_, i) => addDays(t, i - 6));
+  const by = {};
+  (DEMO ? S.demoAct || [] : S.actAll || []).forEach(r => { const d = actDay(r); if (d >= days[0] && d <= t) (by[r.athlete_id] = by[r.athlete_id] || []).push(r); });
+  const q = normQ(_rSearch);
+  const filt = R_FILTERS.find(f => f.id === _rFilter) || R_FILTERS[0];
+  const people = Object.values(S.ath).filter(filt.test).filter(a => !q || rosterHay(a).includes(q));
+  const rows = [], quiet = [];
+  people.forEach(a => { const w = habWeek(H, a, days, by[a.id] || [], courtOk); (w.any ? rows : quiet).push(w); });
+  rows.sort((x, y) => {
+    const u = habSortVal(x, _hSort), v = habSortVal(y, _hSort);
+    return (typeof u === 'string' ? u.localeCompare(v) : u === v ? 0 : u < v ? -1 : 1) || x.a.name.localeCompare(y.a.name);
+  });
+  const th = (k, label) => `<th scope="col" aria-sort="${_hSort === k ? 'ascending' : 'none'}"><button type="button" class="hv-sort${_hSort === k ? ' on' : ''}" onclick="setHabSort('${k}')">${label}</button></th>`;
+  const coreCell = (w, id) => {
+    const s = w.core[id], h = H.byId(id);
+    if (!s.n) return '<td class="hv-m"><span class="muted">—</span></td>';
+    const tip = `${HAB_COLS[id]}: logged on ${s.logged} of ${s.n} days, met on ${s.met}`;
+    return `<td class="hv-m" title="${esc(tip)}"><span class="v${habLow(s) ? ' tone-clay' : ''}">${esc(habAvgText(h, s.avg))}</span><span class="hv-strip" aria-hidden="true">${s.st.map(x => `<i class="${x}"></i>`).join('')}</span></td>`;
+  };
+  const body = rows.map(w => `<tr onclick="location.hash=${jsq('a/' + encodeURIComponent(w.a.id))}">
+      <td class="hv-n"><a href="#a/${encodeURIComponent(w.a.id)}">${avaHtml('ava', w.a.id, w.a.name)}<span>${esc(w.a.name)}</span></a></td>
+      ${HAB_CORE4.map(id => coreCell(w, id)).join('')}
+      <td class="hv-m">${w.poss ? `${w.met}/${w.poss}` : '<span class="muted">—</span>'}</td>
+      <td class="hv-m">${!courtOk ? '<span class="muted" title="The court time did not load">n/a</span>' : w.court ? esc(habMins(w.court)) : '<span class="muted">—</span>'}</td>
+    </tr>`).join('');
+  const table = rows.length ? `<div class="hv-wrap hv-box"><table class="hv"><thead><tr>${th('name', 'Athlete')}${HAB_CORE4.map(id => th(id, HAB_COLS[id])).join('')}${th('other', 'Other habits')}${th('court', 'Court')}</tr></thead><tbody>${body}</tbody></table></div>`
+    : `<p class="empty">${people.length ? 'No one logged a habit or court time in the last 7 days.' : q ? `No one matches “${esc(q)}” here.` : `Nobody in ${esc(filt.label)} right now.`}</p>`;
+  const fold = quiet.length ? `<details class="hv-quiet"><summary>${quiet.length}${rows.length ? ' more' : ''} logged nothing in 7 days</summary><p>${quiet.map(w => `<a href="#a/${encodeURIComponent(w.a.id)}">${esc(w.a.name)}</a>`).join(' · ')}</p></details>` : '';
+  box.innerHTML = table + fold;
+}
 
 window.copyText = copyText;
 
@@ -6194,6 +6587,7 @@ function workTabHtml(D) {
   return `${logsWarn}
     ${metricStripHtml(metrics)}
     ${fiveWeeksPanelC(D)}
+    ${habGridPanelC(D)}
     ${maxesPanel(D)}
     ${weightPanel(D.a)}
     ${cards.length ? cards.join('') : `<p class="empty">${D.a.tier === 'coached' || S.progSrc[athleteId] !== 'db'
@@ -6269,6 +6663,7 @@ async function setStepsTargetC(id, steps, el) {
     const r = await sb.rpc('coach_set_steps_target', { p_athlete_id: id, p_steps: steps });
     if (!r || r.error) throw (r && r.error) || new Error('no answer');
     _stC[id] = { stamp: S.stamp, data: r.data, err: '' };
+    await loadStepsTgtC();   // the habit grid and Athletes -> Habits read their number from here
     if (_D && _D.athleteId === id) { _D.st = _stC[id]; renderDetailBody(); }
     toast('Steps target set: ' + steps.toLocaleString('en-US') + ' from today.');
   } catch (e) {
@@ -6582,7 +6977,7 @@ async function renderDetail(athleteId, sub) {
     const lib = await exLib();
     // Their sessions' text and log (the boot read only the numbers). A failure is kept on the file and said on the
     // work tab, never drawn as days nobody logged. Five weeks (#124) is read beside it, from the athlete's own reader.
-    const [full, fw, st] = await Promise.all([ensureSessionsFull(athleteId), fiveWeeksC(athleteId), stepsTargetsC(athleteId)]);
+    const [full, fw, act, st] = await Promise.all([ensureSessionsFull(athleteId), fiveWeeksC(athleteId), activityOf(athleteId), stepsTargetsC(athleteId)]);
     const now = route();
     if (req !== _detailReq || now.view !== 'detail' || now.id !== athleteId) return;
     // The awaits above can span a reload of the store (assemble() builds new athlete objects): draw the current one.
@@ -6596,6 +6991,7 @@ async function renderDetail(athleteId, sub) {
       lib,
       logsErr: full.ok ? '' : full.error,
       fw,
+      act,
       st,
       metrics: athleteMetrics(history, planDaysC(program).length, optionalDayIdsC(program)),
       stamp: S.stamp,
@@ -9767,6 +10163,8 @@ let _spineQ = '';           // the search box: matches across drafts and approve
 let _spineBase = null;      // { id, state }: the open editor as it was drawn from the server copy
 let _spineDraft = null;     // { id, edits }: only the fields the coach changed, carried across redraws
 let _qualDraft = {};        // 'id:field' -> typed text in the ten qualities, carried across redraws
+let _nvDraft = {};          // entry id -> the link typed in Coverage's No video yet, carried across redraws
+let _nvCardioOpen = false;  // the folded Cardio list in No video yet
 let _spListReset = false;   // the next drawing starts the list at the top (a new search or filter)
 let _spEdShown = null;      // the entry whose editor the last drawing showed, so a different one starts at the top
 let _spListY = null;        // a phone: where the page was when an entry opened over the list
@@ -10245,6 +10643,41 @@ function spineUndoProblem(id, cur, changes) {
   return '';
 }
 
+// No video yet (Coverage, 2026-11-23): one link for one entry. It goes through the same guarded coach_save_spine() the editor uses, with ONLY the video
+// column and the video this page read as its snapshot, so a link someone else pasted meanwhile is a refusal, never overwritten.
+async function noVideoSave(id) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if (!S.spine || S.spine.failed) { fail('The Spine did not load, so nothing can be saved. Tap ↻ Refresh first.'); return; }
+  const cur = S.spine.list.find(e => e.id === id);
+  if (!cur) { fail('This entry is not in the list any more. Refresh.'); return; }
+  const url = String(_nvDraft[id] || '').trim();
+  if (!/^https?:\/\/\S+$/i.test(url)) { fail('That is not a link: it must start with https://'); return; }
+  const nm0 = cur.name;
+  const res = await sb.rpc('coach_save_spine', { p_id: id, p_entry: { video: url }, p_entry_snap: { video: cur.video === undefined ? null : cur.video }, p_coach: {}, p_coach_snap: {} });
+  spineHistStale();
+  if (res.error) {
+    const m = res.error.message || '';
+    fail(!res.error.code
+      ? `The answer never arrived (${m || 'no reply'}), so the page cannot tell whether ${nm0}'s video was saved.\n\nTap ↻ Refresh and look before saving again; the link you typed is still in the box.`
+      : `Could not save the video for ${nm0}: ` + (/Could not find the function|PGRST202/i.test(m + (res.error.code || '')) ? 'the server does not have coach_save_spine yet (supabase/stage48_coach_one_transaction.sql has not been applied).'
+        : /coach only|permission denied|JWT/i.test(m) ? 'your sign-in may have lapsed. Refresh, sign in again if asked, and redo it.' : m)
+        + '\n\nNothing was saved; the link you typed is still in the box.');
+    return;
+  }
+  const out = res.data || {};
+  if (out.ok === false) {
+    const live = out.entry && out.entry.live ? out.entry.live : {};
+    if (out.entry && out.entry.live) Object.assign(cur, out.entry.live); delete _nvDraft[id];
+    fail(`Since you opened this list, someone else (Claude's /spine, or this page in another tab) changed ${nm0}'s Video: now "${spineShort(live.video)}".\n\nNothing was saved, and the entry now shows their link. To put yours over theirs, open it under Entries.`);
+    renderExercises();
+    return;
+  }
+  Object.assign(cur, out.entry && typeof out.entry === 'object' ? out.entry : {}, { video: url });
+  delete _nvDraft[id];
+  toast('Video saved: ' + nm0);
+  renderExercises();
+}
+window.noVideoSave = noVideoSave;
 async function spineSave(id, approve) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   if (!S.spine || S.spine.failed) { fail('The Spine did not load, so nothing can be saved. Tap ↻ Refresh first.'); return; }
@@ -10609,8 +11042,10 @@ function renderExercises() {
   const filter = _spineFilter || (drafts.length ? 'draft' : withDraft.length ? 'claude' : 'approved');
   const q = normQ(_spineQ);
   const hay = e => normQ([e.name, e.id, e.pattern].concat(e.aliases || [], e.equipment || []).join(' '));
-  const shown = q ? list.filter(e => hay(e).includes(q)) : filter === 'approved' ? approved : filter === 'claude' ? withDraft : drafts;
   const nAth = id => Object.keys((who[id] || {}).athletes || {}).length;
+  // Approved entries a live card uses and no video yet (a phone plays only an approved entry's video). Most athletes first, then by name.
+  const noVid = approved.filter(e => !String(e.video || '').trim() && nAth(e.id) > 0).sort((a, b) => nAth(b.id) - nAth(a.id) || a.name.localeCompare(b.name));
+  const shown = q ? list.filter(e => hay(e).includes(q)) : filter === 'approved' ? approved : filter === 'claude' ? withDraft : filter === 'novideo' ? noVid : drafts;
   const nLive = Object.entries(S.programs || {}).filter(([k, v]) => v && !SYSTEM_IDS.includes(k) && v.workouts && (v.workouts.days || []).length).length;
   const lbl = t => `<div class="exlbl">${t}</div>`;
   // A stored value the lists below do not know is shown and kept, never silently dropped on save.
@@ -10748,6 +11183,15 @@ function renderExercises() {
       howFold('cov-how', [`${approved.length} approved · ${drafts.length} draft${drafts.length === 1 ? '' : 's'} waiting for you${
         withDraft.length ? ` · <b class="t-clay">${withDraft.length} with Claude’s draft to read</b>` : ''} · ${noSteps} approved with no How to do it. ${counted}${
         differ.length ? ` <b class="t-clay">${differ.length} card name${differ.length === 1 ? '' : 's'} show${differ.length === 1 ? 's' : ''} something else on a phone until the draft is approved</b> (listed below).` : ''}`]) + `</section>`;
+    const nvRow = e => `<div class="credrow nv-row" data-nv="${esc(e.id)}"><span class="nv-id"><span class="credname">${esc(e.name)}</span><span class="muted t-sm">${plural(nAth(e.id), 'athlete', 'athletes')} · ${esc(e.pattern || 'no pattern')}</span></span>
+      <input class="fld nv-in" type="url" data-nvid="${esc(e.id)}" placeholder="Paste the YouTube link" aria-label="${esc('Video link for ' + e.name)}" value="${esc(_nvDraft[e.id] || '')}"
+        oninput="_nvDraft[${jsq(e.id)}]=this.value" onkeydown="if(event.key==='Enter')noVideoSave(${jsq(e.id)})">
+      <span class="acts"><button class="btn sm" onclick="noVideoSave(${jsq(e.id)})">Save</button></span></div>`;
+    const nvMain = noVid.filter(e => e.pattern !== 'conditioning'), nvCardio = noVid.filter(e => e.pattern === 'conditioning');
+    html += `<section class="panel" id="noVideo"><div class="phead"><span class="t hd">No video yet</span><span class="r">${plural(noVid.length, 'exercise', 'exercises')}</span></div>
+      <p class="psub" style="margin:0 0 8px">Approved entries a live programme uses that have no video. Paste the link and Save: only the video is written.</p>${
+      nvMain.length ? nvMain.map(nvRow).join('') : !nvCardio.length ? '<p class="empty" style="padding:0">Every exercise in use has a video.</p>' : ''}${
+      nvCardio.length ? `<details class="nv-cardio" id="nvCardio"${_nvCardioOpen ? ' open' : ''} ontoggle="_nvCardioOpen=this.open"><summary>Cardio (probably no video needed) <span class="muted">· ${nvCardio.length}</span></summary><div style="margin-top:8px">${nvCardio.map(nvRow).join('')}</div></details>` : ''}</section>`;
     if (differ.length) html += `<section class="panel"><details open><summary class="arch-toggle">Cards that show something else on a phone · ${differ.length} name${differ.length === 1 ? '' : 's'}</summary><div style="margin-top:12px">
       <p class="psub" data-hint="cov-differ" style="margin:0 0 8px">A phone is served approved entries only. Approve the draft and both agree.</p>${
       differ.slice(0, 60).map(d => `<div class="credrow"><span class="credname">${esc(d.u.name)}</span><span class="muted">${Object.keys(d.u.athletes).length} athlete${Object.keys(d.u.athletes).length === 1 ? '' : 's'} · here: ${esc((byId[d.a] || {}).name || d.a)} (${byId[d.a] && byId[d.a].status === 'approved' ? 'approved' : 'draft'}) · phone: ${d.p ? esc((phone.byId[d.p] || {}).name || d.p) : 'nothing'}</span></div>`).join('')
@@ -10762,20 +11206,20 @@ function renderExercises() {
     html += `</div>`;
   } else {
     const fbtn = (f, t) => `<button class="btn sm sp-filter${filter === f && !q ? ' primary' : ''}" data-f="${f}" aria-pressed="${filter === f && !q}">${t}</button>`;
-    const listLabel = q ? 'Matches' : filter === 'approved' ? 'Approved' : filter === 'claude' ? 'Claude’s drafts to read' : 'Waiting for you';
+    const listLabel = q ? 'Matches' : filter === 'approved' ? 'Approved' : filter === 'claude' ? 'Claude’s drafts to read' : filter === 'novideo' ? 'No video yet' : 'Waiting for you';
     const warn = [differ.length ? `${plural(differ.length, 'card name shows', 'card names show')} something else on a phone` : '', unmapped.length ? `${plural(unmapped.length, 'name', 'names')} not in the Spine` : ''].filter(Boolean).join(' · ');
     html += `<p class="sp-intro">One entry per exercise you programme. Nothing shows on a phone until it is <b>Approved</b>.</p>` +
       (warn ? `<a class="sp-warn" href="#exercises/coverage">${warn} → Coverage</a>` : '') +
       `<div class="sp-split${openE ? ' has-ed' : ''}">
       <section class="panel sp-listpane">
         <div class="sp-listhead">
-          <div class="sp-chips">${fbtn('draft', 'Drafts · ' + drafts.length)}${withDraft.length || filter === 'claude' ? fbtn('claude', 'Claude’s drafts · ' + withDraft.length) : ''}${fbtn('approved', 'Approved · ' + approved.length)}</div>
+          <div class="sp-chips">${fbtn('draft', 'Drafts · ' + drafts.length)}${withDraft.length || filter === 'claude' ? fbtn('claude', 'Claude’s drafts · ' + withDraft.length) : ''}${fbtn('approved', 'Approved · ' + approved.length)}${noVid.length || filter === 'novideo' ? fbtn('novideo', 'No video · ' + noVid.length) : ''}</div>
           <input id="spineQ" type="search" value="${esc(_spineQ)}" placeholder="Find an exercise: name, other name, pattern, equipment or id" aria-label="Find an exercise" class="fld">
           <div class="sp-count">${listLabel} · ${shown.length}</div>
         </div>
         <div class="sp-list">${shown.length ? shown.slice().sort((a, b) => nAth(b.id) - nAth(a.id) || a.name.localeCompare(b.name)).map(row).join('')
           : `<p class="empty" style="padding:12px 16px">${q ? 'No entry matches “' + esc(_spineQ) + '”.' : filter === 'draft' ? 'No drafts waiting. Ask Claude to draft the next batch.'
-            : filter === 'claude' ? 'No drafts from Claude waiting. Each one you open and Save leaves this list.' : 'Nothing approved yet: open a draft and tap Approve.'}</p>`}</div>
+            : filter === 'claude' ? 'No drafts from Claude waiting. Each one you open and Save leaves this list.' : filter === 'novideo' ? 'Every approved exercise in use has a video.' : 'Nothing approved yet: open a draft and tap Approve.'}</p>`}</div>
       </section>
       <div class="sp-edpane">${openE ? `<button class="btn sm sp-back">← All exercises</button>${editor(openE)}` : '<div class="sp-empty">Pick an exercise to edit it.</div>'}</div>
     </div>` +
@@ -11371,9 +11815,15 @@ function demoStore() {
   const d = (n) => addDays(t, -n);
   const mkLog = (pattern) => {   // pattern: array of day-offsets that have logs
     const log = {};
-    pattern.forEach(off => log[d(off)] = { train: 1, steps: 9000 + off * 500, water: 8, sleep: 7.5 });
+    pattern.forEach(off => log[d(off)] = { train: 1, steps: 9000 + off * 500, water: 8, sleep: 6 + (off % 4) * 0.5, fuel: 2 + (off % 2) });
     return log;
   };
+  // Court time for two of them (activity_log, the habit grid's Court row and Athletes -> Habits): a hard session shows dark.
+  S.demoAct = [
+    { id: 'demo-a1', athlete_id: 'demo_ana', day: d(1), kind: 'tennis', minutes: 120, effort: 'hard' },
+    { id: 'demo-a2', athlete_id: 'demo_ana', day: d(3), kind: 'padel', minutes: 60, effort: 'normal' },
+    { id: 'demo-l1', athlete_id: 'demo_lena', day: d(2), kind: 'padel', minutes: 45, effort: 'easy' },
+  ];
   // A slow, noisy 12-week weight series on the first demo athlete only —
   // weight is opt-in, so a demo where everyone has it would misrepresent what
   // this dashboard usually looks like.

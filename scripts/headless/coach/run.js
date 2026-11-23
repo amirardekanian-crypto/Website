@@ -549,6 +549,57 @@ S['version-restore'] = async (b) => {
   return r;
 };
 
+S['programs-trimmed-load'] = async (b) => {
+  const r = { id: 'programs-trimmed-load', title: 'The boot reads a trimmed programme; every write still keeps notes and programHistory', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  const cs0 = await L.calls(page);
+  const boot = cs0.filter(c => c.kind === 'from' && c.name === 'programs' && c.op === 'select');
+  check(r, 'the boot programs select names no notes / programHistory (and no bare data column)', boot.length >= 1 && boot.every(c => !/notes|programHistory|(^|,)\s*data\s*(,|$)|\*/.test(c.mods.cols)), boot.map(c => c.mods.cols));
+  const st = await page.evaluate(() => { const p = S.programs.ava_test; return { keys: Object.keys(p).sort(), trim: p._trim === true, days: p.workouts.days.length, cycles: p.cycles.length, name: p.athlete.firstName, free: Object.keys(S.programs.cara_free) }; });
+  check(r, 'S.programs[id] has athlete, cycles, workouts, currentCycleIndex and is marked trimmed', st.trim && st.keys.join() === 'athlete,currentCycleIndex,cycles,workouts' && st.days === 3 && st.cycles === 1 && st.name === 'Ava', st);
+  const sizes = await page.evaluate(async () => {
+    const len = x => JSON.stringify(x.data).length;
+    const full = await sb.from('programs').select('athlete_id, data, updated_at, updated_by');
+    const trim = await sb.from('programs').select('athlete_id, updated_at, updated_by, athlete:data->athlete, sport:data->sport, currentCycleIndex:data->currentCycleIndex, cycles:data->cycles, workouts:data->workouts');
+    return { full: len(full), trimmed: len(trim), alias: Object.keys(trim.data[0]).sort().join() };
+  });
+  check(r, 'the stub answers aliased JSON paths (alias:col->key, JSON values)', /athlete,athlete_id,currentCycleIndex,cycles,sport,updated_at,updated_by,workouts/.test(sizes.alias) && sizes.trimmed < sizes.full, sizes);
+  r.evidence = { programsResponseBytes: sizes };
+  // the File and Came in still draw the day titles
+  await L.go(page, 'a/ava_test/file');
+  await L.settle(page, 400);
+  const fileTxt = await page.locator('body').innerText();
+  check(r, 'the File draws the programme (its cycle)', /Cycle 2/i.test(fileTxt), fileTxt.slice(0, 200));
+  await L.go(page, 'today');
+  await L.settle(page, 400);
+  const came = await page.evaluate(() => (document.getElementById('cameIn') || {}).innerText || '');
+  check(r, 'Came in draws a session with its day title from the trimmed programme', /Legs First|Pull Day|Upper Push|Goblet|Ava/.test(came), came.slice(0, 300));
+  // an editor save keeps notes + programHistory byte-identical
+  await L.go(page, 'a/ava_test/work');
+  const seed = (await L.db(page)).programs.find(p => p.athlete_id === 'ava_test').data;
+  const ed = await openEditor(page, 'Goblet Squat');
+  await setField(ed, 'exSets', 5);
+  const n0 = await L.nCalls(page);
+  await ed.locator('.exed-acts button', { hasText: 'Save' }).click();
+  await L.settle(page, 600);
+  const up = lastOf(await L.callsSince(page, n0), isUpd('programs'));
+  check(r, 'the editor save writes notes and programHistory byte-identical', !!up && JSON.stringify(up.payload.data.notes) === JSON.stringify(seed.notes) && JSON.stringify(up.payload.data.programHistory) === JSON.stringify(seed.programHistory), up && Object.keys(up.payload.data));
+  // a version restore keeps them too
+  await L.go(page, 'a/ava_test/file');
+  await page.locator('details.rawlog summary', { hasText: 'Version history' }).click();
+  await page.locator('#pvlist .pvrow').first().waitFor();
+  const n1 = await L.nCalls(page);
+  await page.locator('#pvlist .pvrow').first().getByRole('button', { name: /Restore this/ }).click();
+  await L.settle(page, 800);
+  const up2 = lastOf(await L.callsSince(page, n1), isUpd('programs'));
+  check(r, 'the version restore writes notes and programHistory byte-identical', !!up2 && JSON.stringify(up2.payload.data.notes) === JSON.stringify(seed.notes) && JSON.stringify(up2.payload.data.programHistory) === JSON.stringify(seed.programHistory), up2 && Object.keys(up2.payload.data));
+  const after = (await L.db(page)).programs.find(p => p.athlete_id === 'ava_test').data;
+  check(r, 'the stored row still has both keys after the restore', JSON.stringify(after.notes) === JSON.stringify(seed.notes) && JSON.stringify(after.programHistory) === JSON.stringify(seed.programHistory), Object.keys(after));
+  check(r, 'no page errors', !log.errors.length, log.errors, []);
+  await page.context().close();
+  return r;
+};
+
 // ── 17. The programme-file upload is gone (pile A4, 2026-10-11) ───────────────────────────────────────────────
 // Amir: "i dont need that publish programme button and i never use it, remove the whole button and function". New athletes and
 // new cycles go up through publish_cycle() (the pipeline); day-to-day changes through the inline editor.
@@ -2808,7 +2859,7 @@ S['design-rules'] = async (b) => {
   const COND_OK = '.brand, .gate h1, .gate .mark, .dethead h2';
   const SCREENS = [
     ['today', 'today'], ['today with Tools open', 'today', async p => { await p.click('#toolsBtn'); await p.waitForTimeout(300); }],
-    ['athletes', 'athletes'], ['an athlete (the work)', 'a/demo_ana'], ['an athlete, charts open', 'a/demo_ana', async p => { await p.click('#chartsBtn'); await p.waitForTimeout(300); }],
+    ['athletes', 'athletes'], ['athletes, habits', 'athletes/habits'], ['an athlete (the work)', 'a/demo_ana'], ['an athlete, charts open', 'a/demo_ana', async p => { await p.click('#chartsBtn'); await p.waitForTimeout(300); }],
     ['an athlete (the file)', 'a/demo_ana/file'], ['a free athlete', 'a/demo_kian'],
     ['exercises', 'exercises'], ['exercises, an entry open', 'exercises', async p => { const row = await p.$('.spine-row'); if (row) { await row.click(); await p.waitForTimeout(500); } }],
     ['qualities', 'exercises/qualities'], ['coverage', 'exercises/coverage'],
@@ -8143,6 +8194,301 @@ S['intake-one-tap'] = async (b) => {
   check(r, 'Mark handled stays quiet and no outcome button is ever primary', (await detail.locator('.in-picks .btn.primary').count()) === 0 && (await detail.locator('.in-quiet .btn.primary').count()) === 0, '');
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
+  return r;
+};
+
+// ── Tidy up the roster, and No video yet (2026-11-23) ─────────────────────────────────────────────────────────
+const tidyIds = page => page.locator('#tidyFold .tidyrow').evaluateAll(els => els.map(e => e.dataset.tidy));
+
+S['roster-tidy'] = async (b) => {
+  const r = { id: 'roster-tidy', title: 'Athletes: a quiet fold lists people with no session in 4 weeks, oldest first; Paused and Former send the File\'s own write; Keep active hides for 28 days and survives a reload', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'athletes', seed: { tidy: true } });
+  const sum = async () => (await page.locator('#tidyFold > summary').innerText()).replace(/\s+/g, ' ').trim();
+  check(r, 'the fold sits above the roster and says how many, in one line', /^4 haven't trained in 4 weeks · tidy up$/.test(await sum()) && await page.evaluate(() => document.getElementById('tidyFold').compareDocumentPosition(document.getElementById('rosterBox')) & Node.DOCUMENT_POSITION_FOLLOWING), await sum());
+  check(r, 'it starts closed', !(await page.locator('#tidyFold').evaluate(e => e.open)), '');
+  await page.locator('#tidyFold > summary').click();
+  check(r, 'exactly the right people, oldest session first and never-trained last (not the paused one, not last week, not the demo, not you, not Ben, not a free signup)',
+    JSON.stringify(await tidyIds(page)) === JSON.stringify(['tidy_older', 'tidy_old', 'eli_new', 'tidy_never']), await tidyIds(page));
+  const t1 = (await page.locator('.tidyrow[data-tidy=tidy_old]').innerText()).replace(/\s+/g, ' ');
+  const t2 = (await page.locator('.tidyrow[data-tidy=eli_new]').innerText()).replace(/\s+/g, ' ');
+  check(r, 'a row says the last session and the tier, plus the cycle end when it is dated; a never-trained row says so', /last session .* · coached · cycle ended \d+ \w+/.test(t1) && /never trained · coached/.test(t2) && !/cycle/.test(t2), { t1, t2 });
+  check(r, 'a row has Paused, Former and a quiet Keep active, and the name opens their file', (await page.locator('.tidyrow[data-tidy=tidy_old] .btn').allInnerTexts()).join() === 'Paused,Former,Keep active' && (await page.locator('.tidyrow[data-tidy=tidy_old] a.t-nm').getAttribute('href')) === '#a/tidy_old', '');
+  // The File's own Paused (no note), for the payload to compare with
+  await L.go(page, 'a/tidy_never/file'); await L.settle(page, 500);
+  let n0 = await L.nCalls(page);
+  await page.locator('.stbtns button', { hasText: 'Paused' }).click(); await L.settle(page, 900);
+  const fileCall = lastOf(await L.callsSince(page, n0), c => c.name === 'coach_set_status');
+  await L.go(page, 'athletes'); await L.settle(page, 500);
+  check(r, 'the person paused in the File has left the list', JSON.stringify(await tidyIds(page)) === JSON.stringify(['tidy_older', 'tidy_old', 'eli_new']), await tidyIds(page));
+  if (!(await page.locator('#tidyFold').evaluate(e => e.open))) await page.locator('#tidyFold > summary').click();
+  n0 = await L.nCalls(page);
+  await page.locator('.tidyrow[data-tidy=tidy_old] .btn', { hasText: 'Paused' }).click(); await L.settle(page, 900);
+  const cs = await L.callsSince(page, n0);
+  const c1 = lastOf(cs, c => c.name === 'coach_set_status');
+  check(r, 'Paused sends the same coach_set_status the File sends (no note, no date)', !!c1 && !!fileCall && c1.payload.p_athlete_id === 'tidy_old' && JSON.stringify(Object.assign({}, c1.payload, { p_athlete_id: 'x' })) === JSON.stringify(Object.assign({}, fileCall.payload, { p_athlete_id: 'x' })) && c1.payload.p_note === null && c1.payload.p_status === 'paused', { c1: c1 && c1.payload, file: fileCall && fileCall.payload });
+  check(r, 'it is on the server, the person left the list, and the fold stayed open', (await L.db(page)).athlete_status.some(x => x.athlete_id === 'tidy_old' && x.status === 'paused') && JSON.stringify(await tidyIds(page)) === JSON.stringify(['tidy_older', 'eli_new']) && await page.locator('#tidyFold').evaluate(e => e.open) && /^2 haven't/.test(await sum()), { ids: await tidyIds(page), s: await sum() });
+  // Keep active: nothing is sent, nothing is saved on the server, and it survives a reload
+  n0 = await L.nCalls(page);
+  await page.locator('.tidyrow[data-tidy=eli_new] .btn', { hasText: 'Keep active' }).click(); await L.settle(page, 400);
+  check(r, 'Keep active sends no call and the person leaves the list; this device remembers the day', !(await L.callsSince(page, n0)).some(c => c.kind === 'rpc' || (c.kind === 'from' && c.op !== 'select')) && JSON.stringify(await tidyIds(page)) === JSON.stringify(['tidy_older'])
+    && await page.evaluate(() => /^\d{4}-\d{2}-\d{2}$/.test(JSON.parse(localStorage.getItem('coach.tidyKeep')).eli_new)), await tidyIds(page));
+  await page.reload();
+  await page.waitForFunction(() => document.querySelector('#rail a.tab') && !document.querySelector('#content .loading'), null, { timeout: 15000 }); await L.settle(page, 600);
+  check(r, 'after a reload they are still hidden', JSON.stringify(await page.evaluate(() => tidyCandidates().map(a => a.id))) === JSON.stringify(['tidy_older']), await page.evaluate(() => tidyCandidates().map(a => a.id)));
+  // 28 days: still hidden on day 27, back on day 28
+  const back = async d => page.evaluate(n => { const x = new Date(); x.setDate(x.getDate() - n); localStorage.setItem('coach.tidyKeep', JSON.stringify({ eli_new: dkey(x) })); return tidyCandidates().map(a => a.id); }, d);
+  const d27 = await back(27), d28 = await back(28);
+  check(r, 'hidden for 28 days: on the 27th day still hidden, on the 28th back in the list', !d27.includes('eli_new') && d28.includes('eli_new'), { d27, d28 });
+  await page.evaluate(() => { Storage.prototype.getItem = () => { throw new Error('no storage'); }; Storage.prototype.setItem = () => { throw new Error('no storage'); }; });
+  check(r, 'with no usable storage nothing is hidden and nothing throws', await page.evaluate(() => { tidyKeepActive('eli_new'); return tidyCandidates().map(a => a.id).includes('eli_new'); }), '');
+  // Former
+  await page.evaluate(() => renderAthletes());
+  if (!(await page.locator('#tidyFold').evaluate(e => e.open))) await page.locator('#tidyFold > summary').click();
+  n0 = await L.nCalls(page);
+  await page.locator('.tidyrow[data-tidy=tidy_older] .btn', { hasText: 'Former' }).click(); await L.settle(page, 900);
+  const c2 = lastOf(await L.callsSince(page, n0), c => c.name === 'coach_set_status');
+  check(r, 'Former sends status former and the person leaves the list', !!c2 && c2.payload.p_athlete_id === 'tidy_older' && c2.payload.p_status === 'former' && !(await tidyIds(page)).includes('tidy_older'), c2 && c2.payload);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── Habits and court (2026-11-23, Amir picked "The Grid"): the grid in the file, Athletes -> Habits, a failed read, the demo ──────────────────────────
+// buildSeed({ habitGrid: true }): Ava has Mobility and a custom habit switched on six days ago, fourteen days of values and court time; Dan one easy court entry.
+const HG = { seed: { habitGrid: true }, fixedTime: '2026-12-10T10:00:00Z' };   // a fixed day: the Steps credit starts 2026-11-22, so all 14 days are after it
+const gridOf = (page) => page.evaluate(() => {
+  const g = document.getElementById('habGrid');
+  if (!g) return null;
+  const rows = [...g.querySelectorAll('tbody tr')].map(tr => {
+    const sum = tr.querySelector('td.hg-s');
+    return { label: tr.querySelector('th').innerText.trim(), cells: [...tr.querySelectorAll('td.hg-c')].map(td => ({ cls: td.className.replace('hg-c', '').trim(), text: td.textContent.trim(), title: td.title })),
+      sum: sum.innerText.trim(), clay: sum.classList.contains('tone-clay') };
+  });
+  const prev = g.previousElementSibling;
+  return { title: g.querySelector('.phead .t').innerText.trim(), right: g.querySelector('.phead .r').innerText.trim(), head: [...g.querySelectorAll('thead th.hg-d')].map(x => x.textContent), todayCols: [...g.querySelectorAll('thead th')].map((x, i) => x.classList.contains('today') ? i : -1).filter(i => i >= 0),
+    rows, legend: g.querySelector('.hg-k').innerText.trim(), underFive: !!prev && (prev.classList.contains('fwc') || !document.querySelector('.fwc')), customDir: [...g.querySelectorAll('tbody th span[dir=auto]')].map(x => x.textContent), hasWrap: !!g.querySelector('.hg-wrap') };
+});
+const actSelects = (cs) => cs.filter(c => c.kind === 'from' && c.name === 'activity_log' && c.op === 'select');
+
+S['habgrid-file'] = async (b) => {
+  const r = { id: 'habgrid-file', title: 'The work -> Habits and court, last 14 days: one row a habit in catalogue order, a habit switched on midweek blank before that day, met / under / empty, a Court row with the hard day dark, the 7-day summary and clay under 3', checks: [] };
+  const { page, log } = await L.openCoach(b, Object.assign({ hash: 'a/ava_test/work' }, HG));
+  const g = await gridOf(page);
+  check(r, 'the panel is there, under Five weeks, with its heading and "7-day average" on the right', !!g && g.title === 'Habits and court · last 14 days' && g.right === '7-day average' && g.underFive, g && { t: g.title, r: g.right, u: g.underFive });
+  check(r, 'the first header row is the 14 days\' weekday letters, today (the last) marked', !!g && g.head.length === 14 && g.head.every(x => /^[SMTWTFS]$/.test(x)) && g.todayCols.length === 1 && g.todayCols[0] === 14, g && { head: g.head.join(''), today: g.todayCols });
+  const lab = x => x.label.replace(/^[^\p{L}]+/u, '');
+  const labels = g ? g.rows.map(lab) : [];
+  check(r, 'Court first, then the roster in the engine\'s catalogue order with the custom habit last', JSON.stringify(labels) === JSON.stringify(['Court', 'Session', 'Steps', 'Sleep', 'Protein', 'Water', 'Mobility', 'Read 10 pages']), labels);
+  check(r, 'the custom habit\'s name has dir=auto and the legend names met, under, not logged and court', !!g && g.customDir.indexOf('Read 10 pages') >= 0 && /met/.test(g.legend) && /logged, under/.test(g.legend) && /not logged/.test(g.legend) && /court minutes \(dark = hard\)/.test(g.legend), g && { d: g.customDir, l: g.legend });
+  const row = n => g && g.rows.find(x => lab(x) === n);
+  const mob = row('Mobility'), stp = row('Steps'), slp = row('Sleep'), wat = row('Water'), crt = row('Court');
+  check(r, 'Mobility (switched on 6 days ago) draws no box on the 7 days before, then ✓ met on the two days it was ticked and grey on the others', !!mob && mob.cells.slice(0, 7).every(c => c.cls === 'x' && c.text === '') && mob.cells[13].cls === 'met' && mob.cells[13].text === '✓' && mob.cells[10].cls === 'met' && mob.cells[12].cls === '' && mob.cells[12].text === '', mob && mob.cells.map(c => c.cls || '-').join(' '));
+  check(r, 'Steps are the number that counts (typed + the activity credit): 10k met, 7,500 typed + 7,000 from the day\'s court time is 14.5k met, a day with nothing logged grey and empty, 10.5k met', !!stp && stp.cells[13].cls === 'met' && stp.cells[13].text === '10k' && stp.cells[12].cls === 'met' && stp.cells[12].text === '14.5k' && stp.cells[9].cls === '' && stp.cells[9].text === '' && stp.cells[11].text === '10.5k', stp && stp.cells.slice(8).map(c => c.cls + ':' + c.text));
+  check(r, '2,000 typed + 60 min of hard tennis shows 9k, under, with the title "2,000 walked + 7,000 from Tennis"; 3,000 typed + the same shows 10k, met', !!stp && stp.cells[3].cls === 'under' && stp.cells[3].text === '9k' && /2,000 walked \+ 7,000 from Tennis$/.test(stp.cells[3].title) && stp.cells[2].cls === 'met' && stp.cells[2].text === '10k' && /3,000 walked \+ 7,000 from Tennis$/.test(stp.cells[2].title), stp && [stp.cells[2], stp.cells[3]]);
+  check(r, 'two kinds of activity in a day read "from your activity"; one kind names it (Padel)', !!stp && /7,500 walked \+ 7,000 from your activity$/.test(stp.cells[12].title) && /9,000 walked \+ 7,000 from Padel$/.test(stp.cells[10].title), stp && [stp.cells[12].title, stp.cells[10].title]);
+  check(r, 'Sleep and Water show the number short: 7.5 met, 6.5 under, 8 met; water 6 under', !!slp && slp.cells[13].text === '7.5' && slp.cells[13].cls === 'met' && slp.cells[12].text === '6.5' && slp.cells[12].cls === 'under' && slp.cells[11].text === '8' && wat.cells[11].text === '6' && wat.cells[11].cls === 'under', slp && wat && { s: slp.cells.slice(10).map(c => c.cls + ':' + c.text), w: wat.cells.slice(10).map(c => c.cls + ':' + c.text) });
+  check(r, 'Court is the day\'s minutes summed: 150 on the hard day (dark, its title lists both entries), 120 on a normal day, 60 on an easy one, the other days transparent', !!crt && crt.cells[12].cls === 'court hard' && crt.cells[12].text === '150' && crt.cells[12].title === 'Tennis 120 min · hard; Other 30 min · normal' && crt.cells[10].cls === 'court' && crt.cells[10].text === '120' && crt.cells[10].title === 'Padel 120 min · normal' && crt.cells[4].text === '60' && crt.cells[0].cls === 'court x' && crt.cells[13].cls === 'court x', crt && crt.cells.map(c => c.cls.replace('court', 'c') + ':' + c.text).join(' '));
+  // Your Number (stage125): with their own target of 4,000 from ten days ago, 4,000 typed is met, and the credit is capped at 70% of THEIR number:
+  // 2,000 typed + an hour of hard tennis is 2,000 + 2,800 = 4.8k, met (against everyone's 10,000 it was 9k, under). Days before the row keep 10,000.
+  await page.evaluate(async () => { window.__DB.steps_targets = [{ athlete_id: 'ava_test', from_day: addDays(todayKey(), -10), steps: 4000 }]; await loadStepsTgtC(); render(); });
+  await L.settle(page, 500);
+  const stp4 = ((await gridOf(page)) || { rows: [] }).rows.find(x => lab(x) === 'Steps');
+  check(r, 'Steps is met at the athlete\'s own number and the credit is capped at 70% of it (4,000 typed met; 2,000 + 2,800 = 4.8k met); a day before the number keeps 10,000', !!stp4 && stp4.cells[7].cls === 'met' && stp4.cells[3].text === '4.8k' && stp4.cells[3].cls === 'met' && stp4.cells[2].text === '10k' && stp4.cells[2].cls === 'met', stp4 && stp4.cells.map(c => c.cls + ':' + c.text).join(' '));
+  await page.evaluate(async () => { window.__DB.steps_targets = []; await loadStepsTgtC(); render(); });
+  await L.settle(page, 400);
+  const sums = g ? Object.fromEntries(g.rows.map(x => [lab(x), x.sum])) : {};
+  check(r, 'the 7-day summary: Steps 11k · 5/7, Sleep 6.9 h · 3/7, Protein 2.8 · 4/7, Water 6.8 · 4/7, check habits "2 of 7", Session "2 sessions", Court "4 h 30 this week"',
+    sums.Steps === '11k · 5/7' && sums.Sleep === '6.9 h · 3/7' && sums.Protein === '2.8 · 4/7' && sums.Water === '6.8 · 4/7' && sums.Session === '2 sessions' && sums.Mobility === '2 of 7' && sums['Read 10 pages'] === '1 of 7' && sums.Court === '4 h 30 this week', sums);
+  check(r, 'a summary is clay when the habit was met on fewer than 3 of the days it existed (Mobility, Read; Session counts sessions and is never clay), and only then', !!g && g.rows.filter(x => x.clay).map(lab).sort().join() === 'Mobility,Read 10 pages', g && g.rows.filter(x => x.clay).map(x => x.label));
+  const cs = await L.calls(page);
+  const sel = actSelects(cs);
+  check(r, 'court time was read once for this athlete, from 13 days back, never the older entry', sel.length === 1 && sel[0].filters.some(f => /^athlete_id\.eq\."ava_test"/.test(f)) && sel[0].filters.some(f => /^day\.gte\./.test(f)) && !crt.cells.some(c => c.text === '90'), sel.map(c => c.filters));
+  await L.go(page, 'athletes'); await L.go(page, 'a/ava_test/work');
+  check(r, 'opening the file again does not read the court time again (once per athlete per page life)', actSelects(await L.calls(page)).length === 1, actSelects(await L.calls(page)).length);
+  // under 600 px the table scrolls sideways inside its own box, the page does not
+  await page.setViewportSize({ width: 390, height: 800 });
+  await L.settle(page, 300);
+  const nar = await page.evaluate(() => { const w = document.querySelector('#habGrid .hg-wrap'); return { page: document.documentElement.scrollWidth <= window.innerWidth + 1, box: w.scrollWidth > w.clientWidth, ov: getComputedStyle(w).overflowX }; });
+  check(r, 'at 390 px the page does not scroll sideways; the grid scrolls inside its own container', nar.page && nar.box && nar.ov === 'auto', nar);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await L.go(page, 'a/ben_test/work');
+  check(r, 'someone with no habit log and no court time has no panel at all', (await gridOf(page)) === null, '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['roster-tidy-none'] = async (b) => {
+  const r = { id: 'roster-tidy-none', title: 'Athletes: no candidate, no fold (the base fixture has one: marking them paused removes the whole fold)', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'athletes' });
+  check(r, 'the base fixture has one never-trained person, so a fold of one: "1 hasn\'t"', /^1 hasn't trained in 4 weeks/.test((await page.locator('#tidyFold > summary').innerText()).trim()), '');
+  await page.evaluate(() => { window.__DB.athlete_status.push({ athlete_id: 'eli_new', status: 'paused', since: '2026-01-01', note: null, updated_at: new Date().toISOString() }); return hardRefresh(); }); await L.settle(page, 900);
+  check(r, 'when nobody is left there is no fold at all', (await page.locator('#tidyFold').count()) === 0, '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['habgrid-court-fails'] = async (b) => {
+  const r = { id: 'habgrid-court-fails', title: 'A court-time read that fails is named in the banner and never drawn as no court time', checks: [] };
+  const fail = [{ kind: 'from', name: 'activity_log', op: 'select', message: 'fixture: activity down', times: 20 }];
+  const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/work', fixedTime: HG.fixedTime, seed: { habitGrid: true, stub: { fail } } });
+  const warn = await page.evaluate(() => { const e = document.getElementById('loadwarn'); return e && !e.hidden ? e.innerText.replace(/\s+/g, ' ') : ''; });
+  check(r, 'the banner says the court time athletes logged did not load, and why', /Not everything loaded/.test(warn) && /the court time athletes logged/.test(warn) && /fixture: activity down/.test(warn), warn);
+  const g = await gridOf(page);
+  check(r, 'the habits are still drawn, and there is no Court row (no empty one either)', !!g && g.rows.length === 7 && /Session/.test(g.rows[0].label) && !g.rows.some(x => /Court/.test(x.label)), g && g.rows.map(x => x.label));
+  await page.evaluate(() => { window.__STUB.fail.length = 0; return hardRefresh(); });
+  await L.settle(page, 900);
+  const g2 = await gridOf(page);
+  const warn2 = await page.evaluate(() => { const e = document.getElementById('loadwarn'); return e && !e.hidden ? e.innerText : ''; });
+  check(r, '↻ Refresh reads it again: the Court row appears and the banner clears', !!g2 && /Court/.test(g2.rows[0].label) && !/court time/.test(warn2), { first: g2 && g2.rows[0].label, warn2 });
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+const nvIds = page => page.locator('#noVideo .nv-row').evaluateAll(els => els.map(e => e.dataset.nv));
+S['exercises-no-video'] = async (b) => {
+  const r = { id: 'exercises-no-video', title: 'Exercises → Coverage → No video yet: approved, used, video-less entries by athletes; cardio folded; Save writes only the video column through coach_save_spine; Entries has the same list as a chip', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises/coverage', seed: { tidy: true } });
+  check(r, 'the panel follows the Coverage summary panel', await page.evaluate(() => { const p = document.getElementById('noVideo'); return !!p && p.previousElementSibling && /Coverage/.test(p.previousElementSibling.innerText) && p.classList.contains('panel'); }), '');
+  check(r, 'heading and count', /No video yet/.test(await page.locator('#noVideo .phead .t').innerText()) && (await page.locator('#noVideo .phead .r').innerText()).trim() === '4 exercises', await page.locator('#noVideo .phead').innerText());
+  check(r, 'approved, used, no video; most athletes first (a draft, one with a video, an unused one and the cardio are not in the main list)', JSON.stringify(await nvIds(page)) === JSON.stringify(['band-row', 'plank-hold', 'band-pull-apart', 'easy-jog']) && (await page.locator('#noVideo > .nv-row').count()) === 3, await nvIds(page));
+  check(r, 'a row says the athletes and the pattern', /4 athletes · pull-horizontal/.test((await page.locator('.nv-row[data-nv=band-row]').innerText()).replace(/\s+/g, ' ')) && /2 athletes · anti-extension|3 athletes · anti-extension/.test((await page.locator('.nv-row[data-nv=plank-hold]').innerText()).replace(/\s+/g, ' ')), await page.locator('.nv-row[data-nv=band-row]').innerText());
+  check(r, 'the cardio is in a closed fold at the end: "Cardio (probably no video needed) · 1"', (await page.locator('#nvCardio > summary').innerText()).replace(/\s+/g, ' ').trim() === 'Cardio (probably no video needed) · 1' && !(await page.locator('#nvCardio').evaluate(e => e.open)) && (await page.locator('#nvCardio .nv-row[data-nv=easy-jog]').count()) === 1, '');
+  const inp = page.locator('.nv-row[data-nv=band-row] input');
+  check(r, 'the box is a url box with the placeholder and a Save button', (await inp.getAttribute('type')) === 'url' && (await inp.getAttribute('placeholder')) === 'Paste the YouTube link' && /fld/.test(await inp.getAttribute('class')) && (await page.locator('.nv-row[data-nv=band-row] .btn').innerText()) === 'Save', '');
+  // a non-link is refused with no call
+  await inp.fill('youtube.com/watch?v=abc');
+  let n0 = await L.nCalls(page);
+  await page.locator('.nv-row[data-nv=band-row] .btn').click(); await L.settle(page, 300);
+  check(r, 'a non-link is refused in words and nothing is sent', /That is not a link: it must start with https:\/\//.test(await L.failText(page)) && !spineRpcs(await L.callsSince(page, n0)).length, await L.failText(page));
+  // typed links survive a redraw
+  await page.locator('.nv-row[data-nv=plank-hold] input').fill('https://youtu.be/PLANK');
+  await page.evaluate(() => renderExercises());
+  check(r, 'a typed link survives a redraw (and so does the bad one)', (await page.locator('.nv-row[data-nv=plank-hold] input').inputValue()) === 'https://youtu.be/PLANK' && (await inp.inputValue()) === 'youtube.com/watch?v=abc', '');
+  // a good link: one call, only the video column
+  await page.locator('.nv-row[data-nv=band-row] input').fill('  https://youtu.be/ROW123 ');
+  n0 = await L.nCalls(page);
+  await page.locator('.nv-row[data-nv=band-row] .btn').click(); await L.settle(page, 700);
+  const sv = spineRpcs(await L.callsSince(page, n0));
+  check(r, 'one coach_save_spine with ONLY the video column, its snapshot (null) and no coach-only half', sv.length === 1 && sv[0].payload.p_id === 'band-row' && JSON.stringify(sv[0].payload.p_entry) === JSON.stringify({ video: 'https://youtu.be/ROW123' }) && JSON.stringify(sv[0].payload.p_entry_snap) === JSON.stringify({ video: null }) && !Object.keys(sv[0].payload.p_coach).length && !Object.keys(sv[0].payload.p_coach_snap).length, sv.map(c => c.payload));
+  check(r, 'toast, the page copy, the server, and the row left the list', /Video saved: Band Row/.test(await L.toastText(page)) && await page.evaluate(() => S.spine.list.find(e => e.id === 'band-row').video === 'https://youtu.be/ROW123') && (await L.db(page)).exercises.find(x => x.id === 'band-row').video === 'https://youtu.be/ROW123'
+    && JSON.stringify(await nvIds(page)) === JSON.stringify(['plank-hold', 'band-pull-apart', 'easy-jog']) && (await page.locator('#noVideo .phead .r').innerText()).trim() === '3 exercises', await nvIds(page));
+  check(r, 'the other typed link is still there after that redraw', (await page.locator('.nv-row[data-nv=plank-hold] input').inputValue()) === 'https://youtu.be/PLANK', '');
+  // a stale save: someone else pasted a link meanwhile
+  await page.evaluate(() => { window.__DB.exercises.find(x => x.id === 'plank-hold').video = 'https://other.example/theirs'; });
+  n0 = await L.nCalls(page);
+  await page.locator('.nv-row[data-nv=plank-hold] .btn').click(); await L.settle(page, 700);
+  const sv2 = spineRpcs(await L.callsSince(page, n0));
+  check(r, 'the refusal is shown and says someone else changed the video; theirs stays on the server', sv2.length === 1 && /someone else/.test(await L.failText(page)) && /Video/.test(await L.failText(page)) && (await L.db(page)).exercises.find(x => x.id === 'plank-hold').video === 'https://other.example/theirs', await L.failText(page));
+  // a server without stage48
+  await page.evaluate(() => { window.__STUB.missingRpc = ['coach_save_spine']; });
+  await page.locator('.nv-row[data-nv=band-pull-apart] input').fill('https://youtu.be/PULL');
+  await page.locator('.nv-row[data-nv=band-pull-apart] .btn').click(); await L.settle(page, 500);
+  check(r, 'a server without coach_save_spine says so, nothing is lost from the box', /coach_save_spine/.test(await L.failText(page)) && (await page.locator('.nv-row[data-nv=band-pull-apart] input').inputValue()) === 'https://youtu.be/PULL', await L.failText(page));
+  await page.evaluate(() => { window.__STUB.missingRpc = []; });
+  // Entries: the same set as a chip
+  await L.go(page, 'exercises'); await L.settle(page, 500);
+  const chip = page.locator('.sp-filter[data-f="novideo"]');
+  check(r, 'Entries has a chip "No video · 2" beside the others (band pull-apart and easy jog are left)', (await chip.innerText()).replace(/\s+/g, ' ') === 'No video · 2', await chip.innerText());
+  await chip.click(); await L.settle(page, 300);
+  check(r, 'it lists that set, and a row opens in the editor', JSON.stringify(await page.locator('.sp-list .spine-row').evaluateAll(els => els.map(e => e.dataset.open))) === JSON.stringify(['band-pull-apart', 'easy-jog']) && /No video yet · 2/.test(await page.locator('.sp-count').innerText()), await page.locator('.sp-count').innerText());
+  await page.locator('.spine-row[data-open="band-pull-apart"] .btn').click(); await L.settle(page, 400);
+  check(r, 'opening one shows the editor for it', (await page.locator('#spineEd').count()) === 1 && /Band Pull-Apart/.test(await page.locator('#spineEd .phead').innerText()), '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['habits-view'] = async (b) => {
+  const r = { id: 'habits-view', title: 'Athletes -> Training | Habits: the switch and #athletes/habits, Back, one row an athlete who logged in 7 days, the four averages with their strips, Other habits, Court, sort by a header, the "logged nothing" fold', checks: [] };
+  const { page, log } = await L.openCoach(b, Object.assign({ hash: 'athletes' }, HG));
+  const sw = () => page.evaluate(() => [...document.querySelectorAll('.rfilters .segs .seg')].map(x => x.textContent + (x.classList.contains('active') ? '*' : '')).join('|'));
+  check(r, 'the roster is as before: a Training | Habits switch beside the chips, Training on, the sort select there, no court time read yet', (await sw()) === 'Training*|Habits' && !!(await page.$('#sortSel')) && !!(await page.$('.rhead')) && actSelects(await L.calls(page)).length === 0, await sw());
+  await page.locator('.rfilters .seg', { hasText: 'Habits' }).click();
+  await page.waitForSelector('.hv');
+  await L.settle(page, 300);
+  check(r, 'Habits puts #athletes/habits in the address and turns Habits on', (await page.evaluate(() => location.hash)) === '#athletes/habits' && (await sw()) === 'Training|Habits*', await page.evaluate(() => location.hash));
+  const rowsOf = () => page.evaluate(() => [...document.querySelectorAll('.hv tbody tr')].map(tr => ({
+    name: tr.querySelector('.hv-n span:not(.ava):not([class*=ava])') ? tr.querySelector('.hv-n a').innerText.trim().replace(/^[A-Z]{1,2}\s*/, '') : '', href: tr.querySelector('.hv-n a').getAttribute('href'),
+    cells: [...tr.querySelectorAll('td.hv-m')].map(td => ({ v: (td.querySelector('.v') || td).innerText.trim(), clay: !!td.querySelector('.tone-clay'), strip: [...td.querySelectorAll('.hv-strip i')].map(i => i.className || 'none').join(' '), title: td.title })) })));
+  let rows = await rowsOf();
+  check(r, 'one row an athlete who logged a habit or court time in the last 7 days (Ava, Cara, Dan), default sort Sleep lowest first (nothing logged counts lowest)', rows.length === 3 && rows.map(x => x.href).join() === '#a/cara_free,#a/dan_proof,#a/ava_test', rows.map(x => x.href));
+  const heads = await page.evaluate(() => [...document.querySelectorAll('.hv thead th')].map(th => th.innerText.trim() + (th.getAttribute('aria-sort') === 'ascending' ? '*' : '')).join('|'));
+  check(r, 'the columns are Athlete, Sleep, Steps, Protein, Water, Other habits, Court, each head a button, Sleep the sorted one', heads === 'Athlete|Sleep*|Steps|Protein|Water|Other habits|Court' && (await page.locator('.hv thead th button').count()) === 7, heads);
+  const ava = rows.find(x => x.href === '#a/ava_test'), cara = rows.find(x => x.href === '#a/cara_free'), dan = rows.find(x => x.href === '#a/dan_proof');
+  // cells: sleep, steps, fuel, water, other, court
+  check(r, 'Ava: Sleep 6.9 h, Steps 11k, Protein 2.8, Water 6.8, Other habits 3/14 (Mobility and the custom one; Session is left out), Court 4 h 30', ava.cells.map(c => c.v).join('|') === '6.9 h|11k|2.8|6.8|3/14|4 h 30', ava.cells.map(c => c.v));
+  check(r, 'Ava\'s Sleep strip is seven bars, oldest left: under met under under met under met; Steps (typed + credit) reads under met none met met met met and neither Steps nor Water is clay', ava.cells[0].strip === 'under met under under met under met' && ava.cells[1].strip === 'under met none met met met met' && !ava.cells[1].clay && !ava.cells[3].clay, [ava.cells[0].strip, ava.cells[1].strip]);
+  check(r, 'Cara: nothing logged for Sleep reads — in clay; Steps 9k (all under), Water 8 (all met)', cara.cells[0].v === '—' && cara.cells[0].clay && cara.cells[1].v === '9k' && cara.cells[1].strip === 'under under under under under under under' && cara.cells[3].v === '8' && !cara.cells[3].clay, cara.cells.map(c => c.v));
+  check(r, 'Dan: Sleep 5.5 h in clay, Steps 9.2k (12k typed one day, 45 min of padel credits 6.4k another) in clay, Court 45 min', dan.cells[0].v === '5.5 h' && dan.cells[0].clay && dan.cells[1].v === '9.2k' && dan.cells[1].clay && dan.cells[5].v === '45 min', dan.cells.map(c => c.v));
+  const fold = await page.evaluate(() => { const d = document.querySelector('.hv-quiet'); return d ? { sum: d.querySelector('summary').innerText.trim(), names: d.querySelector('p').textContent, open: d.open } : null; });
+  check(r, 'a quiet line "2 more logged nothing in 7 days" with a fold that lists their names', !!fold && fold.sum === '2 more logged nothing in 7 days' && /Ben Example/.test(fold.names) && !fold.open, fold);
+  const calls = actSelects(await L.calls(page));
+  check(r, 'court time for everyone was read once, for the last 7 days, with no athlete filter', calls.length === 1 && calls[0].filters.some(f => /^day\.gte\./.test(f)) && !calls[0].filters.some(f => /athlete_id/.test(f)), calls.map(c => c.filters));
+  const order = async () => (await rowsOf()).map(x => x.href.replace('#a/', '').replace(/_.*/, '')).join();
+  await page.locator('.hv thead button', { hasText: 'Steps' }).click(); await L.settle(page, 200);
+  check(r, 'Steps sorts lowest first: Cara 9k, Dan 9.2k, Ava 11k', (await order()) === 'cara,dan,ava', await order());
+  await page.locator('.hv thead button', { hasText: 'Court' }).click(); await L.settle(page, 200);
+  check(r, 'Court sorts highest first: Ava 4 h 30, Dan 45 min, Cara —', (await order()) === 'ava,dan,cara', await order());
+  await page.locator('.hv thead button', { hasText: 'Athlete' }).click(); await L.settle(page, 200);
+  check(r, 'Athlete sorts A to Z', (await order()) === 'ava,cara,dan', await order());
+  check(r, 'sorting reads nothing again', actSelects(await L.calls(page)).length === 1, '');
+  await page.locator('.rfilters .rf', { hasText: 'Coached' }).click(); await L.settle(page, 200);
+  const co = await page.evaluate(() => ({ rows: document.querySelectorAll('.hv tbody tr').length, fold: (document.querySelector('.hv-quiet summary') || {}).innerText }));
+  check(r, 'the roster\'s own filter chips pick who is shown: Coached is Ava with the two coached athletes who logged nothing folded', co.rows === 1 && co.fold === '2 more logged nothing in 7 days', co);
+  await page.locator('.rfilters .rf', { hasText: 'Everyone' }).click(); await L.settle(page, 200);
+  await page.locator('.hv tbody tr', { hasText: 'Dan' }).click(); await L.settle(page, 400);
+  check(r, 'a row opens that athlete\'s file', (await page.evaluate(() => location.hash)).startsWith('#a/dan_proof'), await page.evaluate(() => location.hash));
+  await page.goBack(); await L.settle(page, 500);
+  check(r, 'Back from the file returns to Habits, Back again to Training', (await page.evaluate(() => location.hash)) === '#athletes/habits' && !!(await page.$('.hv')), await page.evaluate(() => location.hash));
+  await page.goBack(); await L.settle(page, 500);
+  check(r, 'Back from Habits is the roster (Training), as it was', (await page.evaluate(() => location.hash)) === '#athletes' && (await sw()) === 'Training*|Habits' && !!(await page.$('.rhead')), await page.evaluate(() => location.hash));
+  await page.goto(L.BASE + '/coach.html#athletes/habits');
+  await page.waitForSelector('#rail a.tab'); await L.settle(page, 800);
+  check(r, 'an address typed as #athletes/habits opens the Habits view', (await sw()) === 'Training|Habits*', await sw());
+  await page.setViewportSize({ width: 390, height: 800 }); await L.settle(page, 300);
+  const nar = await page.evaluate(() => { const w = document.querySelector('.hv-wrap'); return { page: document.documentElement.scrollWidth <= window.innerWidth + 1, box: !!w && w.scrollWidth > w.clientWidth }; });
+  check(r, 'at 390 px the page does not scroll sideways; the table scrolls inside its own box', nar.page && nar.box, nar);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['habits-view-court-fails'] = async (b) => {
+  const r = { id: 'habits-view-court-fails', title: 'Athletes -> Habits: a failed court-time read is named in the banner and Court says so, never "—"', checks: [] };
+  const fail = [{ kind: 'from', name: 'activity_log', op: 'select', message: 'fixture: activity down', times: 20 }];
+  const { page, log } = await L.openCoach(b, { hash: 'athletes/habits', fixedTime: HG.fixedTime, seed: { habitGrid: true, stub: { fail } } });
+  await L.settle(page, 800);
+  const warn = await page.evaluate(() => { const e = document.getElementById('loadwarn'); return e && !e.hidden ? e.innerText.replace(/\s+/g, ' ') : ''; });
+  check(r, 'the banner names the court time athletes logged, with the reason', /the court time athletes logged/.test(warn) && /fixture: activity down/.test(warn), warn);
+  const cells = await page.evaluate(() => [...document.querySelectorAll('.hv tbody tr')].map(tr => { const t = tr.querySelectorAll('td.hv-m'); return t[t.length - 1].innerText.trim(); }));
+  check(r, 'the habits are drawn and every Court cell says n/a (not "—", which means none)', cells.length >= 2 && cells.every(c => c === 'n/a'), cells);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['habgrid-demo'] = async (b) => {
+  const r = { id: 'habgrid-demo', title: '?demo=1: two demo athletes have habit days and court time, so the grid and Athletes -> Habits show', checks: [] };
+  const errs = [];
+  const ctx = await b.newContext({ viewport: { width: 1280, height: 900 }, timezoneId: 'UTC' });
+  const page = await ctx.newPage();
+  page.on('pageerror', e => errs.push(String(e && e.message || e)));
+  await page.route('**/*', route => route.request().url().startsWith(L.BASE) ? route.continue() : route.fulfill({ status: 204, body: '' }));
+  await page.goto(L.BASE + '/coach.html?demo=1#a/demo_ana');
+  await page.waitForSelector('#habGrid', { timeout: 15000 });
+  const g = await gridOf(page);
+  const crt = g && g.rows.find(x => /Court/.test(x.label));
+  check(r, 'Ana\'s file shows the grid with a Court row: a hard day dark and its title', !!crt && crt.cells.some(c => c.cls === 'court hard' && c.title === 'Tennis 120 min · hard') && crt.cells.some(c => c.title === 'Padel 60 min · normal'), crt && crt.cells.filter(c => c.title).map(c => c.title));
+  check(r, 'and her habit rows are drawn from her demo log', !!g && g.rows.length >= 5 && g.rows.some(x => /Steps/.test(x.label) && x.cells.some(c => c.cls === 'met' || c.cls === 'under')), g && g.rows.map(x => x.label));
+  await page.evaluate(() => { location.hash = 'athletes/habits'; });
+  await page.waitForSelector('.hv', { timeout: 10000 });
+  const rows = await page.evaluate(() => [...document.querySelectorAll('.hv tbody tr')].map(tr => tr.innerText.replace(/\s+/g, ' ')));
+  check(r, 'Athletes -> Habits lists the demo athletes, Ana with her court time (3 h) and Lena with 45 min', rows.length >= 3 && rows.some(x => /Ana/.test(x) && /3 h/.test(x)) && rows.some(x => /Lena/.test(x) && /45 min/.test(x)), rows);
+  check(r, 'no page errors', errs.length === 0, errs);
+  await ctx.close();
   return r;
 };
 

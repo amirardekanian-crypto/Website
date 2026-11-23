@@ -35,6 +35,8 @@ like an empty list or a success.
 | 08 | [8. ⚠ What this page deliberately does NOT do](docs/ref/coach-dashboard/08-8-what-this-page-deliberately-does-not-do.md) | 0 KB |
 | 09 | [9. Where the data comes from](docs/ref/coach-dashboard/09-9-where-the-data-comes-from.md) | 7 KB |
 | 10 | [10. Find, the phone's bar, one-tap outcomes (2026-11-23)](docs/ref/coach-dashboard/10-find-phone-bar-one-tap-outcomes.md) | 3 KB |
+| 11 | [11. Tidy the roster, No video yet (2026-11-23)](docs/ref/coach-dashboard/11-tidy-roster-no-video.md) | 2 KB |
+| 12 | [12. Habits and court time, in the file and across everyone (2026-11-23)](docs/ref/coach-dashboard/12-habits-and-court.md) | 3 KB |
 
 ---
 

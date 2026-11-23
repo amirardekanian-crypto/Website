@@ -175,7 +175,11 @@
     if (!cols || cols.trim() === '*') return clone(row);
     var out = {};
     cols.split(',').map(function (c) { return c.trim(); }).filter(Boolean).forEach(function (c) {
-      if (c === '*') Object.assign(out, clone(row)); else out[c] = clone(row[c]);
+      if (c === '*') { Object.assign(out, clone(row)); return; }
+      // PostgREST JSON path: `alias:col->key` or `col->key` (named for the key when unaliased; the value is JSON, not text).
+      var m = c.match(/^(?:([A-Za-z_]\w*):)?([A-Za-z_]\w*)->([A-Za-z_]\w*)$/);
+      if (m) { var base = row[m[2]]; var v = base == null ? null : base[m[3]]; out[m[1] || m[3]] = v === undefined ? null : clone(v); return; }
+      out[c] = clone(row[c]);
     });
     return out;
   }

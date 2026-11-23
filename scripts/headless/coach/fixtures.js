@@ -34,6 +34,9 @@ function programme(firstName, extra) {
         { icon: '💪', title: 'Primary', exercises: [
           { name: 'Trap Bar Deadlift', type: 'standard', rx: { sets: 4, reps: 6, rpe: '7-8' } } ] } ] },
     ] },
+    // Two keys the dashboard never draws (the boot trims them away; a write must still keep them).
+    notes: Array.from({ length: 6 }, (_, i) => ({ id: 'n' + i, text: firstName + ' fixture coaching note ' + i + ' (made up)', at: '2026-01-0' + (i + 1) })),
+    programHistory: [{ name: 'Cycle 1 — Made-Up Block', weeks: '4 weeks', archivedOn: '2026-01-01' }],
   }, extra || {});
 }
 
@@ -249,6 +252,72 @@ function partnerSeed(db, today) {
   ];
 }
 
+// ── Tidy up the roster + No video yet (2026-11-23), made up like everything here ─────────────────────────────────
+// buildSeed({ tidy: true }) adds coached people who have not trained for a while and the entries Coverage lists as having no video. The base seed already
+// has one candidate (Eli: a programme and never a session) and one who must not be listed (Ben, trained two days ago).
+function tidySeed(db, today) {
+  const card = (name, exId) => ({ name, exId, type: 'standard', rx: { sets: 3, reps: 10, rpe: 7 } });
+  const extra = { icon: '🧱', title: 'Tidy fixture', exercises: [] };
+  const prog = (id, first, cards) => {
+    const d = programme(first, { athlete: { id, firstName: first, lastName: 'Example', tier: 'coached' } });
+    d.cycles = [{ name: 'Cycle 1 — Made-Up Block', weeks: '5 weeks', startDate: daysAgo(today, 70), endDate: daysAgo(today, 35) }];
+    d.workouts.days[0].blocks.push(Object.assign({}, extra, { exercises: cards }));
+    db.programs.push({ athlete_id: id, data: d, updated_at: iso(today, 30), updated_by: 'pipeline@example.invalid' });
+  };
+  // used by: Tidy Old (45 days ago), Tidy Older (60 days), Tidy Never, Tidy Recent (7 days), Tidy Paused (paused, 50 days ago)
+  prog('tidy_old', 'Tidyold', [card('Band Row', 'band-row'), card('Band Pull-Apart', 'band-pull-apart'), card('Plank Hold', 'plank-hold'), card('Easy Jog', 'easy-jog'), card('Draft Thing', 'draft-thing')]);
+  prog('tidy_older', 'Tidyolder', [card('Band Row', 'band-row'), card('Plank Hold', 'plank-hold'), card('Video Thing', 'video-thing')]);
+  prog('tidy_never', 'Tidynever', [card('Band Row', 'band-row')]);
+  prog('tidy_recent', 'Tidyrecent', [card('Band Row', 'band-row'), card('Band Pull-Apart', 'band-pull-apart'), card('Easy Jog', 'easy-jog')]);
+  prog('tidy_paused', 'Tidypaused', [card('Plank Hold', 'plank-hold')]);
+  db.session_history.push(session('tidy_old', 'Tidyold Example', 1, daysAgo(today, 45)), session('tidy_older', 'Tidyolder Example', 1, daysAgo(today, 60)),
+    session('tidy_recent', 'Tidyrecent Example', 1, daysAgo(today, 7)), session('tidy_paused', 'Tidypaused Example', 1, daysAgo(today, 50)));
+  db.athlete_status.push({ athlete_id: 'tidy_paused', status: 'paused', since: daysAgo(today, 10), note: null, updated_at: iso(today, 10) });
+  // the demo and the coach's own identity are never listed, whatever their sessions say
+  [['demo', 'Demo'], ['amir_ardekani', 'Coach']].forEach(([id, first]) => {
+    if (!db.programs.some(r => r.athlete_id === id)) db.programs.push({ athlete_id: id, data: programme(first, { athlete: { id, firstName: first, lastName: 'Example', tier: 'coached' } }), updated_at: iso(today, 5), updated_by: 'pipeline@example.invalid' });
+  });
+  const ex = (id, name, pattern, status, video) => ({ id, name, aliases: [], pattern, qualities: ['armour'], purpose: 'Fixture.', tennis: null, cues: null, equipment: [], loads: [], easier: [], harder: [], alts: [],
+    video: video || null, status, updated_at: iso(today, 6), updated_by: 'coach', impact: 'none', muscles: null, steps: [] });
+  db.exercises.push(ex('band-row', 'Band Row', 'pull-horizontal', 'approved'), ex('plank-hold', 'Plank Hold', 'anti-extension', 'approved'), ex('easy-jog', 'Easy Jog', 'conditioning', 'approved'),
+    ex('draft-thing', 'Draft Thing', 'carry', 'draft'), ex('video-thing', 'Video Thing', 'carry', 'approved', 'https://www.youtube.com/watch?v=FIXTURE0002'), ex('unused-thing', 'Unused Thing', 'carry', 'approved'));
+}
+
+// ── Habits and court (2026-11-23, the file's grid and Athletes -> Habits), made up like everything here ───────────────────────────────────────────
+// buildSeed({ habitGrid: true }) gives Ava a real roster timeline (Mobility and a custom habit switched on SIX days ago, so they draw blank before that day),
+// fourteen days of logged values (some met, some under, some not logged), and court time (a hard day with two entries, a normal one, an old one); Dan a sleep
+// log and one easy court entry; Cara keeps the plain log she always had. Ben and Eli log nothing. Offsets are days before the page's today.
+function habitSeed(db, today) {
+  const L = (o, v) => { const x = {}; x[daysAgo(today, o)] = v; return x; };
+  const log = Object.assign({},
+    L(0, { steps: 10000, sleep: 7.5, fuel: 3, water: 8, strength: 1, mobility: 1 }),
+    L(1, { steps: 7500, sleep: 6.5, fuel: 2, water: 8 }),
+    L(2, { steps: 10500, sleep: 8, fuel: 3, water: 6, c_read: 1 }),
+    L(3, { steps: 9000, sleep: 7, fuel: 3, water: 8, strength: 1, mobility: 1 }),
+    L(4, { sleep: 5.5 }),
+    L(5, { steps: 11000, sleep: 7.5, fuel: 3, water: 8 }),
+    L(6, { steps: 4000, sleep: 6, water: 3 }),
+    L(8, { steps: 10000, sleep: 8, fuel: 3, water: 8, strength: 1 }),
+    L(10, { steps: 2000 }),    // 2,000 typed + an hour of hard tennis: 9,000 counts (under the 10,000)
+    L(11, { steps: 3000 }),    // 3,000 typed + an hour of hard tennis: 10,000 counts (met)
+    L(9, { steps: 8000, sleep: 7, fuel: 2, water: 7 }));
+  const cfg = { v: 3, on: { mobility: true, c_read: true }, custom: [{ id: 'c_read', name: '📖 Read 10 pages' }],
+    roster: [{ from: daysAgo(today, 30), ids: ['strength', 'steps', 'sleep', 'fuel', 'water'] },
+             { from: daysAgo(today, 6), ids: ['strength', 'steps', 'sleep', 'fuel', 'water', 'mobility', 'c_read'] }] };
+  const ava = db.athlete_progress.find(r => r.athlete_id === 'ava_test');
+  ava.data = { ava_test_hab_cfg: JSON.stringify(cfg), ava_test_hab_log: JSON.stringify(log) };
+  const dan = db.athlete_progress.find(r => r.athlete_id === 'dan_proof');
+  dan.data = { dan_proof_hab_log: JSON.stringify(Object.assign({}, L(5, { sleep: 5, steps: 12000 }), L(6, { sleep: 6, water: 8 }))) };
+  const act = (id, athlete, off, kind, minutes, effort) => ({ id, athlete_id: athlete, day: daysAgo(today, off), kind, minutes, effort, created_at: iso(today, off, '17') });
+  db.activity_log = [
+    act(1, 'ava_test', 1, 'tennis', 120, 'hard'), act(2, 'ava_test', 1, 'other', 30, 'normal'),
+    act(3, 'ava_test', 3, 'padel', 120, 'normal'), act(4, 'ava_test', 9, 'tennis', 60, 'easy'),
+    act(5, 'dan_proof', 2, 'padel', 45, 'easy'),
+    act(6, 'ava_test', 20, 'tennis', 90, 'normal'),   // older than 14 days: never read
+    act(7, 'ava_test', 10, 'tennis', 60, 'hard'), act(8, 'ava_test', 11, 'tennis', 60, 'hard'),
+  ];
+}
+
 function buildSeed(opt) {
   opt = opt || {};
   const today = opt.today;                     // the page's local YYYY-MM-DD
@@ -374,6 +443,7 @@ function buildSeed(opt) {
     // Career Mode / Courtside (stage70, stage75): the tables exist and are empty unless opt.court fills them (courtSeed above).
     career_awards: [], career_catalogue: [], career_facts: [], courtside_marks: [], career_honour_months: [], career_honours: [], career_goals: [], career_notes: [],
     athlete_status: [],
+    activity_log: [],   // the Court Log (stage116): empty unless opt.habitGrid fills it (habitSeed above)
     // a testing-app buyer's players, notes and results (made up). The coach reads them since stage50, for the backup only.
     assess_players: [
       { id: 'p-0001', account_id: 'u-assess-1', name: 'Fixture Player One', birth_year: 2012, birth_month: 4, sex: 'f', hand: 'r', squad: 'U14', created_at: iso(today, 20), updated_at: iso(today, 5), deleted_at: null },
@@ -386,6 +456,8 @@ function buildSeed(opt) {
     ],
   };
   if (opt.court) courtSeed(db, today, opt.courtAwards !== false);
+  if (opt.tidy) tidySeed(db, today);
+  if (opt.habitGrid) habitSeed(db, today);
   if (opt.crew || opt.open || opt.lounge) crewSeed(db);
   if (opt.open) openSeed(db, today);
   if (opt.lounge) loungeSeed(db, today);
