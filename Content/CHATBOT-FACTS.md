@@ -25,6 +25,7 @@ Last checked against the live pages: 2026-10-17. Amir's own corrections added th
 qualification, Liverpool, any sport and level, the WhatsApp talk, 5 cycles of 5 weeks, PayPal / card-to-card,
 nutrition advice but no plans). 2026-11-19: the Iran price now also has Amir's toman figure (about 6,700,000
 toman a cycle), shown on form-fa.html and index-fa.html, and the 48-hour programme delivery after payment.
+2026-11-23: both apply forms ask where you live first, then show that price.
 
 ---
 
@@ -167,9 +168,13 @@ report, WhatsApp and email support, and a 10% loyalty discount when you renew.
 - **Payment:** fill in the form, Amir messages you on WhatsApp within 48 hours, then you pay by
   card-to-card (کارت‌به‌کارت). Your programme is in your app within 48 hours of paying (Amir, 2026-11-19).
   People outside Iran pay by PayPal.
-- The Farsi form (https://www.amirardekani.com/form-fa.html) first shows the four steps and the price, then asks
-  «با این شرایط شروع کنیم؟» ("Shall we start on these terms?", Amir, 2026-11-23). "Yes" opens the questions; "Not now"
-  offers the course (for tennis players), the free articles or a WhatsApp question.
+- Both application forms, the Farsi one (https://www.amirardekani.com/form-fa.html) and the English one
+  (https://www.amirardekani.com/form.html), first ask where you live (Amir, 2026-11-23: "ask about where they live,
+  and then give appropriate info prices, in both forms"). Living in Iran: about 6,700,000 toman a cycle, paid
+  card-to-card. Outside Iran: the Game, Set and Match plans in US dollars, paid by PayPal. Then the form shows the
+  four steps and asks «با این شرایط شروع کنیم؟» ("Shall we start on these terms?"). "Yes" opens the questions. "Not
+  now" offers the free articles or a WhatsApp question (the English form adds the app demo; the Farsi form adds the
+  course for tennis players living in Iran).
 - **Start:** https://www.amirardekani.com/form-fa.html (the form is in Farsi; the button says «شروع کن»).
 
 ## [both] The Tennis Performance System course (سیستم آمادگی جسمانی تنیس)
