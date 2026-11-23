@@ -76,7 +76,10 @@ reference is [`../../HABITS.md`](../../HABITS.md). These are the rules for the h
   `round(minutes × MET ÷ 3.5) × 100` steps, a day's credit is capped at 70% of the target, and Steps for the day is the typed
   number plus the credit. ⚠️ **The typed number is never changed**: the server adds the credit as it reads the log
   (`hab_log_credited()`, inside `career_observe_proof()`), and the phone reads the log through `HAB_VIEW`, never saving it; the −,
-  + and number box edit the typed number. ⚠️ **The MET table exists twice** (`activity_met()` and `MOVE_MET`):
+  + and typing box edit the typed number. ⚠️ **The number on the row is the number that counts** (2026-11-23, Amir picked
+  *"A Total first"* after Tara read her typed 2,000 while 9,000 was scored): the big number is the total and the line under it
+  says *"2,000 walked + 7,000 from Tennis"*. `scripts/headless/move-credit.js` holds every counted row's number equal to
+  `valOf()`, and the headless stub answers `get_five_weeks()` with the live `acts` (check_twins holds its copies). ⚠️ **The MET table exists twice** (`activity_met()` and `MOVE_MET`):
   `scripts/check_twins.js` holds them equal. Forward only from 2026-11-22 (D20). It pays through Steps only, so Court Log itself
   still pays nothing. The table and its sources: [`../ref/move-credit.md`](../ref/move-credit.md).
 - **Played today? asks, it never pushes** (#126, 2026-11-22, Amir: *"Build 126 first"*). After 5 pm, on a day with no activity

@@ -55,21 +55,38 @@
     if (name === 'get_progress') return res({ data: S.progress || null, error: null, status: 200 });
     if (name === 'get_library') return res({ data: S.library || null, error: null, status: 200 });
     // Your weeks (#122, stage115, scripts/headless/five-weeks.js): get_five_weeks answers `fiveWeeks`; without it, a server without stage115.
+    // ⚠️ THE ANSWER HAS THE LIVE SERVER'S SHAPE. Since stage122 the server also sends `acts` (every Court Log row from 2026-11-22 and the
+    // last 70 days, whatever the weeks), and the phone works the Steps credit from `acts`, not from the weeks. Until 2026-11-23 this stub
+    // never sent it, so every Steps-credit check tested the old fallback and the live path had no check at all (Tara, 2026-11-23). When
+    // `fiveWeeks` carries no `acts`, the stub builds it from the weeks' court and other rows, as the server would; `fiveWeeks.acts` given
+    // explicitly is sent as it is (a row outside the weeks); fwNoActs = a server before stage122 (no `acts` at all).
     if (name === 'get_five_weeks') {
       if (S.fiveWeeks === undefined) return res({ data: null, error: { message: 'Could not find the function public.get_five_weeks(p_athlete_id) in the schema cache', code: 'PGRST202' }, status: 404 });
-      return res({ data: JSON.parse(JSON.stringify(S.fiveWeeks)), error: null, status: 200 });
+      var fwOut = JSON.parse(JSON.stringify(S.fiveWeeks));
+      if (fwOut && !S.fwNoActs && !Array.isArray(fwOut.acts)) {
+        var from70 = new Date(Date.now() - 70 * 86400000).toISOString().slice(0, 10);
+        fwOut.acts = [];
+        (fwOut.weeks || []).forEach(function (w) { (w.days || []).forEach(function (d) {
+          if (d && (d.k === 'court' || d.k === 'other') && d.day >= '2026-11-22' && d.day >= from70) fwOut.acts.push({ day: d.day, kind: d.kind, mins: d.mins, effort: d.effort, id: d.id });
+        }); });
+      }
+      return res({ data: fwOut, error: null, status: 200 });
     }
     // Court Log (#123, stage116): log_activity adds to `fiveWeeks` the way the server's reader would show it (one row per p_id; actErr = a
     // message to refuse with, e.g. 'activity:full'); delete_activity takes it out. Both are kept in '__stubcfg' so a reload sees them.
+    // The court kinds are get_five_weeks()'s seven (ACT_COURT in program.html), not the first three.
     if (name === 'log_activity') {
       if (S.actErr) return res({ data: null, error: { message: S.actErr, code: 'P0001' }, status: 400 });
       var row = { id: params.p_id, athlete_id: params.p_athlete_id, day: params.p_day, kind: params.p_kind, minutes: params.p_minutes, effort: params.p_effort };
       var fw = S.fiveWeeks, seen = false;
+      var COURT = ['tennis', 'padel', 'match', 'beach_tennis', 'pickleball', 'squash', 'badminton'];
       if (fw && fw.weeks) fw.weeks.forEach(function (w) { (w.days || []).forEach(function (d) { if (d.id === row.id) seen = true; }); });
+      if (fw && Array.isArray(fw.acts) && fw.acts.some(function (a) { return a && a.id === row.id; })) seen = true;
       if (fw && fw.weeks && !seen) fw.weeks.forEach(function (w) {
-        if (row.day >= w.from && row.day <= w.to) (w.days = w.days || []).push({ day: row.day, k: ['tennis', 'padel', 'match'].indexOf(row.kind) >= 0 ? 'court' : 'other',
-          kind: row.kind, title: row.kind.charAt(0).toUpperCase() + row.kind.slice(1), mins: row.minutes, effort: row.effort, id: row.id });
+        if (row.day >= w.from && row.day <= w.to) (w.days = w.days || []).push({ day: row.day, k: COURT.indexOf(row.kind) >= 0 ? 'court' : 'other',
+          kind: row.kind, title: row.kind.charAt(0).toUpperCase() + row.kind.slice(1).replace(/_/g, ' '), mins: row.minutes, effort: row.effort, id: row.id });
       });
+      if (fw && Array.isArray(fw.acts) && !seen) fw.acts.push({ day: row.day, kind: row.kind, mins: row.minutes, effort: row.effort, id: row.id });
       S.actLog = (S.actLog || []).concat(seen ? [] : [row]);
       try { var c1 = JSON.parse(localStorage.getItem('__stubcfg') || '{}'); c1.fiveWeeks = fw; localStorage.setItem('__stubcfg', JSON.stringify(c1)); } catch (e) {}
       return res({ data: row, error: null, status: 200 });
@@ -77,6 +94,7 @@
     if (name === 'delete_activity') {
       var gone = false;
       if (S.fiveWeeks && S.fiveWeeks.weeks) S.fiveWeeks.weeks.forEach(function (w) { var b = (w.days || []).length; w.days = (w.days || []).filter(function (d) { return d.id !== params.p_id; }); if (w.days.length < b) gone = true; });
+      if (S.fiveWeeks && Array.isArray(S.fiveWeeks.acts)) { var b2 = S.fiveWeeks.acts.length; S.fiveWeeks.acts = S.fiveWeeks.acts.filter(function (a) { return !a || a.id !== params.p_id; }); if (S.fiveWeeks.acts.length < b2) gone = true; }
       try { var c2 = JSON.parse(localStorage.getItem('__stubcfg') || '{}'); c2.fiveWeeks = S.fiveWeeks; localStorage.setItem('__stubcfg', JSON.stringify(c2)); } catch (e) {}
       return res({ data: gone, error: null, status: 200 });
     }

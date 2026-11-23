@@ -15,8 +15,11 @@ const T = at(0);
 const EVENING = 'Date.prototype.getHours = function () { return 19; };';
 const MORNING = 'Date.prototype.getHours = function () { return 9; };';
 
+// `acts` sent as the live server sends it (stage122): the phone reads the last activity from it, not from the weeks. Given explicitly
+// because the server's own list starts on 2026-11-22 and these rows are dated from today, so the stub's built list could leave them out.
 function weeks(days) {
-  return { n: 1, from: at(-6), to: at(28), current: true, weeks: [{ w: 1, from: at(-6), to: at(0), plan: 3, done: 0, held: false, now: true, days }] };
+  return { n: 1, from: at(-6), to: at(28), current: true, weeks: [{ w: 1, from: at(-6), to: at(0), plan: 3, done: 0, held: false, now: true, days }],
+    acts: days.filter(d => d.k === 'court' || d.k === 'other').map(d => ({ day: d.day, kind: d.kind, mins: d.mins, effort: d.effort, id: d.id })) };
 }
 const PADEL = { day: at(-2), k: 'court', kind: 'padel', title: 'Padel', mins: 75, effort: 'hard', id: 'p1' };
 const OLDER = { day: at(-5), k: 'court', kind: 'tennis', title: 'Tennis', mins: 60, effort: 'normal', id: 't1' };

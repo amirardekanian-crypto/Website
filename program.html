@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=15" data-fa="/assets/js/i18n-fa.js?v=29"></script>
+<script src="/assets/js/i18n.js?v=15" data-fa="/assets/js/i18n-fa.js?v=30"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -4906,6 +4906,9 @@
   #home-overview .hb-name { min-width: 0; font: 600 var(--fs-field)/1.25 'Barlow', sans-serif; }
   #home-overview .hb-row.is-done .hb-name { color: var(--grey); }
   #home-overview .hb-mv { color: var(--ink); }   /* stage121: what Court Log added to Steps */
+  /* 2026-11-23: "2,000 walked + 7,000 from Tennis" is longer than one line at 390 px, and an ellipsis cut off the very word that says
+     where the steps came from. It wraps instead (two classes, so it outranks .hb-sub's nowrap below). */
+  #home-overview .hb-sub.hb-mv { white-space: normal; overflow: visible; }
   /* #126 Played today?: the row under Steps, the clay rim for "not done yet", one green button, two quiet links under it. */
   #home-overview .pt-main { cursor: default; }
   #home-overview .pt-wrap .hb-ic { background: transparent; color: var(--clay); box-shadow: inset 0 0 0 2px var(--clay); }
@@ -13134,9 +13137,17 @@ function habBarHtml(hb, val) {
 function habRowHtml(hb, k) {
   const H = window.AAHabits;
   const done = H.isDone(hb, k), val = H.valOf(k, hb.id);
-  // Steps on a day with Court Log activity (stage121): the tick, the meter and what is left read the scored number (val, through
-  // HAB_VIEW); the − / + / number box show and edit what the athlete typed (raw), and one line says what the activity added.
+  // Steps on a day with Court Log activity (stage121): the tick, the meter, what is left AND THE BIG NUMBER read the scored number
+  // (val, through HAB_VIEW); the − / + and the typing box edit what the athlete typed (raw), and one line splits the two.
+  // ⚠️ THE NUMBER ON THE ROW IS THE NUMBER THAT COUNTS (2026-11-23, Amir picked direction A "Total first"). Until then the button showed
+  // the typed 2,000 and the activity's 7,000 lived only in a grey line, so Tara logged an hour of tennis and read "it doesn't add to my
+  // steps" while the server was scoring 9,000. scripts/headless/move-credit.js holds the button equal to H.valOf() on every count habit.
   const mv = hb.id === 'steps' ? moveCreditOn(k) : null, raw = mv ? habRaw(k, hb.id) : val;
+  const mvFrom = mv ? (mv.kinds.length === 1 ? (ACT_LABEL[mv.kinds[0]] || 'Activity') : 'your activity') : '';
+  const mvLine = !mv ? ''
+    : _habTyping === hb.id ? `Type the steps you walked. ${mvFrom.charAt(0).toUpperCase() + mvFrom.slice(1)} adds ${H.fmtVal(hb, mv.steps)}.`
+    : raw > 0 ? `${H.fmtVal(hb, raw)} walked + ${H.fmtVal(hb, mv.steps)} from ${mvFrom}`
+    : `+${H.fmtVal(hb, mv.steps)} from ${mvFrom}`;
   const name = H.splitEmoji(hb.name)[1] || hb.name;
   const hue = H.hue(hb) || [];
   const mark = `<span class="hb-ic" aria-hidden="true">${done ? HAB_TICK : window.ICON(habIconKey(hb), 2)}</span>`;
@@ -13160,13 +13171,13 @@ function habRowHtml(hb, k) {
       <button type="button" class="hb-step" data-h="${hb.id}" data-d="-1"${raw <= 0 ? ' disabled' : ''} onpointerdown="habStepDown(event, this)" onclick="habStepClick(event, this)" aria-label="Take ${step} off ${esc(name)}">−</button>
       ${_habTyping === hb.id
         ? `<input class="hb-now hb-type" id="hab-type-${hb.id}" type="text" inputmode="${Number(hb.step || 1) % 1 ? 'decimal' : 'numeric'}" enterkeyhint="done" autocomplete="off" value="${H.fmtVal(hb, raw).replace(/,/g, '')}" aria-label="${esc(name)}: type the ${esc(hb.unit || 'number')}" onkeydown="habTypeKey(event, '${hb.id}')" onblur="habTypeSave('${hb.id}')">`
-        : `<button type="button" class="hb-now${done ? ' is-done' : ''}" onclick="habTypeOpen('${hb.id}')" aria-label="${esc(name)}: ${H.fmtVal(hb, raw)} of ${H.fmtVal(hb, hb.target)} ${esc(hb.unit || '')}. Tap to type a number.">${H.fmtVal(hb, raw)}</button>`}
+        : `<button type="button" class="hb-now${done ? ' is-done' : ''}" onclick="habTypeOpen('${hb.id}')" aria-label="${esc(name)}: ${H.fmtVal(hb, val)} of ${H.fmtVal(hb, hb.target)} ${esc(hb.unit || '')}${mv ? ` (${esc(mvLine)})` : ''}. Tap to type a number.">${H.fmtVal(hb, val)}</button>`}
       <button type="button" class="hb-step" data-h="${hb.id}" data-d="1"${raw >= cap ? ' disabled' : ''} onpointerdown="habStepDown(event, this)" onclick="habStepClick(event, this)" aria-label="Add ${step} to ${esc(name)}">+</button>
     </span>` : '';
   return `<div class="hb-wrap" data-h="${hb.id}">
     <div class="hb-row${done ? ' is-done' : ''}${hb.locked ? ' is-locked' : ''}" style="--hcol:${esc(hue[0] || '')};--hbg:${esc(hue[1] || '')}">
       <button type="button" class="hb-main" onclick="habTap('${hb.id}')">
-        ${mark}<span class="hb-b"><span class="hb-name">${esc(name)}</span>${sub ? `<span class="hb-sub">${esc(sub)}</span>` : ''}${mv ? `<span class="hb-sub hb-mv">+${H.fmtVal(hb, mv.steps)} from ${esc(mv.kinds.length === 1 ? (ACT_LABEL[mv.kinds[0]] || 'Activity') : 'your activity')}</span>` : ''}${hb.kind === 'count' ? habBarHtml(hb, val) : ''}</span>
+        ${mark}<span class="hb-b"><span class="hb-name">${esc(name)}</span>${sub ? `<span class="hb-sub">${esc(sub)}</span>` : ''}${mv ? `<span class="hb-sub hb-mv">${esc(mvLine)}</span>` : ''}${hb.kind === 'count' ? habBarHtml(hb, val) : ''}</span>
       </button>${plus}
     </div>${edit}
   </div>`;

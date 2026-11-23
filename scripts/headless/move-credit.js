@@ -1,9 +1,12 @@
 // Court Log counts toward Steps (stage121, 2026-11-22): node scripts/headless/move-credit.js
 //
 // An activity on Your weeks adds round(minutes x MET / 3.5) x 100 steps to that day's Steps, capped at 70% of the target. The typed
-// number is never changed: the engine reads HAB_VIEW (the log plus the credit), the − / + / number box edit HAB_LOG, and only HAB_LOG is
-// saved. What this holds: the row says what the activity added and shows the typed number; what is left and the tick use the total; a +
-// saves the typed number plus one step, never the credit; a day before 2026-11-22 gets nothing; Farsi; no page errors.
+// number is never changed: the engine reads HAB_VIEW (the log plus the credit), the − / + / typing box edit HAB_LOG, and only HAB_LOG is
+// saved. What this holds: THE BIG NUMBER ON THE ROW IS THE SCORED NUMBER (2026-11-23, direction A "Total first": Tara read 2,000 on the
+// button while the server scored 9,000 and said the tennis did not add); the line under it splits walked and activity; what is left and
+// the tick use the total; a + saves the typed number plus one step, never the credit; typing types the walked steps; a day before
+// 2026-11-22 gets nothing; the live server's answer (stage122 `acts`, a row outside the weeks); an activity added on the phone reaches
+// Home at once and is still there after the server's answer; Farsi; no page errors.
 // Serve the repo first (python -m http.server <port> --bind 127.0.0.1; see lib.js: PLAYWRIGHT, CHROMIUM, BASE), then run this.
 'use strict';
 const H = require('./lib');
@@ -13,12 +16,12 @@ const DAY = 86400000;
 const at = n => new Date(Date.now() + n * DAY).toISOString().slice(0, 10);   // the pages here run in UTC
 const T = at(0);
 
-function weeks(days) {
-  return { n: 1, from: at(-3), to: at(31), current: true, weeks: [{ w: 1, from: at(-3), to: at(3), plan: 3, done: 0, held: false, now: true, days }] };
+function weeks(days, extra) {
+  return Object.assign({ n: 1, from: at(-3), to: at(31), current: true, weeks: [{ w: 1, from: at(-3), to: at(3), plan: 3, done: 0, held: false, now: true, days }] }, extra || {});
 }
 async function open(browser, o) {
   const { ctx, p } = await H.openProgram(browser, { tz: 'UTC', stub: { fiveWeeks: o.fw }, seed: { _hab_cfg: CFG, _hab_log: o.log || {} }, opts: {} });
-  await p.evaluate(() => { if (typeof loadFiveWeeks === 'function') loadFiveWeeks(); });
+  if (!o.natural) await p.evaluate(() => { if (typeof loadFiveWeeks === 'function') loadFiveWeeks(); });
   await p.waitForTimeout(900);
   return { ctx, p };
 }
@@ -28,26 +31,43 @@ const row = p => p.evaluate(() => {
     now: (w.querySelector('.hb-now') || {}).textContent, done: !!w.querySelector('.hb-row.is-done'),
     val: window.AAHabits.valOf(window.AAHabits.TKEY(), 'steps') };
 });
+// ⚠️ THE GUARD AGAINST THIS KIND OF BUG: on every counted habit's row, the number drawn is the number the engine scores (and the server
+// scores the same log through hab_log_credited()). A row that shows one number while another one counts is what Tara hit.
+const numbersMatch = p => p.evaluate(() => {
+  const A = window.AAHabits, k = A.AKEY(), bad = [];
+  document.querySelectorAll('.hb-wrap[data-h]').forEach(w => {
+    const hb = A.byId(w.dataset.h), b = w.querySelector('button.hb-now');
+    if (!hb || hb.kind !== 'count' || !b) return;
+    if (b.textContent.trim() !== A.fmtVal(hb, A.valOf(k, hb.id))) bad.push(hb.id + ': drawn ' + b.textContent.trim() + ', scored ' + A.fmtVal(hb, A.valOf(k, hb.id)));
+  });
+  return bad;
+});
 
 (async () => {
   const t = H.checker();
   const browser = await H.launch();
 
-  // ── 1. an hour of tennis on a day with 2,000 typed steps ──
+  // ── 1. an hour of tennis on a day with 2,000 typed steps (Tara, 2026-11-23) ──
   {
     const { ctx, p } = await open(browser, { fw: weeks([{ day: T, k: 'court', kind: 'tennis', title: 'Tennis', mins: 60, effort: 'normal', id: 'a1' }]), log: { [T]: { steps: 2000 } } });
     const r = await row(p);
-    t.check('the row says what the activity added, and shows the typed number', r && r.mv === '+7,000 from Tennis' && r.now === '2,000', JSON.stringify(r));
+    t.check('the big number is the day\'s total, and the line splits walked and tennis', r && r.now === '9,000' && r.mv === '2,000 walked + 7,000 from Tennis', JSON.stringify(r));
     t.check('what is left and the scored number use the total (2,000 + 7,000)', r && r.val === 9000 && r.sub === "1,000 steps to go" && !r.done, JSON.stringify(r));
+    t.check('every counted row draws the number that is scored', (await numbersMatch(p)).length === 0, JSON.stringify(await numbersMatch(p)));
     await p.evaluate(() => habStepOnce('steps', 1));
     await p.waitForTimeout(200);
     const saved = await p.evaluate(k => JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_log'))[k], T);
     const r2 = await row(p);
-    t.check('a + saves the typed number plus one step, never the credit', saved && saved.steps === 2500 && r2.now === '2,500' && r2.val === 9500, JSON.stringify([saved, r2]));
-    await p.evaluate(() => habSetVal('steps', 3000));
+    t.check('a + saves the typed number plus one step, never the credit', saved && saved.steps === 2500 && r2.now === '9,500' && r2.val === 9500
+      && r2.mv === '2,500 walked + 7,000 from Tennis', JSON.stringify([saved, r2]));
+    await p.evaluate(() => habTypeOpen('steps'));
+    const typing = await p.evaluate(() => ({ box: (document.getElementById('hab-type-steps') || {}).value, mv: (document.querySelector('.hb-wrap[data-h="steps"] .hb-mv') || {}).textContent }));
+    t.check('typing opens on the walked steps and says what the tennis adds', typing.box === '2500' && typing.mv === 'Type the steps you walked. Tennis adds 7,000.', JSON.stringify(typing));
+    await p.evaluate(() => { document.getElementById('hab-type-steps').value = '3000'; habTypeSave('steps'); });
     await p.waitForTimeout(200);
     const r3 = await row(p);
-    t.check('3,000 typed + 7,000 credit ticks Steps', r3.done && r3.val === 10000 && r3.now === '3,000', JSON.stringify(r3));
+    const saved3 = await p.evaluate(k => JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_log'))[k], T);
+    t.check('3,000 typed + 7,000 credit ticks Steps, and the typed 3,000 is what is saved', r3.done && r3.val === 10000 && r3.now === '10,000' && saved3.steps === 3000, JSON.stringify([r3, saved3]));
     t.check('no page errors', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }
@@ -60,7 +80,7 @@ const row = p => p.evaluate(() => {
       { day: '2026-11-21', k: 'court', kind: 'tennis', title: 'Tennis', mins: 60, effort: 'hard', id: 'b3' }]) });
     const r = await row(p);
     // cycling easy: 20 x 4.0 / 3.5 = 22.9 -> 2,300; padel easy: 15 x 5.0 / 3.5 = 21.4 -> 2,100
-    t.check('two kinds add up, each to the nearest 100, and the row says "your activity"', r && r.mv === '+4,400 from your activity' && r.val === 4400 && r.now === '0', JSON.stringify(r));
+    t.check('two kinds add up, each to the nearest 100, and with nothing typed the line says "your activity"', r && r.mv === '+4,400 from your activity' && r.val === 4400 && r.now === '4,400', JSON.stringify(r));
     const old = await p.evaluate(() => moveCreditOn('2026-11-21'));
     t.check('a day before 2026-11-22 carries no credit (forward only, D20)', old === null, JSON.stringify(old));
     const kept = await p.evaluate(() => localStorage.getItem(ATHLETE_ID + '_hab_log'));
@@ -68,7 +88,31 @@ const row = p => p.evaluate(() => {
     await ctx.close();
   }
 
-  // ── 3. in Farsi ──
+  // ── 3. the live server's answer (stage122): `acts` holds a row the weeks do not (a day before the cycle starts), and a plain boot ──
+  {
+    const fw = weeks([], { from: at(2), weeks: [{ w: 1, from: at(2), to: at(8), plan: 3, done: 0, held: false, now: false, days: [] }],
+      acts: [{ day: T, kind: 'tennis', mins: 60, effort: 'normal', id: 'd1' }] });
+    const { ctx, p } = await open(browser, { fw, log: { [T]: { steps: 2000 } }, natural: true });
+    const r = await row(p);
+    t.check('an activity outside the weeks still counts, read from acts on a plain boot', r && r.val === 9000 && r.now === '9,000', JSON.stringify(r));
+    await ctx.close();
+  }
+
+  // ── 4. an activity added on the phone reaches Home at once, and is still there after the server's own answer ──
+  {
+    const { ctx, p } = await open(browser, { fw: weeks([]), log: { [T]: { steps: 2000 } } });
+    const before = await row(p);
+    t.check('before: no line, the typed number', before && before.now === '2,000' && !before.mv, JSON.stringify(before));
+    await p.evaluate(() => { openActivitySheet(); actPick('kind', 'tennis'); actPick('mins', 60); actPick('effort', 'normal'); return saveActivity(); });
+    await p.waitForTimeout(1200);   // the save, then loadFiveWeeks()'s answer replacing the phone's own copy
+    const after = await row(p);
+    t.check('after saving an hour of tennis Home shows 9,000 with the split line, after the server answered', after && after.now === '9,000' && after.mv === '2,000 walked + 7,000 from Tennis',
+      JSON.stringify(after));
+    t.check('no page errors', p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+
+  // ── 5. in Farsi ──
   {
     const { ctx, p } = await H.openProgram(browser, { tz: 'UTC', stub: { fiveWeeks: weeks([{ day: T, k: 'court', kind: 'tennis', title: 'Tennis', mins: 60, effort: 'normal', id: 'c1' }]) },
       seed: { _hab_cfg: CFG, _hab_log: { [T]: { steps: 2000 } } }, opts: {}, preload: () => localStorage.setItem('aa_lang', 'fa') });
@@ -77,7 +121,11 @@ const row = p => p.evaluate(() => {
     await p.evaluate(() => { if (typeof loadFiveWeeks === 'function') loadFiveWeeks(); });
     await p.waitForTimeout(900);
     const mv = await p.evaluate(() => (document.querySelector('.hb-wrap[data-h="steps"] .hb-mv') || {}).textContent);
-    t.check('in Farsi the line reads in Farsi', /قدم از تنیس/.test(mv || ''), mv);
+    t.check('in Farsi the line reads in Farsi', /قدم پیاده/.test(mv || '') && /از تنیس/.test(mv || '') && !/walked/.test(mv || ''), mv);
+    await p.evaluate(() => habTypeOpen('steps'));
+    await p.waitForTimeout(300);
+    const mv2 = await p.evaluate(() => (document.querySelector('.hb-wrap[data-h="steps"] .hb-mv') || {}).textContent);
+    t.check('the typing line reads in Farsi too', /بنویس/.test(mv2 || '') && /تنیس/.test(mv2 || '') && !/Type the/.test(mv2 || ''), mv2);
     await ctx.close();
   }
 

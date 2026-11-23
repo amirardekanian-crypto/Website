@@ -1260,6 +1260,17 @@ run('the Steps credit of an activity (MOVE_MET, moveCreditOf / activity_met(), m
    [{ kind: 'pickleball', mins: 5, effort: 'normal' }], [{ kind: 'beach_tennis', mins: 90, effort: 'hard' }]].forEach(acts =>
     [10000, 8000].forEach(t => same('moveCreditOf vs the server\'s arithmetic', [acts, t], A_MOVE.moveCreditOf(acts, t), sqlCredit(acts, t))));
   expect('an hour of normal tennis is 11,700 steps, capped at 7,000', null, A_MOVE.moveCreditOf([{ kind: 'tennis', mins: 60, effort: 'normal' }], 10000), { steps: 7000, raw: 11700 });
+  // The third copy is the headless stub's get_five_weeks / log_activity (scripts/headless/stub.js). It answered without `acts` and with
+  // three court kinds for a day after stage122 changed the server, so every Steps-credit check tested a server that no longer existed
+  // (found 2026-11-23 over Tara's tennis). The court kinds and the first day of `acts` are held equal to the app's and the server's.
+  const court = src => { const m = /\[([^\]]*)\]/.exec(src || ''); return m ? m[1].match(/'([a-z_]+)'/g).map(x => x.slice(1, -1)) : null; };
+  const STUB_SRC = read('scripts/headless/stub.js');
+  const aCourt = court(lineSrc(A_SRC, 'const ACT_COURT', 'program.html'));
+  const fwSql = sql.slice(sql.indexOf('FUNCTION public.get_five_weeks('));
+  expect('the court kinds: program.html ACT_COURT and get_five_weeks()', null, aCourt, court('[' + ((/a\.kind in \(([^)]*)\)/.exec(fwSql) || [])[1] || '') + ']'));
+  expect('the court kinds: program.html ACT_COURT and the headless stub', null, aCourt, court((/var COURT = (\[[^\]]*\])/.exec(STUB_SRC) || [])[1]));
+  expect('the first day of the stub\'s `acts` is MOVE_FROM (the server\'s move_credit_from())', null, (/d\.day >= '(\d{4}-\d{2}-\d{2})'/.exec(STUB_SRC) || [])[1], A_MOVE.MOVE_FROM);
+  expect('get_five_weeks() still sends `acts` (the stub builds it when a test gives none)', null, /'acts', coalesce/.test(fwSql), /fwOut\.acts = \[\]/.test(STUB_SRC));
 });
 
 /* ── report ───────────────────────────────────────────────────────────────── */
