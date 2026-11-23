@@ -129,6 +129,21 @@ const numbersMatch = p => p.evaluate(() => {
     await ctx.close();
   }
 
+  // ── 6. in Farsi, what is left on every built-in counted habit, one and many (2026-11-23: "1,000 steps to go" read "steps ۱,۰۰۰ مونده",
+  //       because the generic "(.+) to go" pattern translates the unit on its own and steps, hours, meals and glasses had no Farsi word) ──
+  for (const log of [{ steps: 2000, sleep: 7, fuel: 2, water: 7 }, { steps: 9500, sleep: 5, fuel: 1, water: 2 }]) {
+    const { ctx, p } = await H.openProgram(browser, { tz: 'UTC', seed: { _hab_cfg: CFG, _hab_log: { [T]: log } }, opts: {} });
+    await p.evaluate(() => { localStorage.setItem('aa_lang', 'fa'); });
+    await p.reload(); await p.waitForTimeout(1500);
+    const subs = await p.evaluate(() => ['steps', 'sleep', 'fuel', 'water'].map(id => {
+      const s = document.querySelector('.hb-wrap[data-h="' + id + '"] .hb-sub');
+      return id + ': ' + (s ? s.textContent : '«no row»');
+    }));
+    t.check('in Farsi every "to go" line is Farsi, unit and all (' + JSON.stringify(log) + ')',
+      subs.every(s => /مونده/.test(s) && !/[A-Za-z]/.test(s.split(': ')[1])), JSON.stringify(subs));
+    await ctx.close();
+  }
+
   await browser.close();
   process.exit(t.report() ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(1); });
