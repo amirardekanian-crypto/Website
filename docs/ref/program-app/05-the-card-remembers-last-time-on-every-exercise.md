@@ -22,10 +22,26 @@ day, across cycles via `matchRenamed()`), and **History ›** opens the History 
   tennis or padel goal (`sport.badge`) is a green badge with a drawn ball, racket or both, the sport bold and the rest of
   the goal under it (`sportBadgeHtml()`, `SPORT_ICON`); any other goal keeps its mono line. `isRacketSport()` reads the
   same badge, so a tennis or padel player's badge must name the sport, or On court never shows.
-- **Not on the card any more** (2026-10-12, *The working card*): the open card has no **Last time** box (it was under
-  the Coach's Note from 2026-09-27; the closed card's clay *Last* pill went before that). The history is the ⓘ's
-  **Your history** row, each empty kg box shows last time's weight as LAST, and a circuit keeps its Last time strip.
-  The ⓘ is there for any lift with history, entry or not (`paintAbout()`), so History is always one tap behind it.
+- **No Last time box** (2026-10-12, *The working card*): the open card has none (it was under the Coach's Note from
+  2026-09-27; the closed card's clay *Last* pill went before that). Each empty kg box shows last time's weight as LAST,
+  and a circuit keeps its Last time strip. The ⓘ is there for any lift with history, entry or not (`paintAbout()`), and
+  its **Your history** row opens the History sheet too, which is how the Library reaches it.
+- **The Your history door, on the card** (Amir, 2026-11-23: *"Build B"*, direction B *History Door* of the board
+  *History on the Card*, after *"people cannot see it"*). On an open card that logs sets and has history, a white row
+  under How to do it, its twin (`.lt-door`, in `.lt-slot`, drawn by `paintLastTime()`): **YOUR HISTORY** over one line,
+  *6 sessions · up from 65 to 75 kg* (*· best set up from 5 to 8 reps* for a lift never weighed, *· holding 70 kg*; with
+  fewer than two sessions to compare, the About row's own *1 session. Last time 70 kg × 6.*), a small line of the
+  sessions (hidden under 360 px) and a ›. It opens the History sheet and leaves the card open. The closed card still
+  shows no history.
+- **The History sheet: one sentence, two lanes** (same day). `histSeries()` is the ONE series the door and the sheet
+  read: the last 12 sessions, oldest first, each session's **heaviest set** in the lift's newest measure (never the
+  estimate, which stays in Personal Records; a lift never weighed counts the most reps in a set). The sheet opens with one
+  plain sentence (`histSummary()`: *10 kg more than on 12 Oct, at about the same effort.*; the reps first when they moved
+  by 3 or more a set), then `histChart()`: a dot per session with its number above and its date under (always *D Mon*,
+  so each becomes its own Shamsi date in Farsi; past 7 sessions every other one, the newest always), the newest filled, a
+  grey *no kg* mark where a session has no weight in this measure, a dashed dot and *low day* on a low day, the floor
+  under the lowest dot; then **Effort, each set**: one bar per set, clay over the target, steel under it, the target a
+  dashed line. `scripts/headless/history-door.js` is the guard.
 - **`<id>_histcache` is a cache and never syncs** (`_snapshot()` skips it; written with
   `_lsRawSet` so it never stamps `lastEditAt`). The source is `get_my_history()`, stage30; since stage60 it leaves out a session the coach hid, so the next
   online open drops it from Last time and the Records.

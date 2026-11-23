@@ -36,7 +36,7 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   - **Too hard? / Too easy? / Other kit?** over **Regressions / Progressions / Alternatives**: a two-column table, a linked
     name with a round ›, a name with no entry marked *Not in the app yet*.
   - **Your history** (opened from a card that has history): one row, *N sessions. Last time 70 kg × 6 · 6 · 5.*, opening the
-    History sheet. It is the card's history now: the open card has no Last time box (*The working card*).
+    History sheet. The open card has its own way in since 2026-11-23, the Your history door (*The Card Remembers*).
   - Opened **whole** (Library → Exercises, or no card on screen), **How do I do it?** comes first: the player, You need and the
     steps (folded after two when there are four or more), then **What should I think about?** (the two good cues) and **What
     do people get wrong?** (the fault, the one clay bar besides the reason).

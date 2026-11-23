@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=15" data-fa="/assets/js/i18n-fa.js?v=26"></script>
+<script src="/assets/js/i18n.js?v=15" data-fa="/assets/js/i18n-fa.js?v=27"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -2861,16 +2861,29 @@
   .note-body strong { font-weight: 700; color: var(--green-ink); }
   @media (prefers-reduced-motion: reduce) { .note-chevron { transition: none; } }
 
-  /* 6. History (openHistorySheet()): the chart on the paper (the line and the dots green), the sessions as paper rows with a hairline between
-     (the date and RPEs in Space Mono, the set line in Barlow bold, the note in italic grey), Personal Records as a door row. */
-  .hs-lbl { margin: 22px 0 6px; font: 400 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
+  /* 6. History (openHistorySheet()): one plain sentence, then the graph on the paper in two lanes (B, Amir 2026-11-23: the heaviest set
+     as green dots with their numbers and dates, then one bar per set's effort against a dashed target), the sessions as paper rows with
+     a hairline between (the date and RPEs in Space Mono, the set line in Barlow bold, the note in italic grey), Personal Records as a door row. */
+  .hs-sum { margin: 18px 0 0; font: 600 var(--fs-lead)/1.35 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .hs-lbl { margin: 18px 0 2px; font: 400 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
   .hs-chart { display: block; width: 100%; height: auto; margin: 0 0 4px; overflow: visible; }
   .hs-base { stroke: var(--hair); stroke-width: 1; }
-  .hs-area { fill: var(--green-ink); fill-opacity: .08; }
-  .hs-line { fill: none; stroke: var(--green-ink); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+  .hs-area { fill: var(--green-ink); fill-opacity: .07; }
+  .hs-line { fill: none; stroke: var(--green-ink); stroke-width: 2.2; stroke-linecap: round; }
+  .hs-line.hs-skip { stroke-dasharray: 2 5; opacity: .55; }
   .hs-dot { fill: var(--green-ink); }
+  .hs-pt { fill: var(--paper); stroke: var(--green-ink); stroke-width: 2.2; }
+  .hs-low { stroke-dasharray: 2.4 2.2; }
+  .hs-gap { fill: none; stroke: var(--grey); stroke-width: 1.4; }
+  .hs-gapt, .hs-lowt { font: 400 var(--fs-label) 'Space Mono', monospace; fill: var(--grey); }
+  .hs-val { font: 700 var(--fs-body) 'Barlow Condensed', sans-serif; fill: var(--ink); }
+  .hs-end { font: 800 var(--fs-lead) 'Barlow Condensed', sans-serif; fill: var(--green-ink); }
   .hs-tick { font: 400 var(--fs-label) 'Space Mono', monospace; fill: var(--grey); }
-  .hs-end { font: 700 var(--fs-label) 'Space Mono', monospace; fill: var(--green-ink); }
+  .hs-lanet { font: 400 var(--fs-label) 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; fill: var(--grey); }
+  .hs-tgt { stroke: var(--grey); stroke-width: 1; stroke-dasharray: 2 3; }
+  .hs-eff { fill: var(--green-ink); fill-opacity: .5; }
+  .hs-eff.over { fill: var(--clay); fill-opacity: 1; }
+  .hs-eff.under { fill: var(--steel); fill-opacity: 1; }
   .hs-list { display: grid; margin-top: 10px; }
   .hs-row { display: grid; gap: 4px; padding: 14px 0; border-top: 1px solid var(--hair); }
   .hs-row:first-child { border-top: 0; }
@@ -3582,6 +3595,22 @@
     white-space: nowrap; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: .8px; text-transform: uppercase; color: var(--green-ink); }
   :where(#day-view, .step-scroll, #ws-body) .lt-big { margin-top: -6px; font: 500 var(--fs-small)/1.35 'Barlow', sans-serif; letter-spacing: 0; color: var(--grey); }
   :where(#day-view, .step-scroll, #ws-body) .lt-big b { font-weight: 700; color: var(--ink); }
+  /* Your history (B, Amir 2026-11-23: "Build B"): the door to the History sheet, How to do it's twin right under it (the same white
+     rounded row, the mono title over its line), the trend mark where How to do it has its ▶, a small line of the sessions before the ›.
+     The line wraps rather than cuts; under 360 px the small line goes, so the words keep their room. */
+  .lt-door { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; margin: 10px 0 0; padding: 0 14px 0 11px; box-sizing: border-box;
+    border: 1px solid var(--box); border-radius: 14px; background: var(--row); color: var(--ink); cursor: pointer; text-align: start; font: inherit; }
+  .lt-door-ic { flex: none; width: 20px; height: 20px; margin-right: 12px; color: var(--green-ink); }
+  .lt-door-ic svg { display: block; width: 20px; height: 20px; }
+  .lt-door-tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; padding: 10px 0; line-height: 1.2; }
+  .lt-door-t { font: 700 var(--fs-label)/1.1 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--green-ink); }
+  .lt-door-n { font: 500 var(--fs-body)/1.25 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; }
+  .lt-door-spark { flex: none; width: 64px; height: 28px; overflow: visible; }
+  .lt-door-spark polyline { fill: none; stroke: var(--green-ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .lt-door-spark circle { fill: var(--green-ink); }
+  .lt-door i { flex: none; margin: -2px 0 0; font: 500 var(--fs-title)/1 'Barlow', sans-serif; font-style: normal; color: var(--grey); }
+  .lt-door:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  @media (max-width: 359px) { .lt-door-spark { display: none; } }
 
   /* 7g. The set table: calm, on the paper. White boxes edged --field, the set numbers grey and the live set the ONE green
      number (a disc), LAST inside an empty kg box, the RPE tag in its own column 40+ px clear of the tick, How hard? a sand
@@ -12295,7 +12324,7 @@ const APP_GUIDE = [
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up: five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly. There are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every effort 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · Effort 7/10 · Down 3 s · Rest 2 min 30 s</strong> (sets × reps, the effort target, how long the lowering takes, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow next to its name means it opens, and the <strong>i</strong> after it is its info.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues), then your sets. How to do it opens by itself the first time you meet an exercise and is folded after that. The ▶ on it means there is a video. If the video won't play on your phone, tap <strong>Open in YouTube</strong> under it.</p><p>Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box. Once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". On a hold, like a plank, the circle times it for you: tap it and the hold timer fills the screen, big enough to read from the floor. Get set during 3-2-1, then it counts down and ticks the set at 0. <strong>Stop</strong> or <strong>✕</strong> stops it. On a hold done each side, it waits after the first side: get set on the other side and tap <strong>Start side 2</strong>. Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>The small <strong>kg</strong> at the top of the weight boxes, or inside each box on a superset, is the unit. Some machines show pounds, and some show no weight at all. Tap it and pick <strong>kg</strong>, <strong>lb</strong> or <strong>plates</strong>. For plates, count the stack and type that number. Pick it once on an exercise and it stays that way next time. Picked the wrong one? Tap <strong>Undo</strong> in the note that shows.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot. If a weight is far above your numbers for that lift, the circle asks once first: tap it again to keep it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and <strong>tap the circle</strong> on the right when it's done. A superset or circuit has <strong>a circle for each round</strong> under its movements: tick each round as you finish it. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
+    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · Effort 7/10 · Down 3 s · Rest 2 min 30 s</strong> (sets × reps, the effort target, how long the lowering takes, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow next to its name means it opens, and the <strong>i</strong> after it is its info.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues), then Your history on an exercise you've done before, then your sets. How to do it opens by itself the first time you meet an exercise and is folded after that. The ▶ on it means there is a video. If the video won't play on your phone, tap <strong>Open in YouTube</strong> under it.</p><p>Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box. Once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". On a hold, like a plank, the circle times it for you: tap it and the hold timer fills the screen, big enough to read from the floor. Get set during 3-2-1, then it counts down and ticks the set at 0. <strong>Stop</strong> or <strong>✕</strong> stops it. On a hold done each side, it waits after the first side: get set on the other side and tap <strong>Start side 2</strong>. Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>The small <strong>kg</strong> at the top of the weight boxes, or inside each box on a superset, is the unit. Some machines show pounds, and some show no weight at all. Tap it and pick <strong>kg</strong>, <strong>lb</strong> or <strong>plates</strong>. For plates, count the stack and type that number. Pick it once on an exercise and it stays that way next time. Picked the wrong one? Tap <strong>Undo</strong> in the note that shows.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot. If a weight is far above your numbers for that lift, the circle asks once first: tap it again to keep it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and <strong>tap the circle</strong> on the right when it's done. A superset or circuit has <strong>a circle for each round</strong> under its movements: tick each round as you finish it. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap <strong>Your history</strong> on the open exercise to read it.</p>` },
   { icon: 'tracking', key: 'guided', title: 'Guided mode',
     body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done · Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your effort. The rest screen also says what comes next. When the rest is over it moves you to the next set, or tap <strong>Skip →</strong> to start it early. The small <strong>i</strong> by the exercise&rsquo;s name in the top bar says what it is for. Supersets and circuits come round by round. It starts with your warm-up: tick each part as you do it, or tap <strong>Done ✓</strong> for all of it. <strong>Skip</strong> moves on, and I see it was skipped. In a week where my note sets a limit, it sits under the top bar and under the effort buttons while you rest, like <strong>Max effort 7</strong>.</p><p>At the end, <strong>Finish session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top. Once the clock is going, it's under <strong>⋯</strong>.</p>` },
   { icon: 'compass', title: 'The ⓘ: what an exercise is for',
@@ -12303,7 +12332,7 @@ const APP_GUIDE = [
   { icon: 'compass', title: 'What each day builds',
     body: `<p>The <strong>Next up</strong> card on Home, and the top of each day, show up to three words, like <strong>Strength · Brakes · Spring</strong>. They're what that day trains most, strongest first, worked out from the exercises in it. Warm-ups don't count.</p><p>Tap one to see what it means. The same words show on an exercise's <strong>i</strong> sheet.</p>` },
   { icon: 'activity', title: 'Your history on every exercise',
-    body: `<p>Every exercise remembers what you did. An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. A set that ran <strong>over</strong> its target last time also shows a faint <em>Last time</em> line beside today's row.</p><p>For the whole story, tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>: every time you've done it, your reps, your efforts and your notes, and how your best set has moved.</p><p>A superset or circuit still shows <strong>Last time</strong> when you open it, because its boxes don't show last time's weights.</p><p>It shows what you did, never what to lift. Train to today's effort target, and I'll put a weight in the Coach's Note when I want one.</p>` },
+    body: `<p>Every exercise remembers what you did. An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. A set that ran <strong>over</strong> its target last time also shows a faint <em>Last time</em> line beside today's row.</p><p>For the whole story, open the exercise and tap <strong>Your history</strong>, right under How to do it. It says how many times you've done it and where you started, then shows every session as a dot with its heaviest set, and under it a bar for each set's effort against your target. Your reps, efforts and notes are under the graph.</p><p>A superset or circuit still shows <strong>Last time</strong> when you open it, because its boxes don't show last time's weights.</p><p>It shows what you did, never what to lift. Train to today's effort target, and I'll put a weight in the Coach's Note when I want one.</p>` },
   { icon: 'activity', title: 'Personal Records: the most you could lift once',
     body: `<p>Open <strong>Progress</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
@@ -26788,8 +26817,9 @@ function histSetsText(sets, planned) {
 }
 // The set in one past session that gives the highest estimated max, at the reps it
 // was done for (its own `n`, else the plan's). { est, kg, reps, rpe } or null. ONE copy
-// of the maths, read by the History sheet's trend and by the records that fill
-// themselves (fillRecordsFrom), so the two can never show different numbers.
+// of the maths, read by the records that fill themselves (fillRecordsFrom) and by Career
+// Mode's twin (check_twins.js). The History sheet drew it until 2026-11-23; it draws the
+// heaviest set now (histSeries()), and the estimate lives in Personal Records.
 // The measure an exercise's sets were lifted in: the unit of the first set that holds a weight, else kg. A session's exercise is in one
 // measure (the unit button relabels the whole card); a set typed in another is left out of every best, so two measures never meet.
 function setsMeasure(sets) {
@@ -26816,16 +26846,85 @@ function histBestSet(e) {
   return best;
 }
 
-// NO HISTORY ON THE EXERCISE CARD (Amir, 2026-10-12: "the history ... should be removed from exercise cards.
-// because their last time, is actually already in the reps, weight box"). The Last time box (CARD-01,
-// 2026-09-27) is gone from every standard card: last time's weight is in each empty kg box under LAST
-// (carrySet()), a set that ran over target last time keeps its faint line under today's row, and the whole
-// story is the ⓘ's Your history, which opens the History sheet. What stays here: the "First time" line on a
-// lift never logged, and a circuit's strip, always open, because a circuit's kg boxes show nothing of last time.
+// ── YOUR HISTORY, ON THE CARD (direction B, "History Door", of the board History on the Card; Amir 2026-11-23:
+// "Build B"). People did not find their history behind the ⓘ, so the open card carries a door to it under How to do
+// it: Your history, how many sessions, where the lift started and where it is now, and a small line. The door opens
+// the History sheet, which draws the same series bigger. ONE series feeds both (histSeries()), so they never disagree:
+//   · the sheet's last 12 sessions, oldest first, a circuit left out;
+//   · each session's HEAVIEST SET in the lift's newest measure (kg, lb or plates), never the estimate: only what was
+//     lifted (no estimate on the working card, 2026-09-26). The estimate stays in Personal Records;
+//   · a lift never weighed: the most reps in one set. A session with neither keeps its place as a grey mark.
+// History, never a prescription: nothing here says what to lift today.
+function histNum(n) { return String(Math.round(n * 100) / 100); }
+function histSeries(name) {
+  const histAll = historyFor(name), hist = histAll.slice(0, 12).filter(h => h.entry && !h.entry.circuit);
+  let lu = null;
+  for (const h of hist) {
+    const s = (h.entry.sets || []).find(x => histSetLogged(x) && weightOf(x.w).n != null);
+    if (s) { lu = weightOf(s.w).unit; break; }
+  }
+  const pts = hist.slice().reverse().map(h => {
+    const e = h.entry, sets = (e.sets || []).filter(histSetLogged), rd = h.ready;
+    const reps = sets.map(s => setReps(s, e.reps || null)).filter(n => n > 0);
+    let v = null, other = null;
+    if (lu) sets.forEach(s => { const w = weightOf(s.w); if (w.n == null) return; if (w.unit !== lu) other = w.unit; else if (v == null || w.n > v) v = w.n; });
+    else if (reps.length) v = Math.max(...reps);
+    // A low day as the History rows say it (B19): the check-in's plan, lower or short, and not trained as written.
+    return { date: h.date, v, other, reps, rpes: sets.map(s => Number(s.r)).filter(r => r > 0),
+      low: !!(rd && (rd.level === 'amber' || rd.level === 'red') && !rd.asWritten) };
+  });
+  const vals = pts.filter(p => p.v != null);
+  return { all: histAll.length, last: histAll[0] || null, pts, vals, lu, first: vals[0] || null, now: vals[vals.length - 1] || null };
+}
+// The measure's word after a number: "kg", "lb", "plates"; a lift never weighed counts reps.
+function histUnit(S, n) { return S.lu ? unitWord(S.lu, n) : 'reps'; }
+// Last time's sets as the About sheet's Your history row says them: "70 kg × 6 · 6 · 6", "4 × 8", "8 · 7 · 7 reps".
+function histLastText(e) {
+  let lt = (!e || e.circuit) ? '' : histSetsText(e.sets, e.reps || null);
+  if (lt.startsWith('×')) {
+    const ns = lt.slice(1).trim().split(' · ');
+    lt = ns.every(n => n === ns[0]) ? `${ns.length} × ${ns[0]}` : ns.join(' · ') + ' reps';
+  }
+  return lt;
+}
+// The door's line: "6 sessions · up from 65 to 75 kg", "5 sessions · best set up from 5 to 8 reps", "· holding 70 kg". With fewer
+// than two sessions to compare, the About sheet's own words: "1 session. Last time 70 kg × 6 · 6 · 6."
+// A number keeps its word on its line ("75 kg", "6 sessions": a no-break space), so a wrap never leaves "kg" alone.
+function histDoorLine(S) {
+  const ses = `${S.all} session${S.all === 1 ? '' : 's'}`;
+  if (S.vals.length < 2) { const lt = S.last ? histLastText(S.last.entry) : ''; return `${ses}.${lt ? ' Last time ' + lt + '.' : ''}`; }
+  const a = S.first.v, b = S.now.v, A = histNum(a), B = `${histNum(b)} ${histUnit(S, b)}`, best = S.lu ? '' : 'best set ';
+  return b > a ? `${ses} · ${best}up from ${A} to ${B}` : b < a ? `${ses} · ${best}down from ${A} to ${B}` : `${ses} · ${best}holding ${B}`;
+}
+// The small line on the door: the same dots as the sheet, the newest filled. Nothing to draw under two sessions.
+function histSpark(S) {
+  if (S.vals.length < 2) return '';
+  const W = 64, H = 28, n = S.pts.length, vs = S.vals.map(p => p.v), lo = Math.min(...vs), hi = Math.max(...vs);
+  const x = i => 3 + i * (W - 9) / Math.max(1, n - 1), y = v => hi === lo ? H / 2 : H - 4 - ((v - lo) / (hi - lo)) * (H - 10);
+  const line = S.pts.map((p, i) => p.v == null ? null : x(i).toFixed(1) + ',' + y(p.v).toFixed(1)).filter(Boolean).join(' ');
+  const li = S.pts.indexOf(S.now);
+  return `<svg class="lt-door-spark" viewBox="0 0 ${W} ${H}" aria-hidden="true"><polyline points="${line}"/><circle cx="${x(li).toFixed(1)}" cy="${y(S.now.v).toFixed(1)}" r="3.2"/></svg>`;
+}
+function histDoorEl(card, S) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'lt-door';
+  b.innerHTML = `<span class="lt-door-ic">${AX_HIST_ICON}</span><span class="lt-door-tx"><span class="lt-door-t">Your history</span><span class="lt-door-n">${
+    esc(histDoorLine(S))}</span></span>${histSpark(S)}<i aria-hidden="true">›</i>`;
+  b.addEventListener('click', ev => { ev.stopPropagation(); openHistorySheet(card); });
+  return b;
+}
+
+// What the card says of last time. No Last time BOX (Amir, 2026-10-12: "the history ... should be removed from exercise
+// cards. because their last time, is actually already in the reps, weight box"): last time's weight is in each empty kg
+// box under LAST (carrySet()), and a set that ran over target last time keeps its faint line under today's row. The rest
+// of the story is behind the Your history door, under How to do it (above; 2026-11-23), and the ⓘ's Your history row.
+// Also here: the "First time" line on a lift never logged, and a circuit's strip, always open, because a circuit's kg
+// boxes show nothing of last time.
 function paintLastTime(card) {
   if (!card || !card.querySelector('.item-name')) return;
   const detail = cardDetail(card);
-  if (detail) detail.querySelectorAll('.lt-strip, .lt-ghost').forEach(el => el.remove());
+  if (detail) detail.querySelectorAll('.lt-strip, .lt-ghost, .lt-door').forEach(el => el.remove());
   if (HIST == null) return;                       // not loaded yet — draw nothing rather than "first time"
   const name = card.querySelector('.item-name').textContent.trim();
   const isCircuit = card.classList.contains('round-group');
@@ -26839,7 +26938,7 @@ function paintLastTime(card) {
   if (!isCircuit) {
     paintKgCol(card);                             // a weight logged before keeps the kg box
     openHowFirstTime(card, !hist.length);          // video and cues open the first time only
-    paintAbout(card);                             // history alone earns the ⓘ: it is the way to History now
+    paintAbout(card);                             // history alone earns the ⓘ: its sheet's Your history row is a way in too
   }
 
   if (!hist.length) {
@@ -26871,6 +26970,9 @@ function paintLastTime(card) {
     place(strip);
     return;
   }
+
+  // The Your history door (B, 2026-11-23): in the slot under How to do it, on a card that logs sets.
+  if (detail.querySelector('.ex-set-log')) place(histDoorEl(card, histSeries(name)));
 
   // The ghost line: only under the set(s) that ran OVER target last time.
   if (target) {
@@ -26963,61 +27065,107 @@ async function loadHistory() {
   } catch (e) { /* offline — the cached copy above stays */ }
 }
 
-// ── The History sheet ── every time this exercise was done, newest first, with a
-// trend of the best set's estimated 1RM (the same maths as Personal Records, so
-// the two can never disagree) or, when no set can be estimated, the top weight.
+// ── The History sheet ── every time this exercise was done, newest first, under one plain sentence and a graph in two
+// lanes (B, Amir 2026-11-23): the heaviest set of each session, then each set's effort against the target. The series
+// is histSeries(), the same one the card's Your history door draws, so the door and the sheet tell one story.
+// "9 Nov", never a bare day: on a Farsi phone each label becomes its own Shamsi date, and a day with no month would not.
+function histDayMon(iso) { return histDateLabel(iso).when.replace(/^\S+ /, ''); }
+// "10 kg more than on 12 Oct" + ", at about the same effort." Two spans, so each half has its own Farsi.
+function histSummary(S) {
+  if (S.vals.length < 2) return '';
+  const a = S.first.v, b = S.now.v, d = Math.round((b - a) * 100) / 100, fd = histDayMon(S.first.date);
+  let head;
+  if (S.lu) head = d > 0 ? `${histNum(d)} ${histUnit(S, d)} more than on ${fd}` : d < 0 ? `${histNum(-d)} ${histUnit(S, -d)} less than on ${fd}`
+                          : `The same ${histNum(b)} ${histUnit(S, b)} as on ${fd}`;
+  else head = d > 0 ? `Your best set went up from ${histNum(a)} to ${histNum(b)} reps since ${fd}` : d < 0 ? `Your best set went down from ${histNum(a)} to ${histNum(b)} reps since ${fd}`
+                     : `The same best set of ${histNum(b)} reps as on ${fd}`;
+  const mid = xs => { const s = xs.slice().sort((p, q) => p - q); return s.length ? s[Math.floor(s.length / 2)] : null; };
+  const rf = mid(S.first.reps), rl = mid(S.now.reps);
+  let tail = '.';
+  // More weight for far fewer reps is not the same lift: say the reps before the effort (3 or more a set either way).
+  if (S.lu && rf && rl && Math.abs(rl - rf) >= 3) tail = `, for ${rl < rf ? 'fewer' : 'more'} reps (${rl} a set, was ${rf}).`;
+  else if (S.first.rpes.length && S.now.rpes.length) {
+    const avg = xs => xs.reduce((s, r) => s + r, 0) / xs.length, de = avg(S.now.rpes) - avg(S.first.rpes);
+    tail = Math.abs(de) <= 0.75 ? ', at about the same effort.' : de < 0 ? ', and it felt easier.' : ', and it felt harder.';
+  }
+  return `<p class="hs-sum"><span>${esc(head)}</span><span>${esc(tail)}</span></p>`;
+}
+// The graph. Top lane: a dot per session with its number above it and its date under it, the newest filled; a grey mark where a
+// session has no weight in this measure; a dashed dot on a low day. The floor sits under the lowest dot, so nothing rests on the
+// line and a small step looks small. Past 7 sessions every other one (the newest always) carries its number and date. Bottom lane:
+// one bar per set, its height the effort, clay over the target and steel under it as the rows colour their numbers, the target a
+// dashed line. Not tappable: the list under it is the detail.
+function histChart(S, target, label) {
+  const P = S.pts, n = P.length, W = 350, padL = 26, padR = 26, top = 30, plotH = 108, plotB = top + plotH, dateY = plotB + 18;
+  const vs = S.vals.map(p => p.v);
+  let lo = Math.min(...vs), hi = Math.max(...vs);
+  if (hi === lo) { lo -= 1; hi += 1; }
+  const sp = hi - lo; lo -= sp * 0.22; hi += sp * 0.04;
+  const step = n > 1 ? (W - padL - padR) / (n - 1) : 0;
+  const x = i => n === 1 ? W / 2 : padL + i * step, X = i => x(i).toFixed(1);
+  const y = v => top + (1 - (v - lo) / (hi - lo)) * (plotH - 10);
+  const said = i => n <= 7 || (n - 1 - i) % 2 === 0;
+  const lowWords = n <= 7 && P.some(p => p.low);
+  let g = `<line class="hs-base" x1="6" x2="${W - 6}" y1="${plotB}" y2="${plotB}"/>`;
+  const idx = [];
+  P.forEach((p, i) => { if (p.v != null) idx.push(i); });
+  g += `<path class="hs-area" d="M${X(idx[0])},${plotB} ${idx.map(i => 'L' + X(i) + ',' + y(P[i].v).toFixed(1)).join(' ')} L${X(idx[idx.length - 1])},${plotB} Z"/>`;
+  for (let k = 1; k < idx.length; k++) {
+    const a = idx[k - 1], b = idx[k];   // dotted across a session that has no weight in this measure
+    g += `<line class="hs-line${b - a > 1 ? ' hs-skip' : ''}" x1="${X(a)}" y1="${y(P[a].v).toFixed(1)}" x2="${X(b)}" y2="${y(P[b].v).toFixed(1)}"/>`;
+  }
+  P.forEach((p, i) => {
+    const now = p === S.now;
+    if (p.v == null) {
+      g += `<circle class="hs-gap" cx="${X(i)}" cy="${plotB - 9}" r="3.5"/>`;
+      const why = p.other ? 'in ' + unitWord(p.other, 2) : (S.lu ? 'no ' + unitWord(S.lu, 2) : '');
+      if (why && said(i)) g += `<text class="hs-gapt" x="${X(i)}" y="${plotB - 18}" text-anchor="middle">${why}</text>`;
+    } else {
+      const cy = y(p.v), r = now ? 6 : 4.5;
+      g += `<circle class="${now ? 'hs-dot' : 'hs-pt'}${p.low ? ' hs-low' : ''}" cx="${X(i)}" cy="${cy.toFixed(1)}" r="${r}"/>`;
+      if (said(i)) g += `<text class="${now ? 'hs-end' : 'hs-val'}" x="${X(i)}" y="${(cy - r - 6).toFixed(1)}" text-anchor="middle">${histNum(p.v)}</text>`;
+    }
+    if (said(i)) g += `<text class="hs-tick" x="${X(i)}" y="${dateY}" text-anchor="middle">${histDayMon(p.date)}</text>`;
+    if (lowWords && p.low) g += `<text class="hs-lowt" x="${X(i)}" y="${dateY + 13}" text-anchor="middle">low day</text>`;
+  });
+  let H = dateY + 8 + (lowWords ? 13 : 0);
+  if (P.some(p => p.rpes.length)) {
+    const lt = H + 24, lh = 40, lb = lt + lh;
+    const tm = String(target == null ? '' : target).match(/(\d+(?:\.\d+)?)(?:\s*[-–]\s*(\d+(?:\.\d+)?))?/);
+    const ey = r => lb - Math.max(0.06, Math.min(1, (r - 4) / 6)) * lh;
+    g += `<text class="hs-lanet" x="6" y="${lt - 9}">Effort, each set</text><line class="hs-base" x1="6" x2="${W - 6}" y1="${lb}" y2="${lb}"/>`;
+    if (tm) {
+      const ty = ey(Number(tm[2] || tm[1])).toFixed(1);   // over means above the top of a range
+      g += `<text class="hs-lanet" x="${W - 6}" y="${lt - 9}" text-anchor="end">target ${esc(String(target).trim())}</text><line class="hs-tgt" x1="6" x2="${W - 6}" y1="${ty}" y2="${ty}"/>`;
+    }
+    P.forEach((p, i) => {
+      const k = p.rpes.length;
+      if (!k) return;
+      const gp = 1.5, bw = Math.max(1.5, Math.min(4, ((n > 1 ? step : 40) * 0.8 - (k - 1) * gp) / k)), x0 = x(i) - (k * bw + (k - 1) * gp) / 2;
+      p.rpes.forEach((r, j) => {
+        const vs2 = rpeVs(r, target), yy = ey(r);
+        g += `<rect class="hs-eff${vs2 ? ' ' + vs2 : ''}" x="${(x0 + j * (bw + gp)).toFixed(1)}" y="${yy.toFixed(1)}" width="${bw.toFixed(1)}" height="${(lb - yy).toFixed(1)}" rx="1"/>`;
+      });
+    });
+    H = lb + 4;
+  }
+  return `<svg class="hs-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}: from ${histNum(S.first.v)} to ${histNum(S.now.v)}">${g}</svg>`;
+}
 function openHistorySheet(card) {
   const name = card.querySelector('.item-name').textContent.trim();
-  const planned = cardReps(card);
   const target = card.dataset.target || null;   // the rows: a past set against the card as written
   const today = rpeTargetOf(card) || null;       // the caption: today's target (this week's cap, a lower day)
   const histAll = historyFor(name), hist = histAll.slice(0, 12);   // the list shows 12 rows, the count is every session (Love All B9)
   const ov = document.getElementById('hist-overlay');
   if (!ov) return;
 
-  // The chart is drawn in the unit the lift was last logged in (kg, lb or plates); a session in another unit leaves the line, never
-  // joins it as if the numbers were alike.
-  let lu = 'kg';
-  for (const h of hist) {
-    const s = h.entry && !h.entry.circuit && (h.entry.sets || []).find(x => weightOf(x && x.w).n != null);
-    if (s) { lu = weightOf(s.w).unit; break; }
-  }
-  const pts = hist.slice().reverse().map(h => {
-    const e = h.entry;
-    if (e.circuit) return null;
-    const best = histBestSet(e);
-    let top = null;
-    (e.sets || []).filter(histSetLogged).forEach(s => {
-      const w = weightOf(s.w);
-      if (w.n != null && w.unit === lu && (top == null || w.n > top)) top = w.n;
-    });
-    const estOk = best && uKey(best.u) === lu;      // an estimate is in its measure's own number: drawn only beside the same measure
-    return { date: h.date, est: estOk ? best.est : null, top };
-  }).filter(Boolean);
-  const estPts = pts.filter(p => p.est != null);
-  const series = estPts.length >= 2 ? { label: `Best set · most you could lift once, ${lu}`, vals: estPts.map(p => p.est) }
-               : (pts.filter(p => p.top != null).length >= 2
-                 ? { label: lu === 'plates' ? 'Top stack, plates' : `Top weight, ${lu}`, vals: pts.filter(p => p.top != null).map(p => p.top) } : null);
-
+  // The graph is drawn in the measure the lift was last logged in (kg, lb or plates); a session in another measure keeps its
+  // place as a grey mark, never joins the line as if the numbers were alike.
+  const S = histSeries(name);
   let chart = '';
-  if (series) {
-    const v = series.vals, W = 300, H = 84, px = 10, py = 14;
-    const lo = Math.min(...v), hi = Math.max(...v), span = (hi - lo) || 1;
-    const x = i => px + (v.length === 1 ? 0 : i * (W - 2 * px) / (v.length - 1));
-    const y = val => H - py - ((val - lo) / span) * (H - 2 * py);
-    const line = v.map((val, i) => `${x(i).toFixed(1)},${y(val).toFixed(1)}`).join(' ');
-    const area = `M${x(0).toFixed(1)},${H - py} L` + v.map((val, i) => `${x(i).toFixed(1)},${y(val).toFixed(1)}`).join(' L')
-               + ` L${x(v.length - 1).toFixed(1)},${H - py} Z`;
-    const lastI = v.length - 1;
-    chart = `<div class="hs-lbl">${esc(series.label)}</div>
-      <svg class="hs-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(series.label)}: from ${v[0]} to ${v[lastI]}">
-        <line x1="0" y1="${H - py}" x2="${W}" y2="${H - py}" class="hs-base"/>
-        <path d="${area}" class="hs-area"/>
-        <polyline points="${line}" class="hs-line"/>
-        <circle cx="${x(lastI).toFixed(1)}" cy="${y(v[lastI]).toFixed(1)}" r="4.5" class="hs-dot"/>
-        <text x="${px}" y="${H - 2}" class="hs-tick">${esc(String(v[0]))}</text>
-        <text x="${W - px - 10}" y="${Math.max(11, y(v[lastI]) - 9).toFixed(1)}" text-anchor="end" class="hs-end">${esc(String(v[lastI]))}</text>
-      </svg>`;
+  if (S.vals.length >= 2) {
+    const label = !S.lu ? 'Most reps in a set' : S.lu === 'plates' ? 'Top stack, plates' : `Top weight, ${S.lu}`;
+    chart = `${histSummary(S)}<div class="hs-lbl">${esc(label)}</div>${histChart(S, target, label)}`;
   }
 
   const rows = hist.map(h => {
@@ -27593,12 +27741,7 @@ function axHow(e) {
 function axHistRow(card, name) {
   const hist = name ? historyFor(name) : [];
   if (!hist.length) return '';
-  const last = hist[0].entry;
-  let lt = last.circuit ? '' : histSetsText(last.sets, last.reps || null);
-  if (lt.startsWith('×')) {
-    const ns = lt.slice(1).trim().split(' · ');
-    lt = ns.every(n => n === ns[0]) ? `${ns.length} × ${ns[0]}` : ns.join(' · ') + ' reps';
-  }
+  const lt = histLastText(hist[0].entry);
   return `<button type="button" class="ax-hist" id="ax-hist">${AX_HIST_ICON}<span class="ax-hist-t"><b>Your history</b><small>${
     hist.length} session${hist.length === 1 ? '' : 's'}.${lt ? ' Last time ' + esc(lt) + '.' : ''}</small></span><span class="ax-go" aria-hidden="true">›</span></button>`;
 }

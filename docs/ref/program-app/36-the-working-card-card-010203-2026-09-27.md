@@ -26,12 +26,13 @@ Built from Amir's notes on two mockups (claude.ai/artifact/EzD59Z2yYA2pXWyqFxQ8r
 - **The number sits in the tick-all ring** since Centre Court (CSS only; `.ex-num` is still the name's sibling), so a
   long name wraps on its own.
 
-**Open**, in this order: the green head with the scoreboard (Centre Court), the note, **How to do it**, the sets, then
-Note and Rest on one row. There is no *Log Sets* label.
+**Open**, in this order: the green head with the scoreboard (Centre Court), the note, **How to do it**, **Your history**
+(since 2026-11-23, on a lift with history), the sets, then Note and Rest on one row. There is no *Log Sets* label.
 - **No Last time box** (Amir, 2026-10-12: *"the history ... should be removed from exercise cards. because their last
   time, is actually already in the reps, weight box"*). It was a box under the note (CARD-01, 2026-09-27: the last set,
   tapped open to every set and History ›). Now last time's weight is each empty kg box's LAST, a set that ran over its
-  target keeps its faint ghost line, and the history is the ⓘ's **Your history** row, which opens the History sheet.
+  target keeps its faint ghost line, and the history is the **Your history** door under How to do it (Amir, 2026-11-23:
+  *"Build B"*; *The Card Remembers*), which opens the History sheet. The ⓘ's Your history row stays, for the Library.
   `paintLastTime()` still draws a first meeting's **First time** line and a circuit's strip (always open: a circuit's kg
   boxes show nothing of last time). The phone's old `lt_open` setting is read by nothing.
 - **How to do it** (`renderHowTo()`, a `<details class="ex-how">`; the steps since 2026-10-11): one folded row that

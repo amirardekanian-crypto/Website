@@ -32,8 +32,8 @@ Reference, section by section: [`PROGRAM-APP.md`](../../PROGRAM-APP.md).
   `scripts/headless/fold.js`). The green and the ink are ONE switch, the `--head-*` tokens on `.checklist-item`: a new
   colour in the row reads them, or it will not fade with the rest. **No Last time box on the open card either** (Amir,
   2026-10-12: *"their last time, is actually already in the reps, weight box"*): last time's weight is each empty kg
-  box's LAST, a set that ran over keeps its faint line, the whole history is the ⓘ's **Your history**, and only a
-  circuit keeps its strip. The kg box follows the Spine's equipment (`kgWanted()`): hidden, never removed.
+  box's LAST, a set that ran over keeps its faint line, the whole history is the **Your history** door under How to do it
+  (Amir, 2026-11-23: *"Build B"*), and only a circuit keeps its strip. The kg box follows the Spine's equipment (`kgWanted()`): hidden, never removed.
 - **The ⓘ's About sheet is Changeover** (Amir, 2026-10-12: *"lets go with A"*; `PROGRAM-APP.md` → *The About sheet*): a
   green top with Amir's reason signed as the week note signs (`WN_SIG` and his photo), then one question per band. Its look
   is `.ax-sheet`, which `sheetWrap()` takes off before any other page draws into the shared frame. **No WhatsApp door and

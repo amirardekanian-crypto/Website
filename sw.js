@@ -619,7 +619,10 @@
 // v284: program.html and i18n.js (?v=15) changed (2026-11-22, Amir: "the name of the training Days and the name of the Cycles should be only in english"): day and cycle names stay English on a Farsi phone.
 // v285: program.html changed (2026-11-23, Amir: "can you fix this for ever?"): the same name twice in a day (Saeed's warm-up bike and finisher bike) keeps
 // two set logs, so one tick no longer ticks both, and the report holds only as many sets as the card has (no "skipped" rows from another day's bike).
-const CACHE = 'aap-v285';
+// v286: program.html and i18n-fa.js (?v=27) changed (2026-11-23, Amir: "Build B"): the open exercise card carries a Your history door under
+// How to do it (the count, where the lift started and where it is now, a small line), and the History sheet says it in one sentence and
+// draws two lanes: the heaviest set of each session, then each set's effort against the target.
+const CACHE = 'aap-v286';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -660,7 +663,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=15',
-  '/assets/js/i18n-fa.js?v=26',
+  '/assets/js/i18n-fa.js?v=27',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).
