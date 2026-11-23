@@ -12,6 +12,9 @@
      Form Step         step, lang    (the first answer in each section, 01 to 07: where people stop)
      Level test start                (sent from tennis/level-test.js)
      Gate Yes FA / Gate Not Now FA   (sent from form-fa.html: the two doors under «با این شرایط شروع کنیم؟»)
+     Gate Where Iran FA / Gate Where Out FA   (form-fa.html: the answer to «کجا زندگی می‌کنی؟» before the price)
+     Gate Yes EN / Gate Not Now EN   (sent from form.html: the two doors under "Shall we start on these terms?")
+     Gate Where Iran EN / Gate Where Out EN   (form.html: the answer to "Where do you live?" before the price)
    Already sent elsewhere: Form Submitted, Form Submitted FA, Proof Signup, Partner Application, 404, Level test 1/2/3. */
 (function () {
   'use strict';

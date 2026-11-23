@@ -27,6 +27,8 @@
 <!-- Plausible (privacy-friendly, cookieless) -->
 <script defer data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
 <script defer src="/assets/js/track.js?v=1"></script>
+<!-- Two doors: the form stays closed until "Yes" (CSS .gate below). Without JavaScript the class is never set and the form shows as before. -->
+<script>document.documentElement.classList.add('gate');</script>
 
 <style>
   /* ═══════════════════════════════════════════════════════════════════════
@@ -577,6 +579,63 @@
     .radio-cards { grid-template-columns: 1fr 1fr; }
     .form-hero h1 { font-size: 32px; }
   }
+
+  /* ── TWO DOORS (Amir, 2026-11-23: "do the same for the english form", after the Farsi one): the four steps and the
+     prices come first, then "Shall we start on these terms?". The form and the progress bar stay closed until "Yes". ── */
+  .gate:not(.gate-open) #intakeForm, .gate:not(.gate-open) .progress { display: none; }
+  [hidden] { display: none !important; }
+  .how { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 32px 28px; margin-bottom: 20px; }
+  .how h2 { font-family: var(--font-display); font-weight: 900; font-size: 26px; line-height: 1.05; text-transform: uppercase; margin: 0 0 8px; }
+  .how-sub { color: var(--text-secondary); font-size: 15px; line-height: 1.6; margin-bottom: 22px; }
+  .steps { list-style: none; margin: 0 0 24px; padding: 0; display: grid; gap: 16px; }
+  .steps li { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; }
+  .steps .n { width: 34px; height: 34px; border-radius: 50%; border: 1.6px solid var(--accent); color: var(--accent); display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-weight: 800; font-size: 17px; }
+  .steps li.pay .n { background: var(--accent); color: var(--accent-ink); }
+  .steps strong { display: block; font-weight: 600; font-size: 16px; line-height: 1.45; padding-top: 5px; color: var(--text-primary); }
+  .steps .st { display: block; color: var(--text-secondary); font-size: 14px; line-height: 1.55; }
+  .plans { background: var(--bg-raised); border-radius: var(--radius-md); padding: 16px; display: grid; gap: 10px; }
+  .plan { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 2px 12px; background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px 14px; }
+  .plan.is-pick { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .plan-name { font-family: var(--font-display); font-weight: 800; font-size: 20px; letter-spacing: .5px; text-transform: uppercase; }
+  .plan-price { font-family: var(--font-display); font-weight: 900; font-size: 28px; line-height: 1; color: var(--accent); }
+  .plan-term { grid-column: 1 / -1; font-size: 14px; line-height: 1.5; color: var(--text-secondary); }
+  .plans-note { font-size: 13px; line-height: 1.6; color: var(--text-secondary); margin-top: 2px; }
+  .how-q { font-family: var(--font-display); font-weight: 900; font-size: 24px; line-height: 1.1; text-transform: uppercase; text-align: center; margin: 28px 0 14px; }
+  .doors { display: grid; gap: 10px; max-width: 420px; margin: 0 auto; }
+  .door-yes, .door-no { font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: 1.5px; text-transform: uppercase; min-height: 52px;
+    padding: 0 20px; border-radius: var(--radius-sm); cursor: pointer; }
+  .door-yes { background: var(--accent-2-fill); color: #fff; border: none; }
+  .door-no { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
+  .door-yes:focus-visible, .door-no:focus-visible, .later-back:focus-visible, .later-opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .how-ask { text-align: center; font-size: 14px; line-height: 1.6; color: var(--text-secondary); margin-top: 14px; }
+  .how-ask a { color: var(--accent-2-text); font-weight: 600; }
+  .later-opts { display: grid; gap: 10px; }
+  .later-opt { display: block; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; background: var(--bg-raised); color: var(--text-primary);
+    text-decoration: none; transition: border-color var(--dur-fast); }
+  .later-opt:hover { border-color: var(--accent); }
+  .later-opt b { display: block; font-weight: 600; font-size: 16px; }
+  .later-opt span { display: block; font-size: 14px; line-height: 1.55; color: var(--text-secondary); }
+  .later-back { font-family: var(--font-body); background: none; border: none; color: var(--accent-2-text); font-weight: 600; font-size: 15px; cursor: pointer;
+    margin-top: 12px; min-height: 44px; padding: 0; }
+  .agreed { background: var(--accent-dim); border: 1px solid rgba(14, 74, 54, 0.20); color: var(--accent); border-radius: var(--radius-md); padding: 14px 16px;
+    font-size: 15px; font-weight: 500; line-height: 1.6; margin-bottom: 20px; }
+  .agreed:focus { outline: none; }
+  /* Living in Iran? (Amir, 2026-11-23: "some iranian people may use the english form, so it needs to give the right info") */
+  .where { position: relative; display: flex; gap: 4px; background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius-pill);
+    padding: 4px; max-width: 420px; }
+  .where input { position: absolute; opacity: 0; pointer-events: none; }
+  .where label { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 10px; border-radius: var(--radius-pill);
+    font-size: 15px; font-weight: 600; color: var(--text-secondary); cursor: pointer; text-align: center; }
+  .how-sub2 { margin-top: 26px; }
+  .where input:checked + label { background: var(--accent); color: var(--accent-ink); }
+  .where input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .iran-price { background: var(--bg-raised); border-radius: var(--radius-md); padding: 20px 16px; text-align: center; }
+  .ip-eq { font-size: 14px; font-weight: 600; color: var(--text-secondary); }
+  .ip-num { font-family: var(--font-display); font-weight: 900; font-size: clamp(40px, 11vw, 54px); line-height: 1.1; color: var(--accent); }
+  .ip-term { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+  .ip-note { font-size: 13px; line-height: 1.6; color: var(--text-secondary); margin-top: 10px; }
 </style>
 <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
 </head>
@@ -614,6 +673,67 @@
 
 <!-- ═══ FORM ═══ -->
 <div class="form-wrap">
+
+<!-- ═══ HOW IT WORKS + THE PRICES, then two doors (Amir, 2026-11-23, the same as form-fa.html) ═══
+     "Yes" opens the form and sets the hidden "Knows the price and is ready to start" answer; "Not now" shows #later
+     (the free articles, the app demo, a WhatsApp question). The prices here are the home page's: change both together.
+     Plausible goals: "Gate Yes EN" and "Gate Not Now EN".
+     WHERE THEY LIVE COMES FIRST (Amir, 2026-11-23: "some iranian people may use the english form, so it needs to give
+     the right info", then "ask about where they live, and then give appropriate info prices, in both forms"). Nothing is
+     picked; the steps, the price and the doors appear after the answer. In Iran = the toman price, card-to-card and the
+     form's "I live in Iran" programme; outside = the three dollar plans and PayPal. THE TOMAN FIGURE is the one on
+     form-fa.html: search 6,700,000 here (the Iran price box, step 3's words in the script, the Iran programme option).
+     The gate is a div, not a section: track.js counts an answer inside a <section> as "Form Started". -->
+<div class="how" id="how" role="region" aria-labelledby="howT">
+  <h2 id="howT">Before you start</h2>
+  <p class="how-sub" id="whereQ">Where do you live? The price and how you pay depend on it.</p>
+  <div class="where" role="radiogroup" aria-labelledby="whereQ">
+    <input type="radio" name="where" id="whereOut" value="out"><label for="whereOut">Outside Iran</label>
+    <input type="radio" name="where" id="whereIr" value="iran"><label for="whereIr">In Iran</label>
+  </div>
+  <div id="afterWhere" hidden>
+  <p class="how-sub how-sub2">How it works: four steps, from this form to your first session.</p>
+  <ol class="steps">
+    <li><span class="n" aria-hidden="true">1</span><div><strong>You fill in this form.</strong><span class="st">About 3 minutes. No commitment yet.</span></div></li>
+    <li><span class="n" aria-hidden="true">2</span><div><strong>I message you on WhatsApp within 48 hours.</strong><span class="st">We talk, and you tell me anything the form didn't ask.</span></div></li>
+    <li class="pay"><span class="n" aria-hidden="true">3</span><div><strong id="payT">You pay by PayPal.</strong><span class="st" id="payS">In advance, for the plan you choose.</span></div></li>
+    <li><span class="n" aria-hidden="true">4</span><div><strong>Your programme is in your app within 48 hours of paying.</strong><span class="st">Then you start training.</span></div></li>
+  </ol>
+  <div class="iran-price" id="plansIr" hidden>
+    <div class="ip-eq">For people living in Iran, about</div>
+    <div class="ip-num">6,700,000</div>
+    <div class="ip-term">toman for each cycle (5 weeks)</div>
+    <p class="ip-note">The equivalent of $25 at the day's rate. I tell you the exact amount on WhatsApp. Includes your own programme in the app, weekly check-ins and WhatsApp support. You pay one cycle at a time, by card-to-card, with no long contract.</p>
+  </div>
+  <div class="plans" id="plansOut">
+    <div class="plan" data-plan="game"><span class="plan-name">Game</span><span class="plan-price">$70</span><span class="plan-term">1 cycle (5 weeks)</span></div>
+    <div class="plan" data-plan="set"><span class="plan-name">Set</span><span class="plan-price">$180</span><span class="plan-term">3 cycles (15 weeks), $60 a cycle</span></div>
+    <div class="plan" data-plan="match"><span class="plan-name">Match</span><span class="plan-price">$300</span><span class="plan-term">6 cycles (30 weeks), $50 a cycle. Adds competition planning and video technique reviews.</span></div>
+    <p class="plans-note">A cycle is 5 weeks. Every plan includes your own programme in the app, weekly check-ins and WhatsApp support. Prices in US dollars.</p>
+  </div>
+  <p class="how-q" id="howQ">Shall we start on these terms?</p>
+  <div class="doors" role="group" aria-labelledby="howQ">
+    <button type="button" class="door-yes" id="doorYes">Yes, take me to the form →</button>
+    <button type="button" class="door-no" id="doorNo">Not now</button>
+  </div>
+  <p class="how-ask">Got a question first? <a class="ask-wa" href="https://wa.me/447435363461" target="_blank" rel="noopener">Ask me on WhatsApp</a></p>
+  </div>
+</div>
+
+<!-- NOT NOW -->
+<section class="how later" id="later" aria-labelledby="laterT" hidden>
+  <h2 id="laterT" tabindex="-1">No problem. I'm here when you're ready.</h2>
+  <p class="how-sub">Until then, these might help:</p>
+  <div class="later-opts">
+    <a class="later-opt" href="/en/articles/"><b>Free articles</b><span>Strength, speed, recovery and nutrition for tennis players.</span></a>
+    <a class="later-opt" href="/program.html?client=demo"><b>Try the app</b><span>A real sample programme. No sign-up.</span></a>
+    <a class="later-opt ask-wa" href="https://wa.me/447435363461" target="_blank" rel="noopener"><b>Got a question?</b><span>Ask me on WhatsApp. I answer myself.</span></a>
+  </div>
+  <button type="button" class="later-back" id="laterBack">← Back</button>
+</section>
+
+<p class="agreed" id="agreed" tabindex="-1" hidden>✓ You know the terms and the price. Now tell me about yourself so I can write a programme that fits you better.</p>
+
 <form id="intakeForm" action="https://api.web3forms.com/submit" method="POST" novalidate>
 
   <!-- ── Web3Forms config ── -->
@@ -627,7 +747,7 @@
   <section class="fsection" aria-labelledby="s0">
     <div class="section-badge">00 · Your Programme</div>
     <h2 id="s0">Which programme are you interested in?</h2>
-    <p class="section-desc">Choose the programme that fits your goals.</p>
+    <p class="section-desc">Choose the programme that fits your goals. Living in Iran? Pick the last one: you pay in toman, one cycle at a time.</p>
 
     <div class="f-field">
       <div class="radio-cards" role="radiogroup" aria-labelledby="s0">
@@ -642,6 +762,10 @@
         <div class="radio-card">
           <input type="radio" id="prog_match" name="Programme" value="Match — $300 / 6 cycles (30 weeks)">
           <label for="prog_match"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i></span>Match: $300 for 6 cycles (30 weeks)</label>
+        </div>
+        <div class="radio-card">
+          <input type="radio" id="prog_iran" name="Programme" value="Iran — about 6,700,000 toman / 1 cycle (5 weeks), card-to-card">
+          <label for="prog_iran"><span class="rc-icon" aria-hidden="true"><svg class="mk" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg></span>I live in Iran: about 6,700,000 toman a cycle (5 weeks)</label>
         </div>
       </div>
     </div>
@@ -1110,6 +1234,9 @@
     </div>
   </details>
 
+  <!-- ─── READY: set to "Yes" by the "Yes" door above (two doors, 2026-11-23); empty only if JavaScript never ran ─── -->
+  <input type="hidden" id="ready" name="Knows the price and is ready to start" value="">
+
   <!-- ─── ADULT OR GUARDIAN: programmes are bought by someone 18 or over ─── -->
   <div class="f-field consent-field">
     <label class="consent" for="adult">
@@ -1150,7 +1277,7 @@
     <div class="big-check" aria-hidden="true">✓</div>
     <h2 id="successTitle" tabindex="-1">Application sent.</h2>
     <p>I will read your application and message you within 48 hours. We will talk about whether we are a good fit.</p>
-    <p>I reply by WhatsApp or email. We talk on WhatsApp first, and you can tell me anything the form did not ask. Then you pay by PayPal and I write your programme. Got a question while you wait? Message me.</p>
+    <p>I reply by WhatsApp or email. We talk on WhatsApp first, and you can tell me anything the form did not ask. Then you pay (by PayPal, or card-to-card if you live in Iran) and I write your programme. Got a question while you wait? Message me.</p>
     <div class="success-actions">
       <a id="successWa" class="success-btn success-btn--p" href="https://wa.me/447435363461" target="_blank" rel="noopener">Message Amir on WhatsApp</a>
       <a class="success-btn success-btn--s" href="/">Back to the site</a>
@@ -1478,6 +1605,61 @@
     function clearOnAnswer(e) { if (e.target && e.target.name) clearError(e.target); }
     form.addEventListener('input', clearOnAnswer);
     form.addEventListener('change', clearOnAnswer);
+
+    // ── Two doors: "Shall we start on these terms?" (Amir, 2026-11-23, as on form-fa.html) ──
+    // "Yes" opens the form and sets the hidden "Knows the price and is ready to start" answer; "Not now" shows #later.
+    // The choice is kept for this tab, so a reload does not ask again.
+    const root = document.documentElement, howEl = document.getElementById('how'), laterEl = document.getElementById('later'),
+          agreedEl = document.getElementById('agreed'), readyEl = document.getElementById('ready');
+    const track = (name) => { if (window.plausible) window.plausible(name); };
+    // Living in Iran? The switch swaps the dollar plans for the Iran price, PayPal for card-to-card, and picks the form's
+    // "I live in Iran" programme (switching back un-picks it and restores a plan that came in the link).
+    const whereIr = document.getElementById('whereIr'), whereOut = document.getElementById('whereOut'), progIran = document.getElementById('prog_iran');
+    const linkPlan = document.querySelector('input[name="Programme"]:checked');   // set from ?plan= further up
+    function setWhere(iran) {
+      document.getElementById('plansOut').hidden = iran; document.getElementById('plansIr').hidden = !iran;
+      document.getElementById('payT').textContent = iran ? 'You pay by card-to-card.' : 'You pay by PayPal.';
+      document.getElementById('payS').textContent = iran ? 'About 6,700,000 toman for 5 weeks, one cycle at a time.' : 'In advance, for the plan you choose.';
+      if (iran) progIran.checked = true;
+      else if (progIran.checked) { progIran.checked = false; if (linkPlan) linkPlan.checked = true; }
+      clearError(progIran); updateProgress();
+    }
+    // nothing is picked: the steps, the price and the doors appear once they say where they live
+    const afterWhere = document.getElementById('afterWhere');
+    function answerWhere(iran) { afterWhere.hidden = false; setWhere(iran); track(iran ? 'Gate Where Iran EN' : 'Gate Where Out EN'); }
+    whereIr.addEventListener('change', () => answerWhere(true));
+    whereOut.addEventListener('change', () => answerWhere(false));
+
+    function openForm(move) {
+      root.classList.add('gate-open'); howEl.hidden = true; laterEl.hidden = true; agreedEl.hidden = false;
+      readyEl.value = whereIr.checked ? 'Yes (Iran price, toman)' : 'Yes (US dollar plans)'; updateProgress();
+      if (move) { agreedEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); try { agreedEl.focus({ preventScroll: true }); } catch (e) { /* not focusable */ } }
+      try { sessionStorage.setItem('aa.formen.gate', whereIr.checked ? 'iran' : 'out'); } catch (e) { /* private mode */ }
+    }
+    document.getElementById('doorYes').addEventListener('click', () => { openForm(true); track('Gate Yes EN'); });
+    document.getElementById('doorNo').addEventListener('click', () => {
+      howEl.hidden = true; laterEl.hidden = false; laterEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      try { document.getElementById('laterT').focus({ preventScroll: true }); } catch (e) { /* not focusable */ }
+      track('Gate Not Now EN');
+    });
+    document.getElementById('laterBack').addEventListener('click', () => {
+      laterEl.hidden = true; howEl.hidden = false; howEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    // the WhatsApp question arrives already saying what it is about
+    document.querySelectorAll('.ask-wa').forEach(a => {
+      a.href = 'https://wa.me/447435363461?text=' + encodeURIComponent('Hi Amir, I have a question before I fill in the form.');
+    });
+    // a plan picked on the home page (?plan=set) is marked in the price list
+    (function () {
+      const plan = (new URLSearchParams(location.search).get('plan') || '').toLowerCase();
+      const tile = /^(game|set|match)$/.test(plan) && document.querySelector('.plan[data-plan="' + plan + '"]');
+      if (tile) tile.classList.add('is-pick');
+    })();
+    // a reload in the same tab does not ask again
+    try {
+      const saved = sessionStorage.getItem('aa.formen.gate');
+      if (saved === 'iran' || saved === 'out') { (saved === 'iran' ? whereIr : whereOut).checked = true; afterWhere.hidden = false; setWhere(saved === 'iran'); openForm(false); }
+    } catch (e) { /* private mode */ }
 
     // ── Submit via fetch → show success overlay ──────────────────────────
     form.addEventListener('submit', async function (e) {

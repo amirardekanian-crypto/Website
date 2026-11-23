@@ -191,6 +191,19 @@
   .later-back{font-family:var(--fa);background:none;border:none;color:var(--clay);font-weight:700;font-size:15px;cursor:pointer;margin-top:12px;min-height:44px;padding:0;}
   .agreed{background:var(--accent-dim);border:1px solid rgba(14,74,54,.2);color:var(--green);border-radius:12px;padding:14px 16px;font-size:15px;font-weight:700;line-height:1.8;margin-bottom:18px;}
   .agreed:focus{outline:none;}
+  /* کجا زندگی می‌کنی؟ (امیر، ۲۰۲۶-۱۱-۲۳: «ask about where they live, and then give appropriate info prices, in both forms») */
+  .where{position:relative;display:flex;gap:4px;background:var(--paper-2);border:1px solid var(--line);border-radius:100px;padding:4px;max-width:440px;}
+  .where input{position:absolute;opacity:0;pointer-events:none;}
+  .where label{flex:1;display:flex;align-items:center;justify-content:center;min-height:48px;padding:0 10px;border-radius:100px;font-weight:700;font-size:16px;color:var(--ink-2);cursor:pointer;text-align:center;}
+  .where input:checked+label{background:var(--green);color:#fff;}
+  .where input:focus-visible+label{outline:3px solid var(--green);outline-offset:2px;}
+  .how-sub2{margin-top:26px;}
+  .plans{background:var(--paper-2);border-radius:12px;padding:16px;display:grid;gap:10px;}
+  .plan{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:2px 12px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;}
+  .plan-name{font-family:var(--disp);font-weight:800;font-size:22px;text-transform:uppercase;text-align:right;}
+  .plan-price{font-family:var(--disp);font-weight:900;font-size:30px;line-height:1;color:var(--green);}
+  .plan-term{grid-column:1/-1;font-size:14px;line-height:1.8;color:var(--ink-2);}
+  .plans-note{font-size:14px;line-height:1.8;color:var(--ink-2);margin-top:2px;}
   .abroad-note{font-size:15px;color:var(--green);background:var(--accent-dim);border:1px solid rgba(14,74,54,.18);border-radius:var(--r);padding:12px 15px;line-height:1.8;}
   .abroad-note a{color:var(--green);font-weight:800;}
   .foot{background:#0a3527;color:rgba(255,255,255,.7);padding:30px 0;text-align:center;font-size:15px;}
@@ -276,41 +289,60 @@
 <!-- HOW IT WORKS + THE PRICE, before the first question (Amir, 2026-11-19: people applied, heard the price on WhatsApp
      and stopped replying; 72 Farsi applications Aug to Nov, about 7 became clients).
      THE TOMAN FIGURE is Amir's own ("hodude 6.700.000 toman", 2026-11-19). When it changes, change every copy:
-     search ۶٬۷۰۰٬۰۰۰ in this file (step 3 and the price box), index-fa.html (price card + FAQ) and
+     search ۶٬۷۰۰٬۰۰۰ in this file (step 3, its words in the script, the price box), index-fa.html (price card + FAQ),
+     form.html (search 6,700,000: the Iran price box, step 3 in the script, the Iran programme option) and
      Content/CHATBOT-FACTS.md, then rebuild and redeploy the chatbot (/chat-facts).
      TWO DOORS (Amir, 2026-11-23: "explanation of A but in two doors", question «با این شرایط شروع کنیم؟»):
      "آره" opens the form and sets the hidden "Knows the price and is ready to start" answer; "الان نه" shows the
      #later panel (the $17 course for tennis players, the free articles, a WhatsApp question). Plausible goals:
-     "Gate Yes FA" and "Gate Not Now FA". -->
-<section class="how" id="how" aria-labelledby="howT">
-  <h2 id="howT">قبل از شروع: چطور کار می‌کنه؟</h2>
-  <p class="how-sub">۴ قدم، از این فرم تا اولین جلسه‌ی تمرینت.</p>
+     "Gate Yes FA" and "Gate Not Now FA".
+     WHERE THEY LIVE COMES FIRST (Amir, 2026-11-23: "ask about where they live, and then give appropriate info prices,
+     in both forms"). Nothing is picked; the steps, the price and the doors appear after the answer. ساکنِ ایران = the
+     toman price and card-to-card; خارج از ایران = the three dollar plans (the English site's) and PayPal, and no course
+     in #later (it is sold in toman). The answer also picks the form's Location question. Goals "Gate Where Iran FA" /
+     "Gate Where Out FA". The gate is a div, not a section: track.js counts an answer inside a <section> as "Form Started". -->
+<div class="how" id="how" role="region" aria-labelledby="howT">
+  <h2 id="howT">قبل از شروع</h2>
+  <p class="how-sub" id="whereQ">کجا زندگی می‌کنی؟ هزینه و روشِ پرداخت به همین بستگی داره.</p>
+  <div class="where" role="radiogroup" aria-labelledby="whereQ">
+    <input type="radio" name="where" id="whereIr" value="iran"><label for="whereIr">ساکنِ ایران</label>
+    <input type="radio" name="where" id="whereAb" value="out"><label for="whereAb">خارج از ایران</label>
+  </div>
+  <div id="afterWhere" hidden>
+  <p class="how-sub how-sub2">چطور کار می‌کنه: ۴ قدم، از این فرم تا اولین جلسه‌ی تمرینت.</p>
   <ol class="steps">
     <li><span class="n" aria-hidden="true">۱</span><div><strong>این فرم رو پر می‌کنی.</strong><span class="st">حدودِ ۳ دقیقه. هنوز هیچ تعهدی نداری.</span></div></li>
     <li><span class="n" aria-hidden="true">۲</span><div><strong>ظرفِ ۴۸ ساعت توی واتساپ بهت پیام می‌دم.</strong><span class="st">با هم حرف می‌زنیم و هر چی فرم نپرسیده رو بهم می‌گی.</span></div></li>
-    <li class="pay"><span class="n" aria-hidden="true">۳</span><div><strong>کارت‌به‌کارت پرداخت می‌کنی.</strong><span class="st">حدودِ ۶٬۷۰۰٬۰۰۰ تومان برای ۵ هفته.</span></div></li>
+    <li class="pay"><span class="n" aria-hidden="true">۳</span><div><strong id="payT">کارت‌به‌کارت پرداخت می‌کنی.</strong><span class="st" id="payS">حدودِ ۶٬۷۰۰٬۰۰۰ تومان برای ۵ هفته.</span></div></li>
     <li><span class="n" aria-hidden="true">۴</span><div><strong>ظرفِ ۴۸ ساعت بعد از پرداخت، برنامه‌ت توی اپته.</strong><span class="st">و تمرین رو شروع می‌کنی.</span></div></li>
   </ol>
-  <div class="how-price">
+  <div class="how-price" id="plansIr">
     <div class="hp-eq">برای ساکنینِ ایران، حدودِ</div>
     <div class="hp-num">۶٬۷۰۰٬۰۰۰</div>
     <div class="hp-term">تومان برای هر سیکل (۵ هفته)</div>
     <p class="hp-note">شاملِ برنامه‌ی اختصاصی، اپ، آپدیتِ هفتگی و پشتیبانیِ واتساپ. معادلِ ۲۵ دلار با نرخِ روز؛ مبلغِ دقیق رو توی واتساپ می‌گم. هر بار فقط برای یه سیکل پرداخت می‌کنی، بدونِ قراردادِ بلندمدت.</p>
+  </div>
+  <div class="plans" id="plansAb" hidden>
+    <div class="plan"><span class="plan-name" dir="ltr">Game</span><span class="plan-price" dir="ltr">$70</span><span class="plan-term">۱ سیکل (۵ هفته)</span></div>
+    <div class="plan"><span class="plan-name" dir="ltr">Set</span><span class="plan-price" dir="ltr">$180</span><span class="plan-term">۳ سیکل (۱۵ هفته)، هر سیکل ۶۰ دلار</span></div>
+    <div class="plan"><span class="plan-name" dir="ltr">Match</span><span class="plan-price" dir="ltr">$300</span><span class="plan-term">۶ سیکل (۳۰ هفته)، هر سیکل ۵۰ دلار. به‌علاوه‌ی برنامه‌ریزی برای مسابقه‌ها و بررسیِ ویدیوییِ تکنیک.</span></div>
+    <p class="plans-note">هر سیکل ۵ هفته‌ست. همه‌ی پلن‌ها شاملِ برنامه‌ی اختصاصی توی اپ، چک‌اینِ هفتگی و پشتیبانیِ واتساپه. قیمت‌ها به دلارِ آمریکاست و با پی‌پل از قبل پرداخت می‌شه.</p>
   </div>
   <p class="how-q" id="howQ">با این شرایط شروع کنیم؟</p>
   <div class="doors" role="group" aria-labelledby="howQ">
     <button type="button" class="door-yes" id="doorYes">آره، بریم سراغِ فرم ←</button>
     <button type="button" class="door-no" id="doorNo">الان نه</button>
   </div>
-  <p class="how-ask">اول سؤال داری؟ <a class="ask-wa" href="https://wa.me/447435363461" target="_blank" rel="noopener">توی واتساپ بپرس</a><br>خارج از ایران زندگی می‌کنی؟ <a href="/#pricing">پلن‌های دلاری</a> مالِ توئه.</p>
-</section>
+  <p class="how-ask">اول سؤال داری؟ <a class="ask-wa" href="https://wa.me/447435363461" target="_blank" rel="noopener">توی واتساپ بپرس</a></p>
+  </div>
+</div>
 
 <!-- NOT NOW -->
 <section class="how later" id="later" aria-labelledby="laterT" hidden>
   <h2 id="laterT" tabindex="-1">باشه، هر وقت آماده بودی همین‌جام.</h2>
   <p class="how-sub">تا اون موقع، این‌ها به دردت می‌خوره:</p>
   <div class="later-opts">
-    <a class="later-opt" href="/tennis/"><b>تنیس بازی می‌کنی؟</b><span>دوره‌ی سیستمِ آمادگیِ جسمانیِ تنیس: ۱۶ هفته برنامه روی گوشیت. یه‌بار پرداخت، معادلِ ۱۷ دلار.</span></a>
+    <a class="later-opt" id="laterCourse" href="/tennis/"><b>تنیس بازی می‌کنی؟</b><span>دوره‌ی سیستمِ آمادگیِ جسمانیِ تنیس: ۱۶ هفته برنامه روی گوشیت. یه‌بار پرداخت، معادلِ ۱۷ دلار.</span></a>
     <a class="later-opt" href="/fa/articles/"><b>مقاله‌های رایگان</b><span>آمادگیِ بدنی، ریکاوری و تغذیه برای تنیس.</span></a>
     <a class="later-opt ask-wa" href="https://wa.me/447435363461" target="_blank" rel="noopener"><b>سؤال داری؟</b><span>توی واتساپ بپرس، خودم جواب می‌دم.</span></a>
   </div>
@@ -772,10 +804,26 @@
   var root=document.documentElement,howEl=document.getElementById('how'),laterEl=document.getElementById('later'),
       agreedEl=document.getElementById('agreed'),readyEl=document.getElementById('ready');
   function track(name){if(window.plausible)window.plausible(name);}
+  // کجا زندگی می‌کنی؟ هیچ گزینه‌ای از قبل انتخاب نشده؛ قدم‌ها، قیمت و دو در بعد از جواب پیدا می‌شن.
+  // ایران = قیمتِ تومان و کارت‌به‌کارت؛ خارج = سه پلنِ دلاری و پی‌پل (و دوره‌ی تومانی توی «الان نه» نیست).
+  // جواب، سؤالِ «کجا زندگی می‌کنی؟»ِ خودِ فرم رو هم انتخاب می‌کنه.
+  var whereIr=document.getElementById('whereIr'),whereAb=document.getElementById('whereAb'),afterWhere=document.getElementById('afterWhere');
+  function setWhere(iran){
+    document.getElementById('plansIr').hidden=!iran;document.getElementById('plansAb').hidden=iran;
+    document.getElementById('payT').textContent=iran?'کارت‌به‌کارت پرداخت می‌کنی.':'با پی‌پل پرداخت می‌کنی.';
+    document.getElementById('payS').textContent=iran?'حدودِ ۶٬۷۰۰٬۰۰۰ تومان برای ۵ هفته.':'از قبل، برای پلنی که انتخاب می‌کنی.';
+    document.getElementById('laterCourse').hidden=!iran;
+    var loc=document.getElementById(iran?'loc_ir':'loc_ab');loc.checked=true;clearErr(loc);
+    document.getElementById('abroadWrap').classList.toggle('on',!iran);upd();
+  }
+  function answerWhere(iran){afterWhere.hidden=false;setWhere(iran);track(iran?'Gate Where Iran FA':'Gate Where Out FA');}
+  whereIr.addEventListener('change',function(){answerWhere(true);});
+  whereAb.addEventListener('change',function(){answerWhere(false);});
   function openForm(move){
-    root.classList.add('gate-open');howEl.hidden=true;laterEl.hidden=true;agreedEl.hidden=false;readyEl.value='Yes';upd();
+    root.classList.add('gate-open');howEl.hidden=true;laterEl.hidden=true;agreedEl.hidden=false;
+    readyEl.value=whereAb.checked?'Yes (US dollar plans)':'Yes (Iran price, toman)';upd();
     if(move){agreedEl.scrollIntoView({behavior:'smooth',block:'start'});try{agreedEl.focus({preventScroll:true});}catch(e){}}
-    try{sessionStorage.setItem('aa.formfa.gate','yes');}catch(e){}
+    try{sessionStorage.setItem('aa.formfa.gate',whereAb.checked?'out':'iran');}catch(e){}
   }
   document.getElementById('doorYes').addEventListener('click',function(){openForm(true);track('Gate Yes FA');});
   document.getElementById('doorNo').addEventListener('click',function(){
@@ -790,7 +838,10 @@
   document.querySelectorAll('.ask-wa').forEach(function(a){
     a.href='https://wa.me/447435363461?text='+encodeURIComponent('سلام امیر، قبل از پر کردنِ فرم یه سؤال دارم.');
   });
-  try{if(sessionStorage.getItem('aa.formfa.gate')==='yes')openForm(false);}catch(e){}
+  // رفرش توی همین تب دوباره نمی‌پرسه
+  try{var saved=sessionStorage.getItem('aa.formfa.gate');
+    if(saved==='iran'||saved==='out'||saved==='yes'){var ir=saved!=='out';(ir?whereIr:whereAb).checked=true;afterWhere.hidden=false;setWhere(ir);openForm(false);}
+  }catch(e){}
 
   // ── ثبتِ پایدار در Supabase (سرورِ خودِ امیر) ─────────────────────────
   // قبلاً فقط Web3Forms بود؛ وقتی در دسترس نبود، فرم گم می‌شد. حالا هم‌زمان
