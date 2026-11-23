@@ -97,6 +97,13 @@ reference is [`../../HABITS.md`](../../HABITS.md). These are the rules for the h
   the day's sheet, the Player Page and the feed, in clay; a plan or session post wears the dumbbell, so court and gym read apart.
 - **Your weeks says this week against the athlete's own usual** (#133, same day): court and other minutes against the average of the
   four 7-day blocks before this week (`fwUsualHtml()`), silent until three weeks of logs. No score and no verdict.
+- **Each athlete can have their own Steps number, and Amir sets it** (#130, 2026-11-23, Amir: *"App suggests, you approve"*, *"Full
+  XP at their number"*). coach.html → an athlete → the Proof tab → **Steps target**: their 14-day usual and a suggestion (+10%, to
+  the nearest 500, 6,000 to 12,000); `coach_set_steps_target()` (stage125) writes a row from today. ⚠️ **Scoring is one formula in two
+  copies**: Steps = (typed + credit capped at 70% of the day's target) x global / the day's target, in `hab_log_credited()` and the
+  phone's `stepsScored()` (HAB_VIEW), held equal by `scripts/check_twins.js`. Hitting their own number is a full Steps day for the ring,
+  the day gate and the XP. Forward only (D20): a number starts the day it is set. ⚠️ Step totals (the 250,000 / 1,000,000 achievements,
+  the crew's million-steps mission) count a met day at the scaled value, so a lower number counts a little more toward them.
 
 ---
 

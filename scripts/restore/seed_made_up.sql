@@ -318,6 +318,8 @@ insert into public.erasure_log (id, erased_at, erased_by, kind, subject_hash, co
 -- Court Log (stage116): one made-up activity, so the rehearsal backs up and restores a row of activity_log
 insert into public.activity_log (id, athlete_id, day, kind, minutes, effort, created_at) values
   ('7e1d0c6a-0000-4000-8000-000000000001', 'ava_test', '2026-11-20', 'tennis', 60, 'normal', '2026-11-20 18:00:00+00');
+-- Your Number (stage125): one made-up steps target, so the rehearsal backs up and restores a row of steps_targets
+insert into public.steps_targets (athlete_id, from_day, steps, set_at) values ('ava_test', '2026-11-20', 8500, '2026-11-20 18:00:00+00');
 -- the counters, as a live database would have them after those explicit ids (the rehearsal's erasures then get 8, 9 and 10)
 select setval(pg_get_serial_sequence('public.erasure_log', 'id'), 7);
 select setval('public.coaching_log_versions_id_seq', 9);

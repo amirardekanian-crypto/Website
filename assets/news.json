@@ -2,6 +2,26 @@
   "_about": "What's new in the app, shown in every athlete's Inbox for 14 days (program.html, newsRows/openNews). Newest first. Each entry: id (unique), at (ISO time), en and fa: { title, items: [one short line each], sign }. Written in Amir's voice (COM-3) in both languages (COM-1). THE RULE (docs/rules/working-with-amir.md): a change to program.html that an athlete would notice ships with its entry here in the same commit; .githooks/commit-msg blocks a program.html commit without this file unless the message says [no news].",
   "items": [
     {
+      "id": "2026-11-23-your-number",
+      "at": "2026-11-23T22:45:00Z",
+      "en": {
+        "title": "Your own steps number",
+        "items": [
+          "I can now set a steps target that fits you, instead of 10,000 for everyone. If I set one, your Steps habit shows it, like Walk 8,500 steps.",
+          "Hitting your number ticks Steps and counts for the day, exactly like 10,000 did."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "عدد قدم مخصوص خودتون",
+        "items": [
+          "حالا می‌تونم یه هدف قدم متناسب با خودتون بذارم، به جای ۱۰ هزار برای همه. اگه بذارم، عادت قدم‌هاتون اون رو نشون می‌ده، مثلاً ۸٬۵۰۰ قدم راه برو.",
+          "رسیدن به عدد خودتون قدم‌ها رو تیک می‌زنه و برای اون روز حساب می‌شه، دقیقاً مثل ۱۰ هزار."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-23-activity-to-crew",
       "at": "2026-11-23T22:30:00Z",
       "en": {

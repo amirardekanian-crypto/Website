@@ -1273,6 +1273,23 @@ run('the Steps credit of an activity (MOVE_MET, moveCreditOf / activity_met(), m
   expect('get_five_weeks() still sends `acts` (the stub builds it when a test gives none)', null, /'acts', coalesce/.test(fwSql), /fwOut\.acts = \[\]/.test(STUB_SRC));
 });
 
+/* ── Your Number: Steps scored against the athlete's own target (stage125, 2026-11-23) ─────────────────────── */
+// program.html stepsScored() (HAB_VIEW) and the server's hab_log_credited() must score a day the same way: the credit capped at 70% of
+// that day's target, then (typed + credit) x global target / the day's target, rounded; unchanged when there is no credit and no target.
+const A_NUM = sandbox('var MOVE_CAP = 0.7;', fromA('stepsScored'), ['stepsScored']);
+run('a day\'s Steps against the athlete\'s own target (stepsScored / hab_log_credited() since stage125)', () => {
+  const snap = read('supabase/schema_snapshot.sql');
+  const i = snap.indexOf('FUNCTION public.hab_log_credited(p_athlete text, p_log jsonb)');
+  const fn = i < 0 ? '' : snap.slice(i, snap.indexOf('$function$;', i));
+  expect('the server caps the credit at 70% of the day\'s own target', null, fn.includes('least(coalesce(r.raw, 0), round(v_t * 0.7))'), true);
+  expect('the server scales (typed + credit) to the global target', null, fn.includes('round((v_typed + v_cr) * v_g / v_t)'), true);
+  expect('the server leaves a day with no credit and the global target as it was', null, fn.includes('if v_cr = 0 and v_t = v_g then continue; end if;'), true);
+  const sql = (typed, raw, t, g) => { const cr = Math.min(raw, Math.round(t * 0.7)); if (cr === 0 && t === g) return null; return Math.round((typed + cr) * g / t); };
+  [[5000, 3000, 7000, 10000], [8500, 0, 8500, 10000], [2000, 11700, 10000, 10000], [0, 0, 10000, 10000], [6000, 0, 6000, 10000], [3000, 9000, 6500, 10000], [12000, 0, 12000, 10000]]
+    .forEach(v => same('stepsScored vs hab_log_credited()', v, A_NUM.stepsScored(...v), sql(...v)));
+  expect('8,500 of an 8,500 target scores as a full 10,000', null, A_NUM.stepsScored(8500, 0, 8500, 10000), 10000);
+});
+
 /* ── report ───────────────────────────────────────────────────────────────── */
 if (failures.length || chipsFailures.length) {
   console.error('\ncheck_twins: ' + (failures.length + chipsFailures.length) + ' problem' + (failures.length + chipsFailures.length === 1 ? '' : 's') + ' (of ' + checks + ' checks):\n');

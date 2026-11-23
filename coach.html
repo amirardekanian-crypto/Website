@@ -1603,7 +1603,7 @@ const $ = (id) => document.getElementById(id);
 const TABLE_KEYS = {
   session_history: ['athlete_id', 'day', 'completed_on'], hab_notes: ['athlete_id', 'day'],
   hab_titles: ['athlete_id', 'title'], hab_season_results: ['athlete_id', 'starts_on'],
-  library_categories: ['kind', 'id'], library_sessions: ['athlete_id', 'slug', 'completed_on'], activity_log: ['id'],
+  library_categories: ['kind', 'id'], library_sessions: ['athlete_id', 'slug', 'completed_on'], activity_log: ['id'], steps_targets: ['athlete_id', 'from_day'],
   assess_results: ['player_id', 'test', 'day'], affiliates: ['code'], assess_accounts: ['user_id'],
   assess_content: ['key'], tps_content: ['key'], tps_accounts: ['user_id'], athlete_identities: ['user_id'],
   library: ['slug'], buyer_notes: ['user_id'],
@@ -2432,6 +2432,8 @@ const BACKUP_TABLES = [
   'library', 'library_categories', 'library_sessions',
   // Court Log (stage116): what athletes logged outside their plan (tennis, padel, matches, runs). Coaching data, kept for good.
   'activity_log',
+  // Your Number (stage125): the personal Steps target Amir set for an athlete, one row per change. Coaching data, kept for good.
+  'steps_targets',
   'affiliates',
   'tps_content', 'course_en', 'tps_accounts', 'assess_content', 'assess_accounts',
   'assess_players', 'assess_notes', 'assess_results',
@@ -6206,6 +6208,75 @@ function workTabHtml(D) {
 // hover a day for what was in it. Read once per athlete per store (S.stamp). A server without stage115, or a read that fails,
 // draws nothing: the day cards below are still the record.
 const _fwC = {};
+// ── Your Number (#130, round 12, 2026-11-23; Amir: "App suggests, you approve" and "Full XP at their number") ──────────────────────
+// Each athlete's Steps target, set here and nowhere else (coach_set_steps_target(), stage125). The panel shows their usual (the median
+// of the last 14 days they typed a steps number, today left out) and a suggestion: the usual plus 10%, to the nearest 500, between 6,000
+// and 12,000. A new number starts today and never rewrites an earlier day (D20). Read once per athlete per store, like Five weeks.
+const _stC = {};
+async function stepsTargetsC(id) {
+  if (DEMO) return null;
+  const hit = _stC[id];
+  if (hit && hit.stamp === S.stamp) return hit;
+  let v;
+  try {
+    const r = await sb.rpc('get_steps_targets', { p_athlete_id: id });
+    v = { stamp: S.stamp, data: r && !r.error ? r.data : null, err: r && r.error ? r.error.message : '' };
+  } catch (e) { v = { stamp: S.stamp, data: null, err: String(e && e.message || e) }; }
+  _stC[id] = v;
+  return v;
+}
+// Their usual: the median of the typed steps on the last 14 days before today (a day with no number is left out), and how many days.
+function stepsUsualC(blob, id, today) {
+  const log = jparse(blob ? blob[id + '_hab_log'] : null) || {};
+  const vals = [];
+  for (let i = 1; i <= 14; i++) {
+    const d = addDays(today, -i), v = log[d] && typeof log[d] === 'object' ? Number(log[d].steps) : NaN;
+    if (isFinite(v) && v > 0) vals.push(v);
+  }
+  if (!vals.length) return { n: 0, usual: 0 };
+  vals.sort((a, b) => a - b);
+  const m = vals.length % 2 ? vals[(vals.length - 1) / 2] : (vals[vals.length / 2 - 1] + vals[vals.length / 2]) / 2;
+  return { n: vals.length, usual: Math.round(m) };
+}
+function stepsSuggestC(usual) { return Math.min(12000, Math.max(6000, Math.round(usual * 1.1 / 500) * 500)); }
+function stepsTargetPanelC(D) {
+  const st = D.st && D.st.data;
+  if (!st) return D.st && D.st.err ? `<p class="empty t-clay">The steps target did not load (${esc(D.st.err)}).</p>` : '';
+  const g = Number(st.global) || 10000, rows = Array.isArray(st.rows) ? st.rows : [];
+  const cur = rows.length ? rows[rows.length - 1] : null, now = cur ? Number(cur.steps) : g;
+  const u = stepsUsualC(D.a.blob, D.athleteId, todayKey());
+  const sug = u.n >= 5 ? stepsSuggestC(u.usual) : null;
+  const n = v => Number(v).toLocaleString('en-US');
+  const btn = (v, label) => `<button class="btn sm" onclick="setStepsTargetC(${jsq(D.athleteId)}, ${v}, this)">${esc(label)}</button>`;
+  return `<section class="panel">
+    <div class="phead"><span class="t hd">Steps target</span><span class="r">${cur ? n(now) + ' since ' + esc(prettyDate(cur.from)) : n(g) + ' (everyone\'s)'}</span></div>
+    <p class="meta">${u.n ? `Their usual: <b>${n(u.usual)}</b> a day (the middle of ${u.n} logged day${u.n === 1 ? '' : 's'} in the last 14).` : 'No steps logged in the last 14 days.'}
+      ${sug ? ` Suggested: <b>${n(sug)}</b> (their usual plus 10%).` : u.n ? ' A suggestion needs 5 logged days.' : ''}</p>
+    <p class="meta">Hitting their number ticks Steps, counts for the day and pays full Steps XP. A new number starts today; earlier days keep theirs.</p>
+    <div class="note-actions" style="margin-top:10px">
+      ${sug && sug !== now ? btn(sug, 'Set ' + n(sug)) : ''}
+      <input type="number" id="st-in-${esc(D.athleteId)}" min="3000" max="20000" step="500" value="${sug || now}" aria-label="Steps target" style="width:110px">
+      <button class="btn sm" onclick="setStepsTargetC(${jsq(D.athleteId)}, Number(document.getElementById('st-in-' + ${jsq(D.athleteId)}).value), this)">Set</button>
+      ${cur && now !== g ? btn(g, 'Back to ' + n(g)) : ''}
+    </div>
+  </section>`;
+}
+async function setStepsTargetC(id, steps, el) {
+  steps = Math.round(Number(steps));
+  if (!(steps >= 3000 && steps <= 20000)) { toast('A steps target is a number from 3,000 to 20,000.'); return; }
+  if (el) el.disabled = true;
+  try {
+    const r = await sb.rpc('coach_set_steps_target', { p_athlete_id: id, p_steps: steps });
+    if (!r || r.error) throw (r && r.error) || new Error('no answer');
+    _stC[id] = { stamp: S.stamp, data: r.data, err: '' };
+    if (_D && _D.athleteId === id) { _D.st = _stC[id]; renderDetailBody(); }
+    toast('Steps target set: ' + steps.toLocaleString('en-US') + ' from today.');
+  } catch (e) {
+    if (el) el.disabled = false;
+    toast('That did not save: ' + String((e && e.message) || e));
+  }
+}
+window.setStepsTargetC = setStepsTargetC;
 // One logged activity in words, for the session card's "the day before" (#127): "Padel 90 min, hard".
 const ACT_WORD_C = { tennis: 'Tennis', match: 'Match', padel: 'Padel', beach_tennis: 'Beach tennis', pickleball: 'Pickleball', squash: 'Squash',
   badminton: 'Badminton', run: 'Running', cycling: 'Cycling', swim: 'Swimming', football: 'Football', gym: 'Gym', other: 'Other' };
@@ -6511,7 +6582,7 @@ async function renderDetail(athleteId, sub) {
     const lib = await exLib();
     // Their sessions' text and log (the boot read only the numbers). A failure is kept on the file and said on the
     // work tab, never drawn as days nobody logged. Five weeks (#124) is read beside it, from the athlete's own reader.
-    const [full, fw] = await Promise.all([ensureSessionsFull(athleteId), fiveWeeksC(athleteId)]);
+    const [full, fw, st] = await Promise.all([ensureSessionsFull(athleteId), fiveWeeksC(athleteId), stepsTargetsC(athleteId)]);
     const now = route();
     if (req !== _detailReq || now.view !== 'detail' || now.id !== athleteId) return;
     // The awaits above can span a reload of the store (assemble() builds new athlete objects): draw the current one.
@@ -6525,6 +6596,7 @@ async function renderDetail(athleteId, sub) {
       lib,
       logsErr: full.ok ? '' : full.error,
       fw,
+      st,
       metrics: athleteMetrics(history, planDaysC(program).length, optionalDayIdsC(program)),
       stamp: S.stamp,
     };
@@ -6650,6 +6722,7 @@ function proofTabHtml(D) {
       <span class="chip${c.tier === 'free' ? '' : ' court'}">${esc(c.tier || '')}</span>
     </div>` : ''}
   </section>
+  ${stepsTargetPanelC(D)}
   <div class="sec"><span>Their wall lines this week</span></div>
   ${myLines.length ? `<section class="panel">${myLines.map(n => `<div class="wline ${n.hidden ? 'hid' : ''}">
       <div class="bd"><div class="wtop"><span class="nm">${esc(wallDayLabel(n.day))}</span>${n.pct != null ? `<span class="pct">${esc(n.pct)}%</span>` : ''}${n.hidden ? '<span class="hidetag">hidden</span>' : ''}</div>
@@ -7181,6 +7254,7 @@ const ERASE_WHAT = {
   hab_notes: ['roll-call line', 'roll-call lines'], hab_titles: ['title', 'titles'], hab_season_results: ['season result', 'season results'],
   leaderboard_optin: ['board place', 'board places'], library_sessions: ['library session done', 'library sessions done'],
   activity_log: ['logged activity (tennis, padel, a run)', 'logged activities'],
+  steps_targets: ['steps target', 'steps targets'],
   messages: ['old message', 'old messages'], call_logs: ['call log', 'call logs'], cycle_reports: ['cycle report', 'cycle reports'],
   coaching_log_versions: ['earlier coaching-log text', 'earlier coaching-log texts'], coaching_logs: ['coaching log', 'coaching logs'],
   program_versions: ['saved programme version', 'saved programme versions'], programs: ['programme', 'programmes'],

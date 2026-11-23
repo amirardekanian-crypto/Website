@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=32"></script>
+<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=33"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -12815,10 +12815,13 @@ let HAB_CFG = null, HAB_LOG = {}, HAB_VIEW = {}, HAB_UI = { day: null }, _habEdi
 function habViewOf(log) {
   const isDay = k => typeof k === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(k);
   const read = (t, k) => {
-    const v = t[k], c = isDay(k) ? moveCreditOn(k) : null;
-    if (!c) return v;
+    const v = t[k];
+    if (!isDay(k)) return v;
+    const c = moveCreditOn(k), tg = stepsTargetOn(k), g = stepsGlobal();
     const d = (v && typeof v === 'object') ? v : {};
-    return Object.assign({}, d, { steps: (typeof d.steps === 'number' ? d.steps : 0) + c.steps });
+    if (!c && (tg === g || typeof d.steps !== 'number')) return v;   // nothing to add and nothing to scale
+    const sc = stepsScored(typeof d.steps === 'number' ? d.steps : 0, c ? c.raw : 0, tg, g);
+    return sc == null ? v : Object.assign({}, d, { steps: sc });
   };
   return new Proxy(log, {
     get: read,
@@ -13144,19 +13147,23 @@ function habRowHtml(hb, k) {
   // ⚠️ THE NUMBER ON THE ROW IS THE NUMBER THAT COUNTS (2026-11-23, Amir picked direction A "Total first"). Until then the button showed
   // the typed 2,000 and the activity's 7,000 lived only in a grey line, so Tara logged an hour of tennis and read "it doesn't add to my
   // steps" while the server was scoring 9,000. scripts/headless/move-credit.js holds the button equal to H.valOf() on every count habit.
-  const mv = hb.id === 'steps' ? moveCreditOn(k) : null, raw = mv ? habRaw(k, hb.id) : val;
+  const mv = hb.id === 'steps' ? moveCreditOn(k) : null, raw = hb.id === 'steps' ? habRaw(k, hb.id) : val;
   const mvFrom = mv ? (mv.kinds.length === 1 ? (ACT_LABEL[mv.kinds[0]] || 'Activity') : 'your activity') : '';
   const mvLine = !mv ? ''
     : _habTyping === hb.id ? `Type the steps you walked. ${mvFrom.charAt(0).toUpperCase() + mvFrom.slice(1)} adds ${H.fmtVal(hb, mv.steps)}.`
     : raw > 0 ? `${H.fmtVal(hb, raw)} walked + ${H.fmtVal(hb, mv.steps)} from ${mvFrom}`
     : `+${H.fmtVal(hb, mv.steps)} from ${mvFrom}`;
-  const name = H.splitEmoji(hb.name)[1] || hb.name;
+  // #130 Your Number: a target Amir set shows in the name; the big number and what is left are real steps against it (the scorers
+  // see the day scaled to everyone's target, H.valOf(), which would read 7,143 for 5,000 of 7,000)
+  const tg = hb.id === 'steps' ? stepsTargetOn(k) : 0, ownT = hb.id === 'steps' && tg !== stepsGlobal();
+  const shown = ownT ? raw + (mv ? mv.steps : 0) : val;
+  const name = ownT ? 'Walk ' + Number(tg).toLocaleString('en-US') + ' steps' : (H.splitEmoji(hb.name)[1] || hb.name);
   const hue = H.hue(hb) || [];
   const mark = `<span class="hb-ic" aria-hidden="true">${done ? HAB_TICK : window.ICON(habIconKey(hb), 2)}</span>`;
   // WHAT IS LEFT, never where you are (AA Proof's own note on this line): the − and + already say the number, and "3,500
   // steps to go" is the half an athlete acts on. A habit you tick rather than count says what it ASKS for instead, which
   // is how the session's row stops reading "Not yet" at someone who has not trained yet today.
-  const left = hb.kind === 'count' && !done ? Math.max(0, (Number(hb.target) || 0) - val) : 0;
+  const left = hb.kind === 'count' && !done ? (hb.id === 'steps' ? Math.max(0, (ownT ? tg : (Number(hb.target) || 0)) - raw - (mv ? mv.steps : 0)) : Math.max(0, (Number(hb.target) || 0) - val)) : 0;
   const sub = done ? 'Done'
     : hb.kind === 'count' ? H.fmtVal(hb, left) + ' ' + (Number(left) === 1 ? String(hb.unit || '').replace(/(ss)es$|s$/, '$1') : String(hb.unit || '')) + ' to go'
     : String(hb.goal || hb.source || '');
@@ -13173,7 +13180,7 @@ function habRowHtml(hb, k) {
       <button type="button" class="hb-step" data-h="${hb.id}" data-d="-1"${raw <= 0 ? ' disabled' : ''} onpointerdown="habStepDown(event, this)" onclick="habStepClick(event, this)" aria-label="Take ${step} off ${esc(name)}">−</button>
       ${_habTyping === hb.id
         ? `<input class="hb-now hb-type" id="hab-type-${hb.id}" type="text" inputmode="${Number(hb.step || 1) % 1 ? 'decimal' : 'numeric'}" enterkeyhint="done" autocomplete="off" value="${H.fmtVal(hb, raw).replace(/,/g, '')}" aria-label="${esc(name)}: type the ${esc(hb.unit || 'number')}" onkeydown="habTypeKey(event, '${hb.id}')" onblur="habTypeSave('${hb.id}')">`
-        : `<button type="button" class="hb-now${done ? ' is-done' : ''}" onclick="habTypeOpen('${hb.id}')" aria-label="${esc(name)}: ${H.fmtVal(hb, val)} of ${H.fmtVal(hb, hb.target)} ${esc(hb.unit || '')}${mv ? ` (${esc(mvLine)})` : ''}. Tap to type a number.">${H.fmtVal(hb, val)}</button>`}
+        : `<button type="button" class="hb-now${done ? ' is-done' : ''}" onclick="habTypeOpen('${hb.id}')" aria-label="${esc(name)}: ${H.fmtVal(hb, shown)} of ${H.fmtVal(hb, ownT ? tg : hb.target)} ${esc(hb.unit || '')}${mv ? ` (${esc(mvLine)})` : ''}. Tap to type a number.">${H.fmtVal(hb, shown)}</button>`}
       <button type="button" class="hb-step" data-h="${hb.id}" data-d="1"${raw >= cap ? ' disabled' : ''} onpointerdown="habStepDown(event, this)" onclick="habStepClick(event, this)" aria-label="Add ${step} to ${esc(name)}">+</button>
     </span>` : '';
   return `<div class="hb-wrap" data-h="${hb.id}">
@@ -19147,8 +19154,55 @@ async function loadFiveWeeks() {
     try { if (FW) _lsRawSet(fwKey(), JSON.stringify(FW)); else localStorage.removeItem(fwKey()); } catch (e) { /* storage full: shown this visit */ }
     paintFiveWeeks();
   } catch (e) { /* the copy above stays */ }
+  loadStepsTargets();   // #130 Your Number
 }
 window.loadFiveWeeks = loadFiveWeeks;
+// ── YOUR NUMBER — #130 (round 12, 2026-11-23; Amir: "App suggests, you approve", "Full XP at their number") ─────────────────────
+// Amir sets an athlete's Steps target in coach.html (stage125). From that day the Steps habit is scored against it, the way the server
+// scores it in hab_log_credited(): Steps = (typed + credit capped at 70% of the day's target) x global target / the day's target, so
+// hitting their own number is a full Steps day for the ring, the day gate and the XP. The row says their number ("Walk 8,500 steps")
+// and what is left of it in real steps. The phone keeps a copy (<id>_steps_tgt, never synced). ⚠️ The server's copy of the arithmetic is
+// hab_log_credited() in supabase/stage125_steps_target.sql: scripts/check_twins.js holds stepsScored() to it.
+let STEPS_TGT = null;   // { global, rows: [{ from, steps }] }
+function stepsTgtKey() { return ATHLETE_ID + '_steps_tgt'; }
+function stepsTgtOk(o) { return !!o && Array.isArray(o.rows); }
+function stepsTgtFromCache() {
+  if (STEPS_TGT || !ATHLETE_ID || window.IS_DEMO || window.IS_PREVIEW) return;
+  try { const o = JSON.parse(localStorage.getItem(stepsTgtKey()) || 'null'); if (stepsTgtOk(o)) STEPS_TGT = o; } catch (e) { /* none yet */ }
+}
+async function loadStepsTargets() {
+  if (!ATHLETE_ID || window.IS_DEMO || window.IS_PREVIEW) return;
+  try {
+    const sb = await _sbReady();
+    if (!sb) return;
+    const res = await _withTimeout(sb.rpc('get_steps_targets', { p_athlete_id: ATHLETE_ID }), 8000);
+    if (!res || res.error || !stepsTgtOk(res.data)) return;   // a server without stage125: everyone's target, as before
+    const was = JSON.stringify(STEPS_TGT);
+    STEPS_TGT = res.data;
+    try { _lsRawSet(stepsTgtKey(), JSON.stringify(STEPS_TGT)); } catch (e) { /* shown this visit */ }
+    if (JSON.stringify(STEPS_TGT) !== was) { _mvFor = undefined; try { paintTodayCard(); } catch (e) { /* next paint */ } }
+  } catch (e) { /* the copy stays */ }
+}
+function stepsGlobal() {
+  const H = window.AAHabits, sh = H && H.byId ? H.byId('steps') : null;
+  let g = 0;
+  try { g = STEPS_TGT && Number(STEPS_TGT.global); } catch (e) { g = 0; }   // a paint before this part of the script ran
+  return g || (sh && Number(sh.target)) || 10000;
+}
+// The target in force on a day: the last row from that day or before, else everyone's.
+function stepsTargetOn(day) {
+  let rows = [];
+  try { stepsTgtFromCache(); rows = STEPS_TGT && Array.isArray(STEPS_TGT.rows) ? STEPS_TGT.rows : []; } catch (e) { rows = []; }   // a paint before this part of the script ran
+  let t = 0;
+  rows.forEach(r => { if (r && String(r.from) <= String(day) && Number(r.steps) > 0) t = Number(r.steps); });
+  return t || stepsGlobal();
+}
+// The day's Steps as every scorer reads it, or null when it is the typed number unchanged (no credit, everyone's target).
+function stepsScored(typed, raw, t, g) {
+  const cr = Math.min(Math.max(0, Number(raw) || 0), Math.round(t * MOVE_CAP));
+  if (cr === 0 && t === g) return null;
+  return Math.round(((Number(typed) || 0) + cr) * g / t);
+}
 // 'YYYY-MM-DD' plus n days, by the calendar (a UTC date, so a clock change never moves a day)
 function fwAdd(iso, n) {
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || ''));
@@ -19200,7 +19254,7 @@ function moveCreditOf(acts, target) {
 // stage122 (2026-11-22; Amir: "yes and even after / because people may not renew program, but want to use the tracker"): from
 // FW.acts, every Court Log row of the last 70 days whatever the weeks, so the credit is the server's before a cycle starts and after
 // the last one ends. A copy from before stage122 has no acts: the weeks' rows, as before.
-let _mvFor = null, _mvLen = -1, _mvMap = {};
+let _mvFor = null, _mvLen = -1, _mvMap = {}, _mvTgt = '';
 function moveActs() {
   if (!fwOk(FW)) return [];
   if (Array.isArray(FW.acts)) return FW.acts.filter(Boolean);
@@ -19209,7 +19263,8 @@ function moveActs() {
   return out;
 }
 function moveCreditMap() {
-  try { if (FW === _mvFor && (!FW || !Array.isArray(FW.acts) || FW.acts.length === _mvLen)) return _mvMap; } catch (e) { return {}; }   // a paint before this part of the script has run (FW not set up yet)
+  try { if (FW === _mvFor && (!FW || !Array.isArray(FW.acts) || FW.acts.length === _mvLen) && JSON.stringify(STEPS_TGT) === _mvTgt) return _mvMap; } catch (e) { return {}; }   // a paint before this part of the script has run (FW not set up yet)
+  try { _mvTgt = JSON.stringify(STEPS_TGT); } catch (e) { _mvTgt = ''; }
   _mvFor = FW; _mvLen = FW && Array.isArray(FW.acts) ? FW.acts.length : -1; _mvMap = {};
   if (!fwOk(FW)) return _mvMap;
   const H = window.AAHabits, sh = H && H.byId ? H.byId('steps') : null, target = (sh && sh.target) || 10000, by = {};
@@ -19217,8 +19272,8 @@ function moveCreditMap() {
     if (d && d.day && String(d.day) >= MOVE_FROM) (by[d.day] = by[d.day] || []).push(d);
   });
   Object.keys(by).forEach(day => {
-    const c = moveCreditOf(by[day], target);
-    if (c.steps > 0) _mvMap[day] = { steps: c.steps, kinds: [...new Set(by[day].map(a => a.kind))] };
+    const c = moveCreditOf(by[day], stepsTargetOn(day) || target);   // #130: capped at 70% of that day's own target
+    if (c.steps > 0) _mvMap[day] = { steps: c.steps, raw: c.raw, kinds: [...new Set(by[day].map(a => a.kind))] };
   });
   return _mvMap;
 }
