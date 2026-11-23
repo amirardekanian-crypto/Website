@@ -138,6 +138,48 @@ const doorOf = nm => `(() => { const c = ${H.card(nm)}; if (!c) return null; if 
     await ctx.close();
   }
 
+  // 8. Their own maxes (Amir, 2026-11-23: "Yes, add them"): a max logged by hand in Personal Records is a diamond in its date's place
+  //    with "your max" under it, off the line, and a row in the list. An automatic record (from a session), a max older than the
+  //    sessions shown and a max in another measure are not drawn.
+  for (const fa of [false, true]) {
+    const tag = fa ? 'maxes, Farsi' : 'maxes';
+    const REC = [
+      { lift: 'Barbell Back Squat', kg: 95, w: 85, r: 3, rpe: 9, d: H.past(20), t: 5 },
+      { lift: 'Barbell Back Squat', kg: 82, w: 70, r: 6, rpe: 7, d: H.past(16), t: 0, auto: true },
+      { lift: 'Barbell Back Squat', kg: 70, w: 60, r: 5, rpe: 8, d: H.past(60), t: 5 },
+      { lift: 'Barbell Back Squat', kg: 210, w: 185, r: 3, rpe: 9, d: H.past(12), t: 5, u: 'lb' },
+    ];
+    const init = fa ? "localStorage.setItem('aa_lang_beta', '1'); localStorage.setItem('aa_lang', 'fa');" : undefined;
+    const { ctx, p } = await H.openProgram(browser, { hist: HIST, seed: { _1rm: REC }, init });
+    await p.evaluate(() => openDayView('1'));
+    await p.waitForTimeout(400);
+    await p.evaluate(`(() => { const c = ${H.card('Barbell Back Squat')}; if (c.classList.contains('collapsed')) toggleExpand(c); c.querySelector('.lt-door').click(); })()`);
+    await p.waitForTimeout(500);
+    const mx = await p.evaluate(() => { const m = document.querySelector('#hist-overlay .readiness-modal'), q = s => [...m.querySelectorAll(s)];
+      const dia = q('.hs-max'), dots = q('.hs-pt, .hs-dot').map(c => +c.getAttribute('cx'));
+      const dx = dia[0] ? +dia[0].getAttribute('d').match(/^M([\d.]+)/)[1] : null;
+      return { n: dia.length, tags: q('.hs-maxt').map(e => e.textContent), vals: q('.hs-val, .hs-end').map(e => e.textContent),
+        between: dx != null && dots.filter(v => v < dx).length === 3 && dots.filter(v => v > dx).length === 3, skip: q('.hs-skip').length,
+        rows: q('.hs-row').length, mrow: q('.hs-mrow').map(r => r.textContent.replace(/\s+/g, ' ').replace(/ /g, ' ').trim()), bars: q('.hs-eff').length }; });
+    t.check(`${tag}: one max on the graph (not the automatic, the old or the pound one)`, mx.n === 1 && mx.tags.length === 1, JSON.stringify(mx));
+    t.check(`${tag}: it sits in its date's place, between the 3rd and 4th sessions, and the line runs solid past it`, mx.between && mx.skip === 0, JSON.stringify(mx));
+    t.check(`${tag}: it carries its weight and adds no effort bars`, mx.vals.includes('85') && mx.bars === 24, JSON.stringify(mx));
+    t.check(`${tag}: a row for it in the list, in date order`, mx.rows === 7 && mx.mrow.length === 1, JSON.stringify(mx));
+    if (!fa) {
+      t.check('maxes: the row says it is their max, its effort and what they lifted', mx.tags[0] === 'your max' && /^[A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2} · Your max · Effort 9 85 kg × 3$/.test(mx.mrow[0]), JSON.stringify(mx));
+    } else {
+      t.check('maxes, Farsi: the mark and the row are Farsi', !/[A-Za-z]/.test(mx.tags[0]) && !/Your max|Effort/.test(mx.mrow[0]), JSON.stringify(mx));
+    }
+    t.check(`${tag}: no page errors`, p.errs.length === 0, p.errs.join(' | '));
+    if (!fa) {
+      await p.evaluate(() => { if (typeof hideAaToast === 'function') hideAaToast(); const ov = document.getElementById('hist-overlay'), m = ov.querySelector('.readiness-modal');
+        ov.style.position = 'absolute'; ov.style.bottom = 'auto'; ov.style.minHeight = '100%'; m.style.maxHeight = 'none'; });
+      await p.waitForTimeout(150);
+      await p.screenshot({ path: path.join(shots, 'history-door-sheet-maxes.png'), fullPage: true });
+    }
+    await ctx.close();
+  }
+
   // 7. On a Farsi phone: the door, the sentence, the graph's words and the guide's new lines all have their Farsi.
   {
     const FARSI = "localStorage.setItem('aa_lang_beta', '1'); localStorage.setItem('aa_lang', 'fa');";

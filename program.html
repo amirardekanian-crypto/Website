@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=15" data-fa="/assets/js/i18n-fa.js?v=27"></script>
+<script src="/assets/js/i18n.js?v=15" data-fa="/assets/js/i18n-fa.js?v=28"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -2874,8 +2874,10 @@
   .hs-dot { fill: var(--green-ink); }
   .hs-pt { fill: var(--paper); stroke: var(--green-ink); stroke-width: 2.2; }
   .hs-low { stroke-dasharray: 2.4 2.2; }
+  .hs-max { fill: var(--paper); stroke: var(--green-ink); stroke-width: 2.2; stroke-linejoin: round; }
   .hs-gap { fill: none; stroke: var(--grey); stroke-width: 1.4; }
   .hs-gapt, .hs-lowt { font: 400 var(--fs-label) 'Space Mono', monospace; fill: var(--grey); }
+  .hs-maxt { font: 700 var(--fs-label) 'Space Mono', monospace; fill: var(--green-ink); }
   .hs-val { font: 700 var(--fs-body) 'Barlow Condensed', sans-serif; fill: var(--ink); }
   .hs-end { font: 800 var(--fs-lead) 'Barlow Condensed', sans-serif; fill: var(--green-ink); }
   .hs-tick { font: 400 var(--fs-label) 'Space Mono', monospace; fill: var(--grey); }
@@ -27090,46 +27092,86 @@ function histSummary(S) {
   }
   return `<p class="hs-sum"><span>${esc(head)}</span><span>${esc(tail)}</span></p>`;
 }
+// Their OWN maxes for this lift in this measure (Amir, 2026-11-23: "Yes, add them", asked whether a record they add themselves shows
+// on Your history): the Personal Records entries logged by hand or as a test (+ Log a max), never the automatic ones (those came from
+// sessions, already dots), read through ceilingSeries() so a renamed lift, one entry a day and a deleted day are the Records' own.
+// Only from the oldest session the sheet shows on: an older max stays in Personal Records.
+function histOwnMaxes(name, lu, from) {
+  if (!lu || typeof ceilingSeries !== 'function') return [];
+  const sr = ceilingSeries().find(r => r.lift === name && uKey(r.u) === uKey(lu));
+  return sr ? sr.entries.filter(e => !e.auto && Number(e.w) > 0 && (!from || e.d >= from)) : [];
+}
 // The graph. Top lane: a dot per session with its number above it and its date under it, the newest filled; a grey mark where a
-// session has no weight in this measure; a dashed dot on a low day. The floor sits under the lowest dot, so nothing rests on the
-// line and a small step looks small. Past 7 sessions every other one (the newest always) carries its number and date. Bottom lane:
-// one bar per set, its height the effort, clay over the target and steel under it as the rows colour their numbers, the target a
-// dashed line. Not tappable: the list under it is the detail.
-function histChart(S, target, label) {
-  const P = S.pts, n = P.length, W = 350, padL = 26, padR = 26, top = 30, plotH = 108, plotB = top + plotH, dateY = plotB + 18;
-  const vs = S.vals.map(p => p.v);
+// session has no weight in this measure; a dashed dot on a low day; a max they logged themselves as a diamond in its date's place,
+// "your max" under its date, off the line (the line is the sessions). The floor sits under the lowest mark, so nothing rests on
+// the line and a small step looks small. A date, a number and a small word show only where they fit (the newest and the maxes
+// first). Bottom lane: one bar per set of each session, its height the effort, clay over the target and
+// steel under it as the rows colour their numbers, the target a dashed line. Not tappable: the list under it is the detail.
+function histChart(S, target, label, maxes) {
+  const slots = S.pts.map(p => ({ s: p, d: p.date }));
+  (maxes || []).forEach(e => slots.push({ m: e, d: e.d }));
+  slots.sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : (a.m ? 1 : 0) - (b.m ? 1 : 0)));
+  const n = slots.length, W = 350, padL = 26, padR = 26, top = 30, plotH = 108, plotB = top + plotH, dateY = plotB + 18;
+  const vs = S.vals.map(p => p.v).concat((maxes || []).map(e => Number(e.w)));
   let lo = Math.min(...vs), hi = Math.max(...vs);
   if (hi === lo) { lo -= 1; hi += 1; }
   const sp = hi - lo; lo -= sp * 0.22; hi += sp * 0.04;
   const step = n > 1 ? (W - padL - padR) / (n - 1) : 0;
   const x = i => n === 1 ? W / 2 : padL + i * step, X = i => x(i).toFixed(1);
   const y = v => top + (1 - (v - lo) / (hi - lo)) * (plotH - 10);
-  const said = i => n <= 7 || (n - 1 - i) % 2 === 0;
-  const lowWords = n <= 7 && P.some(p => p.low);
+  // Which marks carry their date, their number and their small word ("low day", "your max"): each only where it fits, the newest
+  // first, then their maxes, then the rest from the newest back, so no two ever touch. Widths are estimates in the graph's units:
+  // Space Mono at --fs-label is about 7.3 a character, a number in Barlow Condensed about 8.
+  const order = [...new Set([n - 1].concat(slots.map((sl, i) => i).filter(i => slots[i].m), slots.map((sl, i) => n - 1 - i)))];
+  const fits = (cands, text, cw) => {
+    const taken = [], ok = slots.map(() => false);
+    cands.forEach(i => {
+      const w = text(i).length * cw, a = x(i) - w / 2 - 2, b = x(i) + w / 2 + 2;
+      if (!taken.some(([p, q]) => a < q && b > p)) { taken.push([a, b]); ok[i] = true; }
+    });
+    return ok;
+  };
+  const said = fits(order, i => histDayMon(slots[i].d), 7.3);
+  const valOf = i => (slots[i].m ? histNum(Number(slots[i].m.w)) : slots[i].s.v == null ? '' : histNum(slots[i].s.v));
+  const num = fits(order.filter(i => valOf(i)), valOf, 8);
+  const tagOf = i => (slots[i].m ? 'your max' : slots[i].s.low ? 'low day' : '');
+  const tag = fits(order.filter(i => tagOf(i)), tagOf, 7.3);
+  const tagged = tag.some(Boolean);
   let g = `<line class="hs-base" x1="6" x2="${W - 6}" y1="${plotB}" y2="${plotB}"/>`;
   const idx = [];
-  P.forEach((p, i) => { if (p.v != null) idx.push(i); });
-  g += `<path class="hs-area" d="M${X(idx[0])},${plotB} ${idx.map(i => 'L' + X(i) + ',' + y(P[i].v).toFixed(1)).join(' ')} L${X(idx[idx.length - 1])},${plotB} Z"/>`;
+  slots.forEach((sl, i) => { if (sl.s && sl.s.v != null) idx.push(i); });
+  const sv = i => slots[i].s.v;
+  g += `<path class="hs-area" d="M${X(idx[0])},${plotB} ${idx.map(i => 'L' + X(i) + ',' + y(sv(i)).toFixed(1)).join(' ')} L${X(idx[idx.length - 1])},${plotB} Z"/>`;
   for (let k = 1; k < idx.length; k++) {
-    const a = idx[k - 1], b = idx[k];   // dotted across a session that has no weight in this measure
-    g += `<line class="hs-line${b - a > 1 ? ' hs-skip' : ''}" x1="${X(a)}" y1="${y(P[a].v).toFixed(1)}" x2="${X(b)}" y2="${y(P[b].v).toFixed(1)}"/>`;
+    const a = idx[k - 1], b = idx[k];   // dotted across a session that has no weight in this measure (a max between is not a gap)
+    const skip = slots.slice(a + 1, b).some(sl => sl.s);
+    g += `<line class="hs-line${skip ? ' hs-skip' : ''}" x1="${X(a)}" y1="${y(sv(a)).toFixed(1)}" x2="${X(b)}" y2="${y(sv(b)).toFixed(1)}"/>`;
   }
-  P.forEach((p, i) => {
+  slots.forEach((sl, i) => {
+    const p = sl.s;
+    if (sl.m) {
+      const w = Number(sl.m.w), cy = y(w), r = 6.5;
+      g += `<path class="hs-max" d="M${X(i)},${(cy - r).toFixed(1)} L${(x(i) + r).toFixed(1)},${cy.toFixed(1)} L${X(i)},${(cy + r).toFixed(1)} L${(x(i) - r).toFixed(1)},${cy.toFixed(1)} Z"/>`;
+      if (num[i]) g += `<text class="hs-val" x="${X(i)}" y="${(cy - r - 6).toFixed(1)}" text-anchor="middle">${histNum(w)}</text>`;
+      if (said[i]) g += `<text class="hs-tick" x="${X(i)}" y="${dateY}" text-anchor="middle">${histDayMon(sl.d)}</text>`;
+      if (tag[i]) g += `<text class="hs-maxt" x="${X(i)}" y="${dateY + 13}" text-anchor="middle">your max</text>`;
+      return;
+    }
     const now = p === S.now;
     if (p.v == null) {
       g += `<circle class="hs-gap" cx="${X(i)}" cy="${plotB - 9}" r="3.5"/>`;
       const why = p.other ? 'in ' + unitWord(p.other, 2) : (S.lu ? 'no ' + unitWord(S.lu, 2) : '');
-      if (why && said(i)) g += `<text class="hs-gapt" x="${X(i)}" y="${plotB - 18}" text-anchor="middle">${why}</text>`;
+      if (why && said[i]) g += `<text class="hs-gapt" x="${X(i)}" y="${plotB - 18}" text-anchor="middle">${why}</text>`;
     } else {
       const cy = y(p.v), r = now ? 6 : 4.5;
       g += `<circle class="${now ? 'hs-dot' : 'hs-pt'}${p.low ? ' hs-low' : ''}" cx="${X(i)}" cy="${cy.toFixed(1)}" r="${r}"/>`;
-      if (said(i)) g += `<text class="${now ? 'hs-end' : 'hs-val'}" x="${X(i)}" y="${(cy - r - 6).toFixed(1)}" text-anchor="middle">${histNum(p.v)}</text>`;
+      if (num[i]) g += `<text class="${now ? 'hs-end' : 'hs-val'}" x="${X(i)}" y="${(cy - r - 6).toFixed(1)}" text-anchor="middle">${histNum(p.v)}</text>`;
     }
-    if (said(i)) g += `<text class="hs-tick" x="${X(i)}" y="${dateY}" text-anchor="middle">${histDayMon(p.date)}</text>`;
-    if (lowWords && p.low) g += `<text class="hs-lowt" x="${X(i)}" y="${dateY + 13}" text-anchor="middle">low day</text>`;
+    if (said[i]) g += `<text class="hs-tick" x="${X(i)}" y="${dateY}" text-anchor="middle">${histDayMon(p.date)}</text>`;
+    if (tag[i] && p.low) g += `<text class="hs-lowt" x="${X(i)}" y="${dateY + 13}" text-anchor="middle">low day</text>`;
   });
-  let H = dateY + 8 + (lowWords ? 13 : 0);
-  if (P.some(p => p.rpes.length)) {
+  let H = dateY + 8 + (tagged ? 13 : 0);
+  if (S.pts.some(p => p.rpes.length)) {
     const lt = H + 24, lh = 40, lb = lt + lh;
     const tm = String(target == null ? '' : target).match(/(\d+(?:\.\d+)?)(?:\s*[-–]\s*(\d+(?:\.\d+)?))?/);
     const ey = r => lb - Math.max(0.06, Math.min(1, (r - 4) / 6)) * lh;
@@ -27138,11 +27180,11 @@ function histChart(S, target, label) {
       const ty = ey(Number(tm[2] || tm[1])).toFixed(1);   // over means above the top of a range
       g += `<text class="hs-lanet" x="${W - 6}" y="${lt - 9}" text-anchor="end">target ${esc(String(target).trim())}</text><line class="hs-tgt" x1="6" x2="${W - 6}" y1="${ty}" y2="${ty}"/>`;
     }
-    P.forEach((p, i) => {
-      const k = p.rpes.length;
+    slots.forEach((sl, i) => {
+      const k = sl.s ? sl.s.rpes.length : 0;   // a max is one effort, not a session's sets: no bars
       if (!k) return;
       const gp = 1.5, bw = Math.max(1.5, Math.min(4, ((n > 1 ? step : 40) * 0.8 - (k - 1) * gp) / k)), x0 = x(i) - (k * bw + (k - 1) * gp) / 2;
-      p.rpes.forEach((r, j) => {
+      sl.s.rpes.forEach((r, j) => {
         const vs2 = rpeVs(r, target), yy = ey(r);
         g += `<rect class="hs-eff${vs2 ? ' ' + vs2 : ''}" x="${(x0 + j * (bw + gp)).toFixed(1)}" y="${yy.toFixed(1)}" width="${bw.toFixed(1)}" height="${(lb - yy).toFixed(1)}" rx="1"/>`;
       });
@@ -27150,6 +27192,27 @@ function histChart(S, target, label) {
     H = lb + 4;
   }
   return `<svg class="hs-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}: from ${histNum(S.first.v)} to ${histNum(S.now.v)}">${g}</svg>`;
+}
+// One session in the History sheet's list: the date and each set's effort against the card as written, the sets, the note.
+function histRowHtml(h, target) {
+  const e = h.entry, dl = histDateLabel(h.date);
+  const txt = e.circuit ? ((e.items || []).filter(it => it.w).map(it => `${it.name} ${histWt(it.w) || it.w}`).join(' · ') || e.gear || '')
+                        : histSetsText(e.sets, e.reps || null);
+  const rs = e.circuit ? '' : (e.sets || []).filter(histSetLogged).map(s => Number(s.r) || null).filter(Boolean)
+    .map(r => rpeMark(r, target)).join(' ');
+  // The tag follows the level the day was TRAINED at (B19, 2026-10-24): the check-in's plan as filed with that session, lower or short and
+  // not trained as written. Not the raw score: a lower day shows it, a sore day on a normal level and a day trained as written do not.
+  const rd = h.ready, low = !!(rd && (rd.level === 'amber' || rd.level === 'red') && !rd.asWritten);
+  return `<div class="hs-row"><span class="hs-d">${esc(dl.when)}${rs ? ' · Effort ' + rs : ''}${low ? ' · low day' : ''}</span>
+    <span class="hs-v">${esc(txt)}</span>
+    ${e.note ? `<span class="hs-n">“<bdi>${esc(e.note)}</bdi>”</span>` : ''}</div>`;
+}
+// A max they logged, in the list by its date: "Sat 8 Nov · Your max · Effort 9" over "85 kg × 3". Its effort is not set against the
+// card's target (a max is not a training set), so it is never clay.
+function histMaxRowHtml(e, lu) {
+  const w = Number(e.w), r = Number(e.r), rpe = Number(e.rpe);
+  return `<div class="hs-row hs-mrow"><span class="hs-d">${esc(histDateLabel(e.d).when)} · Your max${rpe > 0 ? ' · Effort ' + esc(String(rpe)) : ''}</span>
+    <span class="hs-v">${esc(histNum(w) + ' ' + unitWord(lu, w) + (r > 0 ? ' × ' + r : ''))}</span></div>`;
 }
 function openHistorySheet(card) {
   const name = card.querySelector('.item-name').textContent.trim();
@@ -27162,25 +27225,18 @@ function openHistorySheet(card) {
   // The graph is drawn in the measure the lift was last logged in (kg, lb or plates); a session in another measure keeps its
   // place as a grey mark, never joins the line as if the numbers were alike.
   const S = histSeries(name);
+  const from = S.pts.length ? S.pts[0].date : (hist.length ? hist[hist.length - 1].date : null);
+  const maxes = histOwnMaxes(name, S.lu, from);
   let chart = '';
   if (S.vals.length >= 2) {
     const label = !S.lu ? 'Most reps in a set' : S.lu === 'plates' ? 'Top stack, plates' : `Top weight, ${S.lu}`;
-    chart = `${histSummary(S)}<div class="hs-lbl">${esc(label)}</div>${histChart(S, target, label)}`;
+    chart = `${histSummary(S)}<div class="hs-lbl">${esc(label)}</div>${histChart(S, target, label, maxes)}`;
   }
 
-  const rows = hist.map(h => {
-    const e = h.entry, dl = histDateLabel(h.date);
-    const txt = e.circuit ? ((e.items || []).filter(it => it.w).map(it => `${it.name} ${histWt(it.w) || it.w}`).join(' · ') || e.gear || '')
-                          : histSetsText(e.sets, e.reps || null);
-    const rs = e.circuit ? '' : (e.sets || []).filter(histSetLogged).map(s => Number(s.r) || null).filter(Boolean)
-      .map(r => rpeMark(r, target)).join(' ');
-    // The tag follows the level the day was TRAINED at (B19, 2026-10-24): the check-in's plan as filed with that session, lower or short and
-    // not trained as written. Not the raw score: a lower day shows it, a sore day on a normal level and a day trained as written do not.
-    const rd = h.ready, low = !!(rd && (rd.level === 'amber' || rd.level === 'red') && !rd.asWritten);
-    return `<div class="hs-row"><span class="hs-d">${esc(dl.when)}${rs ? ' · Effort ' + rs : ''}${low ? ' · low day' : ''}</span>
-      <span class="hs-v">${esc(txt)}</span>
-      ${e.note ? `<span class="hs-n">“<bdi>${esc(e.note)}</bdi>”</span>` : ''}</div>`;
-  }).join('');
+  // The sessions and their own maxes, newest first; on one day the session first.
+  const rows = hist.map(h => ({ d: h.date, html: histRowHtml(h, target) }))
+    .concat(maxes.map(e => ({ d: e.d, m: 1, html: histMaxRowHtml(e, S.lu) })))
+    .sort((p, q) => (p.d > q.d ? -1 : p.d < q.d ? 1 : (p.m || 0) - (q.m || 0))).map(r => r.html).join('');
 
   const hasRecord = typeof ceilingLifts === 'function' && ceilingLifts().some(l => l.lift === name);
   ov.querySelector('.readiness-modal').innerHTML = `

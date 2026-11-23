@@ -622,7 +622,10 @@
 // v286: program.html and i18n-fa.js (?v=27) changed (2026-11-23, Amir: "Build B"): the open exercise card carries a Your history door under
 // How to do it (the count, where the lift started and where it is now, a small line), and the History sheet says it in one sentence and
 // draws two lanes: the heaviest set of each session, then each set's effort against the target.
-const CACHE = 'aap-v286';
+// v287: program.html and i18n-fa.js (?v=28) changed (2026-11-23, Amir: "Yes, add them"): a max the athlete logs in Personal Records
+// shows on the History sheet, a diamond in its date's place with "your max" under it and a row in the list; the graph's dates,
+// numbers and small words show only where they fit.
+const CACHE = 'aap-v287';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -663,7 +666,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=15',
-  '/assets/js/i18n-fa.js?v=27',
+  '/assets/js/i18n-fa.js?v=28',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).

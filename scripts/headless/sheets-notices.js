@@ -105,13 +105,13 @@ const CONTROLS = '.sheet-back, .sheet-close, .acct-seg button, .hrow, .acct-sign
       const sm = await small(p, MODAL);
       t.check(`${tag} ${name}: every control is 44 px`, sm.length === 0, JSON.stringify(sm));
       if (name === 'History') {
-        const hs = await p.evaluate(() => { const m = document.querySelector('#hist-overlay .readiness-modal'), rows = [...m.querySelectorAll('.hs-row')], cs = e => getComputedStyle(e);
+        const hs = await p.evaluate(() => { const m = document.querySelector('#hist-overlay .readiness-modal'), rows = [...m.querySelectorAll('.hs-row')], srows = [...m.querySelectorAll('.hs-row:not(.hs-mrow)')], cs = e => getComputedStyle(e);
           const line = m.querySelector('.hs-line'), dot = m.querySelector('.hs-dot'), door = m.querySelector('#hs-rec');
-          return { rows: rows.length, first: rows[0] && cs(rows[0]).borderTopWidth, second: rows[1] && cs(rows[1]).borderTopWidth, line: line && cs(line).stroke, dot: dot && cs(dot).fill, chart: !!m.querySelector('.hs-chart'),
+          return { rows: srows.length, maxRows: m.querySelectorAll('.hs-mrow').length, first: rows[0] && cs(rows[0]).borderTopWidth, second: rows[1] && cs(rows[1]).borderTopWidth, line: line && cs(line).stroke, dot: dot && cs(dot).fill, chart: !!m.querySelector('.hs-chart'),
             date: rows[0] && cs(rows[0].querySelector('.hs-d')).fontFamily, set: rows[0] && { f: cs(rows[0].querySelector('.hs-v')).fontFamily, w: cs(rows[0].querySelector('.hs-v')).fontWeight },
-            note: rows[2] && cs(rows[2].querySelector('.hs-n')).fontStyle, door: door && { cls: door.className, h: Math.round(door.getBoundingClientRect().height), ic: !!door.querySelector('.hrow-ic svg'), a: !!door.querySelector('.hrow-a'), r: cs(door).borderTopLeftRadius },
+            note: srows[2] && cs(srows[2].querySelector('.hs-n')).fontStyle, door: door && { cls: door.className, h: Math.round(door.getBoundingClientRect().height), ic: !!door.querySelector('.hrow-ic svg'), a: !!door.querySelector('.hrow-a'), r: cs(door).borderTopLeftRadius },
             eyebrow: m.querySelector('.readiness-eyebrow').textContent }; });
-        t.check(`${tag} History: the chart on the paper in green (line and dots), three paper rows with a hairline between and none above the first`, hs.chart && hs.line === (dark ? GREEN_DARK : GREEN) && hs.dot === (dark ? GREEN_DARK : GREEN) && hs.rows === 3 && hs.first === '0px' && hs.second === '1px', JSON.stringify(hs));
+        t.check(`${tag} History: the chart on the paper in green (line and dots), three session rows and the seeded max's row (2026-11-23), a hairline between and none above the first`, hs.chart && hs.line === (dark ? GREEN_DARK : GREEN) && hs.dot === (dark ? GREEN_DARK : GREEN) && hs.rows === 3 && hs.maxRows === 1 && hs.first === '0px' && hs.second === '1px', JSON.stringify(hs));
         t.check(`${tag} History: the date in mono, the set line in Barlow bold, the note in italics, Personal Records a door row`, /Space Mono/.test(hs.date) && /Barlow/.test(hs.set.f) && +hs.set.w >= 700 && hs.note === 'italic' && hs.door && /hrow/.test(hs.door.cls) && hs.door.h >= 64 && hs.door.ic && hs.door.a && hs.door.r === '12px' && hs.eyebrow === 'Your history', JSON.stringify(hs));
       }
       if (name === 'Help') {

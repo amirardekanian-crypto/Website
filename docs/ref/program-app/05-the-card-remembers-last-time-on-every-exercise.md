@@ -42,6 +42,13 @@ day, across cycles via `matchRenamed()`), and **History ›** opens the History 
   grey *no kg* mark where a session has no weight in this measure, a dashed dot and *low day* on a low day, the floor
   under the lowest dot; then **Effort, each set**: one bar per set, clay over the target, steel under it, the target a
   dashed line. `scripts/headless/history-door.js` is the guard.
+- **Their own maxes on the sheet** (Amir, same day, asked whether a record they add themselves shows: *"Yes, add them"*).
+  `histOwnMaxes()` reads `ceilingSeries()` (the Records' own read: a renamed lift joined, one entry a day, tombstones out) for
+  this lift in the graph's measure, keeps the entries logged by hand or as a test (never `auto`, which came from sessions and are
+  already dots), from the oldest session shown on. Each is a hollow diamond in its date's place, off the line (the line is the
+  sessions, solid past it), *your max* under its date, no effort bars, and a row in the list (*Sat 8 Nov · Your max · Effort 9*
+  over *85 kg × 3*, its effort never set against the card's target). The door and the sentence stay the sessions'. A date, a
+  number and a small word show only where they fit, the newest and the maxes first (`fits()` in `histChart()`).
 - **`<id>_histcache` is a cache and never syncs** (`_snapshot()` skips it; written with
   `_lsRawSet` so it never stamps `lastEditAt`). The source is `get_my_history()`, stage30; since stage60 it leaves out a session the coach hid, so the next
   online open drops it from Last time and the Records.

@@ -2,6 +2,26 @@
   "_about": "What's new in the app, shown in every athlete's Inbox for 14 days (program.html, newsRows/openNews). Newest first. Each entry: id (unique), at (ISO time), en and fa: { title, items: [one short line each], sign }. Written in Amir's voice (COM-3) in both languages (COM-1). THE RULE (docs/rules/working-with-amir.md): a change to program.html that an athlete would notice ships with its entry here in the same commit; .githooks/commit-msg blocks a program.html commit without this file unless the message says [no news].",
   "items": [
     {
+      "id": "2026-11-23-your-max-on-history",
+      "at": "2026-11-23T20:00:00Z",
+      "en": {
+        "title": "Your own maxes are on Your history too",
+        "items": [
+          "A max you log in Personal Records now shows on the exercise's Your history, as a diamond on its date with \"your max\" under it.",
+          "It also gets its own row in the list, with what you lifted and how hard it was."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "رکوردهایی که خودتون ثبت می‌کنید هم توی تاریخچه هستن",
+        "items": [
+          "رکوردی که توی رکوردهای شخصی ثبت می‌کنید، حالا توی «تاریخچهٔ تو» همون حرکت هم هست: یه لوزی روی تاریخش، با «رکورد شما» زیرش.",
+          "توی فهرست هم یه ردیف جدا داره، با وزنه‌ای که زدید و اینکه چقدر سخت بود."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-23-history-on-the-card",
       "at": "2026-11-23T18:00:00Z",
       "en": {
