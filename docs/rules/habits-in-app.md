@@ -88,6 +88,12 @@ reference is [`../../HABITS.md`](../../HABITS.md). These are the rules for the h
   session card as "the day before: Padel 90 min, hard" (`ydayWordC()`). ⚠️ Information only (REC-7): `readinessPlan()` never reads it.
 - **A hard hour offers the day-after session** (#128, same day). A hard activity of 60 minutes or more says so in its saved message
   and offers `LIB_PICKS.sore` (The Morning After, the session a sore check-in offers), whose ← comes back to Home (`coolDownCall()`).
+- **An activity told to the crew carries its kind, never its effort** (#131, 2026-11-23, Amir: *"build 130 and 131"*). Tell the crew
+  (the saved message, or the day's sheet) opens the composer on the activity; words and a photo are optional; the post is a plain post
+  with `p_session = { act, mins }` (stage124), drawn with its card. ⚠️ **Court time wears the racket** (`ICON.court`, `actIcon()`):
+  the day's sheet, the Player Page and the feed, in clay; a plan or session post wears the dumbbell, so court and gym read apart.
+- **Your weeks says this week against the athlete's own usual** (#133, same day): court and other minutes against the average of the
+  four 7-day blocks before this week (`fwUsualHtml()`), silent until three weeks of logs. No score and no verdict.
 
 ---
 

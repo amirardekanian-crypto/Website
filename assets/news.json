@@ -2,6 +2,28 @@
   "_about": "What's new in the app, shown in every athlete's Inbox for 14 days (program.html, newsRows/openNews). Newest first. Each entry: id (unique), at (ISO time), en and fa: { title, items: [one short line each], sign }. Written in Amir's voice (COM-3) in both languages (COM-1). THE RULE (docs/rules/working-with-amir.md): a change to program.html that an athlete would notice ships with its entry here in the same commit; .githooks/commit-msg blocks a program.html commit without this file unless the message says [no news].",
   "items": [
     {
+      "id": "2026-11-23-court-told",
+      "at": "2026-11-23T20:00:00Z",
+      "en": {
+        "title": "Tell the crew you played",
+        "items": [
+          "After you add an activity, tap Tell the crew. The crew sees what you played and for how long, never how hard. Words and a photo are up to you.",
+          "Court time now has its own racket icon on Your weeks, your page and the crew feed, so it stands apart from the gym.",
+          "Once you have three weeks of activity, Your weeks shows this week next to your usual."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "به تیم بگید بازی کردید",
+        "items": [
+          "بعد از ثبت یه فعالیت، «به تیم بگو» رو بزنید. تیم می‌بینه چی بازی کردید و چقدر، ولی هیچ‌وقت نمی‌بینه چقدر سخت بود. نوشتن و عکس با خودتونه.",
+          "زمان بازی حالا آیکون راکت خودش رو داره، توی هفته‌هاتون، صفحهٔ شما و فید تیم، تا از باشگاه جدا دیده بشه.",
+          "وقتی سه هفته فعالیت ثبت کرده باشید، هفته‌های شما این هفته رو کنار حالت معمولتون نشون می‌ده."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-23-your-max-on-history",
       "at": "2026-11-23T20:00:00Z",
       "en": {

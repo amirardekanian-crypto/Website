@@ -627,7 +627,9 @@
 // numbers and small words show only where they fit.
 // v288: sw.js changed (2026-11-23, Amir: "A: instant"): a tap on the coach's doorbell (stage123, /coach.html#…) opens coach.html and never turns an
 // open athlete app into the dashboard.
-const CACHE = 'aap-v288';
+// v289: program.html and i18n-fa.js (?v=29) changed (2026-11-23, Amir: "build 130 and 131 ... an icon for people who played padel / tennis",
+// "build 133"): Tell the crew from an activity (stage124), the racket icon for court time, and Your weeks' usual line.
+const CACHE = 'aap-v289';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -668,7 +670,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=15',
-  '/assets/js/i18n-fa.js?v=28',
+  '/assets/js/i18n-fa.js?v=29',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).

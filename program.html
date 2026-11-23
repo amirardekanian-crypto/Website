@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=15" data-fa="/assets/js/i18n-fa.js?v=28"></script>
+<script src="/assets/js/i18n.js?v=15" data-fa="/assets/js/i18n-fa.js?v=29"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -5092,6 +5092,24 @@
     color: var(--green-ink); font: 600 var(--fs-body)/1 'Barlow', sans-serif; cursor: pointer; }
   #screen-plan .fw-add:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
   /* The Add activity sheet and a logged activity's row, in #hist-overlay (the shared sheet). */
+  /* #131: the icon an activity wears (the racket in clay for court time), the feed's activity card, the sheet's Tell button; #133 the usual line */
+  .act-ic { flex: none; display: grid; place-items: center; width: 30px; height: 30px; margin-right: 10px; border-radius: 50%; background: var(--tint); color: var(--fill); }
+  .act-ic svg { width: 17px; height: 17px; }
+  .act-ic.is-court, .cr-kic.is-court, .cr-acti.is-court { color: var(--clay); }
+  .pl-row:has(> .act-ic) { justify-content: flex-start; }
+  .pl-row > .act-ic + div { flex: 1; min-width: 0; }
+  .act-btns { display: flex; gap: 12px; align-items: center; flex: none; }
+  .act-tell { border: 0; background: none; padding: 6px 0; color: var(--green-ink); font: 600 var(--fs-small)/1 'Barlow', sans-serif; cursor: pointer; }
+  .cr-kd { display: inline-flex; align-items: center; gap: 4px; }
+  .cr-kic { display: inline-grid; color: var(--grey); }
+  .cr-kic svg { width: 13px; height: 13px; }
+  .cr-actcard { display: flex; align-items: center; gap: 12px; margin: 8px 0 4px; padding: 12px 14px; border-radius: 14px; background: var(--tint); }
+  .cr-acti { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--row); color: var(--fill); }
+  .cr-acti svg { width: 26px; height: 26px; }
+  .cr-actcard b { display: block; font: 700 var(--fs-field)/1.2 'Barlow', sans-serif; }
+  .cr-actcard span span { font: 500 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  .fw-usual { display: grid; gap: 2px; margin: 8px 0 0; font: 400 var(--fs-small)/1.4 'Barlow', sans-serif; color: var(--grey); }
+  .fw-usual b { color: var(--ink); font-weight: 600; }
   .readiness-yday { margin: -4px 0 14px; padding: 8px 12px; border-radius: 10px; background: var(--tint); font: 500 var(--fs-small)/1.45 'Barlow', sans-serif; color: var(--ink); }   /* #127 */
   .act-from { margin: 6px 0 0; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }   /* #126 */
   .act-sec { margin: 14px 0 6px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
@@ -7503,6 +7521,7 @@ window.__ICONS = {
   cardio:     `<path d="M20.8 6.6a4.6 4.6 0 0 0-7.8-2.1L12 5.4l-1-1a4.6 4.6 0 1 0-6.6 6.4l6.6 7 .9-.9"/><polyline points="13 14 15.5 14 17 11.5 19 16 20.5 13 22.5 13"/>`,
   running:    `<circle cx="15" cy="4.5" r="2"/><path d="M11.5 21l1.5-5-3-2 1-5 3 2 2.5 1"/><path d="M9.5 9.5 7 11l-1.5 3"/><path d="M14 16l3 .5 1.5 3"/>`,
   tennis:     `<circle cx="12" cy="12" r="9"/><path d="M5 5a9 9 0 0 1 0 14"/><path d="M19 5a9 9 0 0 0 0 14"/>`,
+  court:      `<ellipse cx="9.4" cy="9.4" rx="5.4" ry="6.6" transform="rotate(-45 9.4 9.4)"/><path d="M7 7.3l4.6 4.6M11.8 6.8 6.8 11.8"/><path d="M13.4 13.4 20.2 20.2"/><circle cx="18.6" cy="5.4" r="2"/>`,   /* #131: court time, never the gym */
   lowerbody:  `<path d="M9 2h6l-.5 8.5L16 21h-3l-1-7-1 7H8l1.5-10.5z"/>`,
   technique:  `<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/>`,
   tracking:   `<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>`,
@@ -16176,7 +16195,9 @@ window.crewOpenAll = crewOpenAll; window.openCrewOpenList = openCrewOpenList; wi
 function crewPostHTML(it) {
   const name = it.amir ? 'Amir' : it.me ? 'You' : (it.who || 'Athlete');
   const person = crewPersonOf(it);
-  const sub = it.amir ? '<small>to the crew</small>' : (it.kind === 'session' ? `<small>${it.session && it.session.day ? 'Day ' + Number(it.session.day) + ' done' : 'A session done'}</small>` : '');
+  const act = crewPostAct(it);   // #131 Court Told: { kind, mins } when the post tells an activity
+  const sub = it.amir ? '<small>to the crew</small>' : (it.kind === 'session' ? `<small class="cr-kd">${actIconHtml('gym', 'cr-kic')}<span>${it.session && it.session.day ? 'Day ' + Number(it.session.day) + ' done' : 'A session done'}</span></small>`
+    : act ? `<small class="cr-kd">${actIconHtml(act.kind, 'cr-kic')}<span>${esc(ACT_LABEL[act.kind] || 'Activity')}</span></small>` : '');
   const top = it.pinned ? `<span class="cr-pin${_crewFreshPin === it.id ? ' is-new' : ''}">Pinned</span>` : `<span class="cr-when">${esc(crewWhen(it.at))}</span>`;
   const ph = it.photo ? `<button type="button" class="cr-ph" data-ph="${esc(it.id)}" onclick="crewPhotoTap(event, '${esc(it.id)}')" aria-label="Open ${esc(it.amir ? "Amir's" : it.me ? 'your' : (it.who || 'their') + "'s")} photo"><img alt=""><span class="cr-ph-wait">Photo</span>${crewStampHTML(it)}</button>` : '';
   // The post's own Delete now sits in the REACTION foot, beside what the post got (2026-10-20). It used to sit on the
@@ -16193,11 +16214,19 @@ function crewPostHTML(it) {
     ? `<button type="button" class="cr-ht cr-rp" onclick="openCrewReply('${esc(it.id)}')" aria-label="Reply to ${esc(it.amir ? 'Amir' : it.me ? 'your post' : (it.who || 'this post'))}">${CREW_REPLY_SVG}</button>` : '';
   return `<article class="cr-post${it.amir ? ' amir' : ''}" data-id="${esc(it.id)}" onclick="crewTwoTap(event, '${esc(it.id)}')">
     <div class="cr-who">${crewDoor(person, 'cr-pl', `${crewFace(person)}<span class="cr-nm">${esc(name)}${sub}</span>`) || `${crewFace(person)}<span class="cr-nm">${esc(name)}${sub}</span>`}${top}</div>
-    ${crewAskQHTML(it)}${it.photo ? ph : words}
+    ${crewAskQHTML(it)}${act && !it.photo ? crewActCardHtml(act) : ''}${it.photo ? ph : words}
     <div class="cr-icons"><span class="cr-react" data-row="${esc(it.id)}" data-mode="heart">${crewHeartHTML(it.id, it.kudos, it.me, false)}</span>${rep}<span class="cr-icons-end">${shr}${del}</span></div>
     ${crewLikedByHTML(it)}${it.photo ? words : ''}
     <div class="cr-reps" data-rep="${esc(it.id)}">${crewRepsHTML(it)}</div>
   </article>`;
+}
+// #131 Court Told (stage124): a plain post may carry the activity it tells, { act, mins }. Effort never reaches the crew.
+function crewPostAct(it) {
+  const s = it && it.kind === 'post' && it.session && typeof it.session === 'object' ? it.session : null;
+  return s && ACT_LABEL[s.act] ? { kind: s.act, mins: Math.round(Number(s.mins) || 0) } : null;
+}
+function crewActCardHtml(a) {
+  return `<div class="cr-actcard">${actIconHtml(a.kind, 'cr-acti')}<span><b>${esc(ACT_LABEL[a.kind] || 'Activity')}</b>${a.mins > 0 ? `<span>${a.mins} min</span>` : ''}</span></div>`;
 }
 // ── Replies (stage92, 2026-10-20) ────────────────────────────────────────────────────────────────────────────────────────
 // Amir: *"replies and likes like instagram"*. He had chosen likes only, and the first week produced Ehsan posting
@@ -18007,7 +18036,7 @@ function playerActionsHTML(key, p) {
 function playerActivityHTML(p, own, first) {
   const a = Array.isArray(p.activity) ? p.activity : null;
   if (!a || !a.length) return '';
-  const rows = a.slice(0, 7).map(r => `<div class="pl-row"><div><span class="t">${esc(ACT_LABEL[r.kind] || plCap(String(r.kind || 'Activity')))}</span>`
+  const rows = a.slice(0, 7).map(r => `<div class="pl-row">${actIconHtml(r.kind)}<div><span class="t">${esc(ACT_LABEL[r.kind] || plCap(String(r.kind || 'Activity')))}</span>`
     + `<span class="q">${esc(plDay(r.day))} · ${Number(r.minutes) || 0} min</span></div></div>`).join('');
   return `<h2 class="prog-sec">${own ? 'Your activity' : esc(first) + "'s activity"}<span class="prog-sec-n">Last 7 days</span></h2><div class="pl-list">${rows}</div>`;
 }
@@ -18750,27 +18779,30 @@ function openCrewPost(mode, dayId, opts) {
   const ov = document.getElementById('hist-overlay'), me = crewMe();
   if (!ov || !BELL || !me.can_post) return;
   const ses = mode === 'session', noPh = (Number(me.photos_left) || 0) <= 0, noPost = (Number(me.posts_left) || 0) <= 0;
-  _crewDraft = { mode: ses ? 'session' : 'post', day: dayId || null, photo: null };
+  const ac = mode === 'activity' && opts.act && ACT_LABEL[opts.act.kind] ? opts.act : null;   // #131 Court Told: { kind, mins }
+  _crewDraft = { mode: ses ? 'session' : 'post', day: dayId || null, photo: null, act: ac ? { act: ac.kind, mins: Math.min(600, Math.max(1, Math.round(Number(ac.mins) || 0))) } : null };
   // What was typed and not sent comes back (2026-10-20): the sheet swipes down on an accident, and 280 characters went with
   // it. A session's own draft is written fresh by crewSessionDraft(), so only a plain post is kept.
   let kept = '';
-  if (!ses) { try { kept = String(localStorage.getItem(crewKeepKey()) || ''); } catch (e) { kept = ''; } }
-  let draft = ses ? crewSessionDraft(dayId) : kept;
+  if (!ses && !ac) { try { kept = String(localStorage.getItem(crewKeepKey()) || ''); } catch (e) { kept = ''; } }
+  let draft = ses ? crewSessionDraft(dayId) : ac ? '' : kept;
   // Hello, crew (86): someone who has never posted opens the composer to a short hello built from their own page, once. It is kept like anything typed and not sent, so editing it or clearing it sticks.
   let hello = '';
-  if (!ses && opts.draft) draft = String(opts.draft);
-  else if (!ses && !opts.prompt && !kept && crewHelloWanted()) { hello = crewHelloDraft(); if (hello) { draft = hello; try { _lsRawSet(crewHelloKey(), '1'); _lsRawSet(crewKeepKey(), hello); } catch (e) {} } }
+  if (!ses && !ac && opts.draft) draft = String(opts.draft);
+  else if (!ses && !ac && !opts.prompt && !kept && crewHelloWanted()) { hello = crewHelloDraft(); if (hello) { draft = hello; try { _lsRawSet(crewHelloKey(), '1'); _lsRawSet(crewKeepKey(), hello); } catch (e) {} } }
   ov.querySelector('.readiness-modal').innerHTML = `
-    <div class="readiness-eyebrow">${ses ? 'Tell the crew' : 'Crew'}</div>
-    <h2 class="readiness-title">${ses ? 'Day ' + esc(String(dayId)) + ' done' : 'Share with the crew'}</h2>
+    <div class="readiness-eyebrow">${ses || ac ? 'Tell the crew' : 'Crew'}</div>
+    <h2 class="readiness-title">${ses ? 'Day ' + esc(String(dayId)) + ' done' : ac ? `<span>${esc(ACT_LABEL[ac.kind])}</span>, <span>${_crewDraft.act.mins} min</span>` : 'Share with the crew'}</h2>
+    ${ac ? crewActCardHtml({ kind: ac.kind, mins: _crewDraft.act.mins }) : ''}
     ${opts.prompt && !ses ? `<p class="cr-prompt" dir="auto">${esc(opts.prompt)}</p>` : ''}
-    <textarea class="cr-txt" dir="auto" maxlength="280" aria-label="Your message to the crew" placeholder="${ses ? 'A line about the session' : opts.prompt ? esc(opts.prompt) : 'What happened in training?'}">${esc(draft)}</textarea>
+    <textarea class="cr-txt" dir="auto" maxlength="280" aria-label="Your message to the crew" placeholder="${ses ? 'A line about the session' : ac ? 'A line about it, if you like' : opts.prompt ? esc(opts.prompt) : 'What happened in training?'}">${esc(draft)}</textarea>
     <span class="cr-cnt" aria-live="polite"></span>
     <div class="cr-prev" hidden><img alt="Your photo"><button type="button" class="cr-rm" aria-label="Take the photo off">×</button></div>
     <label class="cr-add"${noPh ? ' hidden' : ''}>${CREW_CAM_SVG}<span>Add a photo</span><input type="file" accept="image/*"></label>
     ${noPh ? `<p class="cr-note">That is 3 photos today. More tomorrow.${ses ? ' A session goes to the crew with a photo, so this one waits.' : ''}</p>` : ''}
     ${ses ? '<p class="cr-note">A session goes to the crew with a photo.</p>' : ''}
     ${ses ? crewStampNoteHTML(dayId) : ''}
+    ${ac ? '<p class="cr-note">The crew sees what you played and for how long. Never how hard it was. A photo is up to you.</p>' : ''}
     <p class="cr-note"><b>Made smaller before it's sent.</b> About 200 KB, and its location is taken off.</p>
     <p class="cr-note">Gone after 7 days. Amir can remove any post. Only photos you would show your coach.</p>
     <button type="button" class="cr-go"${noPost ? ' disabled' : ''}>${ses ? 'Post with the photo' : 'Post'}</button>
@@ -18779,12 +18811,12 @@ function openCrewPost(mode, dayId, opts) {
   const prev = m.querySelector('.cr-prev'), add = m.querySelector('.cr-add'), file = m.querySelector('.cr-add input'), err = m.querySelector('.cr-err');
   const sync = () => {
     cnt.textContent = ta.value.length + ' / 280';
-    const has = !!_crewDraft.photo, ok = ses ? has : (has || ta.value.trim().length > 0);
+    const has = !!_crewDraft.photo, ok = ses ? has : ac ? true : (has || ta.value.trim().length > 0);
     go.disabled = noPost || !ok;
   };
   ta.addEventListener('input', () => {
     sync();
-    if (ses) return;
+    if (ses || ac) return;
     try { if (ta.value) _lsRawSet(crewKeepKey(), ta.value); else localStorage.removeItem(crewKeepKey()); } catch (e) {}
   });
   file.addEventListener('change', async () => {
@@ -18837,7 +18869,7 @@ async function crewSend(go, ta, err) {
   // comes back as the one it is instead of being written a second time. A server without stage92 ignores the argument.
   if (!d.key) d.key = crewNewKey();
   const p = { p_body: ta.value, p_photo: d.photo ? d.photo.b64 : null, p_w: d.photo ? d.photo.w : null, p_h: d.photo ? d.photo.h : null, p_kind: d.mode,
-    p_session: d.mode === 'session' ? crewSessionPayload(d.day) : null, p_key: d.key };
+    p_session: d.mode === 'session' ? crewSessionPayload(d.day) : d.act ? d.act : null, p_key: d.key };
   let r = null;
   // 45 seconds with a photo, 25 without (2026-10-20). A 200 KB photo on Iran's connection can take longer than 25 s, and the
   // old timeout then said "No signal. Tap Post again" while the upload was still on its way: the server wrote it, the second
@@ -19097,6 +19129,12 @@ const ACT_KINDS = [['tennis', 'Tennis'], ['match', 'Match'], ['padel', 'Padel'],
   ['gym', 'Gym'], ['other', 'Other']];   // 'Running', not 'Run': in Farsi 'Run' is the order بدو
 const ACT_LABEL = Object.fromEntries(ACT_KINDS);
 const ACT_COURT = ['tennis', 'padel', 'match', 'beach_tennis', 'pickleball', 'squash', 'badminton'];
+// #131 (2026-11-22): the icon an activity wears wherever it is shown, so court time reads apart from the gym at a glance: the racket for
+// the court sports, the runner for a run, the dumbbell for gym work and plan sessions, the pulse line for everything else.
+function actIcon(kind) {
+  return ACT_COURT.indexOf(kind) >= 0 ? 'court' : kind === 'run' ? 'running' : kind === 'gym' ? 'strength' : 'activity';
+}
+function actIconHtml(kind, cls) { return `<span class="${cls || 'act-ic'}${ACT_COURT.indexOf(kind) >= 0 ? ' is-court' : ''}" aria-hidden="true">${window.ICON(actIcon(kind), 2)}</span>`; }
 // ── MOVE CREDIT — Court Log counts toward Steps (stage121, 2026-11-22; Amir: "lets do option 1") ─────────────────────────────────
 // One activity is worth round(minutes × MET ÷ 3.5) × 100 steps (walking at ~100 steps a minute is ~3.5 MET), a day's credit is
 // capped at 70% of the Steps target, and Steps for the day is what the athlete typed plus the credit. ⚠️ THE SERVER'S COPY is
@@ -19217,6 +19255,20 @@ function ydayLineHtml(acts) {
 // ── COOL DOWN CALL — #128 (round 12, 2026-11-22; Amir: "build 127 and 128") ────────────────────────────────────────────────────────
 // A hard activity of an hour or more: the saved message offers the day-after session (LIB_PICKS.sore, the one a sore check-in
 // offers), for tonight or tomorrow. One tap opens it; its ← comes back to Home. Nothing is stored and nothing is pushed.
+// ── COURT TOLD — #131 (round 12, 2026-11-22; Amir: "build 130 and 131") ──────────────────────────────────────────────────────────
+// An activity told to the crew: the composer opens on it (kind and minutes, never effort), words and a photo optional, and the post
+// carries { act, mins } (stage124) so the feed draws it with the court icon. From the saved message, and from the day's sheet.
+function crewCanTell() {
+  try { return !!(ATHLETE_ID && !window.IS_DEMO && !window.IS_PREVIEW && BELL && crewMe().can_post); } catch (e) { return false; }
+}
+async function tellActivity(id) {
+  const a = moveActs().find(x => x && String(x.id) === String(id));
+  if (!a) return;
+  if (!BELL) { try { await refreshBell(); } catch (e) { /* no signal: nothing opens */ } }
+  if (!crewCanTell()) return;
+  openCrewPost('activity', null, { act: { kind: a.kind, mins: a.mins } });
+}
+window.tellActivity = tellActivity;
 const COOL_MIN = 60;
 async function coolDownCall(act) {
   try {
@@ -19297,9 +19349,32 @@ function fiveWeeksHTML() {
     <div class="fw-h"><span>${c.n ? 'Cycle ' + esc(String(c.n)) : ''}</span><span>${weeks.length} ${weeks.length === 1 ? 'week' : 'weeks'}</span></div>
     <div class="fw-g">${head}${rows}</div>
     ${foot ? `<div class="fw-f">${foot}</div>` : ''}
+    ${fwUsualHtml(weeks)}
     <p class="fw-tip">${any ? 'Tap a day to see what you did.' : 'Your sessions show here as you train. Add your tennis, padel or anything else you do.'}</p>
     <button type="button" class="fw-add" onclick="openActivitySheet()">+ Add activity</button>
   </div>`;
+}
+// ── YOUR USUAL — #133 (round 12, 2026-11-22; Amir: "build 133") ──────────────────────────────────────────────────────────────────
+// This week's court and other minutes against the athlete's own usual: the average of the four 7-day blocks before this week, from
+// every Court Log row the phone has (moveActs(), 70 days). Silent until there are three weeks of logs before this week, and for a group
+// with nothing this week and nothing usual. No score, no verdict: a busy or a light week shows for what it is.
+function fwUsualHtml(weeks) {
+  try {
+    const cur = (weeks || []).find(w => w && w.now);
+    if (!cur) return '';
+    const from = String(cur.from), today = ymdLocal(new Date()), acts = moveActs().filter(a => a && a.day && Number(a.mins) > 0);
+    if (!acts.length) return '';
+    const first = acts.map(a => String(a.day)).sort()[0];
+    if (first > fwAdd(from, -21)) return '';   // fewer than three weeks of logs before this week
+    const grp = a => ACT_COURT.indexOf(a.kind) >= 0 ? 'court' : 'other';
+    const sum = (lo, hi, g) => acts.filter(a => String(a.day) >= lo && String(a.day) <= hi && grp(a) === g).reduce((n, a) => n + Number(a.mins), 0);
+    const lines = [['court', 'On court this week'], ['other', 'Other this week']].map(([g, label]) => {
+      const now = sum(from, today, g), usual = Math.round(sum(fwAdd(from, -28), fwAdd(from, -1), g) / 4 / 5) * 5;
+      if (!now && !usual) return '';
+      return `<span><span>${label}:</span> <b>${fwMins(now)}</b> · <span>your usual ${fwMins(usual)}</span></span>`;
+    }).filter(Boolean);
+    return lines.length ? `<p class="fw-usual">${lines.join('')}</p>` : '';
+  } catch (e) { return ''; }
 }
 function paintFiveWeeks() {
   const wrap = document.getElementById('fw-wrap'), head = document.getElementById('fw-title');
@@ -19326,11 +19401,12 @@ function openFiveWeeksDay(day) {
     const k = fwKindOf(d);
     if (k === 'court' || k === 'other') {
       const q = [Number(d.mins) > 0 ? Math.round(Number(d.mins)) + ' min' : '', effort[d.effort] || ''].filter(Boolean).join(' · ');
-      return `<div class="pl-row"><div><span class="t">${esc(fwTitle(d) || 'Activity')}</span><span class="q">${esc(q)}</span></div>${d.id ? `<button type="button" class="act-del" onclick="deleteActivity(this, '${esc(String(d.id))}', '${day}')">Delete</button>` : '<span></span>'}</div>`;
+      const tell = d.id && crewCanTell() ? `<button type="button" class="act-tell" onclick="tellActivity('${esc(String(d.id))}')">Tell the crew</button>` : '';   // #131
+      return `<div class="pl-row">${actIconHtml(d.kind)}<div><span class="t">${esc(fwTitle(d) || 'Activity')}</span><span class="q">${esc(q)}</span></div>${d.id ? `<span class="act-btns">${tell}<button type="button" class="act-del" onclick="deleteActivity(this, '${esc(String(d.id))}', '${day}')">Delete</button></span>` : '<span></span>'}</div>`;
     }
     const lib = k === 'library';
     const q = [lib ? (FW_SHELF[d.shelf] ? FW_SHELF[d.shelf] + ' · Library' : 'Library session') : 'Plan session', Number(d.mins) > 0 ? Math.round(Number(d.mins)) + ' min' : ''].filter(Boolean).join(' · ');
-    return `<div class="pl-row"><div><span class="t" dir="auto">${esc(fwTitle(d) || (lib ? 'Library session' : 'Plan session'))}</span><span class="q">${esc(q)}</span></div>${d.extra ? '<span class="pl-xt">Extra</span>' : '<span></span>'}</div>`;
+    return `<div class="pl-row">${actIconHtml(lib ? 'other' : 'gym')}<div><span class="t" dir="auto">${esc(fwTitle(d) || (lib ? 'Library session' : 'Plan session'))}</span><span class="q">${esc(q)}</span></div>${d.extra ? '<span class="pl-xt">Extra</span>' : '<span></span>'}</div>`;
   };
   ov.querySelector('.readiness-modal').innerHTML = `
     <div class="readiness-eyebrow">Your weeks</div>
@@ -19400,7 +19476,10 @@ async function saveActivity() {
     _act = null;
     if (!quick) document.getElementById('hist-overlay').classList.remove('visible');
     aaToast('Added to your weeks.');
-    coolDownCall(res.data || {});   // #128: a hard hour or more offers the day-after session instead
+    coolDownCall(res.data || {}).then(cool => {   // #128: a hard hour or more offers the day-after session instead
+      const r0 = res.data || {};
+      if (!cool && r0.id && crewCanTell()) aaToast('Added to your weeks.', { action: 'Tell the crew', run: () => tellActivity(r0.id) });   // #131
+    });
     if (FW && fwOk(FW)) {   // shown at once, before the server's own answer replaces it
       const r = res.data || {}, wk = FW.weeks.find(w => w && day >= String(w.from) && day <= String(w.to));
       if (wk) (wk.days = wk.days || []).push({ day, k: ACT_COURT.indexOf(r.kind) >= 0 ? 'court' : 'other', kind: r.kind, title: plCap(String(r.kind || 'activity')), mins: r.minutes, effort: r.effort, id: r.id });

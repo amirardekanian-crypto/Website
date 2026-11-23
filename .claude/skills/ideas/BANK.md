@@ -579,9 +579,9 @@ lasted after the game stopped; BE FIT (Patel 2017) a shared stake with lifelines
 | 128 | Cool Down Call | After a hard activity of 60+ min the save message offers one Library recovery session for the next morning | 123 | **built** 2026-11-22 (with 127; the pick is LIB_PICKS.sore, The Morning After) |
 | 129 | The 150 | One line on Your weeks: this week's active minutes the WHO way (hard minutes count double) from plan sessions, Library and Court Log; later a Move habit (Heart Points, AZM) | 122, 123 | pitched (top 3) |
 | 130 | Your Number | A personal Steps target (recent usual +10%, 6,000-12,000, rises Mondays when met 5 of 7); MVP coach.html suggests, Amir sets; XP weight is a rulebook call (D20) (Adams 2017, Apple Move goal) | — | pitched (needs his call) |
-| 131 | Court Told | Court Log save offers Tell the crew with a stamp (kind, minutes, day; never effort), for those who share activity (stage118) (Strava upload and kudos) | 123, the Race | pitched |
+| 131 | Court Told | Court Log save offers Tell the crew with a stamp (kind, minutes, day; never effort), for those who share activity (stage118) (Strava upload and kudos) | 123, the Race | **built** 2026-11-23 (Amir: "build 130 and 131" + the court icon; stage124, cache aap-v289) |
 | 132 | Crew Hours | One shared weekly crew total (plan sessions for all, Court Log from sharers) under the Race card, faces of who added (STEP UP collaboration arm) | 131, the Race | pitched |
-| 133 | Your Usual | Your weeks' foot compares this week's court and other minutes with the athlete's own 4-week usual; silent until 3 weeks of logs (Strava weekly range) | 122, 123 | pitched |
+| 133 | Your Usual | Your weeks' foot compares this week's court and other minutes with the athlete's own 4-week usual; silent until 3 weeks of logs (Strava weekly range) | 122, 123 | **built** 2026-11-23 (Amir: "build 133"; cache aap-v289) |
 
 Cut on the page (so they are not re-pitched): reading Apple Health or Health Connect (impossible from the web; Google Fit's server route
 closed 30 June 2026), an athlete-facing strain or load score (round 5), calories, an active-day streak and a minutes leaderboard (round 11),

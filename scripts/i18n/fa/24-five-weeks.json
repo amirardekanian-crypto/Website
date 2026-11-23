@@ -44,7 +44,15 @@
     "Not today": "امروز نه",
     "Filled in from your last one. Change anything.": "از آخرین فعالیت شما پر شده. هر چیزی رو می‌تونید عوض کنید.",
     "Yesterday:": "دیروز:",
-    "Open it": "بازش کنید"
+    "Open it": "بازش کنید",
+    "A line about it, if you like": "اگه دوست دارید یه خط درباره‌ش بنویسید",
+    "The crew sees what you played and for how long. Never how hard it was. A photo is up to you.": "تیم می‌بینه چی بازی کردید و چقدر. هیچ‌وقت نمی‌بینه چقدر سخت بود. عکس گذاشتن با خودتونه.",
+    "On court this week:": "زمین این هفته:",
+    "Other this week:": "بقیه این هفته:",
+    "A session done": "یه جلسه تموم شد",
+    "Cycling": "دوچرخه‌سواری",
+    "Swimming": "شنا",
+    "Football": "فوتبال"
   },
   "patterns": [
     [
@@ -82,6 +90,10 @@
     [
       "Added to your weeks\\. A hard one: (.+), tonight or tomorrow\\.",
       "به هفته‌هاتون اضافه شد. سنگین بود: $1، امشب یا فردا."
+    ],
+    [
+      "your usual (.+)",
+      "معمولاً {t1}"
     ]
   ]
 }
