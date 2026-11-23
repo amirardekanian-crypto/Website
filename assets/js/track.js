@@ -11,6 +11,7 @@
      Form Started      lang          (the first answer in the apply form)
      Form Step         step, lang    (the first answer in each section, 01 to 07: where people stop)
      Level test start                (sent from tennis/level-test.js)
+     Gate Yes FA / Gate Not Now FA   (sent from form-fa.html: the two doors under «با این شرایط شروع کنیم؟»)
    Already sent elsewhere: Form Submitted, Form Submitted FA, Proof Signup, Partner Application, 404, Level test 1/2/3. */
 (function () {
   'use strict';

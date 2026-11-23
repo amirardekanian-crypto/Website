@@ -16,6 +16,8 @@
 <!-- Plausible (privacy-friendly, cookieless) -->
 <script defer data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
 <script defer src="/assets/js/track.js?v=1"></script>
+<!-- Two doors: the form stays closed until "آره" (CSS .gate below). Without JavaScript the class is never set and the form shows as before. -->
+<script>document.documentElement.classList.add('gate');</script>
 <style>
   @font-face{font-family:'Vazirmatn';src:url('/assets/fonts/Vazirmatn-Variable.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap;}
   :root{
@@ -155,6 +157,42 @@
   .ok-card h2:focus{outline:none;}
   .serr{margin:18px auto 0;max-width:520px;padding:12px 16px;border-radius:12px;background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.3);color:#8f2a1f;font-size:15px;line-height:1.8;text-align:center;}
   .serr a{color:inherit;font-weight:800;}
+  /* چطور کار می‌کنه و چقدر هزینه داره، قبل از اولین سؤال (امیر، ۲۰۲۶-۱۱-۱۹: مردم فرم رو پر می‌کردن، قیمت رو توی واتساپ می‌شنیدن و دیگه جواب نمی‌دادن) */
+  .how{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:30px 26px;margin-bottom:18px;}
+  .how h2{font-weight:800;font-size:24px;line-height:1.4;margin-bottom:4px;}
+  .how-sub{color:var(--ink-2);font-size:15px;margin-bottom:22px;}
+  .steps{list-style:none;display:grid;gap:16px;margin-bottom:24px;}
+  .steps li{display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:start;}
+  .steps .n{width:36px;height:36px;border-radius:50%;border:1.6px solid var(--green);color:var(--green);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;}
+  .steps li.pay .n{background:var(--green);color:#fff;}
+  .steps strong{display:block;font-weight:800;font-size:16px;line-height:1.6;padding-top:5px;}
+  .steps .st{display:block;color:var(--ink-2);font-size:14px;line-height:1.7;}
+  .how-price{background:var(--paper-2);border-radius:12px;padding:22px 18px;text-align:center;}
+  .hp-eq{font-weight:700;font-size:15px;color:var(--ink-2);}
+  .hp-num{font-weight:900;font-size:clamp(36px,11vw,56px);line-height:1.2;color:var(--green);}
+  .hp-term{font-weight:800;font-size:17px;color:var(--ink);}
+  .hp-note{font-size:14px;color:var(--ink-2);margin-top:10px;line-height:1.8;}
+  /* دو در (امیر، ۲۰۲۶-۱۱-۲۳: «توضیحِ A ولی توی دو در»): فرم و نوارِ پیشرفت تا «آره» بسته‌ان */
+  .gate:not(.gate-open) #frm,.gate:not(.gate-open) .progress{display:none;}
+  [hidden]{display:none!important;}
+  .how-q{font-weight:800;font-size:20px;line-height:1.5;text-align:center;margin:26px 0 14px;}
+  .doors{display:grid;gap:10px;max-width:420px;margin:0 auto;}
+  .door-yes,.door-no{font-family:var(--fa);font-weight:800;font-size:17px;min-height:52px;padding:0 20px;border-radius:100px;cursor:pointer;}
+  .door-yes{background:var(--clay-fill);color:#fff;border:none;box-shadow:0 10px 28px rgba(199,85,47,.25);}
+  .door-no{background:transparent;color:var(--green);border:1.5px solid var(--green);}
+  .door-yes:focus-visible,.door-no:focus-visible,.later-back:focus-visible,.later-opt:focus-visible{outline:3px solid var(--green);outline-offset:3px;}
+  .how-ask{text-align:center;font-size:15px;color:var(--ink-2);margin-top:12px;line-height:1.8;}
+  .how-ask a{color:var(--clay);font-weight:700;}
+  .later-opts{display:grid;gap:10px;}
+  .later-opt{display:block;border:1px solid var(--line-2);border-radius:12px;padding:14px 16px;background:var(--paper);text-decoration:none;color:var(--ink);transition:border-color .2s;}
+  .later-opt:hover{border-color:var(--green);}
+  .later-opt b{display:block;font-weight:800;font-size:16px;}
+  .later-opt span{display:block;font-size:14px;color:var(--ink-2);line-height:1.8;}
+  .later-back{font-family:var(--fa);background:none;border:none;color:var(--clay);font-weight:700;font-size:15px;cursor:pointer;margin-top:12px;min-height:44px;padding:0;}
+  .agreed{background:var(--accent-dim);border:1px solid rgba(14,74,54,.2);color:var(--green);border-radius:12px;padding:14px 16px;font-size:15px;font-weight:700;line-height:1.8;margin-bottom:18px;}
+  .agreed:focus{outline:none;}
+  .abroad-note{font-size:15px;color:var(--green);background:var(--accent-dim);border:1px solid rgba(14,74,54,.18);border-radius:var(--r);padding:12px 15px;line-height:1.8;}
+  .abroad-note a{color:var(--green);font-weight:800;}
   .foot{background:#0a3527;color:rgba(255,255,255,.7);padding:30px 0;text-align:center;font-size:15px;}
   .foot a{color:rgba(255,255,255,.85);display:inline-block;padding:10px 6px;}
 
@@ -235,6 +273,52 @@
 </div>
 
 <main id="main" class="wrap">
+<!-- HOW IT WORKS + THE PRICE, before the first question (Amir, 2026-11-19: people applied, heard the price on WhatsApp
+     and stopped replying; 72 Farsi applications Aug to Nov, about 7 became clients).
+     THE TOMAN FIGURE is Amir's own ("hodude 6.700.000 toman", 2026-11-19). When it changes, change every copy:
+     search ۶٬۷۰۰٬۰۰۰ in this file (step 3 and the price box), index-fa.html (price card + FAQ) and
+     Content/CHATBOT-FACTS.md, then rebuild and redeploy the chatbot (/chat-facts).
+     TWO DOORS (Amir, 2026-11-23: "explanation of A but in two doors", question «با این شرایط شروع کنیم؟»):
+     "آره" opens the form and sets the hidden "Knows the price and is ready to start" answer; "الان نه" shows the
+     #later panel (the $17 course for tennis players, the free articles, a WhatsApp question). Plausible goals:
+     "Gate Yes FA" and "Gate Not Now FA". -->
+<section class="how" id="how" aria-labelledby="howT">
+  <h2 id="howT">قبل از شروع: چطور کار می‌کنه؟</h2>
+  <p class="how-sub">۴ قدم، از این فرم تا اولین جلسه‌ی تمرینت.</p>
+  <ol class="steps">
+    <li><span class="n" aria-hidden="true">۱</span><div><strong>این فرم رو پر می‌کنی.</strong><span class="st">حدودِ ۳ دقیقه. هنوز هیچ تعهدی نداری.</span></div></li>
+    <li><span class="n" aria-hidden="true">۲</span><div><strong>ظرفِ ۴۸ ساعت توی واتساپ بهت پیام می‌دم.</strong><span class="st">با هم حرف می‌زنیم و هر چی فرم نپرسیده رو بهم می‌گی.</span></div></li>
+    <li class="pay"><span class="n" aria-hidden="true">۳</span><div><strong>کارت‌به‌کارت پرداخت می‌کنی.</strong><span class="st">حدودِ ۶٬۷۰۰٬۰۰۰ تومان برای ۵ هفته.</span></div></li>
+    <li><span class="n" aria-hidden="true">۴</span><div><strong>ظرفِ ۴۸ ساعت بعد از پرداخت، برنامه‌ت توی اپته.</strong><span class="st">و تمرین رو شروع می‌کنی.</span></div></li>
+  </ol>
+  <div class="how-price">
+    <div class="hp-eq">برای ساکنینِ ایران، حدودِ</div>
+    <div class="hp-num">۶٬۷۰۰٬۰۰۰</div>
+    <div class="hp-term">تومان برای هر سیکل (۵ هفته)</div>
+    <p class="hp-note">شاملِ برنامه‌ی اختصاصی، اپ، آپدیتِ هفتگی و پشتیبانیِ واتساپ. معادلِ ۲۵ دلار با نرخِ روز؛ مبلغِ دقیق رو توی واتساپ می‌گم. هر بار فقط برای یه سیکل پرداخت می‌کنی، بدونِ قراردادِ بلندمدت.</p>
+  </div>
+  <p class="how-q" id="howQ">با این شرایط شروع کنیم؟</p>
+  <div class="doors" role="group" aria-labelledby="howQ">
+    <button type="button" class="door-yes" id="doorYes">آره، بریم سراغِ فرم ←</button>
+    <button type="button" class="door-no" id="doorNo">الان نه</button>
+  </div>
+  <p class="how-ask">اول سؤال داری؟ <a class="ask-wa" href="https://wa.me/447435363461" target="_blank" rel="noopener">توی واتساپ بپرس</a><br>خارج از ایران زندگی می‌کنی؟ <a href="/#pricing">پلن‌های دلاری</a> مالِ توئه.</p>
+</section>
+
+<!-- NOT NOW -->
+<section class="how later" id="later" aria-labelledby="laterT" hidden>
+  <h2 id="laterT" tabindex="-1">باشه، هر وقت آماده بودی همین‌جام.</h2>
+  <p class="how-sub">تا اون موقع، این‌ها به دردت می‌خوره:</p>
+  <div class="later-opts">
+    <a class="later-opt" href="/tennis/"><b>تنیس بازی می‌کنی؟</b><span>دوره‌ی سیستمِ آمادگیِ جسمانیِ تنیس: ۱۶ هفته برنامه روی گوشیت. یه‌بار پرداخت، معادلِ ۱۷ دلار.</span></a>
+    <a class="later-opt" href="/fa/articles/"><b>مقاله‌های رایگان</b><span>آمادگیِ بدنی، ریکاوری و تغذیه برای تنیس.</span></a>
+    <a class="later-opt ask-wa" href="https://wa.me/447435363461" target="_blank" rel="noopener"><b>سؤال داری؟</b><span>توی واتساپ بپرس، خودم جواب می‌دم.</span></a>
+  </div>
+  <button type="button" class="later-back" id="laterBack">→ برگرد</button>
+</section>
+
+<p class="agreed" id="agreed" tabindex="-1" hidden>✓ شرایط و هزینه رو می‌دونی. حالا از خودت بگو تا برنامه‌ی مناسب‌تری برات بنویسم.</p>
+
 <form id="frm" action="https://api.web3forms.com/submit" method="POST" novalidate>
   <input type="hidden" name="access_key" value="efc57e0c-997d-4d71-b07a-71c8268ec668">
   <input type="hidden" name="from_name" value="درخواستِ فارسی">
@@ -245,11 +329,12 @@
   <section class="fsec">
     <div class="sbadge">۰۰ — هزینه</div>
     <h2 id="s0">کجا زندگی می‌کنی؟</h2>
-    <p class="sdesc">فقط برای تعیینِ هزینه — ساکنِ ایران: معادلِ ۲۵ دلار برای هر سیکل (۵ هفته)، به تومان، با نرخِ روز.</p>
+    <p class="sdesc">فقط برای تعیینِ هزینه: ساکنِ ایران به تومان پرداخت می‌کنه، خارج از ایران به دلار.</p>
     <div class="f"><div class="rcards" role="radiogroup" aria-labelledby="s0" style="grid-template-columns:1fr 1fr;">
       <div class="rcard"><input type="radio" id="loc_ir" name="Location" value="Iran resident" required><label for="loc_ir"><span class="ic">🇮🇷</span>ساکنِ ایران</label></div>
       <div class="rcard"><input type="radio" id="loc_ab" name="Location" value="Abroad"><label for="loc_ab"><span class="ic">🌍</span>خارج از ایران</label></div>
     </div></div>
+    <div class="f cond" id="abroadWrap"><p class="abroad-note">خارج از ایران، <a href="/#pricing">پلن‌های سایتِ انگلیسی</a> مالِ توئه: از ۷۰ دلار برای ۵ هفته، با پرداختِ پی‌پل. فرم رو همین‌جا پر کن، جزئیاتش رو توی واتساپ می‌گم.</p></div>
     <div class="f"><label for="dcode">کدِ تخفیف <span class="hint">اختیاری — اگه کدِ تخفیف داری اینجا وارد کن</span></label>
       <input type="text" id="dcode" name="Discount Code" data-skip-progress autocomplete="off" placeholder="مثلاً TENNIS10">
       <div class="dmsg" id="dmsg" aria-live="polite"></div>
@@ -486,6 +571,9 @@
     </div>
   </details>
 
+  <!-- READY: set to "Yes" by the "آره" door above (two doors, 2026-11-23); empty only if JavaScript never ran -->
+  <input type="hidden" id="ready" name="Knows the price and is ready to start" value="">
+
   <!-- ADULT OR GUARDIAN: programmes are bought by someone 18 or over -->
   <div class="f consent-field">
     <label class="consent" for="adult">
@@ -543,6 +631,10 @@
     if(isGen){document.querySelectorAll('input[name="Competitive Level"]').forEach(function(r){r.checked=false;});document.getElementById('freq').selectedIndex=0;}
     else{document.querySelectorAll('input[name="Activity Level"]').forEach(function(r){r.checked=false;});}
     upd();
+  });
+  // خارج از ایران: قیمتِ تومان مالِ اون نیست، پس یادداشتِ پلن‌های دلاری باز می‌شه
+  document.querySelectorAll('input[name="Location"]').forEach(function(el){
+    el.addEventListener('change',function(){document.getElementById('abroadWrap').classList.toggle('on',this.value==='Abroad');});
   });
   // injury detail
   document.querySelectorAll('input[name="Current Injury"]').forEach(function(el){
@@ -673,6 +765,32 @@
   // به‌محضِ جواب‌دادن، خطای اون فیلد پاک می‌شه
   function clearOnAnswer(e){if(e.target&&e.target.name)clearErr(e.target);}
   form.addEventListener('input',clearOnAnswer);form.addEventListener('change',clearOnAnswer);
+
+  // ── دو در: «با این شرایط شروع کنیم؟» (امیر، ۲۰۲۶-۱۱-۲۳) ──
+  // «آره» فرم رو باز می‌کنه و جوابِ مخفیِ ready رو Yes می‌کنه؛ «الان نه» پنلِ #later رو نشون می‌ده.
+  // توی همین تب یادش می‌مونه، پس رفرش دوباره نمی‌پرسه.
+  var root=document.documentElement,howEl=document.getElementById('how'),laterEl=document.getElementById('later'),
+      agreedEl=document.getElementById('agreed'),readyEl=document.getElementById('ready');
+  function track(name){if(window.plausible)window.plausible(name);}
+  function openForm(move){
+    root.classList.add('gate-open');howEl.hidden=true;laterEl.hidden=true;agreedEl.hidden=false;readyEl.value='Yes';upd();
+    if(move){agreedEl.scrollIntoView({behavior:'smooth',block:'start'});try{agreedEl.focus({preventScroll:true});}catch(e){}}
+    try{sessionStorage.setItem('aa.formfa.gate','yes');}catch(e){}
+  }
+  document.getElementById('doorYes').addEventListener('click',function(){openForm(true);track('Gate Yes FA');});
+  document.getElementById('doorNo').addEventListener('click',function(){
+    howEl.hidden=true;laterEl.hidden=false;laterEl.scrollIntoView({behavior:'smooth',block:'start'});
+    try{document.getElementById('laterT').focus({preventScroll:true});}catch(e){}
+    track('Gate Not Now FA');
+  });
+  document.getElementById('laterBack').addEventListener('click',function(){
+    laterEl.hidden=true;howEl.hidden=false;howEl.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  // the WhatsApp question arrives already saying what it is about
+  document.querySelectorAll('.ask-wa').forEach(function(a){
+    a.href='https://wa.me/447435363461?text='+encodeURIComponent('سلام امیر، قبل از پر کردنِ فرم یه سؤال دارم.');
+  });
+  try{if(sessionStorage.getItem('aa.formfa.gate')==='yes')openForm(false);}catch(e){}
 
   // ── ثبتِ پایدار در Supabase (سرورِ خودِ امیر) ─────────────────────────
   // قبلاً فقط Web3Forms بود؛ وقتی در دسترس نبود، فرم گم می‌شد. حالا هم‌زمان

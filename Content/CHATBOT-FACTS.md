@@ -23,7 +23,8 @@ How it is used:
 
 Last checked against the live pages: 2026-10-17. Amir's own corrections added the same day (12 years, padel
 qualification, Liverpool, any sport and level, the WhatsApp talk, 5 cycles of 5 weeks, PayPal / card-to-card,
-nutrition advice but no plans).
+nutrition advice but no plans). 2026-11-19: the Iran price now also has Amir's toman figure (about 6,700,000
+toman a cycle), shown on form-fa.html and index-fa.html, and the 48-hour programme delivery after payment.
 
 ---
 
@@ -156,13 +157,19 @@ report, WhatsApp and email support, and a 10% loyalty discount when you renew.
 - The personal programme (برنامه‌ی اختصاصی), for tennis and padel players and athletes from any sport, as sold on the Farsi site. Price for people living in Iran: **the
   equivalent of $25 a cycle** (one cycle is 5 weeks; Amir, 2026-10-17), paid in toman at that day's
   rate. People in Iran pay **one cycle at a time**: there are no multi-cycle plans or bundle prices
-  for Iran. Amir says the exact toman amount in his message; never work it out. No hidden costs, no long contract. 10% loyalty discount on renewal.
+  for Iran. Right now that is **about 6,700,000 toman a cycle** (Amir, 2026-11-19: "hodude 6.700.000 toman"); the
+  exact amount moves with the rate and Amir says it in his WhatsApp message. Say "about 6,700,000 toman" and never
+  work out any other toman amount. No hidden costs, no long contract. 10% loyalty discount on renewal.
 - Includes: a personal S&C programme for your sport, the app on your phone, cues (and video where
   there is one) for each exercise, weekly updates, readiness and load monitoring, direct messages
   and support.
 - **Living outside Iran?** The English-site plans apply (Game, Set, Match, in US dollars, paid by PayPal).
-- **Payment:** fill in the form, Amir messages you with a few questions, then you pay by
-  card-to-card (کارت‌به‌کارت). People outside Iran pay by PayPal.
+- **Payment:** fill in the form, Amir messages you on WhatsApp within 48 hours, then you pay by
+  card-to-card (کارت‌به‌کارت). Your programme is in your app within 48 hours of paying (Amir, 2026-11-19).
+  People outside Iran pay by PayPal.
+- The Farsi form (https://www.amirardekani.com/form-fa.html) first shows the four steps and the price, then asks
+  «با این شرایط شروع کنیم؟» ("Shall we start on these terms?", Amir, 2026-11-23). "Yes" opens the questions; "Not now"
+  offers the course (for tennis players), the free articles or a WhatsApp question.
 - **Start:** https://www.amirardekani.com/form-fa.html (the form is in Farsi; the button says «شروع کن»).
 
 ## [both] The Tennis Performance System course (سیستم آمادگی جسمانی تنیس)
@@ -211,3 +218,4 @@ report, WhatsApp and email support, and a 10% loyalty discount when you renew.
 - Amir's title: «مربیِ بدنسازیِ تنیس و پدل». His degrees: «ارشد», never "MSc".
 - «یه برنامه» not «فایل» or «PDF». «شدت» not «سختی». «شروع کن» not «درخواست».
 - Prices are «معادلِ ۲۵ دلار برای هر سیکل (۵ هفته)» and «معادلِ ۱۷ دلار», always with «به تومان، با نرخِ روز».
+  For the coaching you may add «این روزها حدودِ ۶٬۷۰۰٬۰۰۰ تومان».
