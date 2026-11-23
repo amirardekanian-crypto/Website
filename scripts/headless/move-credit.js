@@ -141,6 +141,13 @@ const numbersMatch = p => p.evaluate(() => {
     }));
     t.check('in Farsi every "to go" line is Farsi, unit and all (' + JSON.stringify(log) + ')',
       subs.every(s => /مونده/.test(s) && !/[A-Za-z]/.test(s.split(': ')[1])), JSON.stringify(subs));
+    // 2026-11-23 (Amir: "make the big number farsi digits too"): the number on each row is in Persian digits; the typing box is not.
+    const nums = await p.evaluate(() => ['steps', 'sleep', 'fuel', 'water'].map(id => (document.querySelector('.hb-wrap[data-h="' + id + '"] .hb-now') || {}).textContent));
+    t.check('in Farsi the big number on every row is in Persian digits', nums.every(n => n && /[۰-۹]/.test(n) && !/[0-9]/.test(n)), JSON.stringify(nums));
+    await p.evaluate(() => habTypeOpen('steps'));
+    await p.waitForTimeout(300);
+    const box = await p.evaluate(() => (document.getElementById('hab-type-steps') || {}).value);
+    t.check('the typing box keeps the digits the athlete types', /^[0-9]+$/.test(box || ''), JSON.stringify(box));
     await ctx.close();
   }
 

@@ -633,7 +633,9 @@
 // row's big number is the scored total (typed + the activity's credit), and the line under it says "2,000 walked + 7,000 from Tennis".
 // v291: i18n-fa.js (?v=31) changed (2026-11-23, Amir: "fix those 2"): in Farsi what is left on Steps, Sleep, Protein and Water says its unit in
 // Farsi (قدم, ساعت, وعده, لیوان); it read "steps ۱,۰۰۰ مونده" with the English word.
-const CACHE = 'aap-v291';
+// v292: i18n.js (?v=16) changed (2026-11-23, Amir: "make the big number farsi digits too"): in Farsi a habit row's big number
+// (.hb-now) is in Persian digits.
+const CACHE = 'aap-v292';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -673,7 +675,7 @@ const SHELL = [
   '/assets/js/between-sets.js',
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
-  '/assets/js/i18n.js?v=15',
+  '/assets/js/i18n.js?v=16',
   '/assets/js/i18n-fa.js?v=31',
 ];
 

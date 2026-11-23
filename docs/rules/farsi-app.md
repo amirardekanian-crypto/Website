@@ -25,7 +25,8 @@ written from: [`scripts/i18n/BRIEF.md`](../../scripts/i18n/BRIEF.md).
 - **Never compare displayed text in code** (`el.textContent === 'Dismiss'`): in Farsi it is not English any more.
   Compare a class, a `data-*` or the state. The word lists' `readback` items are the known cases.
 - **Amir's picks, 2026-11-20 ("use your picks"):** Shamsi dates (the engine converts the app's English dates);
-  Persian digits in sentences, a training number standing alone stays Latin.
+  Persian digits in sentences, a training number standing alone stays Latin. A habit row's big number is Persian (Amir,
+  2026-11-23: *"make the big number farsi digits too"*, `.hb-now` in i18n.js's `COUNT`); the box that opens to type it is not.
 - **The athlete picks their language, and it is the programme's** (Amir, 2026-11-20: *"let the client pick their
   language, and tell them that by choosing, their next cycle will be in their chosen language, for new clients, put it in
   their form"*; *"i want to write their notes once in the language they have choosen, not in 2 different language.

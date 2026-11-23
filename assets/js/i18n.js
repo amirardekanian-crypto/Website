@@ -406,7 +406,9 @@
     ['.cr-kww', { 'You': 'لایک شما' }]];
   // A count standing alone beside Farsi words (the Team screen first, 2026-11-21) (a heart's count, a vote's percent, last week's tally, the +6 face): Persian digits,
   // and the Persian percent sign (2026-11-21: "57%" and "1" sat beside "۷ رأی" and "۳ جلسه").
-  var COUNT = '.cr-mcd,.cr-ht b,.cr-half .n,.cr-tosslast .tn,.cr-face,.fw-f b,.cyc-k';
+  // (2026-11-23, Amir: "make the big number farsi digits too") A habit row's big number (.hb-now: 9,000 steps, 7.5 hours) sat in Latin
+  // digits beside its own "۲,۰۰۰ قدم پیاده" line. It is Persian now; the box that opens to type it stays as the athlete types it.
+  var COUNT = '.cr-mcd,.cr-ht b,.cr-half .n,.cr-tosslast .tn,.cr-face,.fw-f b,.cyc-k,.hb-now';
   // (2026-11-22) Your weeks' legend ("1 هفتهٔ کامل") and Progress's "1 از ۱۰ جلسه": the number is its own element beside Farsi words.
   // A short English run inside a Farsi line ("«استپ‌آف لندینگ» (Step-Off Landing)", "Back Squat", "Effort ۷") is kept as one
   // left-to-right piece that never breaks across lines: split by the line's end, "(Step-Off" sat at the end of one line and
