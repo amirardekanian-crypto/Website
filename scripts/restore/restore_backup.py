@@ -43,7 +43,10 @@ SHORT_LIVED = {'crew_faces', 'crew_cheers', 'crew_award_likes', 'crew_mentions',
                'crew_push_q', 'crew_push_seen',
                # Which cycle each athlete was last told about (stage87). It rebuilds itself: the first sight of a
                # phone is never a notification, so a restore cannot announce a cycle anybody already has.
-               'push_cycle_seen'}
+               'push_cycle_seen',
+               # What is owed the coach's doorbell (stage123). Deleted after 7 days and only ids; a restored copy would ring
+               # the coach again for sessions and applications already in the dashboard.
+               'coach_inbox'}
 # The logins. Their rows are re-made by the dashboard's Create login (a new Supabase sign-in account each), never restored.
 ACCOUNT_TABLES = {'athlete_identities': 'athlete_id', 'tps_accounts': 'username', 'assess_accounts': 'username'}
 # Tables whose rows belong to a LOGIN, and the column that says which one: the old login's id is swapped for the new login's id.

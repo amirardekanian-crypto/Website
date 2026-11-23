@@ -625,7 +625,9 @@
 // v287: program.html and i18n-fa.js (?v=28) changed (2026-11-23, Amir: "Yes, add them"): a max the athlete logs in Personal Records
 // shows on the History sheet, a diamond in its date's place with "your max" under it and a row in the list; the graph's dates,
 // numbers and small words show only where they fit.
-const CACHE = 'aap-v287';
+// v288: sw.js changed (2026-11-23, Amir: "A: instant"): a tap on the coach's doorbell (stage123, /coach.html#…) opens coach.html and never turns an
+// open athlete app into the dashboard.
+const CACHE = 'aap-v288';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -881,10 +883,14 @@ self.addEventListener('notificationclick', event => {
     }
     // Otherwise the other athlete app's window takes it (the two share this registration). Never any other page of the site: it
     // navigated the first window of any kind, so a tap replaced the coach's dashboard with an unsaved draft, or the course app (2026-10-20).
-    for (const c of all) {
-      let path = '';
-      try { path = new URL(c.url).pathname; } catch (e) {}
-      if (/^\/(program|habits)\.html$/.test(path) && 'focus' in c) { try { await c.navigate(url); } catch (e) {} return c.focus(); }
+    // Only for a notification meant for one of the athlete apps: the coach's doorbell (stage123, /coach.html#…) opens its own window and never
+    // turns the athlete app (a session under way in it) into the dashboard.
+    if (/^(program|habits)\.html$/.test(page)) {
+      for (const c of all) {
+        let path = '';
+        try { path = new URL(c.url).pathname; } catch (e) {}
+        if (/^\/(program|habits)\.html$/.test(path) && 'focus' in c) { try { await c.navigate(url); } catch (e) {} return c.focus(); }
+      }
     }
     if (self.clients.openWindow) return self.clients.openWindow(url);
   })());

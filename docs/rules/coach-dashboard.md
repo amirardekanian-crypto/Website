@@ -90,3 +90,13 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   Authentication → Sign In / Providers → User Signups): the coach check trusts the email in the sign-in alone. Read it back with
   `curl -s https://bvipfipbdcyqnbczjmaq.supabase.co/auth/v1/settings -H "apikey: <the publishable key>"` → `"disable_signup": true`.
   Every live database function has its `CREATE FUNCTION` in `supabase/` (the eight that did not are in `stage56_functions_record.sql`).
+- **The doorbell: every new workout and application rings coach.html** (stage123, 2026-11-23; Amir: *"instead of receving email, i
+  should receive a notification from my coach.html"*, way A, instant). A new `session_history` or `hab_intake` row puts a line in
+  `coach_inbox` (a trigger, inside an exception block: a ring never stops a save) and asks `push-send?only=coach` at once; the
+  `coach-push` job asks again every minute while one is owed. A device is the coach's when it is in `coach_push_subs`: ⚙ Tools →
+  🔔 Notifications → Turn on (the browser's box opens inside that tap only), then Send a test. On a phone that also runs the athlete
+  app it is the SAME subscription, so Turn off only takes it off the coach's list. **Every form saves to the server first**
+  (`assets/js/intake-send.js`: three tries, a retry id `_cid` that `submit_intake()` turns into the same row, and the phone keeps what it
+  could not send). The Proof signup and the partner form land in Leads → Applications with the intake forms.
+  **The emails (Web3Forms) still go in parallel until Amir switches them off**, after about two weeks of every email having its row.
+  `node scripts/headless/intake-send.js` (19), rollback `scripts/rollback_stage123.sql`.

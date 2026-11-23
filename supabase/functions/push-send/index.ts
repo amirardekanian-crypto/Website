@@ -36,6 +36,10 @@
 //                              from the phone: "Your session is still open", 10 minutes after the last set of a session left
 //                              open (push_finish_arm()). The job's list and the one door to sending are push_alert_due() and
 //                              push_alert_take(), which answer for both kinds with each kind's words, tag, TTL and urgency.
+//   POST /push-send?only=coach the coach's doorbell (stage123, 2026-11-23): a new workout or application rings coach.html on the
+//                              coach's own devices (coach_push_subs). Asked by the trigger that filed it (coach_push_fire(), x-push-key)
+//                              and by the every-minute job while a line is owed (coach_push_tick()). coach_push_take() is the one door:
+//                              a line is taken for 2 minutes, so two callers at once send it once; the words are coach_push_words()'s.
 //
 // THE FOUR KINDS, and where each one is decided: habits and workout in push_due() (stage84, hourly,
 // at the athlete's own hour), crew in crew_push_due() (stage86, every 15 minutes), cycle in
@@ -170,6 +174,31 @@ Deno.serve(async (req) => {
 
   if (!same) return json({ error: 'no' }, 401);
   if (!publicKey || !privateKey) return json({ error: 'the VAPID keys are not set' }, 500);
+
+  // The coach's doorbell (stage123). Every device of the coach's gets every line; one taking it is enough to call it sent.
+  if (only === 'coach') {
+    const vapid = { subject, publicKey, privateKey };
+    const { data: items, error } = await db.rpc('coach_push_take');
+    if (error) return json({ error: 'coach_push_take: ' + error.message }, 500);
+    const { data: subs, error: e2 } = await db.rpc('coach_push_targets');
+    if (e2) return json({ error: 'coach_push_targets: ' + e2.message }, 500);
+    const live = (subs ?? []) as { endpoint: string; p256dh: string; auth: string; gone?: boolean }[];
+    let sent = 0, failed = 0, dropped = 0;
+    for (const it of (items ?? []) as { id: number; title: string | null; body: string | null; url: string | null }[]) {
+      if (!it.title) { await db.rpc('coach_push_done', { p_id: it.id, p_ok: true }); continue; }   // its row is gone: nothing to say
+      const payload = JSON.stringify({ title: it.title, body: it.body || '', tag: 'coach-' + it.id, url: it.url || '/coach.html', sent: Date.now() });
+      let anyOk = false;
+      for (const s of live) {
+        if (s.gone) continue;
+        const r = await sendPush({ endpoint: s.endpoint, p256dh: s.p256dh, auth: s.auth }, payload, vapid, { ttl: 86400, urgency: 'high' });
+        if (r.ok) { anyOk = true; sent++; await db.rpc('coach_push_mark', { p_endpoint: s.endpoint, p_result: 'ok' }); }
+        else if (r.gone) { s.gone = true; dropped++; await db.rpc('coach_push_mark', { p_endpoint: s.endpoint, p_result: 'gone' }); }
+        else { failed++; await db.rpc('coach_push_mark', { p_endpoint: s.endpoint, p_result: 'fail' }); }
+      }
+      await db.rpc('coach_push_done', { p_id: it.id, p_ok: anyOk });
+    }
+    return json({ coach: (items ?? []).length, sent, failed, dropped });
+  }
 
   const due: Due[] = [];
   if (only !== 'crew') {

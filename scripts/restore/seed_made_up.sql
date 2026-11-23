@@ -126,6 +126,11 @@ insert into public.crew_questions (id, athlete_id, body, ok_name, created_at, an
 -- would cost every athlete the single notification permission their browser gives, and that cannot be
 -- asked for twice. push_sent (what went out today) and push_config (the VAPID private key and the
 -- sender's shared secret) are deliberately left out, so nothing seeds them.
+-- The coach's own devices (stage123): one made-up computer, so the backup and the restore carry the table.
+insert into public.coach_push_subs (endpoint, p256dh, auth, device, created_at, updated_at) values
+  ('https://fcm.googleapis.com/made-up-coach-endpoint-for-the-rehearsal-0001',
+   'BFNpLdIIpJ-1yq2puIicO5GJJTcbteUYElX75z32dK3UQv16g2H4YjDiiGVwB9psguu5f9rKU4d1NPhtBvmI7dM',
+   'made-up-auth-coach', 'Windows · Chrome', '2026-11-23 12:00:00+00', '2026-11-23 12:00:00+00');
 insert into public.push_subs (endpoint, athlete_id, p256dh, auth, app, kinds, hour, quiet_days, tz_offset, lang, device, created_at, updated_at) values
   ('https://web.push.apple.com/made-up-endpoint-for-the-rehearsal-0001', 'ava_test',
    'BFNpLdIIpJ-1yq2puIicO5GJJTcbteUYElX75z32dK3UQv16g2H4YjDiiGVwB9psguu5f9rKU4d1NPhtBvmI7dM',

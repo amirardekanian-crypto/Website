@@ -371,10 +371,14 @@
     var b=document.getElementById('sbtn'),o=b.innerHTML,serr=document.getElementById('serr');
     serr.hidden=true;b.disabled=true;b.innerHTML='در حالِ ارسال…';
     try{
-      var r=await within(15000,fetch(this.action,{method:'POST',body:new FormData(this)}));
-      if(!r.ok)throw new Error('fail');
-      var d=null;try{d=await r.json();}catch(x){}
-      if(d&&d.success===false)throw new Error('rejected');
+      // The email and the server copy (2026-11-23: coach.html → Leads, and it rings the coach; tried three times and kept on this
+      // phone if it still cannot get through, assets/js/intake-send.js). Either road taking it is a yes.
+      var fd=new FormData(this);
+      var mail=within(15000,fetch(this.action,{method:'POST',body:fd})).then(async function(r){
+        if(!r.ok)return false;var d=null;try{d=await r.json();}catch(x){}return !(d&&d.success===false);});
+      var server=window.AAIntake?AAIntake.save(this,{lang:'fa',programme:'Partner application',name:(fd.get('Coach Name')||'').trim(),
+        contact:(fd.get('Instagram')||'').trim()}).then(function(r){return !!(r&&r.ok);}):Promise.resolve(false);
+      await within(30000,window.AAIntake?AAIntake.firstYes([mail,server]):mail.then(function(ok){if(!ok)throw new Error('fail');}));
       // the next step is WhatsApp, with a message that already names the coach
       var nm=document.getElementById('fn').value.trim();
       var wa=document.getElementById('okWa');
@@ -393,5 +397,6 @@
   });
 })();
 </script>
+<script src="/assets/js/intake-send.js?v=1"></script>
 </body>
 </html>

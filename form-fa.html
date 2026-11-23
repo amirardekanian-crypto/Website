@@ -864,7 +864,7 @@
   async function sendToSupabase(formEl,lang){
     var p=intakePayload(formEl);
     var name=[asText(p['First Name']),asText(p['Last Name'])].filter(Boolean).join(' ').trim();
-    var res=await fetch(SB_URL+'/rest/v1/rpc/submit_intake',{
+    var res=await (window.AAIntake?AAIntake.fetch:fetch)(SB_URL+'/rest/v1/rpc/submit_intake',{
       method:'POST',
       headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -964,5 +964,6 @@
   })();
 })();
 </script>
+<script src="/assets/js/intake-send.js?v=1"></script>
 </body>
 </html>

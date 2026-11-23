@@ -31,7 +31,8 @@ const SHORT_LIVED = ['crew_faces', 'crew_cheers', 'crew_award_likes', 'crew_ment
                      'crew_replies',                            // the replies (stage92): they die with their post at 7 days, so the same promise
                      'push_sent',                              // and what went out today (stage84): it rebuilds itself by not sending twice
                      'crew_push_q', 'crew_push_seen',
-                     'push_cycle_seen'];          // which cycle each athlete was last told about (stage87): it rebuilds itself          // the crew's queue and its watermarks (stage86): the queue keeps the Bell's own 7 days, the watermarks rebuild themselves
+                     'push_cycle_seen',
+                     'coach_inbox'];   // what is owed the coach's doorbell (stage123): 7 days, ids only, a restore must not ring again          // which cycle each athlete was last told about (stage87): it rebuilds itself          // the crew's queue and its watermarks (stage86): the queue keeps the Bell's own 7 days, the watermarks rebuild themselves
 const COACH_JWT = JSON.stringify({ email: 'amirardekanian@gmail.com', role: 'authenticated', sub: '00000000-0000-4000-8000-00000000c0c0' });
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'restore-rehearsal-'));
 
@@ -252,7 +253,8 @@ try {
   const chk2 = await check(B, dirB);
   ok(JSON.stringify(chk2) === JSON.stringify(chk), 'the second run leaves every count as it was');
   const nx = await nextIdsAfterMax(B);
-  ok(nx.n === 11 && nx.bad.length === 0, `all ${nx.n} id counters hand out an id past every restored one`, nx.bad.join('\n'));
+  ok(nx.n === 12 && nx.bad.length === 0,   // 12 since stage123: coach_inbox's counter (never restored, so nothing to be past)
+      `all ${nx.n} id counters hand out an id past every restored one`, nx.bad.join('\n'));
 
   section('7. the logins come back in two steps; the rows that belong to a login follow');
   const made1 = await recreateLogins(B, reportB, new Set(['buyer_one', 'learner_one', 'ava_test']));

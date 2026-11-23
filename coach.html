@@ -25,6 +25,7 @@
 <title>The Coach's Box</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0E4A36">
+<link rel="manifest" href="/manifest-coach.json">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <!-- Pinned (2026-10-10): "@2" let any new 2.x build change how the dashboard signs in or reads
@@ -824,7 +825,7 @@
   .tools { margin-bottom: 12px; }
   .tools > summary { padding: 0 0 12px; }
   .tools-in { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-  .tools-note { flex-basis: 100%; font-size: 12px; color: var(--muted); }
+  .tools-note, .doorbell-note { flex-basis: 100%; font-size: 12px; color: var(--muted); }
   .tools > .how { margin-top: 12px; }
   .toolspanel .creds { margin: 0; padding: 12px 0 0; border: 0; border-top: 1px solid var(--rule); border-radius: 0; box-shadow: none; animation: none; background: none; }
   .stbtns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
@@ -1585,6 +1586,7 @@ const TABLE_KEYS = {
   crew_consent: ['athlete_id'], push_subs: ['endpoint'], crew_open_results: ['open_id', 'athlete_id'],
   career_goals: ['athlete_id', 'month'], career_notes: ['athlete_id', 'day'],
   crew_weeks: ['week_start'], crew_toss_votes: ['week_start', 'athlete_id'],   // stage102: no id column
+  coach_push_subs: ['endpoint'],   // stage123: the coach's devices, no id column
 };
 function keysOf(table) {
   return TABLE_KEYS[table] || (['programs', 'athlete_progress', 'coaching_logs', 'hab_contacts', 'leaderboard_optin', 'athlete_keys', 'athlete_status', 'career_scores', 'athlete_profile']
@@ -1963,6 +1965,7 @@ async function loadAll() {
   await Promise.all([loadLogins(), loadCoachingLogs(), loadLibrary(), loadPrograms()]);
   assemble();
   S.ready = true;
+  doorbellRefresh();   // this device's notifications: keep its address on the server current (the doorbell, stage123)
 }
 
 // What failed to load, in words, under the tabs. Empty when everything came back.
@@ -2326,6 +2329,9 @@ const BACKUP_TABLES = [
   // queue keeps the Bell's own 7-day promise, so a 12-week backup of it would break that promise, and a watermark
   // rebuilds itself by not sending twice. (Names unquoted on purpose: check 1h reads the quoted ones out of here.)
   'push_subs',
+  // The coach's own devices for the doorbell (stage123): a restore keeps them, so coach.html rings again without asking. coach_inbox,
+  // the short-lived list of what is owed a ring, is left out (SHORT_LIVED: 7 days, ids only).
+  'coach_push_subs',
   // ⚠ The Monthly Open (stage85) is the other way round: a challenge and the results Amir confirmed are a RECORD, not a post. They are not deleted
   // after 7 days, they are months of work in a handful of rows, and nothing else could rebuild them. So the Open's two tables are ADDED HERE the
   // day stage85 is applied, in the same commit as the new schema snapshot (test_restore_backup.py check 1h holds the two equal, and it reads the
@@ -4465,10 +4471,115 @@ function setTools(open) {
 }
 function toggleTools() { setTools(!_toolsOpen); }
 window.toggleTools = toggleTools;
+// ── THE DOORBELL (stage123, 2026-11-23; Amir: "instead of receving email, i should receive a notification from my coach.html as i have it
+// like an app installed", and "A: instant") ──
+// A new workout (session_history) or application (hab_intake, every form) puts a line in coach_inbox and asks push-send?only=coach at once;
+// the every-minute job asks again while one is owed. This device is one of the coach's when it is in coach_push_subs: ⚙ Tools →
+// Notifications → Turn on (the browser's own box opens inside that tap and nowhere else). A tap on a notification opens the athlete's file
+// or Leads (sw.js posts { aa: 'go', screen } to a coach window already open, below).
+// ⚠ One website, one notification permission and one subscription: on a phone that also runs the athlete app this is the SAME
+// subscription, so Turn off only removes it from the coach's list and never unsubscribes the browser (that would silence the athlete
+// reminders too). The key is assets/js/push.js's VAPID_PUBLIC.
+const COACH_VAPID = 'BPG2aPjBFIo58UtAD1UP3qwOkmRzoD-qqDBA1MtnCVrrSyIKuyqua7VrkKnPRgfdbUOrL6Phn5eNbLkEnKX4EBk';
+const DOORBELL_KEY = 'coach_bell_on';   // this browser turned it on (localStorage): doorbellRefresh() re-sends its address after every load
+let _doorbell = 'unknown', _doorbellBusy = false;
+function doorbellSupported() { return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window; }
+function doorbellIosNeedsInstall() {
+  const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+  return ios && !standalone;
+}
+function doorbellKey(b64) {
+  const pad = '='.repeat((4 - b64.length % 4) % 4), raw = atob((b64 + pad).replace(/-/g, '+').replace(/_/g, '/'));
+  return Uint8Array.from(raw, c => c.charCodeAt(0));
+}
+function doorbellDevice() {
+  const ua = navigator.userAgent;
+  const os = /Android/.test(ua) ? 'Android' : /iPhone|iPad|iPod/.test(ua) ? 'iPhone' : /Windows/.test(ua) ? 'Windows' : /Mac/.test(ua) ? 'Mac' : 'Computer';
+  const br = /Edg\//.test(ua) ? 'Edge' : /Chrome\//.test(ua) ? 'Chrome' : /Firefox\//.test(ua) ? 'Firefox' : /Safari\//.test(ua) ? 'Safari' : 'Browser';
+  return os + ' · ' + br;
+}
+async function doorbellSubscription(make) {
+  const reg = await navigator.serviceWorker.register('/sw.js');
+  await navigator.serviceWorker.ready;
+  let sub = await reg.pushManager.getSubscription();
+  if (!sub && make) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: doorbellKey(COACH_VAPID) });
+  return sub;
+}
+async function doorbellSend(sub) {
+  const j = sub.toJSON();
+  const { error } = await sb.rpc('coach_push_subscribe', { p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth, p_device: doorbellDevice() });
+  if (error) throw error;
+}
+// The state for the Tools row, and the address kept current: a browser that rotated its subscription would otherwise go quiet.
+async function doorbellRefresh() {
+  if (DEMO) return;
+  const was = _doorbell;
+  try {
+    if (!doorbellSupported()) _doorbell = doorbellIosNeedsInstall() ? 'install' : 'unsupported';
+    else if (Notification.permission === 'denied') _doorbell = 'blocked';
+    else if (Notification.permission !== 'granted' || localStorage.getItem(DOORBELL_KEY) !== '1') _doorbell = 'off';
+    else {
+      const sub = await doorbellSubscription(false);
+      if (sub) { await doorbellSend(sub); _doorbell = 'on'; } else _doorbell = 'off';
+    }
+  } catch (e) { _doorbell = localStorage.getItem(DOORBELL_KEY) === '1' ? 'trouble' : 'off'; }
+  if (_doorbell !== was) paintTools();
+}
+async function doorbellOn() {
+  if (_doorbellBusy) return;
+  _doorbellBusy = true;
+  try {
+    const perm = await Notification.requestPermission();   // inside the tap: the browser's own box
+    if (perm !== 'granted') { _doorbell = perm === 'denied' ? 'blocked' : 'off'; return; }
+    await doorbellSend(await doorbellSubscription(true));
+    localStorage.setItem(DOORBELL_KEY, '1');
+    _doorbell = 'on';
+    toast('Notifications are on for this device. Send a test to see one.');
+  } catch (e) {
+    _doorbell = 'trouble';
+    toast('Notifications could not be turned on: ' + ((e && e.message) || e));
+  } finally { _doorbellBusy = false; paintTools(); }
+}
+async function doorbellOff() {
+  try {
+    const sub = await doorbellSubscription(false);
+    if (sub) { const { error } = await sb.rpc('coach_push_unsubscribe', { p_endpoint: sub.endpoint }); if (error) throw error; }
+    localStorage.removeItem(DOORBELL_KEY);
+    _doorbell = 'off';
+    toast('Notifications are off for this device.');
+  } catch (e) { toast('Could not turn them off: ' + ((e && e.message) || e)); }
+  paintTools();
+}
+async function doorbellTest() {
+  const { data, error } = await sb.rpc('coach_push_test');
+  toast(error ? 'The test did not go: ' + error.message : data && data.ok ? 'Test sent. It should arrive in a few seconds.' : 'No device has notifications on yet.');
+}
+window.doorbellOn = doorbellOn; window.doorbellOff = doorbellOff; window.doorbellTest = doorbellTest;
+function doorbellRowHtml() {
+  const st = {
+    on: ['On for this device', `<button class="btn sm" onclick="doorbellTest()">Send a test</button><button class="btn sm quiet" onclick="doorbellOff()">Turn off</button>`],
+    off: ['Off on this device. Every new workout and application can ring here.', `<button class="btn sm primary" onclick="doorbellOn()">Turn on</button>`],
+    trouble: ['Something went wrong last time.', `<button class="btn sm" onclick="doorbellOn()">Try again</button>`],
+    blocked: ['Blocked for this website in the browser. Allow notifications for amirardekani.com in its site settings, then reload.', ''],
+    install: ['On an iPhone, add this page to the Home Screen and open it from there first.', ''],
+    unsupported: ['This browser cannot show notifications.', ''],
+    unknown: ['Checking…', ''],
+  }[_doorbell] || ['', ''];
+  return `<div class="tools-row doorbell-row"><span class="doorbell-note"><b>🔔 Notifications</b> · ${esc(st[0])}</span>${st[1]}</div>`;
+}
+// A tap on a notification while this window is open: sw.js focuses it and says where to go.
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', ev => {
+    const d = ev.data || {};
+    if (d.aa === 'go' && typeof d.screen === 'string' && d.screen) location.hash = '#' + d.screen.replace(/^#/, '');
+  });
+}
+
 function toolsPanelHtml() {
   const lb = lastBackupAt(), lbBad = lastBadBackupAt();
   const needLogin = athletesNeedingLogin();
-  return `${needLogin.length && !LOAD_ERR.logins
+  return `${doorbellRowHtml()}${needLogin.length && !LOAD_ERR.logins
         ? `<div class="tools-row"><button class="btn sm" onclick="bulkCreateLogins()" title="${esc(needLogin.join(', '))} — coached, trained, no login yet">Create ${needLogin.length} missing login${needLogin.length === 1 ? '' : 's'}</button></div>`
         : ''}
     <details class="tools" open>
@@ -10402,7 +10513,7 @@ window.renderExercises = renderExercises;
 // form.html / form-fa.html write here via submit_intake(); Amir reads them here.
 // The Web3Forms email still fires too — this table is the durable copy so a
 // relay outage can't lose a lead. Backend: supabase/stage27_intake.sql.
-const INTAKE_SKIP = new Set(['First Name', 'Last Name', 'Email', 'Contact (Instagram/WhatsApp)', 'Programme',
+const INTAKE_SKIP = new Set(['First Name', 'Last Name', 'Email', 'Contact (Instagram/WhatsApp)', 'Programme', '_cid',
                              'botcheck', 'access_key', 'from_name', 'subject', 'redirect']);
 function intakeName(i) {
   const p = i.payload || {};

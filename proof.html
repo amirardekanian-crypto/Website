@@ -382,10 +382,15 @@
       btn.textContent = 'Sending…';
       // A slow network must not freeze the button for ever.
       var timer;
-      var timeout = new Promise(function (_, reject) { timer = setTimeout(function () { reject(new Error('timeout')); }, 15000); });
-      var send = fetch(form.action, { method: 'POST', body: new FormData(form) })
+      var timeout = new Promise(function (_, reject) { timer = setTimeout(function () { reject(new Error('timeout')); }, 30000); });
+      var mail = fetch(form.action, { method: 'POST', body: new FormData(form) })
         .then(function (r) { return r.ok ? r.json().catch(function () { return { success: true }; }) : Promise.reject(r); })
-        .then(function (d) { if (d && d.success === false) throw new Error('rejected'); });
+        .then(function (d) { if (d && d.success === false) throw new Error('rejected'); return true; });
+      // The server copy (2026-11-23): saved in coach.html → Leads, and it rings the coach. Tried three times, and kept on this
+      // phone if it still cannot get through (assets/js/intake-send.js). Either road taking it is a yes.
+      var server = window.AAIntake ? AAIntake.save(form, { lang: 'en', programme: 'AA Proof (free)', name: name,
+        email: document.getElementById('pmail').value.trim(), contact: phone.value }).then(function (r) { return !!(r && r.ok); }) : Promise.resolve(false);
+      var send = window.AAIntake ? AAIntake.firstYes([mail, server]) : mail;
       Promise.race([send, timeout]).then(function () {
         clearTimeout(timer);
         document.getElementById('pEcho').textContent = phone.value;
@@ -409,5 +414,6 @@
     });
   })();
 </script>
+<script src="/assets/js/intake-send.js?v=1"></script>
 </body>
 </html>

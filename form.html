@@ -1320,7 +1320,7 @@
     async function sendToSupabase(formEl, lang) {
       const p = intakePayload(formEl);
       const name = [asText(p['First Name']), asText(p['Last Name'])].filter(Boolean).join(' ').trim();
-      const res = await fetch(SB_URL + '/rest/v1/rpc/submit_intake', {
+      const res = await (window.AAIntake ? AAIntake.fetch : fetch)(SB_URL + '/rest/v1/rpc/submit_intake', {
         method: 'POST',
         headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1732,5 +1732,6 @@
   })();
 </script>
 
+<script src="/assets/js/intake-send.js?v=1"></script>
 </body>
 </html>
