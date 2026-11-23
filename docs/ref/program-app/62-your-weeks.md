@@ -67,6 +67,32 @@ hand, because an offline boot never reaches `loadHistory()`.
   `{ day, k, kind, title, mins, effort, id }`; they never count in a week's `done`. In `BACKUP_TABLES`, the snapshot and `coach_erase_person()`.
   **No XP** (Amir's pick: self-logged minutes are easy to inflate).
 
+### Every activity to the crew (stage126, 2026-11-23)
+
+Amir: *"every activity needs to be sent to crew, unless they turn it off in their settings. but after adding something, you can add images
+to it or write with it. every activity, should have an icon. all the racket sports should have the same one but running and cycling and
+swimming should have their own. remove gym from activity ... remove walking as well, its part of their walking steps"*.
+
+- **Posted as it is saved.** `log_activity()` calls `activity_tell()`: an athlete saving their own activity, in the crew, allowed to post,
+  with **Your activity** on in What the crew sees, gets a plain crew post carrying `{ act, mins }` (stage124's activity post), keyed by the
+  activity's id (`crew_posts.client_key`). Never how hard it was. The answer says `told`; a post that cannot be written (10 a day) leaves the
+  activity saved and `told: false`. `get_five_weeks()`'s `acts` say `told` too. Deleting the activity deletes its post.
+- **The switch is on unless turned off** (`crew_me()`, `crew_page()`; `CREW_KINDS_OFF` is empty). stage118 had it off until chosen; an
+  athlete who set it off keeps it off. The same switch shows the last 7 days on their Player Page.
+- **The saved message**: *Added. The crew sees it.* with **Add a photo**; one not told keeps #131's *Tell the crew*. In a day's sheet the
+  row's button is **Add a photo** once told, **Tell the crew** before. Tell the crew now posts with the activity's id as its key, so either
+  way the post is the activity's own.
+- **Add a photo** opens the crew composer on the activity in edit mode (`openCrewPost('activity', null, { act, key, edit })`): eyebrow *On
+  the crew*, **Save** (off until there is a line or a photo), and `crewSendEdit()` calls `activity_post_edit(p_activity, p_body, p_photo,
+  p_w, p_h)`: a new line takes the place of the old one (none sent keeps it), a photo is added or takes the place of the one there (one per
+  post), within the 3 photos a day. An edit is not a new post, so the 10 a day never stops it.
+- **The kinds**: Gym is off the list (a gym session is already a plan or Library session) and there is no Walking (it is in their Steps).
+  The server still takes `gym` (`activity_kinds()`, `activity_met()`, `MOVE_MET`: old rows still score and `check_twins.js` still agrees),
+  and `ACT_LABEL` still names an old gym row.
+- **An icon per kind** (`actIcon()`): one racket (`court`, in clay) for every racket sport, the runner (`running`), the bike (`cycling`), the
+  swimmer (`swim`), the pulse line for football and other, the dumbbell for an old gym row and a plan session.
+- **Tests**: `scripts/headless/activity-crew.js` (16 checks); the stub answers `told` with `actTold` and `activity_post_edit`.
+
 ### In Farsi (2026-11-21, Amir: *"does everything works in farsi version?"*)
 
 Checked on a Farsi phone (`aa_lang = fa`): every word on the card, the sheet and a day's list is Farsi (`scripts/i18n/fa/24-five-weeks.json`,

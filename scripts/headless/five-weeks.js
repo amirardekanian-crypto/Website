@@ -154,7 +154,7 @@ const calls = (p, n) => p.evaluate(n => (window.__STUB.calls || []).filter(c => 
       return { open: ov.classList.contains('visible'), title: (ov.querySelector('.readiness-title') || {}).textContent, kinds: [...ov.querySelectorAll('.act-row')][0].querySelectorAll('.pl-chip').length,
         days: [...ov.querySelectorAll('.act-row')][1].querySelectorAll('.pl-chip').length, picked: [...ov.querySelectorAll('.pl-chip[aria-pressed="true"]')].map(b => b.textContent) };
     });
-    C.check('Add activity opens its sheet: 13 kinds (stage121), four days, tennis today 60 normal picked', sheet.open && sheet.title === 'Add activity' && sheet.kinds === 13 && sheet.days === 4
+    C.check('Add activity opens its sheet: 12 kinds (stage121, less Gym since stage126), four days, tennis today 60 normal picked', sheet.open && sheet.title === 'Add activity' && sheet.kinds === 12 && sheet.days === 4
       && JSON.stringify(sheet.picked) === JSON.stringify(['Tennis', 'Today', '60', 'Normal']), JSON.stringify(sheet));
     // tennis, yesterday, 90, hard
     await p.evaluate(() => { actPick('day', [...document.querySelectorAll('#hist-overlay .act-row')][1].querySelectorAll('.pl-chip')[1].getAttribute('onclick').match(/'(\d{4}-\d{2}-\d{2})'/)[1]); actPick('mins', 90); actPick('effort', 'hard'); });

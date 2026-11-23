@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=31"></script>
+<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=32"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -7523,6 +7523,8 @@ window.__ICONS = {
   strength:   `<path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10"/>`,
   cardio:     `<path d="M20.8 6.6a4.6 4.6 0 0 0-7.8-2.1L12 5.4l-1-1a4.6 4.6 0 1 0-6.6 6.4l6.6 7 .9-.9"/><polyline points="13 14 15.5 14 17 11.5 19 16 20.5 13 22.5 13"/>`,
   running:    `<circle cx="15" cy="4.5" r="2"/><path d="M11.5 21l1.5-5-3-2 1-5 3 2 2.5 1"/><path d="M9.5 9.5 7 11l-1.5 3"/><path d="M14 16l3 .5 1.5 3"/>`,
+  cycling:    `<circle cx="5.5" cy="16.5" r="3.5"/><circle cx="18.5" cy="16.5" r="3.5"/><path d="M5.5 16.5h7L10 9.5M5.5 16.5 10 9.5h5l3.5 7M15 9.5l-1-3h2.5M8.5 8h3"/>`,   /* stage126: a ride */
+  swim:       `<circle cx="17.5" cy="6.5" r="2"/><path d="M3 12l5-4 3.5 3 3-2.5"/><path d="M2 16.5c1.5 0 2-1 3.3-1s1.8 1 3.3 1 2-1 3.4-1 1.9 1 3.4 1 1.9-1 3.3-1 1.8 1 2.3 1"/><path d="M2 20.5c1.5 0 2-1 3.3-1s1.8 1 3.3 1 2-1 3.4-1 1.9 1 3.4 1 1.9-1 3.3-1 1.8 1 2.3 1"/>`,   /* stage126: a swim */
   tennis:     `<circle cx="12" cy="12" r="9"/><path d="M5 5a9 9 0 0 1 0 14"/><path d="M19 5a9 9 0 0 0 0 14"/>`,
   court:      `<ellipse cx="9.4" cy="9.4" rx="5.4" ry="6.6" transform="rotate(-45 9.4 9.4)"/><path d="M7 7.3l4.6 4.6M11.8 6.8 6.8 11.8"/><path d="M13.4 13.4 20.2 20.2"/><circle cx="18.6" cy="5.4" r="2"/>`,   /* #131: court time, never the gym */
   lowerbody:  `<path d="M9 2h6l-.5 8.5L16 21h-3l-1-7-1 7H8l1.5-10.5z"/>`,
@@ -12367,7 +12369,7 @@ const APP_GUIDE = [
   { icon: 'check-circle', key: 'hold', title: 'Hold Serve: weeks in a row you trained',
     body: `<p>A week is <strong>held</strong> when you finish every session in it. Stopping a session early still counts. Library sessions don't.</p><p>Hold weeks in a row and the count beside <strong>This Week</strong> on Home goes up — the count next to it says what is left this week. Miss a week and it starts again from the next week you hold. The time between cycles never counts against you.</p><p>The weeks are your plan's own weeks, the same ones <strong>This Week</strong> counts. The number is worked out on my side, so after a week ends it can take until your next session to update.</p>` },
   { icon: 'activity', key: 'weeks', title: 'Your weeks and your own activity',   // 2026-11-21: Five Weeks (#122) and Court Log (#123), told in the guide by the What's new rule
-    body: `<p>Your weeks, on Progress, shows your cycle a week to a row, with a square for each day. A plan session is green, a Library session is mint, and a held week has a tick. Tap a day to see what you did. Tennis, padel, a match or a run never shows in your plan, so add it: tap + Add activity, choose what it was, which day (today or the last 3 days), the minutes and how hard, then tap Save. Court time is dark on your weeks, anything else grey. I see it too. The crew sees it only if you turn on Your activity: tap your initials, then What the crew sees.</p>` },
+    body: `<p>Your weeks, on Progress, shows your cycle a week to a row, with a square for each day. A plan session is green, a Library session is mint, and a held week has a tick. Tap a day to see what you did. Tennis, padel, a match or a run never shows in your plan, so add it: tap + Add activity, choose what it was, which day (today or the last 3 days), the minutes and how hard, then tap Save. Court time is dark on your weeks, anything else grey. I see it too, and it goes to the crew as you save it, with what you played and how long, never how hard. Then tap Add a photo to put a photo or a line on it. To keep it off the crew, tap your initials, then What the crew sees, and turn off Your activity.</p>` },
   { icon: 'compass', key: 'lang', title: 'Language',   // 2026-11-21: Settings → Language for every athlete
     body: `<p>The app speaks English and Farsi. Tap your initials, then Language, to switch. Everything I write for you comes in both languages, and the names of the exercises stay in English.</p>` },
   { icon: 'activity', key: 'share', title: 'Share a win',
@@ -18391,9 +18393,10 @@ const CREW_KINDS = [
   ['achievement', 'An achievement'], ['best', 'A personal best', 'The lift and its weight'], ['cycle', 'A cycle finished'],
   ['honour', "The month's honours"], ['open', 'The Monthly Open'],
   // Your activity (2026-11-21; Amir: "let people choose if they allow other people to see their activity or no like other things in the setting"): what you add
-  // on Your weeks (Court Log). OFF until you turn it on, unlike every other switch here, because it was private when it began (stage118).
-  ['activity', 'Your activity', 'Tennis, padel and runs you add on Your weeks: what, which day, how long. Never how hard. Off unless you turn it on.']];
-const CREW_KINDS_OFF = ['activity'];   // switches that are off until the athlete turns them on
+  // on Your weeks (Court Log). stage126 (2026-11-23; Amir: "every activity needs to be sent to crew, unless they turn it off in their settings"):
+  // ON like every other switch here, and each activity is posted to the crew as it is saved. stage118 had it off until turned on.
+  ['activity', 'Your activity', 'Tennis, padel, a run or a ride you add on Your weeks goes to the crew as you save it: what and how long. Never how hard.']];
+const CREW_KINDS_OFF = [];   // switches that are off until the athlete turns them on (none since stage126)
 // ── Reminders (stage84, 2026-10-19) ──────────────────────────────────────────────────────────────
 // Amir: "the push should be automatically on, unless they want to turn off in their app settings."
 // So every kind is on from the moment the phone allows it, and this panel is where they come off.
@@ -18791,7 +18794,10 @@ function openCrewPost(mode, dayId, opts) {
   if (!ov || !BELL || !me.can_post) return;
   const ses = mode === 'session', noPh = (Number(me.photos_left) || 0) <= 0, noPost = (Number(me.posts_left) || 0) <= 0;
   const ac = mode === 'activity' && opts.act && ACT_LABEL[opts.act.kind] ? opts.act : null;   // #131 Court Told: { kind, mins }
-  _crewDraft = { mode: ses ? 'session' : 'post', day: dayId || null, photo: null, act: ac ? { act: ac.kind, mins: Math.min(600, Math.max(1, Math.round(Number(ac.mins) || 0))) } : null };
+  // stage126: an activity's post is keyed by the activity (opts.key), and `edit` adds words and a photo to the post already there
+  const ed = !!(ac && opts.edit && opts.key);
+  _crewDraft = { mode: ses ? 'session' : 'post', day: dayId || null, photo: null, act: ac ? { act: ac.kind, mins: Math.min(600, Math.max(1, Math.round(Number(ac.mins) || 0))) } : null,
+    key: ac && opts.key ? String(opts.key) : null, edit: ed };
   // What was typed and not sent comes back (2026-10-20): the sheet swipes down on an accident, and 280 characters went with
   // it. A session's own draft is written fresh by crewSessionDraft(), so only a plain post is kept.
   let kept = '';
@@ -18802,7 +18808,7 @@ function openCrewPost(mode, dayId, opts) {
   if (!ses && !ac && opts.draft) draft = String(opts.draft);
   else if (!ses && !ac && !opts.prompt && !kept && crewHelloWanted()) { hello = crewHelloDraft(); if (hello) { draft = hello; try { _lsRawSet(crewHelloKey(), '1'); _lsRawSet(crewKeepKey(), hello); } catch (e) {} } }
   ov.querySelector('.readiness-modal').innerHTML = `
-    <div class="readiness-eyebrow">${ses || ac ? 'Tell the crew' : 'Crew'}</div>
+    <div class="readiness-eyebrow">${ed ? 'On the crew' : ses || ac ? 'Tell the crew' : 'Crew'}</div>
     <h2 class="readiness-title">${ses ? 'Day ' + esc(String(dayId)) + ' done' : ac ? `<span>${esc(ACT_LABEL[ac.kind])}</span>, <span>${_crewDraft.act.mins} min</span>` : 'Share with the crew'}</h2>
     ${ac ? crewActCardHtml({ kind: ac.kind, mins: _crewDraft.act.mins }) : ''}
     ${opts.prompt && !ses ? `<p class="cr-prompt" dir="auto">${esc(opts.prompt)}</p>` : ''}
@@ -18813,17 +18819,18 @@ function openCrewPost(mode, dayId, opts) {
     ${noPh ? `<p class="cr-note">That is 3 photos today. More tomorrow.${ses ? ' A session goes to the crew with a photo, so this one waits.' : ''}</p>` : ''}
     ${ses ? '<p class="cr-note">A session goes to the crew with a photo.</p>' : ''}
     ${ses ? crewStampNoteHTML(dayId) : ''}
-    ${ac ? '<p class="cr-note">The crew sees what you played and for how long. Never how hard it was. A photo is up to you.</p>' : ''}
+    ${ed ? '<p class="cr-note">The crew already sees what you played and for how long. Add a line, a photo or both. A new line takes the place of the old one.</p>'
+      : ac ? '<p class="cr-note">The crew sees what you played and for how long. Never how hard it was. A photo is up to you.</p>' : ''}
     <p class="cr-note"><b>Made smaller before it's sent.</b> About 200 KB, and its location is taken off.</p>
     <p class="cr-note">Gone after 7 days. Amir can remove any post. Only photos you would show your coach.</p>
-    <button type="button" class="cr-go"${noPost ? ' disabled' : ''}>${ses ? 'Post with the photo' : 'Post'}</button>
-    <p class="cr-err" role="status">${noPost ? 'That is 10 posts today. More tomorrow.' : ''}</p>`;
+    <button type="button" class="cr-go"${noPost && !ed ? ' disabled' : ''}>${ed ? 'Save' : ses ? 'Post with the photo' : 'Post'}</button>
+    <p class="cr-err" role="status">${noPost && !ed ? 'That is 10 posts today. More tomorrow.' : ''}</p>`;
   const m = ov.querySelector('.readiness-modal'), ta = m.querySelector('.cr-txt'), cnt = m.querySelector('.cr-cnt'), go = m.querySelector('.cr-go');
   const prev = m.querySelector('.cr-prev'), add = m.querySelector('.cr-add'), file = m.querySelector('.cr-add input'), err = m.querySelector('.cr-err');
   const sync = () => {
     cnt.textContent = ta.value.length + ' / 280';
-    const has = !!_crewDraft.photo, ok = ses ? has : ac ? true : (has || ta.value.trim().length > 0);
-    go.disabled = noPost || !ok;
+    const has = !!_crewDraft.photo, ok = ses ? has : ed ? (has || ta.value.trim().length > 0) : ac ? true : (has || ta.value.trim().length > 0);
+    go.disabled = (noPost && !ed) || !ok;   // stage126: an edit is not a new post, so the 10 a day does not stop it
   };
   ta.addEventListener('input', () => {
     sync();
@@ -18879,6 +18886,7 @@ async function crewSend(go, ta, err) {
   // The key is made ONCE for this draft and sent with every attempt (stage92), so a post that is already on the server
   // comes back as the one it is instead of being written a second time. A server without stage92 ignores the argument.
   if (!d.key) d.key = crewNewKey();
+  if (d.edit) return crewSendEdit(d, go, ta, err, label);   // stage126: words and a photo on an activity's post already on the crew
   const p = { p_body: ta.value, p_photo: d.photo ? d.photo.b64 : null, p_w: d.photo ? d.photo.w : null, p_h: d.photo ? d.photo.h : null, p_kind: d.mode,
     p_session: d.mode === 'session' ? crewSessionPayload(d.day) : d.act ? d.act : null, p_key: d.key };
   let r = null;
@@ -18907,6 +18915,7 @@ async function crewSend(go, ta, err) {
   if (r.error || !r.data) { err.textContent = crewErrWords(r.error && r.error.message); go.disabled = false; return; }
   if (r.data.me && BELL) BELL.me = r.data.me;
   if (d.photo && d.photo.url && r.data.id) CREW_PHOTOS.set(r.data.id, d.photo.url);   // your own photo shows at once, no download
+  if (d.act && d.key) actMarkTold(d.key);   // stage126: the activity is on the crew now; its day sheet offers Add a photo
   _crewDraft = null;
   crewForgetKept();
   try { _lsRawSet(crewPostedKey(), '1'); } catch (e) {}   // a first post: no hello draft any more (Home Crowd step 4b)
@@ -18915,6 +18924,25 @@ async function crewSend(go, ta, err) {
   _bellAt = 0;
   refreshBell();
   if (r.data.id) crewLight(`#crew-body .cr-post[data-id="${CSS.escape(String(r.data.id))}"]`, 'new');   // idea 77 (Land on It): on Crew, the new post comes into view and lights for about 2 seconds
+}
+// stage126: activity_post_edit() finds the post by the activity's id (the post's key). The words take the place of the old ones (none
+// typed keeps them), and a photo is added or takes the place of the one there. One key per activity, so a second tap after a timeout
+// writes the same words again, never a second post.
+async function crewSendEdit(d, go, ta, err, label) {
+  const p = { p_activity: d.key, p_body: ta.value.trim() ? ta.value : null, p_photo: d.photo ? d.photo.b64 : null, p_w: d.photo ? d.photo.w : null, p_h: d.photo ? d.photo.h : null };
+  let r = null;
+  try { const sb = await _sbReady(); r = sb && await _withTimeout(sb.rpc('activity_post_edit', p), d.photo ? 45000 : 25000); } catch (e) { r = null; }
+  go.textContent = label;
+  if (_noAnswer(r)) { err.textContent = 'No signal. Your words are still here: tap Save again when you have signal.'; go.disabled = false; return; }
+  if (r.error || !r.data) { err.textContent = crewErrWords(r.error && r.error.message); go.disabled = false; return; }
+  if (r.data.me && BELL) BELL.me = r.data.me;
+  if (d.photo && d.photo.url && r.data.id) CREW_PHOTOS.set(r.data.id, d.photo.url);
+  _crewDraft = null;
+  closeHistorySheet();
+  aaToast('Added to your post.');
+  _bellAt = 0;
+  refreshBell();
+  if (r.data.id) crewLight(`#crew-body .cr-post[data-id="${CSS.escape(String(r.data.id))}"]`, 'new');
 }
 window.openCrewPost = openCrewPost;
 window.openCrewSettings = openCrewSettings;
@@ -19135,15 +19163,20 @@ const FW_KINDS = { plan: 'p', library: 'l', court: 'c', other: 'o' };
 const FW_KIND_ORDER = ['plan', 'library', 'court', 'other'];
 // stage121 (2026-11-22) added beach tennis, pickleball, squash, badminton, cycling, swimming, football and gym. The server's list is
 // public.activity_kinds(); the court ones are ACT_COURT here and get_five_weeks()'s 'court' there.
+// stage126 (2026-11-23; Amir: "remove gym from activity, because we already know if they have been to the gym, its same thing twice"):
+// Gym is off the list. The server still takes it (activity_kinds(), MOVE_MET and activity_met() keep it, so an old row still scores and
+// check_twins.js still agrees), and ACT_LABEL still names it for those old rows. Walking is never a kind: it is in the Steps they walk.
 const ACT_KINDS = [['tennis', 'Tennis'], ['match', 'Match'], ['padel', 'Padel'], ['beach_tennis', 'Beach tennis'], ['pickleball', 'Pickleball'],
   ['squash', 'Squash'], ['badminton', 'Badminton'], ['run', 'Running'], ['cycling', 'Cycling'], ['swim', 'Swimming'], ['football', 'Football'],
-  ['gym', 'Gym'], ['other', 'Other']];   // 'Running', not 'Run': in Farsi 'Run' is the order بدو
-const ACT_LABEL = Object.fromEntries(ACT_KINDS);
+  ['other', 'Other']];   // 'Running', not 'Run': in Farsi 'Run' is the order بدو
+const ACT_LABEL = Object.fromEntries(ACT_KINDS.concat([['gym', 'Gym']]));
 const ACT_COURT = ['tennis', 'padel', 'match', 'beach_tennis', 'pickleball', 'squash', 'badminton'];
 // #131 (2026-11-22): the icon an activity wears wherever it is shown, so court time reads apart from the gym at a glance: the racket for
-// the court sports, the runner for a run, the dumbbell for gym work and plan sessions, the pulse line for everything else.
+// the court sports, the dumbbell for gym work and plan sessions, the pulse line for everything else. stage126 (2026-11-23; Amir: "all the
+// racket sports should have the same one but running and cycling and swimming should have their own"): the runner, the bike, the swimmer.
 function actIcon(kind) {
-  return ACT_COURT.indexOf(kind) >= 0 ? 'court' : kind === 'run' ? 'running' : kind === 'gym' ? 'strength' : 'activity';
+  return ACT_COURT.indexOf(kind) >= 0 ? 'court' : kind === 'run' ? 'running' : kind === 'cycling' ? 'cycling' : kind === 'swim' ? 'swim'
+    : kind === 'gym' ? 'strength' : 'activity';
 }
 function actIconHtml(kind, cls) { return `<span class="${cls || 'act-ic'}${ACT_COURT.indexOf(kind) >= 0 ? ' is-court' : ''}" aria-hidden="true">${window.ICON(actIcon(kind), 2)}</span>`; }
 // ── MOVE CREDIT — Court Log counts toward Steps (stage121, 2026-11-22; Amir: "lets do option 1") ─────────────────────────────────
@@ -19272,14 +19305,23 @@ function ydayLineHtml(acts) {
 function crewCanTell() {
   try { return !!(ATHLETE_ID && !window.IS_DEMO && !window.IS_PREVIEW && BELL && crewMe().can_post); } catch (e) { return false; }
 }
-async function tellActivity(id) {
+// stage126 (2026-11-23; Amir: "every activity needs to be sent to crew, unless they turn it off in their settings. but after adding
+// something, you can add images to it or write with it"): log_activity() posts it as it saves (told), keyed by the activity's id. Tell
+// the crew is what is left for an activity that was not told (the switch off, 10 posts today); it uses the same key, so either way
+// the post is the activity's own and Add a photo finds it (activity_post_edit()).
+async function tellActivity(id, edit) {
   const a = moveActs().find(x => x && String(x.id) === String(id));
   if (!a) return;
   if (!BELL) { try { await refreshBell(); } catch (e) { /* no signal: nothing opens */ } }
   if (!crewCanTell()) return;
-  openCrewPost('activity', null, { act: { kind: a.kind, mins: a.mins } });
+  openCrewPost('activity', null, { act: { kind: a.kind, mins: a.mins }, key: String(a.id), edit: !!(edit && a.told) });
 }
 window.tellActivity = tellActivity;
+function actTold(id) { const a = moveActs().find(x => x && String(x.id) === String(id)); return !!(a && a.told); }
+// After a post or an edit lands: the phone's copy says told, so the day's sheet offers Add a photo from now on.
+function actMarkTold(id) {
+  try { if (FW && Array.isArray(FW.acts)) FW.acts.forEach(a => { if (a && String(a.id) === String(id)) a.told = true; }); } catch (e) { /* the next read says it */ }
+}
 const COOL_MIN = 60;
 async function coolDownCall(act) {
   try {
@@ -19412,7 +19454,9 @@ function openFiveWeeksDay(day) {
     const k = fwKindOf(d);
     if (k === 'court' || k === 'other') {
       const q = [Number(d.mins) > 0 ? Math.round(Number(d.mins)) + ' min' : '', effort[d.effort] || ''].filter(Boolean).join(' · ');
-      const tell = d.id && crewCanTell() ? `<button type="button" class="act-tell" onclick="tellActivity('${esc(String(d.id))}')">Tell the crew</button>` : '';   // #131
+      // #131 Tell the crew; stage126: once it is on the crew, Add a photo (words and a photo on its post)
+      const told = d.id && actTold(d.id);
+      const tell = d.id && crewCanTell() ? `<button type="button" class="act-tell" onclick="tellActivity('${esc(String(d.id))}', ${told})">${told ? 'Add a photo' : 'Tell the crew'}</button>` : '';
       return `<div class="pl-row">${actIconHtml(d.kind)}<div><span class="t">${esc(fwTitle(d) || 'Activity')}</span><span class="q">${esc(q)}</span></div>${d.id ? `<span class="act-btns">${tell}<button type="button" class="act-del" onclick="deleteActivity(this, '${esc(String(d.id))}', '${day}')">Delete</button></span>` : '<span></span>'}</div>`;
     }
     const lib = k === 'library';
@@ -19486,15 +19530,18 @@ async function saveActivity() {
     const day = _act.day, quick = !!_act.quick;
     _act = null;
     if (!quick) document.getElementById('hist-overlay').classList.remove('visible');
-    aaToast('Added to your weeks.');
-    coolDownCall(res.data || {}).then(cool => {   // #128: a hard hour or more offers the day-after session instead
-      const r0 = res.data || {};
-      if (!cool && r0.id && crewCanTell()) aaToast('Added to your weeks.', { action: 'Tell the crew', run: () => tellActivity(r0.id) });   // #131
+    const r0 = res.data || {}, told = r0.told === true;   // stage126: log_activity() told the crew as it saved
+    aaToast(told ? 'Added. The crew sees it.' : 'Added to your weeks.');
+    coolDownCall(r0).then(cool => {   // #128: a hard hour or more offers the day-after session instead
+      if (cool || !r0.id) return;
+      if (told) { if (crewCanTell()) aaToast('Added. The crew sees it.', { action: 'Add a photo', run: () => tellActivity(r0.id, true) }); }   // stage126
+      else if (crewCanTell()) aaToast('Added to your weeks.', { action: 'Tell the crew', run: () => tellActivity(r0.id) });   // #131
     });
+    if (told) { _bellAt = 0; try { refreshBell(); } catch (e2) { /* the Bell catches up on its own */ } }
     if (FW && fwOk(FW)) {   // shown at once, before the server's own answer replaces it
-      const r = res.data || {}, wk = FW.weeks.find(w => w && day >= String(w.from) && day <= String(w.to));
+      const r = r0, wk = FW.weeks.find(w => w && day >= String(w.from) && day <= String(w.to));
       if (wk) (wk.days = wk.days || []).push({ day, k: ACT_COURT.indexOf(r.kind) >= 0 ? 'court' : 'other', kind: r.kind, title: plCap(String(r.kind || 'activity')), mins: r.minutes, effort: r.effort, id: r.id });
-      if (Array.isArray(FW.acts) && r.id && !FW.acts.some(a => a && String(a.id) === String(r.id))) FW.acts = FW.acts.concat([{ day, kind: r.kind, mins: r.minutes, effort: r.effort, id: r.id }]);   // stage122: Steps follows at once
+      if (Array.isArray(FW.acts) && r.id && !FW.acts.some(a => a && String(a.id) === String(r.id))) FW.acts = FW.acts.concat([{ day, kind: r.kind, mins: r.minutes, effort: r.effort, id: r.id, told }]);   // stage122: Steps follows at once
       paintFiveWeeks();
     }
     loadFiveWeeks();

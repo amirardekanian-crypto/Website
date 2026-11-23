@@ -2,6 +2,52 @@
   "_about": "What's new in the app, shown in every athlete's Inbox for 14 days (program.html, newsRows/openNews). Newest first. Each entry: id (unique), at (ISO time), en and fa: { title, items: [one short line each], sign }. Written in Amir's voice (COM-3) in both languages (COM-1). THE RULE (docs/rules/working-with-amir.md): a change to program.html that an athlete would notice ships with its entry here in the same commit; .githooks/commit-msg blocks a program.html commit without this file unless the message says [no news].",
   "items": [
     {
+      "id": "2026-11-23-activity-to-crew",
+      "at": "2026-11-23T22:30:00Z",
+      "en": {
+        "title": "Your tennis goes to the crew",
+        "items": [
+          "Every activity you add now goes to the crew as you save it: what you played and how long. Never how hard.",
+          "Tap Add a photo after saving to put a photo or a line on it.",
+          "Running, cycling and swimming have their own icons. Gym is off the list: your sessions already count.",
+          "Rather keep it to yourself? Tap your initials, What the crew sees, and turn off Your activity."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "تنیس‌تون برای تیم می‌ره",
+        "items": [
+          "هر فعالیتی که اضافه می‌کنید، همون موقع که ذخیره‌اش می‌کنید برای تیم می‌ره: چی بازی کردید و چقدر. هیچ‌وقت اینکه چقدر سخت بود.",
+          "بعد از ذخیره «یه عکس اضافه کن» رو بزنید تا یه عکس یا یه خط روش بذارید.",
+          "دویدن، دوچرخه‌سواری و شنا آیکون خودشون رو دارن. باشگاه از لیست برداشته شد: جلسه‌هاتون از قبل حساب می‌شن.",
+          "ترجیح می‌دید برای خودتون بمونه؟ روی حرف‌های اول اسمتون بزنید، «چیزی که تیم می‌بینه»، و «فعالیت تو» رو خاموش کنید."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
+      "id": "2026-11-23-history-on-the-card",
+      "at": "2026-11-23T22:00:00Z",
+      "en": {
+        "title": "Your history is on the exercise card now",
+        "items": [
+          "Open any exercise you've done before. Your history is right under How to do it.",
+          "It says how many times you've done it, where you started and where you are now.",
+          "Tap it for the graph: a dot for every session with its heaviest set, and under it how hard each set was against your target."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "تاریخچهٔ هر حرکت حالا روی کارت خودشه",
+        "items": [
+          "هر حرکتی که قبلاً انجامش دادید رو باز کنید. «تاریخچهٔ تو» درست زیر «چطور انجامش بدی» هست.",
+          "می‌گه چند بار انجامش دادید، از کجا شروع کردید و الان کجایید.",
+          "روش بزنید تا نمودار رو ببینید: برای هر جلسه یه نقطه با سنگین‌ترین ستش، و زیرش اینکه هر ست در مقایسه با هدفتون چقدر سخت بود."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-23-steps-show-your-court-time",
       "at": "2026-11-23T21:30:00Z",
       "en": {
@@ -61,28 +107,6 @@
         "items": [
           "رکوردی که توی رکوردهای شخصی ثبت می‌کنید، حالا توی «تاریخچهٔ تو» همون حرکت هم هست: یه لوزی روی تاریخش، با «رکورد شما» زیرش.",
           "توی فهرست هم یه ردیف جدا داره، با وزنه‌ای که زدید و اینکه چقدر سخت بود."
-        ],
-        "sign": "امیر"
-      }
-    },
-    {
-      "id": "2026-11-23-history-on-the-card",
-      "at": "2026-11-23T18:00:00Z",
-      "en": {
-        "title": "Your history is on the exercise card now",
-        "items": [
-          "Open any exercise you've done before. Your history is right under How to do it.",
-          "It says how many times you've done it, where you started and where you are now.",
-          "Tap it for the graph: a dot for every session with its heaviest set, and under it how hard each set was against your target."
-        ],
-        "sign": "Amir"
-      },
-      "fa": {
-        "title": "تاریخچهٔ هر حرکت حالا روی کارت خودشه",
-        "items": [
-          "هر حرکتی که قبلاً انجامش دادید رو باز کنید. «تاریخچهٔ تو» درست زیر «چطور انجامش بدی» هست.",
-          "می‌گه چند بار انجامش دادید، از کجا شروع کردید و الان کجایید.",
-          "روش بزنید تا نمودار رو ببینید: برای هر جلسه یه نقطه با سنگین‌ترین ستش، و زیرش اینکه هر ست در مقایسه با هدفتون چقدر سخت بود."
         ],
         "sign": "امیر"
       }

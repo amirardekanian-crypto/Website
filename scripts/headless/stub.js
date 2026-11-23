@@ -86,10 +86,17 @@
         if (row.day >= w.from && row.day <= w.to) (w.days = w.days || []).push({ day: row.day, k: COURT.indexOf(row.kind) >= 0 ? 'court' : 'other',
           kind: row.kind, title: row.kind.charAt(0).toUpperCase() + row.kind.slice(1).replace(/_/g, ' '), mins: row.minutes, effort: row.effort, id: row.id });
       });
-      if (fw && Array.isArray(fw.acts) && !seen) fw.acts.push({ day: row.day, kind: row.kind, mins: row.minutes, effort: row.effort, id: row.id });
+      // stage126: `actTold` true = the server told the crew as it saved (the answer and acts say told)
+      if (S.actTold) row.told = true;
+      if (fw && Array.isArray(fw.acts) && !seen) fw.acts.push({ day: row.day, kind: row.kind, mins: row.minutes, effort: row.effort, id: row.id, told: !!S.actTold });
       S.actLog = (S.actLog || []).concat(seen ? [] : [row]);
       try { var c1 = JSON.parse(localStorage.getItem('__stubcfg') || '{}'); c1.fiveWeeks = fw; localStorage.setItem('__stubcfg', JSON.stringify(c1)); } catch (e) {}
       return res({ data: row, error: null, status: 200 });
+    }
+    // stage126: words and a photo on an activity's post (`actEditErr` = a message to refuse with)
+    if (name === 'activity_post_edit') {
+      if (S.actEditErr) return res({ data: null, error: { message: S.actEditErr, code: 'P0001' }, status: 400 });
+      return res({ data: { id: 'p-act-' + String(params.p_activity) }, error: null, status: 200 });
     }
     if (name === 'delete_activity') {
       var gone = false;

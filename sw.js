@@ -635,7 +635,9 @@
 // Farsi (قدم, ساعت, وعده, لیوان); it read "steps ۱,۰۰۰ مونده" with the English word.
 // v292: i18n.js (?v=16) changed (2026-11-23, Amir: "make the big number farsi digits too"): in Farsi a habit row's big number
 // (.hb-now) is in Persian digits.
-const CACHE = 'aap-v292';
+// v293: program.html and i18n-fa.js (?v=32) changed (2026-11-23, Amir: "every activity needs to be sent to crew"): each activity is posted
+// to the crew as it is saved (stage126), Add a photo puts words and a photo on it, icons for running, cycling and swimming, Gym off the list.
+const CACHE = 'aap-v293';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -676,7 +678,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=16',
-  '/assets/js/i18n-fa.js?v=31',
+  '/assets/js/i18n-fa.js?v=32',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).

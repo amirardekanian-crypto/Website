@@ -52,7 +52,12 @@
     "A session done": "یه جلسه تموم شد",
     "Cycling": "دوچرخه‌سواری",
     "Swimming": "شنا",
-    "Football": "فوتبال"
+    "Football": "فوتبال",
+    "Added. The crew sees it.": "اضافه شد. تیم می‌بینه.",
+    "On the crew": "روی تیم",
+    "The crew already sees what you played and for how long. Add a line, a photo or both. A new line takes the place of the old one.": "تیم از قبل می‌بینه چی بازی کردید و چقدر. یه خط، یه عکس یا هر دو رو اضافه کنید. خط جدید جای خط قبلی رو می‌گیره.",
+    "Added to your post.": "به پستتون اضافه شد.",
+    "No signal. Your words are still here: tap Save again when you have signal.": "اینترنت نیست. نوشته‌تون اینجا مونده: وقتی اینترنت اومد دوباره «ذخیره» رو بزنید."
   },
   "patterns": [
     [
