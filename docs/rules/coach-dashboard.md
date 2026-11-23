@@ -62,7 +62,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   are confirmed, is the only place a suggestion is drawn. The honours area (WhatsApp lines) shows an honour only once `S.honours.confirmed` has it; a server with no `confirmed`
   is the old behaviour, no card. The page's quiet freeze never publishes. `COACH_DASHBOARD.md` → *The month's honours wait for Amir*.
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (133 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (156 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - **The UX pass (2026-10-12; Amir's answers in memory `coach-redesign-2026-10-12`)**, round 1 shipped: Today puts Needs you first and wide,
   each row's button names what it does, and **"Also waiting"** (applications, logins to send, backup, older notes) is NOT a reason, so it never
   touches `reasonsOf()` or the people count. The roster is one aligned table (Athlete · Cycle · Last session · Proof · Why); the athlete header
@@ -100,3 +100,13 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   could not send). The Proof signup and the partner form land in Leads → Applications with the intake forms.
   **The emails (Web3Forms) still go in parallel until Amir switches them off**, after about two weeks of every email having its row.
   `node scripts/headless/intake-send.js` (19), rollback `scripts/rollback_stage123.sql`.
+- **Today is what came in** (2026-11-23; Amir's picks, `COACH_DASHBOARD.md` -> *Today, rebuilt around what came in*). The strip is the date, the season,
+  `updated ... ago` (`S.freshAt`) and four counters (came in today, notes to read, applications, cycles ending this week). **Needs you is clay only for a
+  note or a sync problem** (every other reason is a grey dot; `reasonsOf()` is unchanged), and two or more people whose ONLY reason is a missing login are one
+  row with **Set up all** (`bulkCreateLogins(ids)`). The right column is **Came in** (`cameInHtml()`, the last 7 days of sessions, Library sessions and
+  applications, the clay dot read from `localStorage['coach.cameInSeen']` once at boot) and Courtside with its moments behind one fold; **Today has no Proof
+  column and no coach-line composer: the wall is on Proof only**. **Fresh on tap:** `quietRefresh()` (doorbell tap, tab back after 3 minutes, a 5-minute beat)
+  re-reads sessions, applications and Library sessions with `refetch(..., { quiet: true })`, which never raises the fail bar and never redraws under a focused
+  box, an open Erase or danger panel or the exercise editor (`freshSafeNow()`). **A note clears when it is opened** (Open, a day card, a picked session;
+  `autoReadSession()`; nothing in the demo) and the athlete header has **Mark all read**.
+- **Find, the phone's bar, one-tap outcomes** (2026-11-23; Amir picked all three): ⌕ Find (`/`, Ctrl/Cmd+K) reaches an athlete or an application from any screen and never stays open with ⚙ Tools or More; below 600 px the bar is Today · Athletes · Leads · More (Exercises lives in More, More's badge is the Mailbag, Leads wears the new-applications badge); an application's outcome is one tap (Became a client asks for the athlete first, No reply and Not a fit save at once, Other… is the old select) and every road goes through `intakeSetOutcome()`. Mark handled stays, quiet. `COACH_DASHBOARD.md` → *Find, the phone's bar, one-tap outcomes*.

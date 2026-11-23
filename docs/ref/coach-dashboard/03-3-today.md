@@ -229,3 +229,21 @@ screen — a row of grey dots is someone drifting before they churn.
 
 ---
 *One section of the reference. The index is [`COACH_DASHBOARD.md`](../../../COACH_DASHBOARD.md); the rules are in [`docs/rules/`](../../../docs/README.md).*
+
+## Today, rebuilt around what came in (2026-11-23)
+
+Amir's picks, one commit. Today answers "what reached me since I last looked?" before anything else.
+
+**The strip.** The date, the season, then `updated just now` (a 60-second timer rewrites that one word from `S.freshAt`: `N min ago`, `at HH:MM` after an hour, `could not update` when the last quiet refresh failed; no fail bar). Four counters: **N came in today** (sessions trained today, Library sessions done today, applications that reached the server today; the demo and Amir's own login are left out), **N notes to read**, **N applications**, **N cycles end this week** (the `cycle` reason of `reasonsOf()`). "On court today" and "wall lines today" are gone.
+
+**Needs you.** Clay is for a note or a sync problem only: the dot and the words are clay when the top reason is `note` or `sync`; every other reason is a grey dot and plain text. `reasonsOf()` is unchanged. Two or more people whose ONLY reason is a missing login are one row, **N without a login**, their names under it (four, then "+k more"), one **Set up all** button that sends exactly those ids to `athlete-login` `create_many` (`bulkCreateLogins(ids)`; ⚙ Tools still calls it with no argument). The row counts as one of the 12.
+
+**Came in** (right column, `cameInHtml()`). The last 7 days, newest first, grouped Today / Yesterday / the day: a session (name, `Day N · title · RPE · min · partial`, the athlete's note in quotes, **Open** goes to that exact session), a Library session (`library_sessions.created_at`), an application (initials, `Application · FA|EN · programme`, **Open** goes to Leads). 12 rows, then Show all N. A clay 6 px dot marks rows that arrived after the previous page life's first load (`localStorage['coach.cameInSeen']`, read once at boot; nothing is new without it). Panel head: `N new` or `last 7 days`.
+
+**Courtside** keeps its panel, but the moments sit behind one fold, `Courtside · N wins to send` (or `nothing new this week`); the honours reminder stays above it, always. The fold's state is `_courtFoldOpen`. **The Proof column is gone from Today** (Amir had posted no line in 60 days): the wall and its composer are on Proof only.
+
+**Fresh on tap.** `quietRefresh(force)` re-reads sessions, applications and Library sessions (`refetch([...], { quiet: true })`) on the doorbell's `{ aa: 'go' }`, when the tab comes back after three minutes, and every five minutes while visible. It never redraws under the coach's hands (a box focused, an Erase or danger panel open, the exercise editor open, or a screen other than Today, Athletes, an athlete's file or Leads): the data is updated and the next draw, or the box losing focus, shows it.
+
+**A note clears when it is opened.** Opening a day card, picking a session, or arriving by Open on Came in or Needs you marks the session on show read (`autoReadSession()`; nothing in the demo). The athlete's header has **Mark all read** beside "Needs you:" (every new note, recent and older, one patch of memory). Mark read stays.
+
+**Tests.** `today-strip-counters`, `today-came-in`, `today-needs-colour-logins`, `today-quiet-refresh`, `today-note-clears` in `scripts/headless/coach/run.js`.

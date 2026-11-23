@@ -183,6 +183,8 @@
   /* The signed-in address is reassurance, not navigation: it goes first, then the button words, then the brand's second half. */
   @media (max-width: 719px) { .who { display: none; } }
   @media (max-width: 599px) { .tb-lbl { display: none; } .tbtn { padding: 0 12px; } .tb-top { padding: 4px 16px 0; } .brand { min-width: 0; overflow: hidden; text-overflow: ellipsis; } .topbar .right { flex: none; } }
+  @media (max-width: 719px) { #qfBtn .tb-lbl, .brand span { display: none; } }   /* Find shows its glyph only, and the brand its first half, until the bar has room for four buttons with words */
+  @media (min-width: 900px) and (max-width: 1339px) { #qfBtn .tb-lbl { display: none; } }
   @media (max-width: 480px) { .brand span { display: none; } }
   @media (max-width: 360px) { .tb-top { padding: 4px 12px 0; gap: 8px; } .brand { letter-spacing: .04em; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
                               .topbar .right { gap: 8px; } .tbtn { padding: 0 8px; } }
@@ -222,12 +224,13 @@
      second half and the button words below 1180 px, then a little air in the tabs and the brand below 1020 px. At 900 px the seven tabs still fit the bar. */
   @media (min-width: 900px) and (max-width: 1339px) { .who { display: none; } }
   @media (min-width: 900px) and (max-width: 1179px) { .tb-lbl { display: none; } .brand span { display: none; } }
-  @media (min-width: 900px) and (max-width: 1019px) { .brand { letter-spacing: .04em; } .tab { padding: 0 8px; } .topbar { gap: 8px; } .tbtn { padding: 0 10px; } }
+  @media (min-width: 900px) and (max-width: 1019px) { .brand { letter-spacing: .04em; } .tab { padding: 0 6px; } .topbar { gap: 8px; } .tbtn { padding: 0 10px; } }
 
   /* ── A phone's bottom bar (2026-10-12, round 3 of the coach UX pass; Amir works mostly on a PC, so nothing from 600 px up changes). Below 600 px the tab
-     row is hidden and a bar fixed to the bottom of the screen takes its place: Today · Athletes · Exercises · More, the active one marked, the Athletes
-     badge (notes to read) on its item. More opens a small sheet ABOVE the bar with the other four places (Proof, Leads with its new-applications badge,
-     Library, Buyers); More is marked while one of them is on show and carries the Leads badge. 600-899 px keeps the one row of tabs. --bb is the bar's
+     row is hidden and a bar fixed to the bottom of the screen takes its place: Today · Athletes · Leads · More (2026-11-23: he uses the iPhone now, Exercises is a PC job and
+     moved into More), the active one marked, the Athletes badge (notes to read) and the Leads badge (new applications) on their items. More opens a small sheet ABOVE
+     the bar with the other places (Exercises, Proof, Library, Buyers); More is marked while one of them is on show and carries the Mailbag count. 600-899 px keeps
+     the one row of tabs. --bb is the bar's
      height, safe-area inset included; everything that sits at the bottom of the screen reads it, so nothing hides behind the bar (the toast, the Undo bar,
      the Exercises editor's Save bar), and scroll-padding keeps a scrolled-to element above the bar. The offsets
      of other components are here, next to the bar (`body` in front lifts their specificity over their own rules further down; those rules stay as they are).
@@ -268,7 +271,7 @@
     body #toast { bottom: calc(26px + var(--bb)); }
     body .undobar { bottom: calc(76px + var(--bb)); }
     body .spine-acts { bottom: var(--bb); }
-    body .toolspanel { max-height: calc(100vh - var(--stick) - var(--bb) - 16px); }
+    body .toolspanel, body .qfpanel { max-height: calc(100vh - var(--stick) - var(--bb) - 16px); }
   }
   /* 320 px: four 80 px items; a two-digit count on Athletes would reach into Exercises, so the labels and the count tuck in a little. */
   @media (max-width: 340px) { .bb-item .n { left: calc(100% - 5px); padding: 0 4px; min-width: 16px; } }
@@ -317,6 +320,7 @@
   .counter .n small { font-size: 12px; color: rgba(255,255,255,.66); }
   .counter .l { min-width: 0; font-size: 14px; font-weight: 500; line-height: 1.3; color: rgba(255,255,255,.86); }
   .counter.hot .n { color: #FFB99F; }
+  .board-fresh { font-size: 12px; font-weight: 500; color: rgba(255,255,255,.7); white-space: nowrap; }
   @media (max-width: 760px) {
     .counters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; margin-left: 0; }
     .counter { border-radius: 12px; padding: 4px 12px; gap: 4px 8px; }
@@ -324,7 +328,9 @@
   }
   /* A phone: the date and the season stay on one line, so the strip is date + two rows of counters (under 150 px at 390). */
   @media (max-width: 560px) {
-    .board { padding: 12px 16px; }
+    .board { padding: 12px 16px; row-gap: 4px; }
+    .board-top { gap: 0 8px; }   /* the date and the season, with "updated" under them when it does not fit: the strip stays under 150 px */
+    .board-fresh { line-height: 1.2; }
   }
 
   /* ── Panels ── */
@@ -437,8 +443,14 @@
   .i-outcome .i-now { margin: 0 0 12px; font-size: 14px; }
   .i-outcome .i-now a { color: var(--court); border-bottom: 1px solid var(--court-100); text-decoration: none; }
   .in-close { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
-  .in-close label { flex: 1 1 200px; max-width: 260px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); min-width: 0; }
-  .in-close select { width: 100%; min-height: 36px; font: inherit; font-size: 14px; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 8px; max-width: 100%; }
+  .in-close label, .in-more label { flex: 1 1 200px; max-width: 260px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); min-width: 0; }
+  .in-close select, .in-more select { width: 100%; min-height: 36px; font: inherit; font-size: 14px; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 8px; max-width: 100%; }
+  /* One-tap outcomes (2026-11-23): Became a client, No reply, Not a fit and a quiet Other…; the one picked wears the same green as a picked .stbtns button.
+     The part that unfolds (the athlete, or all six outcomes) sits under the row with its Save. */
+  .in-what { font-size: 12px; color: var(--muted); align-self: center; }
+  .in-picks { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .in-picks .btn[aria-pressed="true"] { background: var(--court); border-color: var(--court); color: #fff; }
+  .in-more { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-top: 12px; }
   .in-quiet { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
   .in-quiet .btn { background: none; border-color: transparent; color: var(--muted); }
   .in-quiet .btn:hover { background: var(--court-100); border-color: transparent; color: var(--court); }
@@ -505,7 +517,7 @@
     .in-q.long { grid-template-columns: minmax(88px, 38%) minmax(0, 1fr); }
   }
   @media (max-width: 699px) {
-    .in-close label { flex-basis: 100%; max-width: none; }
+    .in-close label, .in-more label { flex-basis: 100%; max-width: none; }
     .in-detail { padding: 16px 16px 20px; }
     .in-gh, .in-none { padding-left: 16px; padding-right: 16px; }
     .in-row { padding-left: 16px; padding-right: 16px; }
@@ -595,19 +607,19 @@
   .showweek { width: 100%; text-align: center; font-size: 14px; font-weight: 600; color: var(--muted);
               padding: 12px 0 4px; }
   .showweek:hover { color: var(--court); }
-  /* Today's Proof column (round 2): ONE panel, its parts (the composer, today's lines, the quest line, who is drifting) divided by
-     hairlines, with no card inside the card. The last two are one line each and link to Proof, where the full lever and the pulse are. */
-  .pt + .pt { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--rule); }
-  .pt .mic { margin-bottom: 0; }
-  .pt .wallday:first-child { margin-top: 0; }
-  .pt .empty { padding-top: 0; }
-  .ptlink { display: inline-block; margin-top: 8px; font-size: 14px; font-weight: 600; color: var(--muted); text-decoration: none; }
-  .ptlink:hover { color: var(--court); text-decoration: underline; }
-  .ptline { display: block; font-size: 14px; line-height: 1.45; color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
-  .ptline:hover { color: var(--court); }
-  .ptline b { font-weight: 600; }
-  .ptline .dim { color: var(--muted); }
-  .ptline.drift b.lead { color: var(--clay-ink); }
+  /* Came in (2026-11-23): Today's right column, the list of what reached the server in the last 7 days. It is Needs you's row (.need) with a 6 px dot in front
+     that is clay only on a row newer than the last time the page was opened. */
+  .cm-grp { margin: 16px 0 0; }
+  .cm-grp:first-of-type { margin-top: 0; }
+  .need .cm-dot { flex: none; width: 6px; height: 6px; border-radius: 999px; margin: 11px 3px 0 1px; }
+  .need .cm-dot.new { background: var(--clay); }
+  .need .cm-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; min-width: 0; font-size: 14px; line-height: 1.4; }
+  .need .cm-t { flex: none; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .need .cm-note { font-style: normal; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  .need .cm-ph { font-size: 12px; font-weight: 600; }
+  .court .court-fold { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .court .hrem + .court-fold { margin-top: 0; }
+  .court .court-fold > .phead { margin-top: 12px; }
   /* Courtside (stage75): good news, never a reason. In the narrow column a row is the moment, the line already written, then its buttons. */
   .court .cs { display: grid; gap: 4px; padding: 12px 0; }
   .court .cs + .cs { border-top: 1px solid var(--rule); }
@@ -821,6 +833,20 @@
                 box-shadow: var(--float); padding: 16px 16px 16px; }
   .toolspanel[hidden] { display: none; }
   @media (max-width: 899px) { .toolspanel { left: 0; right: 0; width: auto; border-left: 0; border-right: 0; border-radius: 0 0 12px 12px; } }
+  /* Find (2026-11-23): the same hanging panel as Tools, its own class. An input, then Athletes and Applications as hairline rows; the highlighted row is the one Enter opens. */
+  .qfpanel { position: absolute; z-index: 2; top: 100%; right: 16px; width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - var(--stick) - 16px);
+             overflow-y: auto; overscroll-behavior: contain; background: var(--card); border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+             box-shadow: var(--float); padding: 16px; }
+  .qfpanel[hidden] { display: none; }
+  @media (max-width: 899px) { .qfpanel { left: 0; right: 0; width: auto; border-left: 0; border-right: 0; } .qfpanel .qf-in { font-size: 16px; } }
+  .qf-in { width: 100%; min-height: 36px; font: inherit; font-size: 14px; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+  .qf-gh { margin: 16px 0 4px; }
+  .qf-row { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 8px 12px; border-radius: 8px; color: var(--ink); }
+  .qf-row:hover, .qf-row.on { background: var(--court-100); }
+  .qf-t { display: flex; flex-direction: column; min-width: 0; }
+  .qf-n { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .qf-s { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .qf-none { margin: 16px 0 0; font-size: 14px; color: var(--muted); }
   .toolspanel .tools-row { margin-bottom: 12px; }
   .tools { margin-bottom: 12px; }
   .tools > summary { padding: 0 0 12px; }
@@ -1523,11 +1549,13 @@
       <a class="brand" href="#today">AMIR ARDEKANI <span>· THE BOX</span></a>
       <div class="right">
         <span class="who" id="who"></span>
+        <button id="qfBtn" class="tbtn" aria-expanded="false" aria-controls="qfPanel" onclick="qfToggle()" title="Find an athlete or an application (press /)">⌕<span class="tb-lbl"> Find</span></button>
         <button class="tbtn" onclick="hardRefresh()" title="Reload everything from the server" aria-label="Refresh">↻<span class="tb-lbl"> Refresh</span></button>
         <button id="toolsBtn" class="tbtn" aria-expanded="false" aria-controls="toolsPanel" onclick="toggleTools()" title="Coach tools, the backup, and the logins waiting to be sent">⚙<span class="tb-lbl"> Tools</span></button>
         <button id="logoutBtn" class="tbtn">Sign out</button>
       </div>
       <div id="toolsPanel" class="toolspanel" hidden></div>
+      <div id="qfPanel" class="qfpanel" hidden></div>
     </div>
     <nav class="rail" aria-label="Sections"><div class="rail-in" id="rail"></div></nav>
   </header>
@@ -1820,6 +1848,8 @@ function sessionNoteText(s) {
 // RPC results — never scored locally (see the header comment).
 const S = {
   ready: false,
+  freshAt: 0,      // ms: when the lists last came back whole (loadAll, a quiet refresh); the strip's "updated ... ago"
+  freshBad: false, // the last quiet refresh failed: the strip says "could not update"
   prog: [],        // athlete_progress rows
   hist: [],        // session_history rows, LIGHT: no `summary` and no `log` (see loadHistory); an athlete's are merged in when their file opens. HIDDEN sessions are not in it
   histHidden: [],  // the rows the coach hid (stage60): kept apart so every number leaves them out; the athlete's File lists them and syncGapsOf() counts them as present
@@ -1931,7 +1961,7 @@ function ensureSessionsFull(athleteId) {
 }
 
 async function loadAll() {
-  if (DEMO) { demoStore(); S.ready = true; return; }
+  if (DEMO) { demoStore(); S.ready = true; S.freshAt = Date.now(); return; }
   const [prog, hist, notes, contacts, rules, seasons, optin, intake, affs, stat] = await Promise.all([
     selectAll('athlete_progress', 'athlete_id, athlete_name, data, updated_at'),
     loadHistory(),
@@ -1965,6 +1995,8 @@ async function loadAll() {
   await Promise.all([loadLogins(), loadCoachingLogs(), loadLibrary(), loadPrograms()]);
   assemble();
   S.ready = true;
+  S.freshAt = Date.now(); S.freshBad = false;
+  cameInStamp();   // the first whole load of this page's life is the "you have seen up to here" mark for Came in
   doorbellRefresh();   // this device's notifications: keep its address on the server current (the doorbell, stage123)
 }
 
@@ -1992,14 +2024,19 @@ function loadWarnHtml() {
 }
 
 // Refetch just the slices a write touched, then re-render.
-async function refetch(parts) {
+// opts.quiet is the page refreshing itself (quietRefresh, below): a slice that fails is NOT a fail bar, it only makes the strip say "could not update",
+// and the screen is redrawn only where nothing is in the coach's hands (freshSafeNow); otherwise the data waits for the next draw.
+async function refetch(parts, opts) {
   if (DEMO) { render(); return; }
+  const quiet = !!(opts && opts.quiet);
   const jobs = [], bad = [];
+  let quietBad = false;
+  const miss = (label, why) => { if (quiet) quietBad = true; else bad.push(`${label} (${why})`); };
   // A slice that fails to come back is TOLD, not skipped: a save that worked and then showed the old wall, quest week or contact list looked like
   // nothing had happened (audit TODAY-13, 2026-10-11; only the session list used to say so). Programmes report through the banner (LOAD_ERR).
   const take = (label, p, apply) => jobs.push(Promise.resolve(p).then(
-    r => { if (r && r.error) bad.push(`${label} (${r.error.message})`); else apply(r); },
-    e => { bad.push(`${label} (${(e && e.message) || e})`); }));
+    r => { if (r && (r.error || (quiet && r.short))) miss(label, r.error ? r.error.message : 'only part of it came back'); else apply(r); },
+    e => { miss(label, (e && e.message) || e); }));
   if (parts.includes('notes')) take('the crew wall', sb.from('hab_notes').select('*').gte('day', addDays(todayKey(), -7)), r => { S.notes = r.data || []; });
   if (parts.includes('rules')) take('the quest and XP rules', sb.from('xp_rules').select('rules').eq('id', 1).maybeSingle(), r => { S.rules = (r.data && r.data.rules) || null; });
   if (parts.includes('contacts')) take('the Proof contacts', sb.rpc('contact_list'), r => { S.contacts = r.data || []; });
@@ -2007,17 +2044,66 @@ async function refetch(parts) {
   if (parts.includes('status')) take('the paused and former marks', selectAll('athlete_status', '*'), r => { S.status = {}; (r.data || []).forEach(x => { S.status[x.athlete_id] = x; }); });
   if (parts.includes('affiliates')) take('the affiliate codes', sb.from('affiliates').select('*').order('code'), r => { S.affiliates = r.data || []; });
   if (parts.includes('hist')) take('the session list', loadHistory(), r => { S.hist = r.data || []; });
+  if (parts.includes('libDone')) take('the Library sessions', selectAll('library_sessions', LIBDONE_COLS), r => { S.libDone = r.short ? null : (r.data || []); LOAD_ERR.libDone = r.short ? `only ${r.data.length} of ${r.total} came back` : ''; });
   if (parts.includes('programs')) jobs.push(loadPrograms());
   if (parts.includes('prog')) take('the athletes\' progress', selectAll('athlete_progress', 'athlete_id, athlete_name, data, updated_at'), r => { S.prog = r.data || []; });
   if (parts.includes('optin')) take('the leaderboard names', sb.from('leaderboard_optin').select('athlete_id, display_name, title'), r => { S.optin = {}; (r.data || []).forEach(x => S.optin[x.athlete_id] = x); });
   await Promise.all(jobs);
-  if (bad.length) fail(`Saved, but ${bad.join(' and ')} could not be reloaded, so what you see for ${bad.length === 1 ? 'it' : 'them'} may be out of date. Tap ↻ Refresh.`);
+  if (quiet) { S.freshBad = quietBad; if (!quietBad) S.freshAt = Date.now(); }
+  else if (bad.length) fail(`Saved, but ${bad.join(' and ')} could not be reloaded, so what you see for ${bad.length === 1 ? 'it' : 'them'} may be out of date. Tap ↻ Refresh.`);
   // Everything that feeds the roster and the athlete file is rebuilt in one place, after all the
   // reads: a contact forgotten, a programme replaced, a progress blob deleted. (Only 'hist' did
   // this before, so a forgotten contact kept their dots and board name until ↻ Refresh.)
   if (parts.some(x => ['hist', 'programs', 'prog', 'optin', 'contacts', 'status'].includes(x))) assemble();
+  if (quiet) {
+    freshPaint();
+    if (!freshSafeNow()) { _quietPending = true; return; }
+  }
   render();
 }
+
+// ── Fresh on tap (2026-11-23, Amir's pick "fix 1"): the page brings itself up to date. A tap on the doorbell (sw.js says { aa:'go' }), the tab
+// coming back after three minutes away, and a five-minute beat while it is on screen each re-read the three lists that new work lands in
+// (sessions, applications, Library sessions). It never redraws under the coach's hands: with a box focused, an Erase or danger panel open or
+// the exercise editor open, the data is updated and the next draw (or the box losing focus) shows it. Failure is one quiet word in the strip.
+let freshBusy = false, _quietPending = false;
+function freshText() {
+  if (S.freshBad) return 'could not update';
+  const m = S.freshAt ? Math.floor((Date.now() - S.freshAt) / 60000) : 0;
+  if (m < 1) return 'updated just now';
+  if (m < 60) return `updated ${m} min ago`;
+  const d = new Date(S.freshAt);
+  return `updated at ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+function freshPaint() { const el = $('freshAt'); if (el) el.textContent = freshText(); }
+function exEditorOpen() {
+  return Object.keys(_exDrafts).length > 0 || [...document.querySelectorAll('[id^="exed-"]')].some(b => b.style.display === 'block');
+}
+// True when a redraw would not take anything out of the coach's hands.
+function freshSafeNow() {
+  if (!['today', 'athletes', 'detail', 'leads'].includes(route().view)) return false;
+  const f = document.activeElement, c = $('content');
+  if (f && c && c.contains(f) && (/^(INPUT|TEXTAREA|SELECT)$/.test(f.tagName) || f.isContentEditable)) return false;
+  if (_danger || _erase) return false;
+  return !exEditorOpen();
+}
+async function quietRefresh(force) {
+  if (DEMO || !S.ready || freshBusy) return;
+  if (!force && S.freshAt && Date.now() - S.freshAt < 30000) return;
+  freshBusy = true;
+  try { await refetch(['hist', 'intake', 'libDone'], { quiet: true }); }
+  catch (e) { S.freshBad = true; freshPaint(); }
+  finally { freshBusy = false; }
+}
+setInterval(freshPaint, 60000);
+setInterval(() => { if (document.visibilityState === 'visible') quietRefresh(); }, 5 * 60 * 1000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && Date.now() - S.freshAt > 3 * 60 * 1000) quietRefresh(); });
+// The box that held the redraw back lost focus: draw now, if the screen is still one that is safe to draw.
+document.addEventListener('focusout', ev => {
+  const c = $('content');
+  if (!_quietPending || !c || !ev.target || !c.contains(ev.target)) return;
+  setTimeout(() => { if (_quietPending && S.ready && freshSafeNow()) render(); }, 60);
+});
 
 // Load every athlete's programme. Names, tier, sessions/week for adherence, and
 // the prescribed plan for the detail view. The programs table IS the roster: every
@@ -2241,10 +2327,10 @@ function athletesNeedingLogin() {
 // instead of one 'create' per athlete. Nothing new to build for distribution:
 // every password lands in athlete_identities same as a single create, so the
 // existing "Logins to send" panel picks all of them up automatically.
-async function bulkCreateLogins() {
+async function bulkCreateLogins(ids) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   if (loginsUnknown()) return;
-  const ids = athletesNeedingLogin();
+  if (!Array.isArray(ids)) ids = athletesNeedingLogin();   // ⚙ Tools: everyone who needs one; Needs you's "Set up all" names its own people
   if (!ids.length) return;
   if (!confirm(
     `Create logins for ${ids.length} athlete${ids.length === 1 ? '' : 's'}?\n\n${ids.join(', ')}\n\n` +
@@ -2570,6 +2656,7 @@ function pickLibraryFile(kind) {
   input.click();
 }
 
+const LIBDONE_COLS = 'athlete_id, slug, completed_on, title, duration_min, created_at';   // created_at: when it reached the server, for Came in
 async function loadLibrary() {
   S.libCats = [];
   S.lib = [];
@@ -2580,7 +2667,7 @@ async function loadLibrary() {
   const [c, l, dn] = await Promise.all([
     sb.from('library_categories').select('*').order('sort_order'),
     selectAll('library', 'slug, kind, category_id, published, updated_at, data, sort_order', ['sort_order', 'slug']),
-    selectAll('library_sessions', 'athlete_id, slug, completed_on, title, duration_min'),
+    selectAll('library_sessions', LIBDONE_COLS),
   ]);
   if (!c.error) S.libCats = c.data || [];
   if (!l.error && !l.short) S.lib = l.data || [];
@@ -3161,6 +3248,7 @@ window.addEventListener('scroll', () => { if (_lastViewKey) _scrollMem[_lastView
 function render() { withEraseFocus(renderNow); }   // withEraseFocus: the Erase panel's boxes keep focus across a redraw
 function renderNow() {
   if (!S.ready) return;
+  _quietPending = false;   // this draw shows whatever a quiet refresh held back
   $('content').classList.remove('no-anim');
   fixLegacyHash();
   renderRail();
@@ -3189,6 +3277,7 @@ window.addEventListener('hashchange', ev => {
   if (_erase && _erase.status !== 'busy') _erase = null;   // an open Erase panel never follows the coach to another screen
   if (_danger && !_danger.busy) _danger = null;            // nor does a dangerAsk panel (Delete training history, Forget, End the run, Delete for good, Delete a call log)
   if (_toolsOpen) setTools(false);                         // a menu closes when you go somewhere: on Library it sat over the publish buttons
+  if (_qfOpen) qfSet(false);                               // Find closes the same way
   // Leaving the Exercises tab, or moving between its three sub-tabs (the editor is only on Entries), with typed, unsaved work asks
   // first, and stays put on a no.
   fixLegacyHash();
@@ -3200,13 +3289,13 @@ window.addEventListener('hashchange', ev => {
   render();
 });
 // ── The phone's bottom bar (round 3 of the coach UX pass, 2026-10-12) ───────────────────────────────────────────────────────────────────
-// Below 600 px (the CSS decides; the markup is always drawn) the tab row is hidden and #botbar takes its place: Today · Athletes · Exercises · More.
-// More opens #moreSheet above the bar with the other places in TABS (Proof, Leads, Library, Buyers; a place added to TABS lands there). The sheet is ONE
+// Below 600 px (the CSS decides; the markup is always drawn) the tab row is hidden and #botbar takes its place: Today · Athletes · Leads · More (2026-11-23: Exercises is a PC job and moved into More).
+// More opens #moreSheet above the bar with the other places in TABS (Exercises, Proof, Library, Buyers; a place added to TABS lands there). The sheet is ONE
 // history step, as the athlete app's layers are: opening it pushes a guard entry with the address unchanged, so Back closes the sheet and nothing else.
 // Every other way out (a pick, a tap on the scrim, Esc, More again, a tap on the bar) goes back over that entry first and a pick navigates after it, so
 // no dead step is left in the history. With the sheet closed nothing here touches the history. Opening it closes ⚙ Tools and the reverse.
-const BAR_IDS = ['today', 'athletes', 'exercises'];
-const MORE_NOTE = { proof: 'The week, the Mailbag, the wall', leads: 'Applications, signups, codes', links: 'Workouts and articles', buyers: 'Course and Testing app logins' };
+const BAR_IDS = ['today', 'athletes', 'leads'];
+const MORE_NOTE = { exercises: 'The Spine, qualities, coverage', proof: 'The week, the Mailbag, the wall', links: 'Workouts and articles', buyers: 'Course and Testing app logins' };
 let _moreOpen = false, _moreGuard = false, _moreWait = null, _barHtml = '', _sheetHtml = '', _shownHash = '';
 const isPhoneBar = () => window.matchMedia('(max-width: 599px)').matches;
 function paintBotBar(active, waiting, newIntake) {
@@ -3215,11 +3304,12 @@ function paintBotBar(active, waiting, newIntake) {
   if (!bar || !sheet) return;
   const badge = (n, title) => n > 0 ? `<span class="n" title="${title}">${n}</span>` : '';
   const notes = badge(waiting, `${waiting} note${waiting === 1 ? '' : 's'} to read`), apps = badge(newIntake, `${newIntake} new application${newIntake === 1 ? '' : 's'}`);
+  const mb = mailbagOpen(), mail = badge(mb, `${mb} question${mb === 1 ? '' : 's'} waiting in the Mailbag`);   // More carries the Mailbag count now that Leads is on the bar
   const forBar = TABS.filter(t => BAR_IDS.includes(t.id)), forMore = TABS.filter(t => !BAR_IDS.includes(t.id));
   const on = id => active === id ? ' active' : '', cur = id => active === id ? ' aria-current="page"' : '';
-  const bhtml = forBar.map(t => `<a class="bb-item${on(t.id)}" href="#${t.id}"${cur(t.id)} onclick="return navTap(event)"><span class="bb-l">${t.label}${t.id === 'athletes' ? notes : ''}</span></a>`).join('')
-    + `<button type="button" id="moreBtn" class="bb-item${forMore.some(t => t.id === active) ? ' active' : ''}" aria-haspopup="true" aria-expanded="false" aria-controls="moreSheet" onclick="toggleMore(event)"><span class="bb-l">More${apps}</span></button>`;
-  const shtml = forMore.map(t => `<a class="ms-row${on(t.id)}" href="#${t.id}"${cur(t.id)} onclick="return navTap(event)"><span class="ms-text"><span class="ms-name">${t.label}</span>${MORE_NOTE[t.id] ? `<span class="ms-note">${MORE_NOTE[t.id]}</span>` : ''}</span>${t.id === 'leads' ? apps : t.id === 'proof' ? badge(mailbagOpen(), `${mailbagOpen()} question${mailbagOpen() === 1 ? '' : 's'} waiting in the Mailbag`) : ''}</a>`).join('');
+  const bhtml = forBar.map(t => `<a class="bb-item${on(t.id)}" href="#${t.id}"${cur(t.id)} onclick="return navTap(event)"><span class="bb-l">${t.label}${t.id === 'athletes' ? notes : t.id === 'leads' ? apps : ''}</span></a>`).join('')
+    + `<button type="button" id="moreBtn" class="bb-item${forMore.some(t => t.id === active) ? ' active' : ''}" aria-haspopup="true" aria-expanded="false" aria-controls="moreSheet" onclick="toggleMore(event)"><span class="bb-l">More${mail}</span></button>`;
+  const shtml = forMore.map(t => `<a class="ms-row${on(t.id)}" href="#${t.id}"${cur(t.id)} onclick="return navTap(event)"><span class="ms-text"><span class="ms-name">${t.label}</span>${MORE_NOTE[t.id] ? `<span class="ms-note">${MORE_NOTE[t.id]}</span>` : ''}</span>${t.id === 'proof' ? mail : ''}</a>`).join('');
   // Rewritten only when it changed, so a redraw does not take the focus away.
   const hadFocus = document.activeElement && document.activeElement.id === 'moreBtn';
   if (bhtml !== _barHtml) { bar.innerHTML = bhtml; _barHtml = bhtml; if (hadFocus && $('moreBtn')) $('moreBtn').focus(); }
@@ -3282,11 +3372,14 @@ window.hardRefresh = hardRefresh;
 function renderToday() {
   const t = todayKey();
   const now = new Date();
-  const habAthletes = Object.values(S.ath).filter(a => a.isHab);
-  const onCourt = habAthletes.filter(a => a.habToday).length;
-  const wallToday = S.notes.filter(n => n.day === t && n.athlete_id !== COACH_NOTE_ID && !n.hidden).length;
-  const sessions7 = S.hist.filter(s => s.completed_on && s.completed_on >= addDays(t, -6)).length;
+  const skip = id => SYSTEM_IDS.includes(id) || id === AMIR_ATHLETE_ID;
+  // Came in today: the sessions trained today, the Library sessions done today and the applications that reached the server today (the same people Came in lists).
+  const cameToday = S.hist.filter(h => h.completed_on === t && !skip(h.athlete_id)).length
+    + (Array.isArray(S.libDone) ? S.libDone.filter(l => l.completed_on === t && !skip(l.athlete_id)).length : 0)
+    + (S.intake || []).filter(i => { const d = i.created_at ? new Date(i.created_at) : null; return d && !isNaN(d) && dkey(d) === t; }).length;
   const waiting = Object.values(S.ath).reduce((n, a) => n + a.toReply, 0);
+  const apps = newApplications();
+  const cyc = Object.values(S.ath).filter(a => (a.reasons || []).some(r => r.key === 'cycle')).length;
   const season = currentSeason();
   const sd = seasonDay();
 
@@ -3295,25 +3388,25 @@ function renderToday() {
       <div class="board-top">
         <span class="board-date">${longDay(now)}</span>
         ${season ? `<span class="board-season">${esc(season.name)} · <b>Day ${sd}</b></span>` : ''}
+        <span class="board-fresh" id="freshAt">${esc(freshText())}</span>
       </div>
       <div class="counters">
-        <a class="counter" href="#proof">
-          <span class="n">${onCourt}<small>/${habAthletes.length}</small></span> <span class="l">on court today</span></a>
-        <a class="counter" href="#today" onclick="scrollPanel(event,'proofToday')">
-          <span class="n">${wallToday}</span> <span class="l">wall line${wallToday === 1 ? '' : 's'} today</span></a>
-        <a class="counter" href="#athletes"><span class="n">${sessions7}</span> <span class="l">session${sessions7 === 1 ? '' : 's'}, last 7 days</span></a>
+        <a class="counter" href="#today" onclick="scrollPanel(event,'cameIn')">
+          <span class="n">${cameToday}</span> <span class="l">came in today</span></a>
         <a class="counter ${waiting ? 'hot' : ''}" href="#today" onclick="scrollPanel(event,'needPanel')">
           <span class="n">${waiting}</span> <span class="l">note${waiting === 1 ? '' : 's'} to read</span></a>
+        <a class="counter ${apps ? 'hot' : ''}" href="#leads">
+          <span class="n">${apps}</span> <span class="l">application${apps === 1 ? '' : 's'}</span></a>
+        <a class="counter" href="#athletes"><span class="n">${cyc}</span> <span class="l">cycle${cyc === 1 ? ' ends' : 's end'} this week</span></a>
       </div>
     </section>
     <div class="tcols">
       <section class="panel" id="needPanel" style="animation-delay:.05s">${needPanelHtml()}</section>
       <div class="colstack">
-        ${S.court && S.court.on ? `<section class="panel court" id="courtPanel" style="animation-delay:.06s">${courtsideHtml()}</section>` : ''}
-        <section class="panel" id="proofToday" style="animation-delay:.08s">${proofTodayHtml(habAthletes)}</section>
+        <section class="panel" id="cameIn" style="animation-delay:.06s">${cameInHtml()}</section>
+        ${S.court && S.court.on ? `<section class="panel court" id="courtPanel" style="animation-delay:.08s">${courtsideHtml()}</section>` : ''}
       </div>
     </div>`;
-  wireWallComposer();
 }
 function scrollPanel(ev, id) {
   if (route().view !== 'today') return; // let the href navigate first
@@ -3322,10 +3415,9 @@ function scrollPanel(ev, id) {
 }
 window.scrollPanel = scrollPanel;
 
-// The wall, in two places (round 2, 2026-10-12): the FULL wall lives on Proof (wallPanelHtml: the composer, every day's lines, Show the full
-// week) and Today keeps a short Proof column (proofTodayHtml: the composer, today's lines, one quest line, one drifting line). The coach
-// reads hidden lines too (greyed) and can hide/show any line. Only one copy of #coachLineInput is ever in the page: Today draws the
-// composer inside #proofToday, Proof inside #wallPanel.
+// The wall lives on Proof only (wallPanelHtml: the composer, every day's lines, Show the full week). Today's Proof column was taken off on
+// 2026-11-23 (Amir posted no line in 60 days; Today's right column is Came in and Courtside). The coach reads hidden lines too (greyed) and
+// can hide/show any line. Only one copy of #coachLineInput is ever in the page, inside #wallPanel.
 function coachLineComposerHtml() {
   const mine = coachLine(todayKey());
   return `<div class="mic">
@@ -3359,37 +3451,6 @@ function wallPanelHtml() {
     ${coachLineComposerHtml()}
     ${wallFeedHtml(wallLines(showWeek ? 7 : 2), `Nothing on the wall ${showWeek ? 'this week' : 'yet today'}. The crew posts one line a day from their app.`)}
     <button class="showweek" onclick="toggleWallWeek()">${showWeek ? 'Show less' : 'Show the full week ↓'}</button>`;
-}
-// Today's Proof column: ONE panel, four parts between hairlines. The full wall, the quest lever and the pulse are on Proof.
-function proofTodayHtml(habAthletes) {
-  const drift = driftLineHtml(habAthletes);
-  return `
-    <div class="phead"><span class="t hd">Proof today</span></div>
-    <div class="pt">${coachLineComposerHtml()}</div>
-    <div class="pt">
-      ${wallFeedHtml(wallLines(1), 'Nothing on the wall yet today. The crew posts one line a day from their app.')}
-      <a class="ptlink" href="#proof">Earlier lines on Proof →</a>
-    </div>
-    <div class="pt">${questLineHtml()}</div>
-    ${drift ? `<div class="pt">${drift}</div>` : ''}`;
-}
-// One line about the quest week: the live run, or the nudge to start one. Both open Proof, where the lever is.
-function questLineHtml() {
-  const run = activeQuestRun();
-  if (!run) return `<a class="ptline" href="#proof"><b>No quest week live</b> <span class="dim">· start one on Proof →</span></a>`;
-  const t = todayKey(), ends = questRunEnd(run);
-  const dayN = daysBetween(run.start, t) + 1, total = daysBetween(run.start, ends) + 1, n = run.ids.length;
-  return `<a class="ptline" href="#proof"><b>Quest week</b> <span class="dim">· day ${dayN} of ${total} · ${n} quest${n === 1 ? '' : 's'} · ends ${ends === t ? 'today' : DOWS[pDate(ends).getDay()]} →</span></a>`;
-}
-// One line about who is drifting: the habit athletes silent for QUIET_HABIT_DAYS or more (the pulse's own rule), most silent first, four
-// names at most. Nothing at all when nobody is.
-function driftLineHtml(habAthletes) {
-  const quiet = habAthletes.filter(a => a.habGap >= QUIET_HABIT_DAYS)
-    .sort((a, b) => (b.habGap - a.habGap) || a.name.localeCompare(b.name));
-  if (!quiet.length) return '';
-  const SHOW = 4;
-  const names = quiet.slice(0, SHOW).map(a => `${esc(a.name)} <span class="dim">${a.habGap} d</span>`).join(', ');
-  return `<a class="ptline drift" href="#proof"><b class="lead">Drifting:</b> ${names}${quiet.length > SHOW ? `, <span class="dim">+ ${quiet.length - SHOW} more</span>` : ''} <span class="dim">→</span></a>`;
 }
 function wallLineHtml(n) {
   const isCoach = n.athlete_id === COACH_NOTE_ID;
@@ -3478,6 +3539,7 @@ const COURT_MARK_LINE = { held_weeks: 'week_held', century: 'century', bests: 'b
 const COURT_CAP = 5;
 // Who is never a client, as inTotals() says: the server cannot name your own login in a public stage file (pre-commit guard 6), so the page passes it.
 const COURT_NOT_CLIENTS = SYSTEM_IDS.concat([AMIR_ATHLETE_ID]);
+let _courtFoldOpen = false;   // the moments' fold on Today stays as the coach left it across a repaint
 let _courtAll = false, _goalEdit = null, _goalDraft = '', _fromEdit = null, _fromDraft = '';
 // 2026-10-25, round 7, idea #92: what is typed in the pick's reason box and the name chosen under "Someone else", kept across a repaint (a background
 // refresh redraws the panel; it must never wipe what Amir typed). _whyMissing: the server has no coach_honours_why() (stage100 not applied): no box.
@@ -3534,6 +3596,7 @@ function paintCourt() {
     if (el && on) {
       // The honours fold and the cursor in the reason box survive the redraw (a background refresh must not close what Amir is writing in).
       const fold = $('courtHon'), wasOpen = !!(fold && fold.open), f = document.activeElement, keep = f && f.id === 'whyIn' ? [f.selectionStart, f.selectionEnd] : null;
+      if (_honOpen) _courtFoldOpen = true;   // the Pick's reason box moves into the honours area, inside the fold
       el.innerHTML = courtsideHtml();
       if ((wasOpen || _honOpen) && $('courtHon')) $('courtHon').open = true;
       _honOpen = false;
@@ -3609,8 +3672,11 @@ function courtsideHtml() {
   const gs = courtGroups(), open = gs.filter(g => !g.seen), seen = gs.filter(g => g.seen);
   const shown = _courtAll ? open : open.slice(0, COURT_CAP);
   const firstWeek = Number(todayKey().slice(8)) <= 7, hon = honoursHtml(firstWeek);
+  // The honours reminder is always up when it is due; the moments are behind one fold (2026-11-23): "Courtside · N wins to send".
+  const word = open.length ? `Courtside · ${open.length} win${open.length === 1 ? '' : 's'} to send` : 'Courtside · nothing new this week';
   return `
     ${honRemindOn() ? honRemindHtml() : ''}
+    <details class="court-fold" id="courtFold"${_courtFoldOpen ? ' open' : ''} ontoggle="_courtFoldOpen=this.open"><summary>${esc(word)}</summary>
     <div class="phead"><span class="t hd">Courtside</span><span class="r">this week${open.length > COURT_CAP ? ` · ${COURT_CAP} of ${open.length}` : ''}</span></div>
     ${firstWeek ? hon : ''}
     ${firstWeek && hon ? '<div class="eyebrow cs-eb">This week</div>' : ''}
@@ -3618,7 +3684,8 @@ function courtsideHtml() {
       : shown.map(courtRowHtml).join('') || '<p class="empty">Nothing big this week yet. Moments land here as they happen.</p>'}
     ${open.length > COURT_CAP ? `<button class="showweek" onclick="_courtAll=!_courtAll;paintCourt()">${_courtAll ? 'Show fewer' : `+ ${open.length - COURT_CAP} more this week`}</button>` : ''}
     ${seen.length ? `<details class="cs-fold" id="courtSeen"><summary>Seen this week <span class="muted">${seen.length}</span></summary>${seen.map(courtSeenHtml).join('')}</details>` : ''}
-    ${firstWeek ? '' : hon}`;
+    ${firstWeek ? '' : hon}
+    </details>`;
 }
 // Saw it ('saw'), WhatsApp or Copy ('sent': seen too), Undo ('undo'). The row moves at once; a refusal is said.
 async function courtAct(id, idsCsv, what) {
@@ -3946,6 +4013,85 @@ async function fromSend(id, take) {
 const fromTakeBack = id => fromSend(id, true);
 Object.assign(window, { goalEdit, goalCancel, goalSave, goalDone, fromOpen, fromCancel, fromSend, fromTakeBack });
 
+// ── Came in (2026-11-23, Amir's pick "fix 2"): everything that reached the server in the last 7 days, newest first: a session, a Library session
+// done, an application. A clay 6 px dot marks the rows that arrived after the last time this page was opened: the time of the first whole load of
+// the previous page life is kept in localStorage['coach.cameInSeen'] and READ ONCE at boot, so a row that arrives while the page is open (a quiet
+// refresh) has a later time and gets the dot too. No stored time (a new browser, storage blocked) marks nothing.
+const CAMEIN_ROWS = 12;
+let _cameInAll = false, _cameInSeen = null, _cameInStamped = false;
+try { const v = Number(localStorage.getItem('coach.cameInSeen')); if (v > 0) _cameInSeen = v; } catch (e) { /* no storage: nothing is marked new */ }
+function cameInStamp() {
+  if (_cameInStamped) return;
+  _cameInStamped = true;
+  try { localStorage.setItem('coach.cameInSeen', String(Date.now())); } catch (e) { /* the dots just do not carry over */ }
+}
+function cameInItems() {
+  const cut = addDays(todayKey(), -6), out = [];
+  const skip = id => SYSTEM_IDS.includes(id) || id === AMIR_ATHLETE_ID;
+  const stamp = (v, day) => { const n = v ? Date.parse(v) : NaN; return isNaN(n) ? { t: pDate(day).getTime() + 12 * 3600000, time: false } : { t: n, time: true }; };
+  (S.hist || []).forEach(h => {
+    if (skip(h.athlete_id) || !h.completed_on || String(h.completed_on) < cut) return;
+    out.push(Object.assign({ k: 's', h, key: histKey(h) }, stamp(h.updated_at, h.completed_on)));
+  });
+  if (Array.isArray(S.libDone)) S.libDone.forEach(l => {
+    if (skip(l.athlete_id) || !l.completed_on || String(l.completed_on) < cut) return;
+    out.push(Object.assign({ k: 'l', l, key: 'l|' + l.athlete_id + '|' + l.slug + '|' + l.completed_on }, stamp(l.created_at, l.completed_on)));
+  });
+  (S.intake || []).forEach(i => {
+    const d = i.created_at ? new Date(i.created_at) : null;
+    if (!d || isNaN(d) || dkey(d) < cut) return;
+    out.push({ k: 'a', i, key: 'a|' + i.id, t: d.getTime(), time: true });
+  });
+  out.forEach(x => { x.day = dkey(new Date(x.t)); });
+  return out.sort((a, b) => (b.t - a.t) || a.key.localeCompare(b.key));
+}
+function cameInRowHtml(x) {
+  const isNew = _cameInSeen != null && x.t > _cameInSeen;
+  const d = new Date(x.t), when = x.time ? `<span class="cm-t">${pad2(d.getHours())}:${pad2(d.getMinutes())}</span>` : '';
+  let name, say, note = '', go, face;
+  if (x.k === 's') {
+    const h = x.h, id = h.athlete_id;
+    const pd = (((S.programs[id] || {}).workouts || {}).days || []).find(p => Number(p.id) === Number(h.day));
+    const title = h.focus || (pd && pd.focusTag) || '';
+    name = nameOf(id);
+    say = `Day ${h.day}${title ? ' · ' + title : ''}${h.session_rpe != null ? ' · RPE ' + h.session_rpe : ''}${h.duration_min != null ? ' · ' + h.duration_min + ' min' : ''}${isPartialStatus(h.status) ? ' · partial' : ''}`;
+    const text = sessionHasNote(h) ? sessionNoteText(h) : '';
+    if (text) note = `<span class="s cm-note" dir="auto">“${esc(text)}”</span>`;
+    go = `openAthlete(${jsq(id)},'work',${Number(h.day)},${jsq(h.completed_on)})`;
+    face = avaHtml('pface', id, name);
+  } else if (x.k === 'l') {
+    const l = x.l, id = l.athlete_id;
+    name = nameOf(id);
+    say = `Library: ${l.title || unslug(l.slug)}${l.duration_min != null ? ' · ' + l.duration_min + ' min' : ''}`;
+    go = `openAthlete(${jsq(id)},'work')`;
+    face = avaHtml('pface', id, name);
+  } else {
+    const i = x.i, prog = intakeProgShort(i.programme);
+    name = intakeName(i);
+    say = `Application · ${i.lang === 'fa' ? 'FA' : 'EN'}${prog ? ' · ' + prog : ''}`;
+    go = `openApplication(${jsq(i.id)}); location.hash = '#leads'`;
+    face = `<span class="pface" aria-hidden="true">${esc(initials(name))}</span>`;
+  }
+  return `<div class="need cm-row" data-k="${x.k}">
+      <span class="needgo static"><span class="cm-dot${isNew ? ' new' : ''}"${isNew ? ' title="New since you last opened this page"' : ''}></span>${face}<span class="b"><span class="cm-top"><span class="n"><bdi>${esc(name)}</bdi></span>${when}</span><span class="s cm-say">${esc(say)}</span>${note}</span></span>
+      <span class="nacts"><button class="btn sm" onclick="${go}">Open</button></span>
+    </div>`;
+}
+function cameInHtml() {
+  const t = todayKey(), y = addDays(t, -1);
+  const all = cameInItems(), fresh = _cameInSeen == null ? 0 : all.filter(x => x.t > _cameInSeen).length;
+  const shown = _cameInAll ? all : all.slice(0, CAMEIN_ROWS);
+  let last = '', rows = '';
+  shown.forEach(x => {
+    if (x.day !== last) { last = x.day; rows += `<div class="eyebrow cm-grp">${esc(x.day === t ? 'Today' : x.day === y ? 'Yesterday' : prettyDate(x.day))}</div>`; }
+    rows += cameInRowHtml(x);
+  });
+  return `
+    <div class="phead"><span class="t hd">Came in</span><span class="r">${fresh ? fresh + ' new' : 'last 7 days'}</span></div>
+    ${rows || '<p class="empty">Nothing came in this week.</p>'}
+    ${all.length > CAMEIN_ROWS ? `<button class="showweek" onclick="_cameInAll=!_cameInAll;render()">${_cameInAll ? 'Show fewer' : 'Show all ' + all.length}</button>` : ''}`;
+}
+
 // Who needs the coach: one row per PERSON, from reasonsOf() (the same rule the roster uses), most
 // urgent first. A note row opens the day the note is on. Each row has ONE button on the right that names what the tap
 // does (2026-10-12, round 1 of the coach UX pass); the words and the reasons stay a button too and open the athlete, as the
@@ -3966,8 +4112,10 @@ function needPanelHtml() {
                     : `openAthlete(${jsq(a.id)},${jsq(top.sub)})`;
     const say = note ? `Day ${note.day} note: “${sessionNoteText(note)}”` : top.text;
     const more = a.reasons.slice(1).map(r => r.text).join(' · ');
-    const dot = `<span class="dot ${top.tone === 'warn' ? 'clay' : top.tone === 'good' ? 'court' : 'grey'}"></span>`;
-    const body = `<span class="b"><span class="l1"><span class="n">${esc(a.name)}</span> <span class="r1${top.tone === 'warn' ? ' warn' : ''}">${esc(say)}</span></span>${more ? `<span class="s more">${esc(more)}</span>` : ''}</span>`;
+    // Clay is for a note or a sync problem only (2026-11-23): every other reason is grey and plain, whatever tone reasonsOf() gives it.
+    const clay = top.key === 'note' || top.key === 'sync';
+    const dot = `<span class="dot ${clay ? 'clay' : 'grey'}"></span>`;
+    const body = `<span class="b"><span class="l1"><span class="n">${esc(a.name)}</span> <span class="r1${clay ? ' warn' : ''}">${esc(say)}</span></span>${more ? `<span class="s more">${esc(more)}</span>` : ''}</span>`;
     const wa = NEED_WA_KEYS.includes(top.key) ? waLink(a.contact && a.contact.whatsapp) : '';
     let acts;
     if (note) {
@@ -3988,7 +4136,20 @@ function needPanelHtml() {
     </div>`;
   };
   const CAP = 12;
-  const shown = _needAll ? people : people.slice(0, CAP);
+  // Two or more people whose ONLY reason is a missing login are one row, "N without a login", with one button for all of them (one alone keeps its own row).
+  const loginOnly = people.filter(a => a.reasons.length === 1 && a.reasons[0].key === 'login');
+  const folded = loginOnly.length >= 2 ? new Set(loginOnly.map(a => a.id)) : null;
+  const persons = folded ? people.filter(a => !folded.has(a.id)) : people;
+  const slots = CAP - (folded ? 1 : 0);   // the login row counts as one of the CAP
+  const shown = _needAll ? persons : persons.slice(0, slots);
+  const loginRow = !folded ? '' : (() => {
+    const ids = loginOnly.map(a => a.id), names = loginOnly.map(a => a.name);
+    const sub = names.slice(0, 4).join(', ') + (names.length > 4 ? `, +${names.length - 4} more` : '');
+    return `<div class="need" id="needLogins">
+      <span class="needgo static"><span class="dot grey"></span><span class="b"><span class="l1"><span class="n">${ids.length} without a login</span></span><span class="s">${esc(sub)}</span></span></span>
+      <span class="nacts"><button class="btn sm" onclick="bulkCreateLogins(JSON.parse(${jsq(JSON.stringify(ids))}))" title="Create a login for each of these ${ids.length} people">Set up all</button></span>
+    </div>`;
+  })();
   // Also waiting. One row each, each with its own button.
   const also = [];
   const housekeeping = (dotClass, title, text, buttons) => `<div class="need">
@@ -4016,8 +4177,8 @@ function needPanelHtml() {
   nudgeRows(housekeeping).forEach(x => also.push(x));   // "Trains, not in the crew": the Players' Lounge (K1)
   return `
     <div class="phead"><span class="t hd">Needs you</span><span class="r">${people.length ? people.length + (people.length === 1 ? ' person' : ' people') : ''}</span></div>
-    ${shown.map(row).join('') || '<p class="empty">Nobody is waiting on you. Clean bench. ✓</p>'}
-    ${people.length > CAP ? `<button class="showweek" onclick="_needAll=!_needAll;render()">${_needAll ? 'Show fewer' : 'Show all ' + people.length}</button>` : ''}
+    ${shown.map(row).join('') + loginRow || '<p class="empty">Nobody is waiting on you. Clean bench. ✓</p>'}
+    ${persons.length + (folded ? 1 : 0) > CAP ? `<button class="showweek" onclick="_needAll=!_needAll;render()">${_needAll ? 'Show fewer' : 'Show all ' + people.length}</button>` : ''}
     ${also.length ? `<div class="also"><div class="eyebrow">Also waiting</div>${also.join('')}</div>` : ''}`;
 }
 // "Set up login": open their File, where a person with no login has the password box drawn already, and put the cursor in it.
@@ -4465,12 +4626,96 @@ let _toolsOpen = false, _toolsHtml = '';
 function setTools(open) {
   _toolsOpen = !!open;
   if (_toolsOpen && _moreOpen) closeMore();   // never together with the phone's More sheet
+  if (_toolsOpen && _qfOpen) qfSet(false);   // nor with Find
   const p = $('toolsPanel'), b = $('toolsBtn');
   if (p) p.hidden = !_toolsOpen;
   if (b) b.setAttribute('aria-expanded', String(_toolsOpen));
 }
 function toggleTools() { setTools(!_toolsOpen); }
 window.toggleTools = toggleTools;
+// ── FIND (2026-11-23; Amir: getting to one of 45 athletes was Athletes, find the row, click) ──
+// The ⌕ Find button, `/` (when no text box has the focus) and Ctrl/Cmd+K open one panel under the bar: an input, then Athletes (the roster search's own text, rosterHay())
+// and Applications (name, email, contact). Nothing typed shows the five athletes with the latest session. ↑ ↓ move the highlight, Enter opens it, Esc closes. Never
+// open together with ⚙ Tools or the phone's More sheet; any screen change closes it.
+let _qfOpen = false, _qfSel = 0, _qfItems = [];
+function qfMatches(raw) {
+  const q = normQ(raw), items = [];
+  let aths = Object.values(S.ath || {}).filter(a => !SYSTEM_IDS.includes(a.id));
+  if (q) aths = aths.filter(a => rosterHay(a).includes(q));
+  else aths = aths.filter(a => a.lastSession).sort((x, y) => String(y.lastSession).localeCompare(String(x.lastSession)));
+  aths.slice(0, q ? 8 : 5).forEach(a => items.push({ kind: 'a', id: a.id }));
+  if (q) (S.intake || []).filter(i => normQ([intakeName(i), i.email, i.contact, String(i.contact || '').replace(/[^0-9]/g, '')].join(' | ')).includes(q))
+    .sort((x, y) => new Date(y.created_at) - new Date(x.created_at)).slice(0, 5).forEach(i => items.push({ kind: 'i', id: String(i.id) }));
+  return items;
+}
+function qfRowHtml(it, n) {
+  if (it.kind === 'a') {
+    const a = S.ath[it.id], sub = tierText(a) + ' · ' + (!S.programs[a.id] ? 'no programme' : (a.cycle && a.cycle.name) || 'no cycle');
+    return `<button type="button" class="qf-row" role="option" id="qf-r${n}" data-i="${n}">${avaHtml('pface', a.id, a.name)}<span class="qf-t"><span class="qf-n"><bdi>${esc(a.name)}</bdi></span><span class="qf-s">${esc(sub)}</span></span></button>`;
+  }
+  const i = (S.intake || []).find(x => String(x.id) === it.id), name = intakeName(i);
+  return `<button type="button" class="qf-row" role="option" id="qf-r${n}" data-i="${n}"><span class="pface" aria-hidden="true">${esc(initials(name))}</span><span class="qf-t"><span class="qf-n"><bdi>${esc(name)}</bdi></span><span class="qf-s">Application · ${i.lang === 'fa' ? 'FA' : 'EN'} · arrived ${esc(timeAgo(i.created_at))}</span></span></button>`;
+}
+function qfRender() {
+  const box = $('qfList'), inp = $('qfInput');
+  if (!box || !inp) return;
+  _qfItems = qfMatches(inp.value); _qfSel = 0;
+  const part = kind => _qfItems.map((it, n) => it.kind === kind ? qfRowHtml(it, n) : '').join('');
+  const ah = part('a'), ih = part('i');
+  box.innerHTML = (ah ? `<h3 class="eyebrow qf-gh">Athletes</h3>${ah}` : '') + (ih ? `<h3 class="eyebrow qf-gh">Applications</h3>${ih}` : '')
+    + (_qfItems.length ? '' : `<p class="qf-none">${inp.value.trim() ? 'Nobody matches.' : 'Type a name, id, email or WhatsApp number.'}</p>`);
+  qfPaintSel();
+}
+function qfPaintSel() {
+  document.querySelectorAll('#qfList .qf-row').forEach(el => {
+    const on = Number(el.dataset.i) === _qfSel;
+    el.classList.toggle('on', on); el.setAttribute('aria-selected', String(on));
+    if (on) { $('qfInput').setAttribute('aria-activedescendant', el.id); el.scrollIntoView({ block: 'nearest' }); }
+  });
+}
+function qfSet(open) {
+  const p = $('qfPanel'), b = $('qfBtn');
+  if (!p || !b) return;
+  const was = _qfOpen;
+  _qfOpen = !!open;
+  if (_qfOpen) {
+    if (_toolsOpen) setTools(false);
+    if (_moreOpen) closeMore();
+    if (!was) { p.innerHTML = '<input id="qfInput" class="qf-in" type="text" autocomplete="off" spellcheck="false" placeholder="Name, id, email or WhatsApp" aria-label="Find an athlete or an application" role="combobox" aria-expanded="true" aria-controls="qfList"><div id="qfList" role="listbox"></div>'; qfRender(); }
+  }
+  p.hidden = !_qfOpen;
+  b.setAttribute('aria-expanded', String(_qfOpen));
+  if (_qfOpen) $('qfInput').focus();
+}
+function qfToggle() { qfSet(!_qfOpen); }
+function qfGo(it) {
+  if (!it) return;
+  qfSet(false);
+  if (it.kind === 'a') { const h = '#a/' + encodeURIComponent(it.id); if (location.hash === h) render(); else location.hash = h; return; }
+  openApplication(it.id);
+  if (location.hash === '#leads') render(); else location.hash = '#leads';
+}
+window.qfToggle = qfToggle;
+const qfTyping = el => !!el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable);
+document.addEventListener('keydown', e => {
+  const app = $('app');
+  if (!app || app.style.display === 'none') return;
+  if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && String(e.key).toLowerCase() === 'k') { e.preventDefault(); qfSet(true); return; }
+  if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey && !qfTyping(e.target)) { e.preventDefault(); qfSet(true); return; }
+  if (!_qfOpen) return;
+  if (e.key === 'Escape') { e.preventDefault(); qfSet(false); if ($('qfBtn')) $('qfBtn').focus(); }
+  else if (e.target && e.target.id === 'qfInput') {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (_qfItems.length) { _qfSel = (_qfSel + (e.key === 'ArrowDown' ? 1 : _qfItems.length - 1)) % _qfItems.length; qfPaintSel(); } }
+    else if (e.key === 'Enter') { e.preventDefault(); qfGo(_qfItems[_qfSel]); }
+  }
+});
+document.addEventListener('input', e => { if (e.target && e.target.id === 'qfInput') qfRender(); });
+document.addEventListener('click', e => {
+  if (!_qfOpen) return;
+  const path = e.composedPath(), row = path.find(n => n && n.classList && n.classList.contains('qf-row'));
+  if (row) { qfGo(_qfItems[Number(row.dataset.i)]); return; }
+  if (!path.some(n => n && (n.id === 'qfPanel' || n.id === 'qfBtn'))) qfSet(false);
+});
 // ── THE DOORBELL (stage123, 2026-11-23; Amir: "instead of receving email, i should receive a notification from my coach.html as i have it
 // like an app installed", and "A: instant") ──
 // A new workout (session_history) or application (hab_intake, every form) puts a line in coach_inbox and asks push-send?only=coach at once;
@@ -4572,7 +4817,10 @@ function doorbellRowHtml() {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', ev => {
     const d = ev.data || {};
-    if (d.aa === 'go' && typeof d.screen === 'string' && d.screen) location.hash = '#' + d.screen.replace(/^#/, '');
+    if (d.aa === 'go' && typeof d.screen === 'string' && d.screen) {
+      location.hash = '#' + d.screen.replace(/^#/, '');
+      quietRefresh(true);   // the new session is why the coach tapped: read it now, without waiting for the beat
+    }
   });
 }
 
@@ -5183,8 +5431,27 @@ function dayVerdict(groups) {
 let _workSel = {};        // day number → completed_on of the session being compared
 let _workOpen = {};       // day number → is the card expanded
 
-function setWorkSession(day, on) { _workSel[day] = on; renderDetailBody(); }
-function toggleWorkDay(day) { _workOpen[day] = !_workOpen[day]; renderDetailBody(); }
+// A note clears when the coach opens it (2026-11-23, Amir's pick "fix 3": 25 of 26 recent notes were never marked read because he reads them here, so Needs you
+// listed the same people for ever): opening a day card, picking a session, or arriving by Open (_pendingFocus) marks the session on show read. Mark read
+// stays. Nothing in the demo. A set of keys in flight keeps a second open from marking it twice.
+const _autoReadBusy = new Set();
+function autoReadSession(s) {
+  if (DEMO || !s || !sessionNeedsReply(s)) return;
+  const k = histKey(s);
+  if (_autoReadBusy.has(k)) return;
+  _autoReadBusy.add(k);
+  Promise.resolve(markNoteRead(s.athlete_id, s.day, s.completed_on)).then(() => { _autoReadBusy.delete(k); }, () => { _autoReadBusy.delete(k); });
+}
+// The session a day card shows now (workDayCard's own choice): the one picked, else the latest, inside the current cycle's dates.
+function workShownSession(day) {
+  if (!_D) return null;
+  const startOn = _D.a && _D.a.cycle && _D.a.cycle.start ? String(_D.a.cycle.start) : null;
+  const list = _D.history.filter(h => Number(h.day) === Number(day) && (!startOn || String(h.completed_on) >= startOn));
+  const chosen = _workSel[day];
+  return (chosen && list.find(x => x.completed_on === chosen)) || list[0] || null;
+}
+function setWorkSession(day, on) { _workSel[day] = on; renderDetailBody(); autoReadSession(workShownSession(day)); }
+function toggleWorkDay(day) { _workOpen[day] = !_workOpen[day]; renderDetailBody(); if (_workOpen[day]) autoReadSession(workShownSession(day)); }
 window.setWorkSession = setWorkSession;
 window.toggleWorkDay = toggleWorkDay;
 
@@ -6215,7 +6482,9 @@ function cycleLineHtml(D) {
 function needsLineHtml(a) {
   const need = (a.reasons || []).concat(a.quietFlags || []);
   if (!need.length) return '';
-  return `<div class="det-need"><b>Needs you:</b> ${need.map(r => `<a${r.tone === 'warn' ? ' class="warn"' : ''} href="#a/${encodeURIComponent(a.id)}/${encodeURIComponent(r.sub || 'file')}">${esc(r.text)}</a>`).join(' · ')}</div>`;
+  // Mark all read: every note of theirs still new, the recent and the older (a.needReplySessions), in one tap.
+  const unread = (a.needReplySessions || []).length;
+  return `<div class="det-need"><b>Needs you:</b> ${need.map(r => `<a${r.tone === 'warn' ? ' class="warn"' : ''} href="#a/${encodeURIComponent(a.id)}/${encodeURIComponent(r.sub || 'file')}">${esc(r.text)}</a>`).join(' · ')}${unread ? ` <button class="btn sm quiet" onclick="markAllRead(${jsq(a.id)})" title="Clear all ${unread} new note${unread === 1 ? '' : 's'} of ${esc(a.name)} without opening each day">Mark all read</button>` : ''}</div>`;
 }
 async function renderDetail(athleteId, sub) {
   let a = S.ath[athleteId];
@@ -6309,7 +6578,9 @@ async function renderDetail(athleteId, sub) {
   if (st && st.scrollIntoView) st.scrollIntoView({ inline: 'center', block: 'nearest' });
   if (_pendingFocus && _pendingFocus.id === athleteId) {
     const el = document.getElementById('wday-' + _pendingFocus.day);
+    const pf = _pendingFocus;
     _pendingFocus = null;
+    autoReadSession(_D.history.find(h => Number(h.day) === pf.day && (!pf.on || h.completed_on === pf.on)));   // opened from a note or Came in: it has been seen
     if (el) el.scrollIntoView({ block: 'start' });
   }
 }
@@ -6684,6 +6955,23 @@ function markHistRead(rows) {
   assemble(); render();
 }
 window.markNoteRead = markNoteRead;
+// Every note of one athlete still new (recent and older), marked by key, then ONE patch of the copy in memory. The same per-row update clearNoteBacklog() uses.
+async function markAllRead(athleteId) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const a = S.ath[athleteId], rows = a ? a.needReplySessions.slice() : [];
+  if (!rows.length) return;
+  let failed = 0;
+  const marked = [];
+  for (const r of rows) {
+    const res = await sb.from('session_history').update({ coach_status: 'read' })
+      .eq('athlete_id', r.athlete_id).eq('day', r.day).eq('completed_on', r.completed_on).select('athlete_id, day, completed_on');
+    if (writeFailed(res)) failed++; else marked.push(...res.data);
+  }
+  if (failed) fail(`${marked.length} marked read, ${failed} could not be. Refresh and try again.`);
+  else toast(`${marked.length} note${marked.length === 1 ? '' : 's'} marked read`);
+  markHistRead(marked);
+}
+window.markAllRead = markAllRead;
 
 // --- the session-report email, read back into a session -----------------------
 // The page no longer offers it (the "+ Add past session from email" box was removed on 2026-10-12; Amir: "i will never do
@@ -10571,8 +10859,10 @@ function intakeGuess(i) {
   return hits.length === 1 ? hits[0].id : '';
 }
 // The closing row of an application (round 2 of the coach UX pass, 2026-10-12; Amir: the outcome is the main way to close one, Mark handled stays as a
-// quiet button for "closed, no outcome", Archive is spam or not a fit, Reopen brings a handled or archived one back). One row: What happened, Which athlete
-// (only when that outcome keeps one), Save outcome as the one primary button, and the quiet buttons at the right. The saved outcome and its athlete sit above it.
+// quiet button for "closed, no outcome", Archive is spam or not a fit, Reopen brings a handled or archived one back). One row: What happened as buttons (2026-11-23,
+// Amir: 63 of 81 had no outcome because it was a dropdown and a Save): Became a client (unfolds Which athlete + Save, a client needs one), No reply and Not a fit (save
+// at once), a quiet Other… (unfolds the select of all outcomes + Save), and the quiet buttons at the right. The picked one wears the green .stbtns uses; none of
+// the buttons is primary, the Save inside an unfolded part is. The saved outcome and its athlete sit above it.
 function intakeCloseHtml(i) {
   const st = intakeGroupOf(i);
   const cur = i.outcome || '', ath = i.athlete_id || '', pick = ath || intakeGuess(i);
@@ -10582,15 +10872,24 @@ function intakeCloseHtml(i) {
   // an athlete linked to an id that is no longer on the roster (erased, renamed) stays selectable so saving does not drop it silently
   const gone = ath && !intakeAthletes().some(a => a.id === ath) ? `<option value="${esc(ath)}" selected>${esc(ath)} (not on the roster)</option>` : '';
   const act = (to, label) => `<button class="btn sm intake-act" data-id="${esc(i.id)}" data-to="${to}">${label}</button>`;
+  const pick1 = (k, l) => `<button type="button" class="btn sm in-pick" data-out="${k}" aria-pressed="${k === cur ? 'true' : 'false'}">${l}</button>`;
+  const other = !!cur && !['client', 'no_reply', 'not_a_fit'].includes(cur);   // an outcome with no button of its own: Other… wears the picked look
   const quiet = st === 'new' ? act('handled', 'Mark handled') + act('archived', 'Archive')
               : st === 'handled' ? act('new', 'Reopen') + act('archived', 'Archive')
               : act('new', 'Reopen');
   return `<div class="i-outcome" data-id="${esc(i.id)}">${now}
     <div class="in-close">
-      <label>What happened<select class="i-out-sel"><option value="">${cur ? 'No outcome (clear it)' : 'Choose…'}</option>${opts}</select></label>
-      <label class="i-who"${intakeKeepsAthlete(cur) ? '' : ' hidden'}>Which athlete<select class="i-ath-sel"><option value="">Choose…</option>${gone}${aths}</select></label>
-      <button class="btn sm primary intake-outcome-save">Save outcome</button>
+      <span class="in-what" id="inWhat-${esc(i.id)}">What happened</span>
+      <div class="in-picks" role="group" aria-labelledby="inWhat-${esc(i.id)}">
+        ${pick1('client', 'Became a client')}${pick1('no_reply', 'No reply')}${pick1('not_a_fit', 'Not a fit')}
+        <button type="button" class="btn sm quiet in-other" aria-expanded="false" aria-pressed="${other ? 'true' : 'false'}">Other…</button>
+      </div>
       <span class="in-quiet">${quiet}</span>
+    </div>
+    <div class="in-more" data-mode="" data-cur="${esc(cur)}" hidden>
+      <label class="i-what">What happened<select class="i-out-sel"><option value="">${cur ? 'No outcome (clear it)' : 'Choose…'}</option>${opts}</select></label>
+      <label class="i-who">Which athlete<select class="i-ath-sel"><option value="">Choose…</option>${gone}${aths}</select></label>
+      <button type="button" class="btn sm primary intake-outcome-save">Save</button>
     </div>
   </div>`;
 }
@@ -10679,8 +10978,31 @@ function wireIntake(root) {
   if (!root) return;
   root.querySelectorAll('.copy-btn-js').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); copyText(btn.dataset.url, btn); }));
   root.querySelectorAll('.intake-act').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); intakeSetStatus(btn.dataset.id, btn.dataset.to, btn); }));
-  root.querySelectorAll('.i-out-sel').forEach(sel => sel.addEventListener('change', () => { const w = sel.closest('.i-outcome').querySelector('.i-who'); if (w) w.hidden = !intakeKeepsAthlete(sel.value); }));
-  root.querySelectorAll('.intake-outcome-save').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); intakeSaveOutcome(btn); }));
+  root.querySelectorAll('.i-outcome').forEach(box => {
+    const sel = box.querySelector('.i-out-sel'), more = box.querySelector('.in-more'), other = box.querySelector('.in-other');
+    const sync = () => {   // what shows in the unfolded part: the athlete (Became a client, or Other… with an outcome that keeps one), the select (Other… only)
+      const mode = more.dataset.mode;
+      more.hidden = !mode;
+      box.querySelector('.i-what').hidden = mode !== 'other';
+      box.querySelector('.i-who').hidden = !(mode === 'client' || (mode === 'other' && intakeKeepsAthlete(sel.value)));
+      other.setAttribute('aria-expanded', String(mode === 'other'));
+    };
+    sel.addEventListener('change', sync);
+    box.querySelectorAll('.in-pick').forEach(btn => btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const k = btn.dataset.out;
+      if (k === 'client') { more.dataset.mode = more.dataset.mode === 'client' ? '' : 'client'; sel.value = 'client'; sync(); const f = more.dataset.mode && box.querySelector('.i-ath-sel'); if (f) f.focus({ preventScroll: true }); return; }
+      if (btn.getAttribute('aria-pressed') === 'true') return;   // already what is saved
+      intakeSetOutcome(box.dataset.id, k, null, btn);
+    }));
+    other.addEventListener('click', (e) => { e.preventDefault(); more.dataset.mode = more.dataset.mode === 'other' ? '' : 'other'; sel.value = more.dataset.cur; sync(); });
+    box.querySelector('.intake-outcome-save').addEventListener('click', (e) => {
+      e.preventDefault();
+      const outcome = sel.value || null;
+      intakeSetOutcome(box.dataset.id, outcome, intakeKeepsAthlete(outcome) ? (box.querySelector('.i-ath-sel').value || null) : null, e.currentTarget);
+    });
+    sync();
+  });
   root.querySelectorAll('.in-row').forEach(btn => btn.addEventListener('click', () => intakePick(btn.dataset.id)));
   root.querySelectorAll('.in-back').forEach(btn => btn.addEventListener('click', intakeBack));
   root.querySelectorAll('.in-arch').forEach(d => d.addEventListener('toggle', () => { _intakeArch = d.open; }));
@@ -10733,10 +11055,8 @@ async function intakeSetStatus(id, to, btn) {
   intakeRedraw('.in-title'); renderRail();
 }
 
-async function intakeSaveOutcome(btn) {
-  const box = btn.closest('.i-outcome'), id = box.dataset.id;
-  const outcome = box.querySelector('.i-out-sel').value || null;
-  const athlete = intakeKeepsAthlete(outcome) ? (box.querySelector('.i-ath-sel').value || null) : null;
+// One save for every road to an outcome: the two instant buttons, Became a client's Save, and Other…'s Save. `btn` is the button that was tapped (off while it works).
+async function intakeSetOutcome(id, outcome, athlete, btn) {
   if (outcome === 'client' && !athlete) { fail('Pick the athlete this application became.'); return; }
   if (!DEMO) {
     btn.disabled = true;

@@ -34,6 +34,7 @@ like an empty list or a success.
 | 07 | [7. PROOF](docs/ref/coach-dashboard/07-7-proof/INDEX.md) | 27 KB · 3 parts |
 | 08 | [8. ⚠ What this page deliberately does NOT do](docs/ref/coach-dashboard/08-8-what-this-page-deliberately-does-not-do.md) | 0 KB |
 | 09 | [9. Where the data comes from](docs/ref/coach-dashboard/09-9-where-the-data-comes-from.md) | 7 KB |
+| 10 | [10. Find, the phone's bar, one-tap outcomes (2026-11-23)](docs/ref/coach-dashboard/10-find-phone-bar-one-tap-outcomes.md) | 3 KB |
 
 ---
 
@@ -88,3 +89,7 @@ Built on the branch `lounge-coach`, **not live**: the server side is stage96 (fa
 The English line is Amir's: "Hi Sara. The crew is live in your app. The others cheer each other on there. Have a look in the Crew tab. You choose what they see." Both live in coach.html as `NUDGE_EN` and `NUDGE_FA` (the Farsi one marked as a draft); change the words there.
 
 **Tests.** `scripts/headless/coach/run.js`: `lounge-form-fa-code`, `lounge-game-line`, `lounge-faces`, `lounge-nudge`, `lounge-cheer`, `lounge-cheers-words`, `lounge-partner-codes`. The stub answers the new functions only when the seed says so (`buildSeed({lounge: true})` for stage96, `{partner: true}` for stage97), in the CONTRACT's shapes, with made-up people; without them every one answers "Could not find the function", which is how every other scenario still runs against an older server.
+
+## Today, rebuilt around what came in (2026-11-23)
+
+Amir's picks: the strip says `updated ... ago` with four counters (came in today, notes to read, applications, cycles ending this week); Needs you is clay only for a note or a sync problem and folds two or more bare "no login" people into one **Set up all** row; the right column is **Came in** (the last 7 days, a clay dot for what is new) and Courtside behind a fold; Today's Proof column is gone; the page refreshes itself on a doorbell tap (`quietRefresh()`); a note clears when it is opened, and the athlete header has **Mark all read**. The full account is at the end of [3. TODAY](docs/ref/coach-dashboard/03-3-today.md).
