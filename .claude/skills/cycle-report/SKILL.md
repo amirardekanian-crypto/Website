@@ -98,6 +98,10 @@ because athletes often start a day or two before the date) and run them:
 - **Q5** Court Log (stage116): what the athlete logged in the app outside the plan, by week: court time (tennis, padel, a
   match) and other (a run, anything else), minutes, how many were hard, and the days. **Information only (REC-7).** Empty is
   not "no tennis": athletes log some sessions, not all, and the log only exists since 2026-11-21.
+- **Q8** Stacked (#144, 2026-11-24): a bundle for `node scripts/recovery/stacked.js <file>` (give it the file the Supabase tool saved
+  the answer to, or save the `bundle` value to a scratch file). It prints the line coach.html shows on the athlete's file (The work →
+  Stacked): big gym days within a day of hard court, hard days in a row, leg days with 3+ sets at RPE 9-10 followed within two days by
+  another leg day, and the check-ins after big days against the rest. Coach.html's own functions do the counting. **Information only (REC-7).**
 - **Q6** the monthly goal (`career_goals`): one row per calendar month from the cycle's start to next month, with the line,
   the day it was ticked, and `can_write` (the server takes a write or a tick only for last, this or next month).
 
@@ -127,6 +131,7 @@ Work through this list. Each line is a finding only if the data says so.
 | **Sleep** | readiness `sleep`: avg, and poor nights by weekday | Call a pattern only at 3+ points; 2 is "watch" |
 | **Words** | day notes, messages, calls | What the athlete said goes in "what you told me" |
 | **Monthly goal** | Q6: each goal the cycle touched, ticked or not, against the evidence (a "3 sessions every week" goal is checked against Q2) | Met and not ticked: Amir ticks it at Step 3. It feeds the next goal (Step 3) |
+| **Stacked** | Q8's line, as it prints | How the days piled up around the gym (REC-5's double-day rule): one line in the Debrief's Training line; when it repeats, a question for Amir at Step 3. Never a load or day change by itself (REC-7) |
 | **Court time** | Q5: court hours per week, the hard ones, and any that fell the day before a session (match it with Q2's dates) | Recovery and the training days: it explains a low readiness or a flat week. Never a load change by itself (REC-7): what it suggests goes to Amir at Step 3 |
 
 Then look forward: `next_cycle.focuses` and `teaser` (the locked roadmap), the ledger's deferred
@@ -253,6 +258,7 @@ If not, leave it out.
 
 **Training** — <done> of <planned> sessions (a gap and its cause, in a few words) · real time
 ×<ratio> the model, per day (D1 73 vs 51) · each primary's top set, first → last, flat lifts named
+· Stacked from Q8, the line as it prints, when it names anything (REC-7: a fact, the question goes to Amir)
 · the Ceiling for a flagged lift: e1RM, grade, date (TST-6) · a data fault only as the decision it
 forces ("take no starting load from his RPE", PRG-11; "whole bar or per side unknown") · each
 promise or gate: met / partly / not yet, with its number · court time from Q5, when any was logged: hours a week

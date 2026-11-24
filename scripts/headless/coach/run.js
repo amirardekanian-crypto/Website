@@ -8522,6 +8522,39 @@ S['footprint-big-day-pill'] = async (b) => {
 };
 
 // ── #144 Stacked: The work tab, one panel under Five weeks, one line for the cycle (coach.html stackedPanelC; Court Log from get_five_weeks()'s acts) ──
+S['stacked-panel'] = async (b) => {
+  const r = { id: 'stacked-panel', title: 'Stacked: a big session (RPE 8) the day after a hard Court Log activity shows section.stk with "1 big gym day within a day of hard court"; an athlete with no sessions this cycle shows no .stk', checks: [] };
+  const FX = require('./fixtures'), TODAY = '2026-12-10', d = n => FX.daysAgo(TODAY, n);
+  const fw = { n: 1, from: d(20), to: d(-14), current: true, weeks: [{ w: 1, from: d(20), to: d(14), plan: 3, done: 0, held: false, now: false, days: [] }],
+    acts: [{ day: d(2), kind: 'padel', mins: 75, effort: 'hard', id: 'a-padel-1' }] };
+  const { page, log } = await L.openCoach(b, { fixedTime: TODAY + 'T10:00:00Z', seed: { stub: { fiveWeeks: { ava_test: fw } } } });
+  await page.evaluate(([start]) => {
+    ['ava_test', 'eli_new'].forEach(id => { const p = window.__DB.programs.find(x => x.athlete_id === id); p.data.cycles[0].startDate = start; delete p.data.cycles[0].endDate; });
+    const A = window.__DB.session_history.filter(h => h.athlete_id === 'ava_test');
+    A.find(h => h.day === 1 && h.completed_on === A.map(x => x.completed_on).sort().pop()).session_rpe = 8;
+  }, [d(20)]);
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
+  const rec = await page.evaluate(() => !!(window.AAREC && AAREC.fp && AAREC.fp.court));
+  check(r, 'the page has the recovery rules (window.AAREC)', rec, rec);
+  await L.go(page, 'a/ava_test/work');
+  await L.settle(page, 500);
+  const asked = (await L.calls(page)).filter(c => c.kind === 'rpc' && c.name === 'get_five_weeks' && c.payload && c.payload.p_athlete_id === 'ava_test');
+  check(r, 'the file read Ava\'s weeks (get_five_weeks) once the work tab opened', asked.length >= 1 && asked[0].result && asked[0].result.ok, asked.map(c => c.result));
+  const stk = () => page.evaluate(() => { const s = document.querySelector('section.stk'); return s ? { line: (s.querySelector('p.stk-l') || {}).textContent, head: (s.querySelector('.hd') || {}).textContent, underFive: !!(s.previousElementSibling && s.previousElementSibling.classList.contains('fwc')) || undefined } : null; });
+  const a = await stk();
+  check(r, 'Ava: section.stk with a p.stk-l line', !!a && !!a.line, a);
+  check(r, 'the line names "1 big gym day within a day of hard court"', !!a && /1 big gym day within a day of hard court/.test(a.line || ''), a && a.line);
+  check(r, 'it ends with the counts: 1 big day of 3 sessions, 1 hard court day logged', !!a && /1 big day of 3 sessions, 1 hard court day logged$/.test(a.line || ''), a && a.line);
+  check(r, 'the panel is headed Stacked', !!a && a.head === 'Stacked', a && a.head);
+  await L.go(page, 'a/eli_new/work');
+  await L.settle(page, 500);
+  const e = await stk();
+  check(r, 'Eli (a dated cycle, no sessions in it): no .stk panel', e === null, e);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 (async () => {
   const b = await L.launch();
   const ids = Object.keys(S).filter(id => !only.length || only.some(w => id.includes(w)));

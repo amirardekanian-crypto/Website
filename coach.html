@@ -428,6 +428,7 @@
   .psub { font-size: 12px; color: var(--muted); margin: -8px 0 12px; }
 
   .empty { color: var(--muted); font-size: 14px; padding: 12px 0 4px; }
+  .stk-l { margin: 0; font-size: 14px; line-height: 1.5; }   /* #144 Stacked: one line, the cycle's counts */
   /* ── Leads: the referral-code cards (.intake-card and .i-*, named for the Intake they were first drawn for) and an application's closing row ── */
   /* A card in a panel is a hairline-divided row (one level of container): its header is the fold's summary, its body opens under it. */
   .intake-card { border-top: 1px solid var(--rule); }
@@ -5208,6 +5209,67 @@ function bigDayMarkC(D, s) {
   const why = fp.why.map(w => fpWhyC(w, fp)).join(', ');
   return ` <span class="zpill fp-big" title="${esc('Big day: ' + why)}">big day</span>`;
 }
+// ── STACKED — #144 (round 14 'The Changeover', 2026-11-24; Amir: "go with your picks and build all") ──────────────────────────────
+// One line for the cycle on the athlete's file, The work: the days that piled up around the gym log, which the log alone cannot show.
+// REC-5 already writes a double-day rule into a concurrent athlete's plan (gym after sport, or 4-6 hours apart); this shows whether
+// their weeks look like that. Four counts, from Footprint (#139) and Court Log: big gym days on the same day as hard court or the day
+// next to it; times two hard days came in a row (a big gym day or a hard activity of an hour or more, recovery/footprint.toml [court]);
+// a leg day with 3+ sets at RPE 9-10 followed within two days by another leg day; and the check-in of a session within two days after
+// a big day against all the others. INFORMATION ONLY (REC-7): /cycle-report reads the same numbers (scripts/recovery/stacked.js runs
+// this function on Q8's bundle) and /program-design asks Amir about them; nothing changes a load or a day on its own.
+// Pure: rows [{ date, fp, ready }] (the athlete's sessions with their footprints), acts [{ day, kind, mins, effort }], the rules, the window.
+function stackedOfC(rows, acts, rules, from, to) {
+  const R = rules && rules.fp;
+  if (!R || !from || !to) return null;
+  const dayNo = v => { const m = String(v == null ? '' : v).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) / 86400000 : NaN; };
+  const f0 = dayNo(from), t0 = dayNo(to);
+  const sess = (rows || []).filter(x => x && x.fp && dayNo(x.date) >= f0 && dayNo(x.date) <= t0).sort((a, b) => dayNo(a.date) - dayNo(b.date));
+  const courtAll = new Set((acts || []).filter(a => a && a.effort === 'hard' && Number(a.mins) >= R.court.hard_min).map(a => dayNo(a.day)).filter(isFinite));
+  const courtIn = [...courtAll].filter(d => d >= f0 && d <= t0);
+  const big = sess.filter(x => x.fp.level === 'big');
+  const nearCourt = big.filter(x => [-1, 0, 1].some(k => courtAll.has(dayNo(x.date) + k))).length;
+  const hard = new Set(big.map(x => dayNo(x.date)).concat(courtIn));
+  let inRow = 0;
+  hard.forEach(d => { if (hard.has(d + 1)) inRow++; });
+  const failThen = sess.filter((x, i) => x.fp.lower && x.fp.hard >= R.big.hard_sets
+    && sess.some((y, j) => j > i && y.fp.lower && dayNo(y.date) > dayNo(x.date) && dayNo(y.date) - dayNo(x.date) <= 2)).length;
+  const score = r => { const o = r && typeof r === 'object' ? r : null; if (!o || o.skipped) return null;
+    const v = typeof o.score === 'number' ? o.score : Number(o.composite); return isFinite(v) && v > 0 ? v : null; };
+  const after = [], rest = [];
+  sess.forEach(x => {
+    const s = score(x.ready);
+    if (s == null) return;
+    const d = dayNo(x.date);
+    (big.some(y => y !== x && dayNo(y.date) < d && d - dayNo(y.date) <= 2) ? after : rest).push(s);
+  });
+  const mean = a => a.length ? a.reduce((n, v) => n + v, 0) / a.length : null;
+  const diff = after.length >= 2 && rest.length >= 2 ? Math.round((mean(rest) - mean(after)) * 10) / 10 : null;
+  return { sessions: sess.length, big: big.length, court: courtIn.length, nearCourt, inRow, failThen, after: after.length, rest: rest.length, diff };
+}
+// The line itself, in words Amir reads in one glance. Shared with scripts/recovery/stacked.js, which prints it for /cycle-report.
+function stackedLineC(st) {
+  if (!st) return '';
+  const n = (k, one, many) => `${k} ${k === 1 ? one : many}`;
+  const bits = [];
+  if (st.nearCourt) bits.push(n(st.nearCourt, 'big gym day', 'big gym days') + ' within a day of hard court');
+  if (st.inRow) bits.push(n(st.inRow, 'time', 'times') + ' two hard days in a row');
+  if (st.failThen) bits.push(n(st.failThen, 'leg day', 'leg days') + ' with 3+ sets at RPE 9-10, then another leg day within 2 days');
+  if (st.diff != null) bits.push(`check-ins after big days ${Math.abs(st.diff).toFixed(1)} ${st.diff >= 0 ? 'lower' : 'higher'} (${st.after} vs ${st.rest})`);
+  const head = bits.length ? bits.join(' · ') : (st.big ? 'nothing piled up' : 'no big gym days yet');
+  return head + ` · ${n(st.big, 'big day', 'big days')} of ${n(st.sessions, 'session', 'sessions')}, ${n(st.court, 'hard court day', 'hard court days')} logged`;
+}
+function stackedPanelC(D) {
+  const cd = D && D.a && D.a.cycle;
+  if (!cd || !cd.start || !window.AAREC || D.logsErr) return '';
+  const to = cd.end && String(cd.end) < todayKey() ? String(cd.end) : todayKey();
+  const rows = (D.history || []).map(s => ({ date: String(s.completed_on || ''), fp: footprintOfSessionC(D, s), ready: jparse(s.readiness) }));
+  const st = stackedOfC(rows, fileActsC(D), window.AAREC, String(cd.start), to);
+  if (!st || !st.sessions) return '';
+  return `<section class="panel stk">
+    <div class="phead"><span class="t hd">Stacked</span><span class="r">this cycle · information only, nothing in the plan moves (REC-7)</span></div>
+    <p class="stk-l">${esc(stackedLineC(st))}</p>
+  </section>`;
+}
 // ── Habits and court time, in the coach's file and across everyone (2026-11-23; Amir picked direction A, "The Grid") ─────────────────────────────
 // What a habit IS and when it is MET is the engine's, assets/js/habits-core.js, the file the athlete's app loads: nothing here retypes it (a second copy is how the
 // coach and the athlete end up disagreeing). The engine holds one athlete at a time, so every draw binds it to one athlete, asks, and binds the next. Court time is
@@ -6704,6 +6766,7 @@ function workTabHtml(D) {
   return `${logsWarn}
     ${metricStripHtml(metrics)}
     ${fiveWeeksPanelC(D)}
+    ${stackedPanelC(D)}
     ${habGridPanelC(D)}
     ${maxesPanel(D)}
     ${weightPanel(D.a)}

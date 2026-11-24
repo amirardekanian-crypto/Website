@@ -38,6 +38,7 @@ like an empty list or a success.
 | 11 | [11. Tidy the roster, No video yet (2026-11-23)](docs/ref/coach-dashboard/11-tidy-roster-no-video.md) | 2 KB |
 | 12 | [12. Habits and court time, in the file and across everyone (2026-11-23)](docs/ref/coach-dashboard/12-habits-and-court.md) | 3 KB |
 | 13 | [13. The big day pill (2026-11-24)](docs/ref/coach-dashboard/13-big-day-pill.md) | 2 KB |
+| 14 | [14. Stacked (2026-11-24)](docs/ref/coach-dashboard/14-stacked.md) | 2 KB |
 
 ---
 

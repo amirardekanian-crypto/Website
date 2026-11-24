@@ -28,7 +28,7 @@ in `docs/rules/recovery.md`.
 - **#142 Back-to-Back** (`backToBackCall()`, first inside `coolDownCall()`): saving a hard activity the day after another hard day (court or a big
   gym day) says *Second hard day in a row. Tomorrow easy if you can. Tonight: food and sleep.* with The Morning After. Saving a match offers Final
   Whistle. Only for today's activity.
-- **#144 Stacked** is coach-only, on the athlete's file in coach.html.
+- **#144 Stacked** is coach-only: one line on the athlete's file in coach.html (`COACH_DASHBOARD.md` → *14. Stacked (2026-11-24)*), and /cycle-report's Q8.
 - **The guide** has a card, `key: 'recovery'` in `APP_GUIDE`, *After a session: tonight and tomorrow*. A news entry goes with it when it ships
   (`assets/news.json`).
 
