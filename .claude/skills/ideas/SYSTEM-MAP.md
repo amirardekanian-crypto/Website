@@ -10,7 +10,9 @@ already shipped. Line numbers drift, so search by function name.
 - **An exercise has an identity since the Spine** (2026-09-24, stage31): `exercises` (athlete-readable
   once approved: purpose, pattern, up to three of the ten qualities, 3 cues, regressions / progressions /
   alternatives as ids or plain names, body parts + impact, muscles, equipment, video) and
-  `exercise_coach` (coach-only: SFR, flags, volume credits). About 220 entries. A card resolves by
+  `exercise_coach` (coach-only: SFR, flags, volume credits). 440 entries on 2026-11-24, every one with `loads` (ten body
+  areas: ankle-foot, calf-achilles, knee, hamstring, hip-groin, low-back, trunk, shoulder, elbow-forearm-wrist, neck) and
+  `impact` (none, landing, plyometric, running), so a session's body areas can be totalled from its set log. A card resolves by
   `exId`, then name and aliases (`spineFor()` / `spineForC()`). The entry's `video` is the only video
   source; `exercise_library.json` and its Notion sync were retired on 2026-09-26.
 - **Programme record** (`public.programs`, via `get_program()`): `athlete{}`, `sport{badge}`,
@@ -47,8 +49,10 @@ that keeps time from a timestamp; one finish that sends itself) · Personal Reco
 **Built since the map:** #1 The Spine, #2 The Quality Map, #4 Because, #5 The Card Remembers, #12 as
 the `/cycle-report` skill, and the Fresh Eyes work (PROGRAM-APP.md has each). **Gaps still open:** cycle
 outcomes are never checked in the app; court load is self-logged (Court Log) and read as information only (REC-7), match results invisible; the Library meets the
-programme at only two moments (LIB-01, 2026-09-27: a sore check-in offers The Morning After, a finished
-week offers Green Light); a flagged pain is never asked about again.
+programme at three moments (LIB-01, 2026-09-27: a sore check-in offers The Morning After on the finished card, a finished
+week offers Green Light on Home; since 2026-11-22 a hard Court Log activity of 60+ min offers The Morning After in its save
+message, #128 Cool Down Call), and Library recovery sessions had been marked done 3 times ever on 2026-11-24; a flagged pain is
+never asked about again.
 
 ## coach.html
 

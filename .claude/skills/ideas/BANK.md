@@ -588,6 +588,36 @@ closed 30 June 2026), an athlete-facing strain or load score (round 5), calories
 badges or tiers for activity (Career Mode cuts), a BE FIT team stake with lifelines (= #61 Doubles, cut; revisit past 20 in the crew), and
 readiness moving the steps target (Oura; against REC-7).
 
+## Round 14 · 2026-11-24 · "The Changeover" (recovery suggestions after a session, with an evidence brief)
+
+Page: https://claude.ai/artifact/DR5ZxXpXH1vqr21yAzsnpy
+
+Brief: an athlete asked how the app could tell them how to recover after training. Amir asked what the science says, what we can do
+with what we have (session RPE, the new activities, the Library's breathing, rolling and stretching sessions) and what to add. /sc-research
+ran first (his answers: adults of all levels; tonight + the next 48 h; current evidence + what changed; all four angles: feel vs perform vs
+adapt, dosing from RPE and load, sleep/food/spacing first, tennis/padel); 50 papers checked against their abstracts. Live numbers (28 days):
+151 sessions by 22 athletes, 140 with session RPE (mean 7.0, 41 at 8+), 24 sessions with 3+ sets at RPE 9-10; 9 sore check-ins (the only
+finish-card recovery offer); recovery sessions done 3 times ever (one athlete, September); Sleep ticked by 8 athletes, Fuel by 10, Mobility
+by 3, Breathe by 1; 78% of next sessions came 2+ days later (56 days). Found: the Library's own copy says "Sleep and food do the repairing"
+(The Morning After) and nothing at the finish says it. Evidence: sleep, food and spacing do the recovering; massage, rolling, cold water and
+compression ease soreness; stretching and breathing don't speed recovery (Raidl 2026 RCT); cold water after lifting costs strength (Malta 2021).
+Numbered 139-145 because another session's round 13 took 134-138 the same day.
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 139 | Footprint | One read of a finished session: big / normal / easy from session RPE × minutes and sets at RPE 9-10, later the Spine's `loads` and `impact`, new exercises, cycle week, finish time and Court Log the day before; thresholds in a data file; never shown to the athlete as a number; a "big day" mark beside the RPE in coach.html; sits beside #134's MET engine | — | pitched (build first, with 140) |
+| 140 | The Last Word | 2-3 lines on the finished card for tonight and the next 48 h in Amir's words (about 15 templates, English and Farsi, COM-1/COM-3): protein and bed, what tomorrow will feel like, when the next hard day fits; at most one Library row and one article | 139 | pitched (build first; top 3) |
+| 141 | Day Two | The morning after a big day (or new exercises, or a hard 60+ min activity) Home offers The Morning After, the morning it was written for, instead of only the finished card the evening before | 139 | pitched (top 3) |
+| 142 | Back-to-Back | Cool Down Call also notices the second hard day running ("Tomorrow easy if you can") and a match (Final Whistle); information only (REC-7) | 123, 128 | pitched (top 3) |
+| 143 | Matched Pair | The one Library session offered follows the Spine body areas the session loaded (legs → The Morning After or Night Shift, elbow-forearm-wrist → Racket Arm, low back → First Light); never a Care loading session | 139 | pitched (later) |
+| 144 | Stacked | coach.html, one line per cycle: big gym days within 24 h of hard court, hard days in a row, failure sets followed within 48 h by another lower-body day, check-ins after big days; feeds the Debrief and design's questions (REC-5, REC-7) | 139, 123 | pitched (park until a month of Court Log) |
+| 145 | The Toolbox | One Library article (English and Farsi, /article) sorting recovery tools by feel / perform / adapt; ice baths never after lifting; /chat-facts and a carousel from it | — | pitched (quick extra) |
+
+Cut on the page (so they are not re-pitched): a recovery score or readiness ring (rounds 5 and 12), cold water after S&C sessions, a
+stretch or breathing block at the end of every session, a muscle map with "recovered %" (#28 Body Weather stays where it is), a bedtime
+push after big days, recovery XP or a recovery mission, heart-rate variability from watches (round 12), a "how recovered do you feel"
+check-in question (validated, but the check-in already has five; only if he asks), product suggestions (massage guns, compression).
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |
