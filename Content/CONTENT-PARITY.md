@@ -35,6 +35,9 @@ age rules differ on purpose (CLAUDE.md: the two audiences are deliberately diffe
 4. **Farsi goes to Amir to read before it ships.** Nothing Farsi ships unread.
 5. **Publish to every surface in the same sitting** (or list what is still missing here), then update the table below.
 6. **When a fact changes on one surface, change it on all of them**, and list them in the handoff.
+7. **Every article gets its TPS lesson in the same sitting** (Amir, 2026-11-24: *"whenever I add a blog, TPS needs to get it as well"*).
+   "No TPS lesson yet" is no longer a valid state for a new article: write the juniors-and-parents lesson (the course's own rules, Farsi in
+   the course register plus the `course_en` twin, `Content/parity-drafts/LESSON-SPEC.md`), Amir reads its Farsi, then publish and stamp the app.
 
 ## The matrix (updated 2026-10-02, end of the port)
 
@@ -68,8 +71,8 @@ lesson changes are in `Content/parity-drafts/<slug>/lesson-changes.md`. The Fars
 | RPE and choosing a weight | `rpe-weights` (learn-3) | `rpe-explained` (the app keeps its own `APP_GUIDE`) |
 | Training alongside tennis and tournaments | `tennis-tournaments` (learn-4) | `training-around-matches` |
 | Match reflection and goal setting (2026-11-19) | `match-reflection` (learn-4, order 52, **new**; `course_en` twin) | `turn-match-experiences-into-training-goals` (Mental shelf) |
-| What actually helps after training (2026-11-24) | none yet (adult article; the course's `recovery-adaptation` and `sleep-recovery` cover the junior basics) | `what-helps-recovery` (Recovery shelf) |
-| Recovery after a match and between matches (2026-11-24) | none yet | `recovery-between-matches` (Recovery shelf) |
+| What actually helps after training (2026-11-24) | `what-helps-recovery` (learn-3, order 37, **new**; `course_en` twin; drafted, waiting for Amir's read of the Farsi) | `what-helps-recovery` (Recovery shelf) |
+| Recovery after a match and between matches (2026-11-24) | `recovery-between-matches` (learn-4, order 53, **new**; `course_en` twin; drafted, waiting for Amir's read of the Farsi) | `recovery-between-matches` (Recovery shelf) |
 | How to structure on-court practice, the ladder (2026-11-24; research in `Content/parity-drafts/tennis-practice-ladder/verify.md`) | none yet | `tennis-practice-ladder` (Training shelf) |
 | Why a drill skill breaks in matches (2026-11-24) | none yet | `why-it-breaks-in-matches` (Training shelf) |
 | Practising under pressure (2026-11-24) | none yet (a junior version needs the ESSA wellbeing cautions and a parent in the loop first) | `train-under-pressure` (Mental shelf) |
@@ -164,6 +167,7 @@ Amir said "fix everything with your own recommendation", so these were decided b
    course register from his approved article text).
 5. **English twin paragraphs** over 3 sentences in a few lessons this port did not rewrite (pre-existing); lint and trim
    when one of those lessons is next edited.
-6. **The two recovery articles** (2026-11-24, `what-helps-recovery` and `recovery-between-matches`): written for adults, so no TPS lesson was
-   written. A juniors' version needs its own under-18 rules for cold water and protein and a doctor's check first. Science in
-   `Content/parity-drafts/<slug>/verify.md`. Keep Your Edge now cites Thomas 2018 for the time before a match, and the older Recovery, Nutrition and Pre-Competition articles point to the two new ones (2026-11-24).
+6. **The two recovery articles** (2026-11-24, `what-helps-recovery` and `recovery-between-matches`): their TPS lessons are drafted in
+   `Content/parity-drafts/<slug>/lesson.fa.json` and `lesson.en.json` (juniors and parents, the course's rules kept: every session as
+   written, no supplements, an adult present under 18, no alcohol advice). **Amir to read the lessons' Farsi**, then they go into `tps_content` and
+   `course_en`. Covers are reused bench pictures. Science in `Content/parity-drafts/<slug>/verify.md`. Keep Your Edge now cites Thomas 2018 for the time before a match, and the older Recovery, Nutrition and Pre-Competition articles point to the two new ones (2026-11-24).

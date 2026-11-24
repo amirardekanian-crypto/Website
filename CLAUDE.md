@@ -54,6 +54,8 @@ Each line is the short form. The file beside it holds the full wording, which is
   [`docs/record/`](docs/record/INDEX.md), never in a rules file. → [`docs/README.md`](docs/README.md)
 - **Every change athletes notice is told**: a `program.html` change ships with its entry in `assets/news.json`
   (their Inbox, English and Farsi), or `[no news]` in the message. → [`docs/rules/working-with-amir.md`](docs/rules/working-with-amir.md)
+- **Every article is also a TPS lesson** (Amir, 2026-11-24): whenever a blog goes out, the course gets its lesson in the
+  same sitting, Farsi in the course's register plus its `course_en` twin, and Amir reads the Farsi. → [`docs/rules/seo.md`](docs/rules/seo.md)
 - **Run the hooks.** `git config core.hooksPath .githooks`, once per clone; a habits.html or
   sw.js commit that skips them has reached the live site before.
   → [`docs/rules/working-with-amir.md`](docs/rules/working-with-amir.md)

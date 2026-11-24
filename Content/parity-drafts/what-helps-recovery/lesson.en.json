@@ -1,0 +1,108 @@
+{
+  "id": "what-helps-recovery",
+  "icon": "🧰",
+  "group": "Body & health",
+  "order": 37,
+  "title": "What actually helps you recover?",
+  "summary": "Sleep, food and space between hard days do most of the repairing, and most other tools only change how you feel.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "Ask three questions of every method",
+      "p": [
+        "A recovery method can do one of three things: make you feel better today, help you play better tomorrow, or help you get fitter over the weeks. Most do only one of these. Some even work against another.",
+        "Most of the research in this lesson is on adults, not teenagers. We found no recovery study in padel, so we use tennis evidence and say so."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Feeling better and playing better are not the same thing. Always ask which one a method actually does."
+    },
+    {
+      "h": "Sleep and food do the repairing",
+      "p": [
+        "Start with sleep. Many athletes sleep under 7 hours, and what you need is personal. Of the sleep methods studied, sleeping more did the most for later performance, but there are few studies.",
+        "Teenagers need more sleep. Find the amount in the lesson “Sleep, recovery and performance” and go to bed a little earlier after a hard day.",
+        "Then food. Spread protein across the day's meals and have a proper meal after training. Ask a sports dietitian for exact amounts for a growing player, and see the lesson “Eating before, during and after training” for meals."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Food, not supplements. Pills and powders have no place in this lesson."
+    },
+    {
+      "h": "Hard days need space",
+      "p": [
+        "After a very hard session, your body needs time. In a study of 10 adult male athletes, fatigue from 10 sets of 5 jump squats was gone by 48 hours. After 10 sets of 5 heavy squats or 15 maximal 30 m sprints, it took up to 72 hours.",
+        "Anything new usually leaves you sorer than work you are used to, because muscle adapts after a damaging session. The same soreness is smaller next time.",
+        "If you lift and also have another hard session on the same day, more space is better. In a study of 58 amateur rugby players, strength gains were smaller with no gap between the two than with 6 or 24 hours. The lesson “Training around tennis and matches” has the detail."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Do each session as written on your card. This lesson is about what you add around the sessions, not about cutting one."
+    },
+    {
+      "h": "Massage, foam rolling and compression",
+      "p": [
+        "These three mostly change how you feel. None of them is needed for recovery."
+      ],
+      "ol": [],
+      "list": [
+        "Massage: the best of these for easing soreness. In a review of 29 studies it showed no benefit for strength, jumping, sprinting or endurance.",
+        "Foam rolling: small. It lowers pain by about 6%. Straight after training the effect is tiny and it is clearer 24 to 72 hours later, so the next day is a better time.",
+        "Compression clothing: a small benefit, clearest for getting strength back after lifting."
+      ],
+      "warn": "",
+      "callout": ""
+    },
+    {
+      "h": "Cold water: take care",
+      "p": [
+        "After a hard session, cold water eased soreness and gave back a little power 24 hours later. But in a 12-week study, men who sat in cold water for 10 minutes after every strength session built less strength and muscle. A review of 8 studies agreed.",
+        "These studies were on adults. For a player under 18, cold water is only right with a parent's OK and an adult there, and never after a weights session."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "With a heart or blood pressure problem, ask a doctor before using cold water.",
+      "callout": "Cold water is not a habit after strength training. This is our practical advice, not a result from a study on matches."
+    },
+    {
+      "h": "Stretching, cooling down and slow breathing",
+      "p": [],
+      "ol": [],
+      "list": [
+        "Stretching: after training it made no clear difference to getting strength back or to soreness at 24, 48 and 72 hours, and the evidence is very low in certainty. Do it if you like it, but don't count it as recovery.",
+        "An easy cool-down, like a walk or a gentle ride: little effect on performance the same day or the next, and it doesn't ease soreness. It may help your heart rate and breathing settle.",
+        "Slow breathing: while you do it, it raises heart rate variability, a sign of calm. In a 4-week trial of 34 people, 10 minutes after each session and before bed added no recovery or performance benefit. Use it to settle before sleep, not to repair muscle."
+      ],
+      "warn": "",
+      "callout": ""
+    },
+    {
+      "h": "Tennis and padel",
+      "p": [
+        "Tennis has a few small studies. In one, 8 highly trained players, after days with two on-court sessions, tried cold water, compression clothing and sleep advice together against stretching with no sleep advice. Time in play and stroke rate in the next match went up a lot, but with 8 players most differences were not statistically significant.",
+        "We found no recovery study in padel. In 52 amateur players, a match of about 57 minutes pushed heart load up in every set, but jump height and grip strength did not drop after any set. That is one study."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": ""
+    },
+    {
+      "h": "Tonight and the next two days",
+      "p": [],
+      "ol": [
+        "Tonight: eat a proper meal with protein and drink water.",
+        "Tonight: go to bed on time, or a little earlier.",
+        "Tomorrow: if you like, 10 minutes of walking or easy cycling. The evidence is mixed, but it costs nothing.",
+        "Tomorrow: soreness is normal, sharp or one-sided pain is not. See the lesson “Pain or soreness? And the red flags” and tell your coach or parents.",
+        "Day after: do the next session as written on your card."
+      ],
+      "list": [],
+      "warn": "",
+      "callout": "Sleep, food and space between hard days do the main work. Everything else only changes how you feel."
+    }
+  ]
+}

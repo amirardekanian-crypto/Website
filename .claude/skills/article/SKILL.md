@@ -270,11 +270,15 @@ title and blocks go in as `data.fa`, which the athlete app shows on a Farsi phon
 is missing or its blocks no longer line up with the English. So write and approve the Farsi before publishing. Re-run it after every revision of a published
 article, so the app never lags the website. coach.html's button still works as the manual fallback.
 
-**The TPS course too** (Amir, 2026-11-19: *"add to tps as well"*). Step 0.6's parity check names the course
-lesson. If there is none, write it (Farsi in the course's formal register plus its `course_en` twin, the rules in
-`Content/CONTENT-PARITY.md` → *How to publish each surface*, drafts in `Content/parity-drafts/<lesson-id>/`), add its
-cover to `ART.lesson` in `tennis/app/app.js` (reuse a bench picture before generating one) and run
-`python scripts/stamp_tps_app.py`. Done this way the first time for `match-reflection`.
+**The TPS course too, every time** (Amir, 2026-11-19: *"add to tps as well"*; made a rule 2026-11-24: *"whenever I add a
+blog, TPS needs to get it as well"*). An article is not finished until the course has its lesson, in the same sitting.
+Step 0.6's parity check names the course lesson. If there is none, write it for juniors and parents (Farsi in the course's
+formal register plus its `course_en` twin, the rules in `Content/CONTENT-PARITY.md` → *How to publish each surface* and
+`Content/parity-drafts/LESSON-SPEC.md`, drafts `lesson.fa.json` and `lesson.en.json` in `Content/parity-drafts/<slug>/`),
+keeping the course's own rules (every session as written, no supplements, an adult present under 18). **Amir reads the
+lesson's Farsi before it goes into `tps_content`.** Then add its cover to `ART.lesson` in `tennis/app/app.js` (reuse a bench
+picture before generating one) and run `python scripts/stamp_tps_app.py`. Skipping it, or saying "no lesson yet" in a commit
+message, is not allowed. Done this way first for `match-reflection`.
 
 Then tell Amir:
 - The app link: `program.html?article=<slug>` (shareable, works without login)

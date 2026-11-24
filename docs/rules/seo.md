@@ -31,6 +31,11 @@ search in Iran). The routine (Search Console, the monthly checklist, how titles 
   heading, nothing named in the title that the body does not cover, and the Instagram caption written to SOP §5.
 - **The `/article` skill does the whole chain** (Steps 6–9): Farsi draft → **Amir's OK** →
   `--stamp` → build → commit → coach.html publish. Nothing Farsi ships unread.
+- **Every article is also a TPS lesson** (Amir, 2026-11-24: *"whenever I add a blog, TPS needs to get it as well"*). The `/article` run is not
+  finished until the course has the lesson: juniors and parents, the course's formal Farsi plus its `course_en` twin, drafts in
+  `Content/parity-drafts/<slug>/`, Amir reads the Farsi, then `tps_content`, `course_en`, a cover in `ART.lesson` and
+  `scripts/stamp_tps_app.py`. The lesson keeps the course's rules (every session as written, no supplements, an adult present
+  under 18). Procedure: `Content/CONTENT-PARITY.md` rule 7 and `Content/parity-drafts/LESSON-SPEC.md`.
 - **The sitemap lists a root page only when it has a canonical link and no `noindex`.** A new
   public page needs a canonical, then a rebuild.
 - **The name:** the visible brand stays "Amir Ardekani / امیر اردکانی", but page titles, article

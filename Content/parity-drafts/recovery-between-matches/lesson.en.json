@@ -1,0 +1,92 @@
+{
+  "id": "recovery-between-matches",
+  "icon": "🔁",
+  "group": "Tennis & competition",
+  "order": 53,
+  "title": "Recovering between matches: playing again tomorrow?",
+  "summary": "When matches stack up, food, sleep and staying calm matter most between two matches and that night.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "What piles up when matches stack",
+      "p": [
+        "In one study, 7 trained men played 4-hour matches on 4 days in a row. From day 2 their sprint and jump got worse, and serve accuracy after play was worse. Soreness and fatigue rose every day, and they moved less.",
+        "In another, 8 men played three 2-hour matches in 3 days. Leg strength and how fast the legs produce force were lower before matches 2 and 3, and were still down after 1 to 2 days of rest.",
+        "These studies were small, mostly on adult men, and the matches were longer than most club matches. Treat them as a guide, not exact numbers."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": ""
+    },
+    {
+      "h": "Padel: less evidence, and a tired head",
+      "p": [
+        "We found no recovery study in padel. In 52 amateur players, a match of about 57 minutes pushed heart load up in every set, but jump height and grip strength did not drop after any set.",
+        "In 14 professional players, mental fatigue rose after each match and built up across two matches in one day. Motivation and reaction time fell."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "These studies show how hard a match is, not what fixes it. The advice below comes from tennis and general sports science."
+    },
+    {
+      "h": "Between two matches on the same day",
+      "p": [
+        "Between two matches your job is not repair, because real repair takes sleep and time. Your job is to stay loose, fed and calm."
+      ],
+      "ol": [],
+      "list": [
+        "Walk for a few minutes, then sit.",
+        "Eat and drink early. See the lesson “Eating before and on match day” for amounts.",
+        "Stay out of the direct sun, and rest your head too: a quiet spot, a little away from your phone.",
+        "Skip long stretches and warm up as usual. A stretch held for 60 seconds or more can trim strength and power by a few percent."
+      ],
+      "warn": "",
+      "callout": "This routine is our practical advice, not a method tested directly in a study."
+    },
+    {
+      "h": "That night",
+      "p": [
+        "After the last match you are still wired, and adrenaline doesn't switch off just because you sat down. Move a little first, then breathe slowly for a few minutes.",
+        "Then eat a proper meal with protein and carbohydrate, drink water and plan your sleep. In the tennis study, sleep advice went with less soreness and fatigue. If the match finished late, wind down and keep your bedtime close to normal."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": ""
+    },
+    {
+      "h": "Cold water: only when you play again tomorrow",
+      "p": [
+        "If you play again tomorrow, 15 minutes in cold water after today's last match can be a fair choice. In a review of 52 studies, cold water improved muscle power 24 hours later and eased soreness after hard exercise. In the tennis study, cold water with 3 hours of compression clothing and sleep advice went with large gains in time in play, but with 8 players it was not statistically significant.",
+        "These studies were on adults and on training, not real matches. For a player under 18, only with a parent's OK and an adult there, and never after a weights session."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "With a heart or blood pressure problem, ask a doctor before using cold water.",
+      "callout": ""
+    },
+    {
+      "h": "The morning after",
+      "p": [
+        "Ten minutes of walking or easy cycling can be a good start. The evidence on it is mixed, so don't expect much. If you play again that day, warm up as usual."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": ""
+    },
+    {
+      "h": "When are your legs really back?",
+      "p": [
+        "Two rest days may not be enough. After a three-match tournament, explosive leg power was still low after two days of rest, and one day was clearly not enough. In a lab study, fatigue from heavy squats and maximal sprints took up to 72 hours to clear.",
+        "Do your sessions as written on your card. If your legs feel very heavy after a match weekend or something hurts, tell your coach and parents. Changes are your coach's decision."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Take the second match as seriously as the first: food, warm-up and sleep. Cold water only when you play again tomorrow, never after weights."
+    }
+  ]
+}
