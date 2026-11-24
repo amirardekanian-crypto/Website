@@ -653,7 +653,9 @@
 // under Steps comes back once a day until the athlete logs their first activity.
 // v301: program.html and i18n-fa.js (?v=38) changed (2026-11-24, round 15 'Over the Line', Amir: "go with your picks"): The Count-Up, a
 // Court Log save says what it added to the week's Move minutes, with the bar, and "That's your line" on the save that reaches 300.
-const CACHE = 'aap-v301';
+// v302: program.html changed (2026-11-24, Amir: "everytime i open the app i see it. doesnt it have to go away"): the Cycle complete moment's
+// seen list (<id>_hl_seen) merges as a union, so a server copy without this cycle's mark can no longer take the phone's mark away at the next pull.
+const CACHE = 'aap-v302';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

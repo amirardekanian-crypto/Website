@@ -214,6 +214,42 @@ const liveReady = p => p.waitForFunction(() => {
     await r2.ctx.close();
   }
 
+  // ── 2b. "It comes back every time I open the app" (2026-11-24): the moment is marked seen in <id>_hl_seen, and that key
+  // is synced. mergeStoredValue() had no branch for it, so it fell to the scalar rule (the cloud copy wins whole), and a server
+  // copy that lacked this cycle's mark took the phone's mark away at the next pull: the moment came back at every open.
+  // <id>_rw_seen already had the union; this key now has the same one. ──
+  {
+    const P = prog(1);
+    const mark = 'cycle2|' + P.cycles[1].endDate;
+    const old = { 'cycle1|2026-10-19': 1792479159279 };
+    const cloud = { [H.ID + '_hl_seen']: JSON.stringify(old), [H.ID + '_snapAt']: new Date(Date.now() - 3600e3).toISOString() };
+    // The phone has already shown it (mark held), and the server's copy is older and lacks it: the pull must not hand the moment back.
+    const { ctx, p } = await open(browser, { prog: P, hist: hist(1), seed: { _hl_seen: Object.assign({ [mark]: 1 }, old) }, stub: { progress: cloud } });
+    await p.waitForTimeout(800);
+    t.check('a server copy that lacks this cycle\'s mark does not bring the moment back', await p.evaluate(() => !document.querySelector('.hl-moment')));
+    t.check('…and the phone keeps the mark it holds (the union of both lists)', await p.evaluate(([id, m]) => {
+      const o = JSON.parse(localStorage.getItem(id + '_hl_seen') || '{}'); return !!o[m] && !!o['cycle1|2026-10-19'];
+    }, [H.ID, mark]));
+    // The merge itself, both ways round, whichever side wins the scalar rule: a mark seen anywhere stays seen everywhere.
+    const mg = await p.evaluate(id => {
+      const k = id + '_hl_seen', a = JSON.stringify({ a: 5, both: 9 }), b = JSON.stringify({ b: 7, both: 4 }), f = x => Object.keys(JSON.parse(x)).sort().join();
+      const r = [mergeStoredValue(k, a, b, false), mergeStoredValue(k, a, b, true), mergeStoredValue(k, null, b, false), mergeStoredValue(k, a, '', true)];
+      return { keys: r.map(f), both: JSON.parse(r[0]).both };
+    }, H.ID);
+    t.check('mergeStoredValue(_hl_seen): a union whoever wins, the earlier time kept, a missing side is no loss', mg.keys.join('|') === 'a,b,both|a,b,both|b,both|a,both' && mg.both === 4, JSON.stringify(mg));
+    t.check('no page errors (the seen list)', p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+  {
+    // Two phones: the first has shown the moment and pushed; the second (never opened since) must not push its older list over it.
+    const P = prog(1), mark = 'cycle2|' + P.cycles[1].endDate;
+    const cloud = { [H.ID + '_hl_seen']: JSON.stringify({ [mark]: 1795536000000 }), [H.ID + '_snapAt']: new Date(Date.now() - 3600e3).toISOString() };
+    const { ctx, p } = await open(browser, { prog: P, hist: hist(1), seed: { _hl_seen: { 'cycle1|2026-10-19': 1 } }, stub: { progress: cloud } });
+    await p.waitForTimeout(800);
+    t.check('another phone already showed it: this one does not show it again', await p.evaluate(() => !document.querySelector('.hl-moment')));
+    await ctx.close();
+  }
+
   // ── 3. The finish card: a New best band after Done, and it stays (quietly) after a reload ──
   {
     const sets = w => [1, 2, 3, 4].map(() => ({ w: String(w), n: '', r: '8', d: true }));
