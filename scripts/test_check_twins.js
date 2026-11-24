@@ -14,7 +14,9 @@ const FILES = ['program.html', 'coach.html', 'habits.html', 'assets/js/chips.js'
   // the Steps credit's third copy: the headless stub's court kinds and the first day of its `acts` (2026-11-23)
   'scripts/headless/stub.js',
   // the habit config merge: program.html's habLoad() runs against the engine's defaultCfg() (coach.html habCfgOfC, 2026-11-23)
-  'assets/js/habits-core.js']
+  'assets/js/habits-core.js',
+  // Footprint (#139, section 12): both copies read the recovery rules, generated from recovery/*.toml (2026-11-24)
+  'assets/js/recovery.js']
   .concat(['rulebook', 'badges', 'achievements', 'titles', 'missions', 'quests', 'recognition'].map(n => 'career/' + n + '.toml'));
 // No GIT_* variable reaches a git command in the temp folder, or the guard run on it. The pre-commit hook runs this test inside
 // `git commit`, which exports GIT_DIR and GIT_INDEX_FILE. On 2026-10-17 the temp folder's `git init` then re-initialised the REAL
@@ -78,6 +80,7 @@ want('the app\'s today is the UTC day again (a day off in New Zealand)', swap('p
 want('the last-week alias drifts (the dashboard applies `last` in a one-week cycle too)', swap('coach.html', 'w.total > 1 && w.wk === w.total && ok(notes.last)', 'w.wk === w.total && ok(notes.last)'), 1, /weekNoteNow vs weekNoteOnC/);
 want('the session grace drifts (six hours become five on the dashboard)', swap('coach.html', 'const SESSION_GRACE_MS_C = 6 * 3600000;', 'const SESSION_GRACE_MS_C = 5 * 3600000;'), 1, /sessionIsStale vs sessionIsStaleC/);
 want('the dashboard goes back to its own 30-hour window idea (a day is no longer the test)', swap('coach.html', 'return d.toDateString() !== new Date().toDateString() && (Date.now() - d.getTime()) > SESSION_GRACE_MS_C;', 'return (Date.now() - d.getTime()) > 30 * 3600e3;'), 1, /sessionIsStale vs sessionIsStaleC/);
+want("Footprint drifts (the dashboard's big day needs one point more than the phone's)", swap('coach.html', "if (rpe != null && rpe >= B.session_rpe) why.push('rpe');", "if (rpe != null && rpe > B.session_rpe) why.push('rpe');"), 1, /footprintOf vs footprintOfC/);
 want('the check-in score drifts (the dashboard counts soreness and drops how ready they feel)', swap('coach.html', "const READY_FOUR_C = ['sleep', 'energy', 'stress', 'overall'];", "const READY_FOUR_C = ['sleep', 'energy', 'stress', 'soreness'];"), 1, /readinessS vs readinessSC/);
 want('the usual drifts (the dashboard needs four check-ins, not five)', swap('coach.html', 'const READY_BASE_N_C = 10, READY_BASE_MIN_C = 5;', 'const READY_BASE_N_C = 10, READY_BASE_MIN_C = 4;'), 1, /readinessBase vs usualC/);
 want('the usual drifts (the last twelve, not ten)', swap('coach.html', 'const READY_BASE_N_C = 10, READY_BASE_MIN_C = 5;', 'const READY_BASE_N_C = 12, READY_BASE_MIN_C = 5;'), 1, /readinessBase vs usualC/);

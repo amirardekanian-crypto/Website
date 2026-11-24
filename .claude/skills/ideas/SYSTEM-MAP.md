@@ -48,10 +48,7 @@ that keeps time from a timestamp; one finish that sends itself) · Personal Reco
 
 **Built since the map:** #1 The Spine, #2 The Quality Map, #4 Because, #5 The Card Remembers, #12 as
 the `/cycle-report` skill, and the Fresh Eyes work (PROGRAM-APP.md has each). **Gaps still open:** cycle
-outcomes are never checked in the app; court load is self-logged (Court Log) and read as information only (REC-7), match results invisible; the Library meets the
-programme at three moments (LIB-01, 2026-09-27: a sore check-in offers The Morning After on the finished card, a finished
-week offers Green Light on Home; since 2026-11-22 a hard Court Log activity of 60+ min offers The Morning After in its save
-message, #128 Cool Down Call), and Library recovery sessions had been marked done 3 times ever on 2026-11-24; a flagged pain is
+outcomes are never checked in the app; court load is self-logged (Court Log) and read as information only (REC-7), match results invisible; the Library meets the programme at seven moments (LIB-01, 2026-09-27: a sore check-in offers The Morning After on the finished card, a finished week offers Green Light on Home; since 2026-11-22 a hard Court Log activity of 60+ min offers The Morning After in its save message, #128 Cool Down Call; since 2026-11-24, round 14 'The Changeover', docs/ref/program-app/63: **The Last Word** on the finished card, on the day only: *Tonight and tomorrow*, two or three lines chosen by **Footprint** (big, normal or easy, never shown as a number), then one Library row that follows the body areas worked (Matched Pair, never a Care loading session) and one article; **Day Two**, Home's suggestion slot the morning after a big, new or hard day, before Green Light; **Back-to-Back**, Cool Down Call's message after a second hard day running, and Final Whistle after a match. The finished card's grid rows: suggestion 7, habit 8, WhatsApp 9. Numbers and words in recovery/*.toml, information only, REC-7), and Library recovery sessions had been marked done 3 times ever on 2026-11-24; a flagged pain is
 never asked about again.
 
 ## coach.html
@@ -63,7 +60,7 @@ Free signups, Referral codes, Chats) · Library · Buyers (Course, Testing app);
 verify_jwt off, $5 monthly cap); the `ANTHROPIC_API_KEY` secret is set. coach.html has no AI call. privacy.html 2.9 covers
 Claude for writing programmes from the application and training record, 2.11 the chatbot. `cycle_reports` (one row,
 2026-06-28, a `model` column) is an old AI-report table nothing reads. Athlete file: The work (ACWR, readiness vs baseline,
-adherence, Personal records, planned-vs-done per day by exercise name, the day's targets, inline
+adherence, Personal records, planned-vs-done per day by exercise name, a "big day" pill beside a session's RPE since 2026-11-24 (footprintOfC(), twin of the phone's footprintOf()), the day's targets, inline
 editor) · Proof · Calls · File (versions, coaching log). The Chat sub-tab went on 2026-09-26: a session
 note is only marked read, and Amir answers on WhatsApp.
 

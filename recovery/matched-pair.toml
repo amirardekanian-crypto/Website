@@ -1,0 +1,129 @@
+# Matched Pair (#143) · the one Library session follows where the work landed
+#
+# When The Last Word (the finished card) or Day Two (Home, the next morning) offers a Library session, it is the one that fits
+# the body areas the session loaded: the Footprint counts every working set once for each pick below whose areas its exercise
+# loads (the Spine's `loads`), and the pick with the most sets wins (a tie goes to the one higher in this file).
+#
+# `evening` is for a session finished at [evening] from or later (footprint.toml), `morning` for one finished before, and for
+# Day Two, which is always the morning. Each is a list: the first session the Library has is offered, so a session that is not
+# published yet is skipped. Every id is a Library session's id (workouts/<shelf>/<id>.json).
+#
+# Two moments come first and are not in this map: a sore check-in still brings The Morning After (LIB-01, LIB_PICKS.sore in
+# program.html), and a late finish on a big day brings Lights Out ([late], below).
+version = 1
+
+# Never one of these: the Care shelf's loading sessions are training, not recovery. The checker refuses them anywhere here.
+never = ["forearm-loading", "shoulder-endurance", "back-under-load", "knee-and-achilles-loading", "lower-back"]
+
+# A big day whose sets load none of the areas below (a bike day with no Spine areas, say) takes this pick.
+fallback = "legs"
+
+[[pick]]
+id = "legs"
+areas = ["knee", "hamstring", "calf-achilles", "ankle-foot"]
+evening = ["evening-release", "day-after"]
+morning = ["day-after"]
+kick_en = "For your legs"
+kick_fa = "برای پاهاتون"
+
+[[pick]]
+id = "hips"
+areas = ["hip-groin"]
+evening = ["hips-and-groin"]
+morning = ["hips-and-groin"]
+kick_en = "For your hips"
+kick_fa = "برای لگنتون"
+
+[[pick]]
+id = "shoulder"
+areas = ["shoulder"]
+evening = ["thoracic-and-shoulder"]
+morning = ["thoracic-and-shoulder"]
+kick_en = "For your shoulders"
+kick_fa = "برای شونه‌هاتون"
+
+[[pick]]
+id = "arm"
+areas = ["elbow-forearm-wrist"]
+evening = ["racket-arm"]
+morning = ["racket-arm"]
+kick_en = "For your racket arm"
+kick_fa = "برای دست راکتتون"
+
+[[pick]]
+id = "back"
+areas = ["low-back"]
+evening = ["morning-back"]
+morning = ["morning-back"]
+kick_en = "For your back"
+kick_fa = "برای کمرتون"
+
+# A late finish on a big day: one session to switch off before sleep (breathing is for switching off, never for repair).
+[late]
+sessions = ["pre-sleep"]
+kick_en = "After a late one"
+kick_fa = "بعد از یه جلسهٔ دیروقت"
+
+# Day Two (#141): Home, the morning after. The kicker says why it is there; the session is the pick's `morning` for a big gym
+# day or new exercises, and these lists for the rest.
+[day_two]
+big_en = "Big day yesterday"
+big_fa = "دیروز جلسهٔ سنگینی داشتید"
+new_en = "New exercises yesterday"
+new_fa = "دیروز حرکت جدید داشتید"
+hard_en = "Hard day yesterday"
+hard_fa = "دیروز روز سختی داشتید"
+hard = ["day-after"]
+match_en = "Match yesterday"
+match_fa = "دیروز مسابقه داشتید"
+match = ["day-after-match", "day-after"]
+two_en = "Two hard days in a row"
+two_fa = "دو روز سنگین پشت سر هم"
+two = ["day-after-match", "day-after"]
+
+# The words after a session's name on its row ("The Morning After: a walk first, then ankles and hips. 17 min, no kit."),
+# one per session this folder can offer.
+[[say]]
+session = "day-after-match"
+en = "twenty easy minutes, then hips, back and arm"
+fa = "بیست دقیقه حرکت سبک، بعد لگن، کمر و دست"
+
+[[say]]
+session = "day-after"
+en = "a walk first, then ankles and hips"
+fa = "اول پیاده‌روی، بعد مچ پا و لگن"
+
+[[say]]
+session = "evening-release"
+en = "slow roller work, tonight"
+fa = "کار آروم با فوم رولر، امشب"
+
+[[say]]
+session = "hips-and-groin"
+en = "easy range for hips and groin"
+fa = "دامنهٔ حرکتی سبک برای لگن و کشاله"
+
+[[say]]
+session = "thoracic-and-shoulder"
+en = "upper back and overhead range"
+fa = "بالای کمر و دامنهٔ حرکتی بالای سر"
+
+[[say]]
+session = "racket-arm"
+en = "forearm, elbow and shoulder"
+fa = "ساعد، آرنج و شونه"
+
+[[say]]
+session = "morning-back"
+en = "easy movement, first thing in the morning"
+fa = "حرکت سبک، اول صبح"
+
+[[say]]
+session = "pre-sleep"
+en = "long exhales to switch off before sleep"
+fa = "بازدم‌های بلند برای آروم شدن قبل از خواب"
+
+[[say]]
+session = "post-competition"
+en = "move first, then breathe"
+fa = "اول حرکت، بعد نفس"

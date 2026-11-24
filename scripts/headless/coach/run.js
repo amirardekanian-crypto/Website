@@ -8492,6 +8492,36 @@ S['habgrid-demo'] = async (b) => {
   return r;
 };
 
+// ── #139 Footprint: a big session wears a "big day" pill right after its RPE (recovery/footprint.toml, window.AAREC) ──────────────
+S['footprint-big-day-pill'] = async (b) => {
+  const r = { id: 'footprint-big-day-pill', title: 'Footprint: a session rated 8 shows a "big day" pill after its sRPE; a session rated 6 with nothing else big shows none', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  const rec = await page.evaluate(() => !!(window.AAREC && AAREC.fp && AAREC.fp.big));
+  check(r, 'the page has the recovery rules (window.AAREC)', rec, rec);
+  const set = (w, n, rpe) => ({ w, n, r: String(rpe), d: true });
+  const logOf = rpe => [{ ex: 'Goblet Squat', block: 'Strength', reps: 8, note: '', sets: [set('20', 8, rpe), set('20', 8, rpe), set('20', 8, rpe)] }];
+  await page.evaluate(([l8, l6]) => {
+    const A = window.__DB.session_history.filter(h => h.athlete_id === 'ava_test');
+    const d1 = A.filter(h => h.day === 1).sort((x, y) => y.completed_on.localeCompare(x.completed_on))[0], d2 = A.find(h => h.day === 2);
+    d1.session_rpe = 8; d1.log = l8;
+    d2.session_rpe = 6; d2.log = l6;
+  }, [logOf(7), logOf(6)]);
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
+  await L.go(page, 'a/ava_test/work');
+  const meta = n => page.evaluate(n => { const m = document.querySelector('#wday-' + n + ' .wday-meta'); return m ? m.innerHTML : null; }, n);
+  const text = async n => ((await page.locator('#wday-' + n + ' .wday-meta').first().textContent()) || '').replace(/\s+/g, ' ').trim();
+  const m1 = await meta(1), t1 = await text(1);
+  check(r, 'Day 1 (sRPE 8) has the pill, class zpill fp-big, text "big day"', /<span class="zpill fp-big"[^>]*>big day<\/span>/.test(m1 || ''), m1);
+  check(r, 'it comes right after the sRPE text', /sRPE 8\/10(<\/[a-z]+>)*\s*<span class="zpill fp-big"/.test(m1 || '') || /sRPE 8\/10 big day/.test(t1), t1);
+  const m2 = await meta(2), t2 = await text(2);
+  check(r, 'Day 2 (sRPE 6, sets at 6) shows sRPE 6/10 and no pill', /sRPE 6\/10/.test(t2) && !/fp-big/.test(m2 || '') && !/big day/.test(t2), t2);
+  check(r, 'the pill title gives the reason (session RPE 8+)', /title="Big day: session RPE 8\+"/.test(m1 || ''), m1);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── #144 Stacked: The work tab, one panel under Five weeks, one line for the cycle (coach.html stackedPanelC; Court Log from get_five_weeks()'s acts) ──
 (async () => {
   const b = await L.launch();
   const ids = Object.keys(S).filter(id => !only.length || only.some(w => id.includes(w)));

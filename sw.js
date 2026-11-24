@@ -639,7 +639,9 @@
 // to the crew as it is saved (stage126), Add a photo puts words and a photo on it, icons for running, cycling and swimming, Gym off the list.
 // v294: program.html and i18n-fa.js (?v=33) changed (2026-11-23, Amir: "build 130", "App suggests, you approve", "Full XP at their number"):
 // Your Number, the personal Steps target Amir sets in coach.html (stage125), read and scored on the phone the server's way.
-const CACHE = 'aap-v294';
+// v295: program.html, coach.html and the new recovery.js (?v=1), i18n-fa.js (?v=34) (2026-11-24, round 14 'The Changeover', Amir: "go with
+// your picks and build all"): Footprint, The Last Word on the finished card, Matched Pair, Day Two on Home, Back-to-Back in Court Log.
+const CACHE = 'aap-v295';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -680,7 +682,10 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=16',
-  '/assets/js/i18n-fa.js?v=33',
+  '/assets/js/i18n-fa.js?v=34',
+  // The recovery rules (v295, round 14): Footprint's thresholds and The Last Word's lines, generated from recovery/*.toml. The finished card
+  // reads them at Done, signal or not. By the exact URL the page asks for: a change is a ?v= bump there, here, and a CACHE bump.
+  '/assets/js/recovery.js?v=1',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).

@@ -264,6 +264,13 @@
           "duration": "20 min",
           "equipment": "Foam Roller",
           "file": "workouts/recovery/evening-release.json"
+        },
+        {
+          "id": "day-after-match",
+          "title": "Talking Pace",
+          "duration": "28 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/recovery/day-after-match.json"
         }
       ]
     },

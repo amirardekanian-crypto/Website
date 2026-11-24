@@ -37,6 +37,9 @@
 <script src="/assets/js/chips.js?v=20261011b"></script>
 <!-- The habit engine: what a habit is and when it is met (the athlete app loads the same file). The habit grid and Athletes -> Habits draw what it answers. -->
 <script defer src="/assets/js/habits-core.js?v=1" onload="window.habEngineReady && habEngineReady()" onerror="window.habEngineFailed && habEngineFailed()"></script>
+<!-- The recovery rules (round 14, 2026-11-24): Footprint's thresholds as window.AAREC, the file the athlete app reads, built from recovery/*.toml.
+     The "big day" pill beside a session's RPE is footprintOfC() on them (no rules: no pill). -->
+<script src="/assets/js/recovery.js?v=1"></script>
 <style>
   :root {
     --paper: #FAF7F2; --card: #FFFFFF; --ink: #1A1A1A;
@@ -5093,6 +5096,118 @@ function renderRoster() {
 }
 window.renderRoster = renderRoster;
 
+// ── FOOTPRINT — #139 (round 14 'The Changeover', 2026-11-24; Amir: "go with your picks and build all") ──────────────────────────
+// A COPY of program.html footprintOf(): one read of a finished session, big, normal or easy, from recovery/footprint.toml (window.AAREC,
+// assets/js/recovery.js, the file the athlete's app reads). scripts/check_twins.js runs both on the same sessions: change one, change the
+// other. Here it draws the "big day" mark beside a session's RPE (workDayCard(), earlierCyclesHtml()); the athlete never sees it as a mark
+// or a number, only as The Last Word's words. Like #134 The Week Line it starts from session RPE x minutes.
+function footprintOfC(s, ctx) {
+  const R = ctx && ctx.rules && ctx.rules.fp;
+  if (!s || !R) return null;
+  const B = R.big;
+  const dayNo = v => { const m = String(v == null ? '' : v).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) / 86400000 : NaN; };
+  const norm = n => String(n == null ? '' : n).toLowerCase().replace(/\s+/g, ' ').trim();
+  const num = v => { if (v === '' || v == null) return null; const n = Number(v); return isFinite(n) ? n : null; };
+  const prep = t => { const x = String(t == null ? '' : t).toLowerCase(); return (R.sets.prep_words || []).some(w => x.indexOf(w) >= 0); };
+  const logged = st => !!(st && (st.w || st.r || st.d));
+  const spineOf = typeof ctx.spineOf === 'function' ? ctx.spineOf : () => null;
+  const low = R.lower.areas || [], kinds = B.impact_kinds || [];
+  const d0 = dayNo(s.date), rpe = num(s.rpe), mins = num(s.mins);
+  let sets = 0, withAreas = 0, lowerSets = 0, hard = 0, impact = 0;
+  const areas = {}, names = [];
+  const tally = (en, n) => {
+    sets += n;
+    const L = en && Array.isArray(en.loads) ? en.loads : [];
+    if (L.length) {
+      withAreas += n;
+      L.forEach(a => { areas[a] = (areas[a] || 0) + n; });
+      if (L.some(a => low.indexOf(a) >= 0)) lowerSets += n;
+    }
+    if (en && kinds.indexOf(en.impact) >= 0) impact += n;
+  };
+  (Array.isArray(s.log) ? s.log : []).forEach(e => {
+    if (!e || prep(e.block)) return;
+    if (e.circuit) {   // a round counts once it is rated (the record keeps only the rated rounds), once for each movement in it
+      const rounds = (Array.isArray(e.rounds) ? e.rounds : []).filter(r => r && r.r).length;
+      if (rounds) (Array.isArray(e.items) ? e.items : []).forEach(it => tally(it && it.name ? spineOf(it.name) : null, rounds));
+      return;
+    }
+    const done = (Array.isArray(e.sets) ? e.sets : []).filter(logged);
+    if (!done.length) return;
+    names.push(norm(e.ex));
+    hard += done.filter(st => { const r = num(st.r); return r != null && r >= B.hard_set_rpe; }).length;
+    tally(spineOf(e.ex), done.length);
+  });
+  const lower = withAreas > 0 && lowerSets / withAreas >= R.lower.share;
+  // The athlete's usual (the middle load of their sessions in the days before) and the exercises they have done before.
+  let usual = null, newEx = 0;
+  if (Array.isArray(ctx.earlier) && isFinite(d0)) {
+    const loads = [], seen = new Set();
+    ctx.earlier.forEach(h => {
+      const d = dayNo(h && h.date);
+      if (!isFinite(d) || d >= d0) return;
+      const hr = num(h.rpe), hm = num(h.mins);
+      if (d0 - d <= B.usual_days && hr != null && hm != null && hm > 0) loads.push(hr * hm);
+      if (d0 - d <= R.new.days) (Array.isArray(h.log) ? h.log : []).forEach(e => {
+        if (e && !e.circuit && !prep(e.block) && (Array.isArray(e.sets) ? e.sets : []).some(logged)) seen.add(norm(e.ex));
+      });
+    });
+    if (loads.length >= B.usual_min) {
+      loads.sort((a, b) => a - b);
+      const m = loads.length >> 1;
+      usual = loads.length % 2 ? loads[m] : (loads[m - 1] + loads[m]) / 2;
+    }
+    newEx = names.filter((n, i) => n && names.indexOf(n) === i && !seen.has(n)).length;
+  }
+  const load = rpe != null && mins != null && mins > 0 ? rpe * mins : null;
+  const why = [];
+  if (rpe != null && rpe >= B.session_rpe) why.push('rpe');
+  if (load != null && usual != null && usual > 0 && load >= usual * B.load_over_usual) why.push('load');
+  if (hard >= B.hard_sets) why.push('hardsets');
+  if (impact >= B.impact_sets && (!B.impact_lower || lower)) why.push('impact');
+  const level = why.length ? 'big' : (rpe != null && rpe <= R.easy.session_rpe ? 'easy' : 'normal');
+  const acts = Array.isArray(ctx.acts) ? ctx.acts : [];
+  const hardAct = a => !!(a && a.effort === 'hard' && Number(a.mins) >= R.court.hard_min);
+  const fin = /^\d{2}:\d{2}$/.test(String(s.fin || '')) ? String(s.fin) : '';
+  return {
+    level, why, rpe, mins, load, usual: usual == null ? null : Math.round(usual), sets, hard, impact, areas, lower, newEx,
+    week1: ctx.week === 1, fin, late: !!fin && fin >= R.late.from, evening: !!fin && fin >= R.evening.from,
+    courtBefore: isFinite(d0) && acts.some(a => hardAct(a) && dayNo(a.day) === d0 - 1),
+    courtToday: isFinite(d0) && acts.some(a => hardAct(a) && dayNo(a.day) === d0)
+  };
+}
+// The coach's side of the read: the session as session_history keeps it, the athlete's own sessions before it (their logs once the file
+// opened them), the phone's view of the Spine (the file's lib: approved entries, as a phone resolves a card), their Court Log as Your weeks
+// reads it (get_five_weeks()'s acts, fileActsC(), the phone's source too). The same answer the phone worked out at Done.
+const _fpMemoC = new WeakMap();   // one read per session per drawn file (D is rebuilt whenever its data changes)
+function footprintOfSessionC(D, s) {
+  if (!D || !s || !window.AAREC) return null;
+  const memo = _fpMemoC.get(D) || new Map(), mk = s.day + '|' + s.completed_on + '|' + (Array.isArray(s.log) ? 'l' : '-');
+  _fpMemoC.set(D, memo);
+  if (memo.has(mk)) return memo.get(mk);
+  const lib = D.lib;
+  const spineOf = n => { if (!lib || !lib.idx) return null; const id = spineForC(lib.idx, n, null, lib.byId); return id ? lib.byId[id] || null : null; };
+  const asLog = l => Array.isArray(l) ? l : (Array.isArray(jparse(l)) ? jparse(l) : []);
+  const earlier = (D.history || []).map(h => ({ date: h.completed_on, rpe: h.session_rpe, mins: h.duration_min, log: asLog(h.log) }));
+  const fp = footprintOfC({ date: s.completed_on, rpe: s.session_rpe, mins: s.duration_min, fin: s.fin || '', log: asLog(s.log) },
+    { rules: window.AAREC, earlier, spineOf, week: null, acts: fileActsC(D) });
+  memo.set(mk, fp);
+  return fp;
+}
+// The athlete's Court Log rows as the file holds them: get_five_weeks()'s `acts` (the last 70 days), inside fiveWeeksC()'s { stamp, data, err }.
+function fileActsC(D) { const d = D && D.fw && D.fw.data; return d && Array.isArray(d.acts) ? d.acts : []; }
+// The mark: a neutral pill beside the RPE, its reasons in the title. Information for Amir only (REC-7): nothing in the plan moves.
+function fpWhyC(w, fp) {
+  const B = window.AAREC.fp.big;
+  return { rpe: `session RPE ${B.session_rpe}+`, load: `load ${fp.usual ? (fp.load / fp.usual).toFixed(1) + 'x' : 'well above'} their usual`,
+    hardsets: `${fp.hard} sets at RPE ${B.hard_set_rpe}+`, impact: `${fp.impact} sets of jumps or landings on a leg day` }[w] || w;
+}
+function bigDayMarkC(D, s) {
+  const fp = footprintOfSessionC(D, s);
+  if (!fp || fp.level !== 'big') return '';
+  const why = fp.why.map(w => fpWhyC(w, fp)).join(', ');
+  return ` <span class="zpill fp-big" title="${esc('Big day: ' + why)}">big day</span>`;
+}
 // ── Habits and court time, in the coach's file and across everyone (2026-11-23; Amir picked direction A, "The Grid") ─────────────────────────────
 // What a habit IS and when it is MET is the engine's, assets/js/habits-core.js, the file the athlete's app loads: nothing here retypes it (a second copy is how the
 // coach and the athlete end up disagreeing). The engine holds one athlete at a time, so every draw binds it to one athlete, asks, and binds the next. Court time is
@@ -6499,6 +6614,8 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
     // #127 Yesterday on Court (2026-11-22): what the athlete had logged the day before, carried on the check-in (readiness.yday).
     if (rd && Array.isArray(rd.yday) && rd.yday.length) meta.push('the day before: ' + rd.yday.map(ydayWordC).join(' + '));
   }
+  // #139 Footprint: a big session wears a "big day" pill beside its RPE (bigDayMarkC(); none while the log did not load).
+  const rpeAt = meta.findIndex(m => /^sRPE /.test(m)), bigMark = s && !noLog ? bigDayMarkC(_D, s) : '';
   // Say both when both are true — a day can have work skipped AND work done at
   // the wrong dose, and only naming the worse of the two hides half the story.
   const verdictBits = [];
@@ -6540,7 +6657,7 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
       <span class="wday-n">${esc(dayNum)}</span>
       <span class="wday-main">
         <span class="wday-title">${esc(focus || 'Day ' + dayNum)}${optional ? ` <span class="zpill${s ? ' green' : ''}">${s ? 'optional · a bonus' : 'optional'}</span>` : ''}${needsReply ? ' <span class="zpill reply">note to read</span>' : ''}</span>
-        <span class="wday-meta">${esc(meta.join(' · ')) || (thisCycle ? 'nothing logged on this day this cycle yet' : 'nothing logged against this day yet')}</span>
+        <span class="wday-meta">${meta.length ? meta.map((m, i) => esc(m) + (i === rpeAt ? bigMark : '')).join(' · ') : (thisCycle ? 'nothing logged on this day this cycle yet' : 'nothing logged against this day yet')}</span>
       </span>
       <span class="wday-right">${scoreline}<span class="tag ${statusTone === 'ok' ? 'done' : statusTone === 'warn' ? 'partial' : ''}">${esc(status)}</span></span>
       <span class="day-c-chev">▾</span>
@@ -6745,7 +6862,8 @@ function earlierCyclesHtml(D, earlier) {
     const bits = [prettyDate(s.completed_on), 'Day ' + s.day + (s.focus ? ' — ' + s.focus : ''), isPartialStatus(s.status) ? partialLabel(s.status) : 'Complete'];
     if (s.session_rpe != null) bits.push('sRPE ' + s.session_rpe + '/10');
     if (s.duration_min != null) bits.push(s.duration_min + ' min');
-    return `<details class="rawlog" id="${uid}"><summary>${esc(bits.join(' · '))}</summary>
+    const rpeAt = bits.findIndex(m => /^sRPE /.test(m)), mark = D.logsErr ? '' : bigDayMarkC(D, s);   // #139
+    return `<details class="rawlog" id="${uid}"><summary>${bits.map((m, i) => esc(m) + (i === rpeAt ? mark : '')).join(' · ')}</summary>
       <div class="elog-body">${D.logsErr ? 'The log did not load.' : esc(exerciseLogPart(s.summary))}</div>
       <div class="note-actions"><button class="btn sm" onclick="hideSession(${jsq(D.athleteId)}, ${Number(s.day)}, ${jsq(s.completed_on)})">Hide this log</button></div>
     </details>`;

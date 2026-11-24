@@ -17,6 +17,7 @@ The atlas across the whole repo — pages, assets, skills, scripts, docs — is
 | [`rules/server-and-data.md`](rules/server-and-data.md) | programmes live on the server; backups; coaching logs; erasure |
 | [`rules/program-app.md`](rules/program-app.md) | the athlete app: data, sessions, saving |
 | [`rules/program-app-look.md`](rules/program-app-look.md) | the athlete app: screens, cards, colour, navigation |
+| [`rules/recovery.md`](rules/recovery.md) | recovery after a session (Footprint, The Last Word, Day Two, Back-to-Back, Matched Pair) and the Library's moments (LIB-01) |
 | [`rules/crew-feed.md`](rules/crew-feed.md) | the Crew tab's feed since round 10: the heart, replies that fold, Trained Today, Add Yours |
 | [`rules/habits.md`](rules/habits.md) | AA Proof, the habit app (being retired) |
 | [`rules/habits-in-app.md`](rules/habits-in-app.md) | the habits where they live now: Today's card, the habit half of Progress, the list |

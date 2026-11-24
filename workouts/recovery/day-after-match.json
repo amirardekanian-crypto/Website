@@ -1,0 +1,120 @@
+{
+  "id": "day-after-match",
+  "title": "Talking Pace",
+  "category": "recovery",
+  "countsAs": "mobility",
+  "duration": "28 min",
+  "equipment": "Bodyweight",
+  "focusTag": "After a Match, Easy Engine",
+  "intro": [
+    "This is for the day after a match, or after two hard days in a row. Start with twenty easy minutes of walking, an easy bike or an easy swim, slow enough to talk the whole way. Then a few minutes for your hips, calves, upper back and racket arm, through an easy range.",
+    "This makes today move better. Sleep and food do the repairing. Easy movement won't fix tired legs on its own, but you'll feel less stiff, and it costs nothing. Can't hold a conversation? Slow down. This isn't fitness work. If your legs are still heavy on the third day, look at your sleep and your food first."
+  ],
+  "before": [
+    {
+      "label": "Normal",
+      "text": "Heavy legs and a tired racket arm the day after a match are normal, and one side often feels it more."
+    },
+    {
+      "label": "Stop and get it checked",
+      "text": "A sharp pain, pain that spreads, numbness, swelling, a joint that gives way, or a sudden pull or pop."
+    },
+    {
+      "label": "A day or two later",
+      "text": "Far more sore than normal, or your pee goes dark? Get it checked the same day."
+    }
+  ],
+  "blocks": [
+    {
+      "title": "Easy Engine",
+      "icon": "🚶",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Walk",
+          "exId": "walk",
+          "rx": { "time": "20 min" },
+          "note": "A bike or an easy swim does the same job, as long as you can talk the whole time."
+        }
+      ]
+    },
+    {
+      "title": "Hips and Legs",
+      "icon": "🦵",
+      "exercises": [
+        { "type": "simple", "name": "Leg Swings", "exId": "leg-swings", "rx": { "reps": 10, "side": true } },
+        { "type": "simple", "name": "90/90 Hip Switch", "exId": "90-90-hip-switch", "rx": { "reps": 8 } },
+        { "type": "simple", "name": "Ankle Dorsiflexion Rocks", "exId": "ankle-dorsiflexion-rocks", "rx": { "reps": 10, "side": true } }
+      ]
+    },
+    {
+      "title": "Back and Racket Arm",
+      "icon": "🧘",
+      "exercises": [
+        { "type": "simple", "name": "Cat-Cow", "exId": "cat-cow", "rx": { "reps": 8 } },
+        { "type": "simple", "name": "Open Book", "exId": "open-book", "rx": { "reps": 6, "side": true } },
+        { "type": "simple", "name": "Cross-Body Arm Swing", "exId": "cross-body-arm-swing", "rx": { "reps": 10 } }
+      ]
+    }
+  ],
+  "fa": {
+    "id": "day-after-match",
+    "title": "Talking Pace",
+    "category": "recovery",
+    "countsAs": "mobility",
+    "duration": "28 min",
+    "equipment": "Bodyweight",
+    "focusTag": "بعد از مسابقه، حرکت سبک",
+    "intro": [
+      "این برای روز بعد از مسابقه‌ست، یا بعد از دو روز سنگین پشت سر هم. با بیست دقیقه حرکت سبک شروع کنید: پیاده‌روی، دوچرخهٔ آروم یا شنای آروم، اون‌قدر آروم که تمام مدت بتونید حرف بزنید. بعد چند دقیقه برای لگن، ساق پا، بالای کمر و دست راکتتون، توی یه دامنهٔ راحت.",
+      "این جلسه باعث می‌شه امروز بدنتون راحت‌تر حرکت کنه. ترمیم رو خواب و غذا انجام می‌دن. حرکت سبک به‌تنهایی خستگی پاها رو درست نمی‌کنه، ولی خشکی کمتری حس می‌کنید و هزینه‌ای هم نداره. نمی‌تونید حرف بزنید؟ آروم‌تر برید. این تمرین آمادگی نیست. اگه روز سوم هنوز پاهاتون سنگینه، اول خواب و غذاتون رو نگاه کنید."
+    ],
+    "before": [
+      {
+        "label": "عادی",
+        "text": "سنگینی پاها و خستگی دست راکت روز بعد از مسابقه عادیه، و معمولاً یه طرف بیشتر حسش می‌کنه."
+      },
+      {
+        "label": "بایستید و بدید چک بشه",
+        "text": "درد تیز، دردی که پخش می‌شه، بی‌حسی، ورم، مفصلی که خالی می‌کنه، یا کشیدگی یا صدای تق ناگهانی."
+      },
+      {
+        "label": "یکی دو روز بعد",
+        "text": "خیلی بیشتر از معمول درد دارید یا ادرارتون تیره شده؟ همون روز معاینه بشید."
+      }
+    ],
+    "blocks": [
+      {
+        "title": "Easy Engine",
+        "icon": "🚶",
+        "exercises": [
+          {
+            "type": "simple",
+            "name": "Walk",
+            "exId": "walk",
+            "rx": { "time": "20 min" },
+            "note": "دوچرخه یا شنای آروم هم همین کار رو می‌کنه، به شرطی که تمام مدت بتونید حرف بزنید."
+          }
+        ]
+      },
+      {
+        "title": "Hips and Legs",
+        "icon": "🦵",
+        "exercises": [
+          { "type": "simple", "name": "Leg Swings", "exId": "leg-swings", "rx": { "reps": 10, "side": true } },
+          { "type": "simple", "name": "90/90 Hip Switch", "exId": "90-90-hip-switch", "rx": { "reps": 8 } },
+          { "type": "simple", "name": "Ankle Dorsiflexion Rocks", "exId": "ankle-dorsiflexion-rocks", "rx": { "reps": 10, "side": true } }
+        ]
+      },
+      {
+        "title": "Back and Racket Arm",
+        "icon": "🧘",
+        "exercises": [
+          { "type": "simple", "name": "Cat-Cow", "exId": "cat-cow", "rx": { "reps": 8 } },
+          { "type": "simple", "name": "Open Book", "exId": "open-book", "rx": { "reps": 6, "side": true } },
+          { "type": "simple", "name": "Cross-Body Arm Swing", "exId": "cross-body-arm-swing", "rx": { "reps": 10 } }
+        ]
+      }
+    ]
+  }
+}

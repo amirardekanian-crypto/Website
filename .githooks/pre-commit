@@ -649,4 +649,18 @@ if git diff --cached --name-only --diff-filter=ACM | grep -qE '^program[.]html$'
   node scripts/i18n/check_new_words.js || true
 fi
 
+# -- 32. the recovery rules are what recovery/*.toml say (added 2026-11-24) ------------------------------------------------
+# Why: recovery/footprint.toml, last-word.toml and matched-pair.toml are the numbers and the words of round 14 'The Changeover'
+# (Footprint, The Last Word, Matched Pair, Day Two, Back-to-Back), files Amir edits by hand. scripts/check_recovery.py refuses a
+# number out of range, a fact nobody defined, a line no session can reach, a session or article that does not exist, a Care
+# loading session offered as recovery, a line with no Farsi, an em-dash or a semicolon, a rest day named or cold water, and a
+# built file (assets/js/recovery.js, scripts/i18n/fa/29-recovery.json) older than the toml. The apps never read the toml itself.
+if git diff --cached --name-only --diff-filter=ACMD | grep -qE '^(recovery/.+[.]toml|assets/js/recovery[.]js|scripts/i18n/fa/29-recovery[.]json|scripts/(build|check)_recovery[.]py)$'; then
+  if ! rec_out=$("$PY" -X utf8 scripts/check_recovery.py 2>&1); then
+    echo "$rec_out"
+    echo "pre-commit: BLOCKED -- the recovery rules have an error (details above; python scripts/check_recovery.py)."
+    failed=1
+  fi
+fi
+
 exit $failed
