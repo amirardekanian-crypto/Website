@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=43"></script>
+<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=44"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -5150,6 +5150,10 @@
   .fw-mv-n b, .fw-mv-wk b { font: 700 var(--fs-field)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
   .fw-mv-xp { font: 600 var(--fs-small)/1 'Barlow', sans-serif; color: var(--green-ink); }
   .fw-mv-ok { color: var(--green-ink); font-weight: 700; }
+  /* #152 Best Week Yet (round 15): a clay pill beside the number when this week beats every earlier week on the card */
+  .fw-mv-best { align-self: center; padding: 4px 8px; border-radius: 99px; background: var(--clay); color: #fff; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .8px; text-transform: uppercase; white-space: nowrap; }
+  /* #155 Long Day (round 15): a word on an activity of two hours or more, in the crew */
+  .cr-actcard .cr-long { margin-left: auto; align-self: center; padding: 4px 8px; border-radius: 99px; border: 1px solid var(--clay); color: var(--clay); font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .8px; text-transform: uppercase; font-style: normal; white-space: nowrap; }
   .fw-mv-bar { position: relative; display: flex; width: 100%; height: 12px; margin: 8px 0 0; padding: 0; border: 0; border-radius: 6px; background: var(--tint); overflow: visible; cursor: pointer; }
   .fw-mv-bar:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 3px; }
   .fw-ms { display: block; height: 100%; }
@@ -16350,8 +16354,11 @@ function crewPostAct(it) {
   const s = it && it.kind === 'post' && it.session && typeof it.session === 'object' ? it.session : null;
   return s && ACT_LABEL[s.act] ? { kind: s.act, mins: Math.round(Number(s.mins) || 0) } : null;
 }
+// #155 LONG DAY (round 15, 2026-11-24): an activity of 120 minutes or more wears "Long day" (a tournament day, a long ride). A word only, no
+// achievement on purpose: paying for one long day would reward the thing a coach watches. The rest after it is Day Two's (#141).
+const LONG_DAY_MIN = 120;
 function crewActCardHtml(a) {
-  return `<div class="cr-actcard">${actIconHtml(a.kind, 'cr-acti')}<span><b>${esc(ACT_LABEL[a.kind] || 'Activity')}</b>${a.mins > 0 ? `<span>${a.mins} min</span>` : ''}</span></div>`;
+  return `<div class="cr-actcard">${actIconHtml(a.kind, 'cr-acti')}<span><b>${esc(ACT_LABEL[a.kind] || 'Activity')}</b>${a.mins > 0 ? `<span>${a.mins} min</span>` : ''}</span>${a.mins >= LONG_DAY_MIN ? '<i class="cr-long">Long day</i>' : ''}</div>`;
 }
 // ── COURT TOLD, GROUPED (2026-11-24; Amir, from his phone: "all the similar activities should be in the same message like when people did workout") ──
 // Since stage126 every activity an athlete saves goes to the crew by itself, so a court day was three identical cards in a row. A PLAIN activity post (a kind and
@@ -20113,11 +20120,16 @@ function fwMoveHtml(weeks, meta) {
     const keys = MV_PARTS.filter(([k]) => Number(mv[k]) > 0)
       .map(([k, c, label]) => `<span><i class="fw-k is-${c}"></i><span>${label}</span> <b>${fwNum(mv[k])}</b></span>`).join('');
     const xp = Number(mv.xp) > 0 ? `<span class="fw-mv-xp">+${fwNum(mv.xp)} XP</span>` : total >= line ? '<span class="fw-mv-ok" role="img" aria-label="At the line">✓</span>' : '';
+    // #152 BEST WEEK YET (round 15 'Over the Line', 2026-11-24): this week's Move minutes beat every earlier week on the card, once there are three
+    // of them to beat. Recognition only: no push, never an "almost" (the line is far for the middle athlete; their own best is not). The numbers are
+    // the server's (get_five_weeks()), the phone only compares them.
+    const earlier = (weeks || []).filter(w => w && w !== cur && w.move && typeof w.move.total === 'number' && String(w.from) < String(cur.from));
+    const best = earlier.length >= 3 && total > 0 && total > Math.max(...earlier.map(w => Math.round(w.move.total))) ? '<span class="fw-mv-best">Best week yet</span>' : '';
     const num = Number(meta.number) || 0;
     const steps = Number(mv.steps) > 0
       ? `<p class="fw-mv-s"><span>Steps a day:</span> <b>${fwNum(mv.steps)}</b>${num ? ` · <span>your number</span> <b>${fwNum(num)}</b>` : ''}</p>` : '';
     return `<div class="fw-mv">
-      <div class="fw-mv-h"><span class="fw-mv-t">Move this week</span><span class="fw-mv-n"><b>${fwNum(total)}</b> <span>of ${fwNum(line)}</span></span>${xp}</div>
+      <div class="fw-mv-h"><span class="fw-mv-t">Move this week</span><span class="fw-mv-n"><b>${fwNum(total)}</b> <span>of ${fwNum(line)}</span></span>${xp}${best}</div>
       <button type="button" class="fw-mv-bar" onclick="openMoveSheet()" aria-label="How your Move minutes are counted">${segs}<span class="fw-mm" style="left:${(mark / top * 100).toFixed(2)}%"></span><span class="fw-mm is-line" style="left:${(line / top * 100).toFixed(2)}%"></span></button>
       ${keys ? `<div class="fw-mv-k">${keys}</div>` : ''}
       ${steps}

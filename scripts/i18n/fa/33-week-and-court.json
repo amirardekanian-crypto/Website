@@ -1,5 +1,5 @@
 {
-  "area": "Career catalogue, rulebook version 15 (2026-11-24, stage130): round 15 'Over the Line', the week and the court. Full Week and its runs (The Line, a ring emblem), Court Hours, Match Day, Cross-Court, the weeks on court and the Ten-Hour Month (Court, a roundel), the cabinet's new section Moving, and the words on the emblems. 'Move minutes' is دقیقهٔ تحرک (28-whole-week.json). Formal (شما), as every new Farsi text since 2026-11-21. Drafts until Amir has read them. Also the crew's Over the Line card (#151): the week that went over 300 Move minutes, and what took it there.",
+  "area": "Career catalogue, rulebook version 15 (2026-11-24, stage130): round 15 'Over the Line', the week and the court. Full Week and its runs (The Line, a ring emblem), Court Hours, Match Day, Cross-Court, the weeks on court and the Ten-Hour Month (Court, a roundel), the cabinet's new section Moving, and the words on the emblems. 'Move minutes' is دقیقهٔ تحرک (28-whole-week.json). Formal (شما), as every new Farsi text since 2026-11-21. Drafts until Amir has read them. Also the crew's Over the Line card (#151): the week that went over 300 Move minutes, and what took it there. Also #152 Best Week Yet (the tag on Your weeks) and #155 Long Day (the word on a crew activity of two hours or more).",
   "exact": {
     "Moving": "تحرک",
     "WEEK": "هفته",
@@ -65,7 +65,9 @@
     "Over the line": "از خط رد شد",
     "a session": "یه جلسه",
     "a full moving week": "یه هفتهٔ پرتحرک",
-    "went over the line": "از خط رد شد"
+    "went over the line": "از خط رد شد",
+    "Best week yet": "بهترین هفته‌تون",
+    "Long day": "روز طولانی"
   },
   "patterns": [
     [
