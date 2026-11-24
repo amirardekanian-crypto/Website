@@ -679,7 +679,7 @@ row (TASTE.md). It reversed the cut of "weeks at the line in a row". Live steps 
 
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
-| 156 | The Walking Ladder | Walking gets all three shapes: a first 10,000 day; 3 days in a row at your number below GROUND COVERED's 7 / 21 / 60 (and 10 if he wants it); 100,000 / 200,000 / 300,000 steps in a calendar month with "Won N times"; a day's steps as the app scores them (typed + Court Log credit) | 136 | pitched (his idea, calls open) |
+| 156 | The Walking Ladder | Walking gets all three shapes: a first 10,000 day; 3 days in a row at your number below GROUND COVERED's 7 / 21 / 60 (and 10 if he wants it); 100,000 / 200,000 / 300,000 steps in a calendar month with "Won N times"; a day's steps as the app scores them (typed + Court Log credit) | 136 | **picked** 2026-11-24 ("i like your ladder"): 1 · 3 · 7 · 21 · 60, no 10 |
 | 157 | Full Weeks in a Row | 2 / 4 / 8 plan weeks in a row at the 300 line, beside 146's total count (4 athletes have done 2, nobody 3) | 146 | pitched (his idea) |
 | 158 | Court Every Week | The court family's in-a-row shape counted in weeks, never days (rest days): an activity logged in 4 / 8 / 12 plan weeks running; its month shape is hours in a calendar month (10 h) | 148 | pitched (his idea) |
 
@@ -689,6 +689,17 @@ Statuses above: 146, 148, 150, 151 **picked** 2026-11-24; 154 picked (comes with
 Cut on the page (so they are not re-pitched): ~~weeks at the line in a row (a count instead)~~ (reversed by Amir, #157), a 600-minute week (pays for too much), a medal
 per sport (collection), gold / silver / bronze (metals and the colour rule), XP per activity (the Steps credit pays), a Move minutes board
 (rounds 11 and 13), an "almost there" Sunday line (= Break Point), achievements for effort or one long day.
+
+**Three shapes, everywhere (2026-11-24).** Amir, *"i like your ladder"* (so #156 is 1 · 3 · 7 · 21 · 60, no 10), then *"have a look at
+other activities, other habits, workouts and etc and see where you can apply this as well"*. A section on the same page audits every
+family for one day · a month · in a row. Live numbers (habit log, every day ever, done = at Proof's target): sleep 392 days by 21
+athletes, 11 with 3 in a row, 6 months of 20+ nights (3 athletes); water 12 athletes, 8 with 3 running; protein 16, 7; mobility 9
+athletes, 4 with 3 running, longest 9; breathing 5 athletes, 27 days; supplements 13. Facts: 48 bests by 12 athletes, 9 calendar months
+with 3+ (7 athletes); 613 check-ins by 37, 10 at 25, 2 at 50; Library 5 sessions by 2; perfect days 14 by 4, one run of 3.
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 159 | Three Shapes, Everywhere | Every family gets one day · a month · in a row where it is missing: firsts for steps, sleep, water, protein, mobility, breathing and the first check-in; 3 in a row below each habit's 7 (and UNBROKEN's); mobility 3 · 7 · 21 and breathing 3 · 7 (no achievement today); 20 nights / days in a month for sleep, water, protein, days that count, 15 for mobility, 10 perfect days; perfect days 3 · 7 in a row; HOUSE RULES 3 · 7 · 21 for a habit of your own; Library 4 in a month and 3 · 6 weeks running; every session checked in 4 weeks running, check-ins 50 · 100; 3 bests in a month, a best in 3 cycles running; Full Moving Month. Left out: supplements (a product, the tick pays), months with Amir, comebacks, retests, cycles, cheers, effort, training days in a row. One-time achievements in rulebook v14 with `paid_from`; three phases (about 16 catalogue-only rows on existing tests, then two month tests and about 15 rows, then about 9 training rows); cabinet 162 → about 200 | 156 | pitched (his ask) |
 
 ## Grown out of deep-dives
 
