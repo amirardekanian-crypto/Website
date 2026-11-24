@@ -70,7 +70,7 @@ and Ryan 1999 (expected rewards undermine, positive feedback helps), Mazeas 2022
 
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
-| 29 | Hold Serve | A streak of held weeks (every session of the plan's week, any days; rest days never break it, pauses between cycles); later Proof's session ladder counts held weeks (settles the Proof audit's open decision 4), optionally STEP UP's metal standing that moves up and down | — | pitched · **recommended first** |
+| 29 | Hold Serve | A streak of held weeks (every session of the plan's week, any days; rest days never break it, pauses between cycles); later Proof's session ladder counts held weeks (settles the Proof audit's open decision 4), optionally STEP UP's metal standing that moves up and down | — | **picked** 2026-11-24 · build first |
 | 30 | Courtside | coach.html → Today "Worth a word": the week's wins (new best, effort-matched win, held-weeks mark, session mark, comeback) with a pre-filled WhatsApp in the athlete's language; not a reason | (37) | pitched · top 3 |
 | 31 | Signed Off | The training's first share card: Cycle complete → Story card with cycle art, sessions, weeks held, top 3 wins, retest, Amir's signature and photo, AMIRARDEKANI.COM; Farsi card later | — | **built** 2026-10-17 as **Highlight Reel** (design page https://claude.ai/artifact/SuyYRPeX9n2SdbiUvoHhkF, "go with your picks"): Signed Off with four more training cards (New Best, Same Effort, Retest, The Distance), Story or post, English or Farsi from the start, a one-time Cycle complete moment, and Career Mode's five reward cards drawn for phase 3 (`assets/js/sharecard.js`, PROGRAM-APP.md → Highlight Reel). Weeks held waits for Hold Serve (#29) |
 | 32 | Ring the Bell | Crew → Board \| Bell: automatic 7-day lines for a new best, a held-weeks mark or a session mark, 👏 once; consent asked at the first win | (37) | pitched |
@@ -660,18 +660,33 @@ pick, with 150 riding along; B The Week Ends Well (151-153); C Every Activity An
 
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
-| 146 | Full Week | Achievement family for weeks at the 300 line, counted in total, never a streak: Full Week (first, `repeats = "move_week"` for "Won N times"), 4, 12, 26 Full Weeks at 100 / 200 / 500 / 1000 XP; test `total` on `move_week`; a ring emblem | 135 | pitched · top 3 (with 148) |
+| 146 | Full Week | Achievement family for weeks at the 300 line, counted in total, never a streak: Full Week (first, `repeats = "move_week"` for "Won N times"), 4, 12, 26 Full Weeks at 100 / 200 / 500 / 1000 XP; test `total` on `move_week`; a ring emblem | 135 | **picked** 2026-11-24 ("go with your picks"), with 148 in one stage |
 | 147 | Whole Week | Once: plan, court and walking (or Library) each 30+ Move minutes in one plan week, 150 XP; new test `week_parts` | 146 | pitched (once court data exists) |
-| 148 | Court Hours | 10 / 25 / 100 hours of Court Log activity, every kind together, 150 / 400 / 1000 XP (25 h is about 290,000 steps of work = QUARTER OF A MILLION's 400); a 0-XP `activity_done` fact from `log_activity()`, new test `sum`; a court roundel emblem | 123 | pitched · top 3 (with 146) |
+| 148 | Court Hours | 10 / 25 / 100 hours of Court Log activity, every kind together, 150 / 400 / 1000 XP (25 h is about 290,000 steps of work = QUARTER OF A MILLION's 400); a 0-XP `activity_done` fact from `log_activity()`, new test `sum`; a court roundel emblem | 123 | **picked** 2026-11-24, with 146 in one stage |
 | 149 | Match Day and Cross-Court | Firsts on 148's fact: the first Match logged (50 XP), three kinds in one cycle (100 XP); not results (#36 Silverware stays its own) | 148 | pitched |
-| 150 | The Count-Up | The Court Log save toast shows the activity's Move minutes and the week's bar filling in clay ("+68 Move minutes. 212 of 300"), from `get_five_weeks()`, no phone arithmetic; GAME-13; recognition only | 134 | pitched · **recommended first** |
-| 151 | Over the Line | A Bell moment card (#121 family) for the activity or session that takes a week past 300: ring emblem, "OVER THE LINE +24", once a week per person, sharers only; recognition only | 135, 121 | pitched · top 3 |
+| 150 | The Count-Up | The Court Log save toast shows the activity's Move minutes and the week's bar filling in clay ("+68 Move minutes. 212 of 300"), from `get_five_weeks()`, no phone arithmetic; GAME-13; recognition only | 134 | **picked** 2026-11-24 · build first |
+| 151 | Over the Line | A Bell moment card (#121 family) for the activity or session that takes a week past 300: ring emblem, "OVER THE LINE +24", once a week per person, sharers only; recognition only | 135, 121 | **picked** 2026-11-24 |
 | 152 | Best Week Yet | A clay "Best week yet" tag on Your weeks when the closing week beats the athlete's best of the previous eight (after three weeks), one Inbox line; no push, never "almost"; recognition only | 134 | pitched |
 | 153 | The Monday Card | A 9:16 share card for a week at the line: the Move minutes big, a plan / court / walking / Library split bar, AMIRARDEKANI.COM, English and Farsi; waits for the share-card design pass | 134 | pitched (after the card pass) |
 | 154 | Courtside Move Lines | The new awards in coach.html's Courtside with the WhatsApp line in the athlete's language (templates in `recognition.toml`); a tap per line | 146, 148 | pitched (comes with 146 and 148) |
 | 155 | Long Day | Grown along the way: a 120+ minute activity shows "Long day" on its crew post, beside the recovery offer (#128, #141); no achievement on purpose | 123 | pitched |
 
-Cut on the page (so they are not re-pitched): weeks at the line in a row (a count instead), a 600-minute week (pays for too much), a medal
+**Picks, 2026-11-24:** Amir, *"go with your picks"* (direction A with 150, Court Hours pays like walking, the names Full Week and
+Court Hours, the Monday Card waits for the share-card pass), then the rule of three shapes: a single day, a month's total and days in a
+row (TASTE.md). It reversed the cut of "weeks at the line in a row". Live steps numbers that day (typed only, 377 days, 23 athletes since
+12 Jul): 91 days at 10,000 by 14 athletes; 4 athletes with 3 in a row, longest run 5, so nobody has ever held GROUND COVERED I (7);
+5 calendar months at 100,000 (4 athletes), 1 at 200,000, 0 at 300,000 (best 205,100). Grown from his answer, waiting on his calls:
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 156 | The Walking Ladder | Walking gets all three shapes: a first 10,000 day; 3 days in a row at your number below GROUND COVERED's 7 / 21 / 60 (and 10 if he wants it); 100,000 / 200,000 / 300,000 steps in a calendar month with "Won N times"; a day's steps as the app scores them (typed + Court Log credit) | 136 | pitched (his idea, calls open) |
+| 157 | Full Weeks in a Row | 2 / 4 / 8 plan weeks in a row at the 300 line, beside 146's total count (4 athletes have done 2, nobody 3) | 146 | pitched (his idea) |
+| 158 | Court Every Week | The court family's in-a-row shape counted in weeks, never days (rest days): an activity logged in 4 / 8 / 12 plan weeks running; its month shape is hours in a calendar month (10 h) | 148 | pitched (his idea) |
+
+Statuses above: 146, 148, 150, 151 **picked** 2026-11-24; 154 picked (comes with 146 and 148); 153 picked to wait for the card pass;
+147, 149, 152, 155 picked in the order on the page.
+
+Cut on the page (so they are not re-pitched): ~~weeks at the line in a row (a count instead)~~ (reversed by Amir, #157), a 600-minute week (pays for too much), a medal
 per sport (collection), gold / silver / bronze (metals and the colour rule), XP per activity (the Steps credit pays), a Move minutes board
 (rounds 11 and 13), an "almost there" Sunday line (= Break Point), achievements for effort or one long day.
 
