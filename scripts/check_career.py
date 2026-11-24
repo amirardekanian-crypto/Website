@@ -149,7 +149,8 @@ KNOWN_KEYS = {
              "weeks_away", "window_days", "min_gain", "career_only",
              "line", "mark", "per", "met_floor", "walk_floor", "walk_steps_per_min", "walk_cap", "walk_met"},   # stage127: move_week
     "badge": {"name", "meaning", "kind", "counts", "habit", "proof_codes", "caption", "free", "origin", "tiers",
-              "retire_at", "starts_at", "superseded_by", "run", "history_twin_counts", "patterns", "qualities", "exclude"},
+              "retire_at", "starts_at", "superseded_by", "run", "history_twin_counts", "patterns", "qualities", "exclude",
+              "paid_from"},   # century carries one on the live catalogue (2026-11-24)
     "tier": {"at", "metal", "xp", "size", "title", "mult", "tier_name"},
     "achievement": {"name", "meaning", "reads", "rule", "xp", "size", "caption", "free", "origin", "title", "proof_code",
                     "retire_at", "starts_at", "superseded_by", "test", "goals", "habits", "run", "at", "groups", "bests",

@@ -56,6 +56,7 @@ counts = ["session_finished", "session_finished_early"]
 caption = "{n} sessions with Amir."
 free = false
 origin = "new"
+paid_from = "2026-10-18"     # on the live catalogue since an earlier seed and never written here; brought to the repo 2026-11-24 so a seed from these files changes nothing
 tiers = [
   { at = 25, metal = "bronze", xp = 300, size = "highlight" },
   { at = 50, metal = "silver", xp = 600, size = "milestone" },

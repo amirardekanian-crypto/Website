@@ -21,8 +21,7 @@ The rules: `docs/rules/habits-in-app.md`, `docs/rules/career.md`. The numbers: `
 
 ## Open
 
-- **The live catalogue and the repo differ in two rows.** The version 13 seed kept the live catalogue as it was, so nothing an athlete
-  holds moved. Live, badge `century` has `paid_from = "2026-10-18"`, which `career/badges.toml` does not carry; live, message
-  `amirs_pick` says "this month" where the repo says "{month}". Not fixed on purpose: decide which side is right (with Amir for
-  `paid_from`, since D20 and D21 apply), then bring the other side to it and re-seed.
+- **Closed the same day: the live catalogue and the repo now match.** The repo took `century`'s live `paid_from = "2026-10-18"` (it
+  pays as it always has; `check_career.py` knows the key), and the live `amirs_pick` line took the repo's "{month}" wording, which coach.html
+  already used. All 162 rows and the version 13 rulebook hash the same on both sides; `career_compare()` ok.
 - **The Library shelf METs are by analogy** with the 2024 Adult Compendium (`move_shelf_met()`); check them with `/sc-research`.
