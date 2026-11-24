@@ -643,6 +643,38 @@ stretch or breathing block at the end of every session, a muscle map with "recov
 push after big days, recovery XP or a recovery mission, heart-rate variability from watches (round 12), a "how recovered do you feel"
 check-in question (validated, but the check-in already has five; only if he asks), product suggestions (massage guns, compression).
 
+## Round 15 · 2026-11-24 · "Over the Line" (achievements, medals and cards for the weekly total and for each activity)
+
+Page: https://claude.ai/artifact/3PxRLCNLFF8tDf3TudwBTx
+
+Brief: Amir, *"create some achievements/medals/congratz Cards and other things other achievement get, for weekly activity and the activity
+it self, give me some suggestions of what we can do"*, straight after The Whole Week (#134-#138) went live. Live numbers: `move_week()` run
+for 28 athletes over the 8 calendar weeks 28 Sep to 22 Nov: 122 active weeks, middle 203 Move minutes, 79 at the 150 mark (21 athletes),
+26 at the 300 line (15 athletes), 3 athletes at it 3 times, nobody 4, 5 weeks past 450, 1 past 600 (max 686); a week beating the
+athlete's own earlier best 28 times. Court Log: 6 activities ever, 3 athletes, 315 minutes, longest 60, no match; 1 `move_week` paid so
+far. 134 awards to 29 athletes in 28 days. Walking has five steps achievements (GROUND COVERED I-III, QUARTER OF A MILLION, THE
+MILLION); court time has none. Court Log writes no career fact today. Pay rule on the page: a one-time achievement pays XP (its own
+source, as Held on top of week_held; rulebook v14, `paid_from` per D21); anything that comes back is recognition only (GAME-6).
+Three directions: A Into the Cabinet (146-149, two new emblem shapes, ring and court roundel, steps Ink to Champion, never a metal) =
+pick, with 150 riding along; B The Week Ends Well (151-153); C Every Activity Answers (150, 151, 155).
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 146 | Full Week | Achievement family for weeks at the 300 line, counted in total, never a streak: Full Week (first, `repeats = "move_week"` for "Won N times"), 4, 12, 26 Full Weeks at 100 / 200 / 500 / 1000 XP; test `total` on `move_week`; a ring emblem | 135 | pitched · top 3 (with 148) |
+| 147 | Whole Week | Once: plan, court and walking (or Library) each 30+ Move minutes in one plan week, 150 XP; new test `week_parts` | 146 | pitched (once court data exists) |
+| 148 | Court Hours | 10 / 25 / 100 hours of Court Log activity, every kind together, 150 / 400 / 1000 XP (25 h is about 290,000 steps of work = QUARTER OF A MILLION's 400); a 0-XP `activity_done` fact from `log_activity()`, new test `sum`; a court roundel emblem | 123 | pitched · top 3 (with 146) |
+| 149 | Match Day and Cross-Court | Firsts on 148's fact: the first Match logged (50 XP), three kinds in one cycle (100 XP); not results (#36 Silverware stays its own) | 148 | pitched |
+| 150 | The Count-Up | The Court Log save toast shows the activity's Move minutes and the week's bar filling in clay ("+68 Move minutes. 212 of 300"), from `get_five_weeks()`, no phone arithmetic; GAME-13; recognition only | 134 | pitched · **recommended first** |
+| 151 | Over the Line | A Bell moment card (#121 family) for the activity or session that takes a week past 300: ring emblem, "OVER THE LINE +24", once a week per person, sharers only; recognition only | 135, 121 | pitched · top 3 |
+| 152 | Best Week Yet | A clay "Best week yet" tag on Your weeks when the closing week beats the athlete's best of the previous eight (after three weeks), one Inbox line; no push, never "almost"; recognition only | 134 | pitched |
+| 153 | The Monday Card | A 9:16 share card for a week at the line: the Move minutes big, a plan / court / walking / Library split bar, AMIRARDEKANI.COM, English and Farsi; waits for the share-card design pass | 134 | pitched (after the card pass) |
+| 154 | Courtside Move Lines | The new awards in coach.html's Courtside with the WhatsApp line in the athlete's language (templates in `recognition.toml`); a tap per line | 146, 148 | pitched (comes with 146 and 148) |
+| 155 | Long Day | Grown along the way: a 120+ minute activity shows "Long day" on its crew post, beside the recovery offer (#128, #141); no achievement on purpose | 123 | pitched |
+
+Cut on the page (so they are not re-pitched): weeks at the line in a row (a count instead), a 600-minute week (pays for too much), a medal
+per sport (collection), gold / silver / bronze (metals and the colour rule), XP per activity (the Steps credit pays), a Move minutes board
+(rounds 11 and 13), an "almost there" Sunday line (= Break Point), achievements for effort or one long day.
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |
