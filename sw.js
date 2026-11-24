@@ -655,7 +655,9 @@
 // Court Log save says what it added to the week's Move minutes, with the bar, and "That's your line" on the save that reaches 300.
 // v302: program.html changed (2026-11-24, Amir: "everytime i open the app i see it. doesnt it have to go away"): the Cycle complete moment's
 // seen list (<id>_hl_seen) merges as a union, so a server copy without this cycle's mark can no longer take the phone's mark away at the next pull.
-const CACHE = 'aap-v302';
+// v303: program.html and i18n-fa.js (?v=39) changed (2026-11-24, Amir: "Build the fan (A)"): a Crew card whose day holds two or more achievements
+// or marks wears them all as a fan of emblems, "3 achievements", and its badge opens the list, each row its own door.
+const CACHE = 'aap-v303';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -696,7 +698,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=16',
-  '/assets/js/i18n-fa.js?v=38',
+  '/assets/js/i18n-fa.js?v=39',
   // The recovery rules (v295, round 14): Footprint's thresholds and The Last Word's lines, generated from recovery/*.toml. The finished card
   // reads them at Done, signal or not. By the exact URL the page asks for: a change is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/recovery.js?v=1',

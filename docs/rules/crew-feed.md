@@ -63,6 +63,11 @@ wish for the level, the records, a join and the other achievements to be shown i
 - **Cards stand on their own.** A card is never inside the white `.cr-lines` block. A line with only an `open` part, or one the card cannot draw, stays a slim row in that block.
 - **The slim row is the fallback, and it is unchanged.** Without stage96, or while the emblems have not loaded, or if an emblem will not draw, the round 10 Quiet Lines row is
   drawn exactly as before. The emblems load after the page, so Crew repaints once they arrive.
+- **Two or more medals on one line are a fan** (Amir, 2026-11-24, asked how three achievements won on one day should show: *"Build the fan (A)"*). A line holding two or more
+  achievements or marks that can be opened is still ONE card, led by rank as above, but its badge is a **fan of their emblems** (three at most, the lead on top and leftmost, the others peeking
+  from behind it), its fact is **"3 achievements"** (**"2 trophies"** when a mark is among them, never a clay part), and every name is a word in the small line (three, then "+N more").
+  The badge is one button and opens a list in the sheet, one row per medal (the lead first), and **a row is a door to that medal's own sheet with ‹ Back to the list**. The list is never cut at
+  three. A line with one medal is the card it always was, and **an honour still leads and keeps the medals as words under it**. The build record is `docs/ref/program-app/60-moment-cards.md`.
 
 2026-11-20: the Bell now shows a best's weight and its gain in kg (Amir, asked directly: "The weight, like my picture"). The card reads "125 kg +5" with the "+5" in clay, and the
 small line is the name and the lift. A first best on a lift has no gain, so it reads "80 kg". The server sends `bests: { "<lift>": { "kg", "up" } }` (stage113), `up` being kg above

@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=38"></script>
+<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=39"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -6572,6 +6572,21 @@
   #screen-crew .cr-mc .cr-react.is-menu { grid-column: 1 / -1; margin: 2px 0 0; }
   #screen-crew .cr-mc .cr-mchi { align-self: center; margin: 0 6px 0 0; }
   #screen-crew .cr-mc .cr-hburst { width: 56px; height: 56px; margin: -28px 0 0 -28px; }
+  /* THE FAN (2026-11-24; Amir: "Build the fan (A)"): two or three emblems in the badge's own 56 px, the lead on top and leftmost, the others peeking out from behind it 10 px at a
+     time. A thin ring of the card's own colour (a drop-shadow, so it follows any emblem shape) keeps one from running into the next, in light and in dark. Still ONE button, one door. */
+  #screen-crew .cr-fan { position: relative; display: block; width: 56px; height: 56px; }
+  #screen-crew .cr-fan.n2 { width: 50px; }
+  #screen-crew .cr-fan svg { position: absolute; top: 10px; width: 36px; height: 36px;
+    filter: drop-shadow(1.5px 0 0 var(--row)) drop-shadow(-1.5px 0 0 var(--row)) drop-shadow(0 1.5px 0 var(--row)) drop-shadow(0 -1.5px 0 var(--row)); }
+  #screen-crew .cr-fan svg:nth-child(1) { left: 0; z-index: 3; }
+  #screen-crew .cr-fan svg:nth-child(2) { left: 10px; z-index: 2; }
+  #screen-crew .cr-fan.n2 svg:nth-child(2) { left: 14px; }
+  #screen-crew .cr-fan svg:nth-child(3) { left: 20px; z-index: 1; }
+  /* what the badge opens: one row per medal, its emblem, its name and kind, and the › of a door */
+  #hist-overlay .cr-mrow { grid-template-columns: 48px minmax(0, 1fr) auto; gap: 12px; min-height: 64px; }
+  #hist-overlay .cr-mre { display: block; width: 48px; height: 48px; }
+  #hist-overlay .cr-mre svg { display: block; width: 48px; height: 48px; }
+  #hist-overlay .cr-mrt { display: block; min-width: 0; }
   /* PLAYERS' LOUNGE · THE CYCLE BARS, PLAYER FACTS AND THE FACE STACK (steps 4 to 6, 2026-10-24). Week Bars, with the extra sessions as small round dots after the bar
      (Amir: "the workouts can be anything other than their cycles, they can do extra, it needs to show that as well"); Player Facts for every racket sport and for people
      who play none (Amir: "applicable to all racket sports, and general people as well"); the Face Stack on an achievement ("i like face stack a bit more"). Colours are the
@@ -16727,6 +16742,27 @@ function crewMomentLead(it) {
   for (const k of CREW_MC_RANK) { const i = parts.findIndex(p => p && p.k === k); if (i >= 0) return { p: parts[i], i }; }
   return null;
 }
+// THE FAN (2026-11-24; Amir, asked how three achievements on one day should show: "Build the fan (A)"). Three won together were ONE emblem with a door and two names as plain words that
+// could not be tapped. Now a line that holds two or more achievements or marks that can be opened wears them all: the lead's emblem on top, the others peeking from behind it (three at most),
+// "3 achievements" as the fact, every name in the small line. The badge opens the list (openCrewMedals), and each row of it is a door to what that one is (openCrewAch, ‹ Back to the list).
+// A line with one is the card it always was. The lead keeps its place by CREW_MC_RANK, so an honour still leads (and the medals stay words under it).
+function crewMcMedals(it, lead) {
+  if (!lead || !lead.p || (lead.p.k !== 'achievement' && lead.p.k !== 'mark')) return [];
+  const out = [];
+  (it.parts || []).forEach((p, i) => {
+    if (!p || (p.k !== 'achievement' && p.k !== 'mark')) return;
+    const d = achDetailOf(p);
+    if (d) out.push({ p, i, d });
+  });
+  if (!out.some(m => m.i === lead.i)) return [];   // the lead cannot be opened (a mark with no badge): the card stays the one it was
+  return out.sort((a, b) => a.i === lead.i ? -1 : b.i === lead.i ? 1 : a.i - b.i);   // the lead first, the rest in the order sent
+}
+function crewMcFan(medals) {
+  const n = medals.length, shown = medals.slice(0, 3), ach = medals.every(m => m.p.k === 'achievement'), more = n - shown.length;
+  return { fan: n, badge: `<span class="cr-fan n${shown.length}" aria-hidden="true">${shown.map(m => m.d.svg).join('')}</span>`,
+    big: `${n} ${ach ? 'achievements' : 'trophies'}`,   // one text, so a Farsi phone says it with Persian digits ("(\d+) achievements?" in the word lists)
+    sub: shown.map(m => esc(m.d.name)).concat(more > 0 ? ['+' + more + ' more'] : []) };
+}
 function crewMcOn() { return crewPagesOn() && !!cabE(); }
 function crewMcDisc(t) { return `<span class="cr-mcd" aria-hidden="true">${t}</span>`; }
 const CREW_HONOUR_WORDS = { sessions: 'Most sessions', improved: 'Most improved', full_month: 'Full Month', pick: "Amir's Pick" };
@@ -16778,22 +16814,24 @@ function crewMomentCardHTML(it) {
   const lead = crewMomentLead(it);
   if (!lead) return '';
   const pp = crewPersonOf(it), who = it.me ? 'You' : (it.who || 'Someone'), first = it.me ? 'You' : String(it.who || 'them').split(/\s+/)[0];
-  let f = null;
-  try { f = crewMcFace(it, lead, first); } catch (e) { f = null; }   // an emblem that will not draw falls back to the slim row
+  let f = null, medals = [];
+  try { medals = crewMcMedals(it, lead); f = medals.length > 1 ? crewMcFan(medals) : crewMcFace(it, lead, first); } catch (e) { f = null; }   // an emblem that will not draw falls back to the slim row
   if (!f) return '';
-  // the other moments of the day, in words, after who
-  const rest = (it.parts || []).map((p, i) => i === lead.i ? '' : crewPartText(p)).filter(Boolean).map(esc);
+  // the other moments of the day, in words, after who (a fan names its medals itself, so they are not said twice)
+  const named = f.fan ? medals.map(m => m.i) : [lead.i];
+  const rest = (it.parts || []).map((p, i) => named.indexOf(i) >= 0 ? '' : crewPartText(p)).filter(Boolean).map(esc);
   const badge = f.face
     ? `<span class="cr-mcf">${crewFace(pp, 'tt')}<i class="cr-mcnew" aria-hidden="true">NEW</i></span>`
+    : f.fan ? `<button type="button" class="cr-mcb cr-mcfan" onclick="openCrewMedals('${esc(it.key)}')" aria-label="What these are">${f.badge}</button>`
     : (f.door ? `<button type="button" class="cr-mcb" onclick="openCrewAch('${esc(it.key)}', ${lead.i})" aria-label="What this is">${f.badge}</button>` : `<span class="cr-mcb" aria-hidden="true">${f.badge}</span>`);
   const kw = crewKudosWords(it.kudos);
   const canHello = !it.me && pp.ck && crewMe().can_post && lead.p.k === 'joined';
   const right = canHello
     ? `<button type="button" class="cr-sayhi cr-mchi" onclick="crewSayHello('${esc(pp.ck)}')" aria-label="Say hello to ${esc(first)}">Say hello</button>`
     : `<span class="cr-react on-line${_crewOpenEm[it.key] ? ' is-menu' : ''}" data-row="${esc(it.key)}" data-mode="heart" data-count="1">${crewHeartHTML(it.key, it.kudos, it.me, true)}</span>`;
-  return `<div class="cr-line cr-mc cr-mc-${esc(lead.p.k)}" data-key="${esc(it.key)}" onclick="crewTwoTap(event, '${esc(it.key)}')">${badge}
+  return `<div class="cr-line cr-mc cr-mc-${esc(lead.p.k)}${f.fan ? ' cr-mc-fan' : ''}" data-key="${esc(it.key)}" onclick="crewTwoTap(event, '${esc(it.key)}')">${badge}
     <span class="cr-mct"><span class="cr-mcbig" dir="auto">${f.big}</span>
-      <span class="cr-mcsub">${crewNameHTML(pp, who)} · ${[f.sub].concat(rest).map(t => `<span>${t}</span>`).join(' · ')}</span>
+      <span class="cr-mcsub">${crewNameHTML(pp, who)} · ${[].concat(f.sub, rest).map(t => `<span>${t}</span>`).join(' · ')}</span>
       <small data-kw="${esc(it.key)}">${crewLineMeta(it, kw)}</small></span>${right}</div>`;
 }
 // The small line under a moment: who liked it, then when. Each in its own element, so a Farsi phone translates each one alone
@@ -16869,6 +16907,26 @@ function openCrewAch(key, idx) {
   achDetailSheet(Object.assign(d, { meta: 'Won by ' + (it.who || 'someone in the crew') + (day ? ' · ' + cabDay(day) : '') }));
 }
 window.openCrewAch = openCrewAch;
+// The fan's list (2026-11-24): every achievement or mark a line holds, one row each, each row a door to what it is (openCrewAch, wrapped like this one, so ‹ Back from it comes
+// back here). Reads the line from the phone's copy of the Bell by its key, as openCrewAch does.
+function openCrewMedals(key) {
+  const ov = document.getElementById('hist-overlay'), it = ((BELL && BELL.items) || []).find(x => x && String(x.key) === String(key));
+  if (!ov || !it || !cabE()) return;
+  const medals = crewMcMedals(it, crewMomentLead(it));
+  if (medals.length < 2) return;
+  const ach = medals.every(m => m.p.k === 'achievement'), at = Date.parse(it.at), day = at ? cabDay(ymdLocal(new Date(at))) : '';
+  const rows = medals.map(m => `<button type="button" class="cr-bt pl-row cr-mrow" onclick="openCrewAch('${esc(it.key)}', ${m.i})">
+    <span class="cr-mre" role="img" aria-label="${esc(m.d.name).replace(/"/g, '&quot;')}">${m.d.svg}</span>
+    <span class="cr-mrt"><span class="t" dir="auto">${esc(m.d.name)}</span>${m.d.kind ? `<span class="q">${esc(m.d.kind)}</span>` : ''}</span>
+    <span class="c" aria-hidden="true">›</span></button>`).join('');
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">${ach ? 'Achievements' : 'Trophies'}</div>
+    <h2 class="readiness-title">${medals.length} ${ach ? 'achievements' : 'trophies'}</h2>
+    <p class="readiness-sub">${it.me ? (day ? 'Won ' + esc(day) : 'Won') : 'Won by ' + esc(it.who || 'someone in the crew') + (day ? ' · ' + esc(day) : '')}</p>
+    <div class="pl-list">${rows}</div>`;
+  ov.classList.add('visible');
+}
+window.openCrewMedals = openCrewMedals;
 // ONE ladder on one block (2026-10-20). It used to read "1. Ehsan A. LV 14 — 3,153" above "4. Elmira A. LV 29 — 1,114": the
 // level is lifetime and the number that sorts is this SEASON's, and the season was two days old, so a level-29 athlete sat
 // below a level-14 one with both numbers on the same row. The LV chip is gone and the block is titled *This season*, which is
@@ -28123,6 +28181,7 @@ function wrapSheetOpeners() {
   openPlayerWeek = sheetWrap(openPlayerWeek); window.openPlayerWeek = openPlayerWeek;   // a Player Page's week of sessions (This cycle)
   openPlayerTrophy = sheetWrap(openPlayerTrophy); window.openPlayerTrophy = openPlayerTrophy;   // a trophy: ‹ Back to "All n" when it was opened from there
   openCrewAch = sheetWrap(openCrewAch); window.openCrewAch = openCrewAch;   // an achievement opened from a Crew line
+  openCrewMedals = sheetWrap(openCrewMedals); window.openCrewMedals = openCrewMedals;   // the fan's list (3 achievements on one line); a row opens its own, ‹ Back to the list
   openFacePhoto = sheetWrap(openFacePhoto); window.openFacePhoto = openFacePhoto;   // Your photo: opened from your page, or from the account's Profile group (‹ Back to it)
   openYourGame = sheetWrap(openYourGame); window.openYourGame = openYourGame;   // Your game: the account's Profile group; ‹ Back to the account
   openCheer = sheetWrap(openCheer); window.openCheer = openCheer;   // Cheer Sara: opened from her page

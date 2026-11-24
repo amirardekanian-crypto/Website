@@ -29,6 +29,23 @@ Section 59 is the step before this one.
   `gains` goes away. This replaces the stage81 rule "a best names the lift and never a weight"; the old line stays in its file with the dated replacement after it.
 - `crewMcFace()` leads with the lift that gained most. With several lifts the small line says how many more.
 
+### The fan (2026-11-24): two or more medals on one line
+
+Amir asked how three achievements won on one day should show (the card drew one emblem, one door, and the other two names as words nobody could tap) and took the fan
+(*"Build the fan (A)"*, over medal chips under the card). The rule, short, is in `docs/rules/crew-feed.md` → *Moment cards*.
+
+- **`crewMcMedals(it, lead)`** returns every part of the line that is an `achievement` or a `mark` with a badge (`achDetailOf()`), the lead first, the rest in the order sent. It returns `[]` unless the
+  lead itself is one of them, so an honour-led line is not a fan. Two or more is a fan.
+- **`crewMcFan(medals)`** is the face of such a card, in place of `crewMcFace()`: `{ fan: n, badge, big, sub }`. `badge` is `span.cr-fan.n2|n3` holding the first three emblems; `big` is the plain
+  text `3 achievements` or `2 trophies` (one text node, so a Farsi phone gets Persian digits from the existing `(\d+) achievements?` and the new `(\d+) trophies`); `sub` is the names, each in its own span,
+  then `+N more` past three. `crewMomentCardHTML()` leaves the medals out of the "other parts as words" so nothing is said twice, adds `cr-mc-fan` to the card, and draws the badge as
+  `button.cr-mcb.cr-mcfan` calling `openCrewMedals(key)`.
+- **`openCrewMedals(key)`** draws the list in the shared sheet (`sheetWrap()`ped, so ‹ Back works): eyebrow *Achievements* or *Trophies*, title `3 achievements`, `Won by Mina S. · 24 Nov` (yours:
+  `Won 24 Nov`), then `.cr-mrow` rows (emblem 48 px, name, its kind, ›). A row calls `openCrewAch(key, i)`, which opens that medal's sheet (your own opens your cabinet's), and ‹ Back comes back to the list.
+- **The look.** `.cr-fan` is 56 px square, the same as the badge it replaces, so the card's grid does not change: 36 px emblems 10 px apart, a ring of the card's own colour made with `drop-shadow`
+  (it follows any emblem shape, light and dark). Checked at 320 px in dark mode by `scripts/headless/crew.js` section 21.
+- **Not done on purpose.** The fan is not drawn when an honour leads (the honour is Amir's; the medals stay words), and the slim row still has its own tappable names (`.cr-ach`).
+
 ### The traps
 
 - **`emblems.js` loads deferred.** The page is up before `AAEmblem` is, so the first paint of Crew is slim rows. `emblemsReady()` (the script's `onload`) repaints Crew when it is open.
