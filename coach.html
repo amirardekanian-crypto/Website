@@ -5361,15 +5361,19 @@ let _habWho = null;   // the athlete the engine is bound to (habBind): their own
 const habTgtC = (h, d) => h.id === 'steps' && _habWho ? stepsTargetOnC(_habWho, d, h.target) : h.target;
 // The number that COUNTS for a habit on a day, as the athlete sees it: typed, and for Steps plus the day's activity credit (`by`: day -> activity rows;
 // null when the court time did not load, then the typed number stands and the banner says why).
+// The day's steps as the athlete's row shows them: typed plus the activity's whole worth (2026-11-24, Amir: "it should go up, doesnt need
+// to give xp if its more than enough"; program.html mvAll). Done is the same either way: the capped credit already reaches the target.
 function habValC(H, h, d, by) {
   const v = H.valOf(d, h.id);
-  return h.id === 'steps' && by && by[d] && d >= MOVE_FROM_C ? v + moveCreditOfC(by[d], habTgtC(h, d), d).steps : v;
+  if (!(h.id === 'steps' && by && by[d] && d >= MOVE_FROM_C)) return v;
+  const c = moveCreditOfC(by[d], habTgtC(h, d), d);
+  return v + Math.max(c.steps, Number(c.raw) || 0);
 }
 const habDoneC = (H, h, d, by) => h.id === 'steps' ? habValC(H, h, d, by) >= habTgtC(h, d) : H.isDone(h, d);
 // "2,000 walked + 7,000 from Tennis" (program.html's own line); '' on a day with no credit.
 function habStepsTitleC(H, h, d, by) {
   if (h.id !== 'steps' || !by || !by[d] || d < MOVE_FROM_C) return '';
-  const c = moveCreditOfC(by[d], habTgtC(h, d), d).steps;
+  const cc = moveCreditOfC(by[d], habTgtC(h, d), d), c = Math.max(cc.steps, Number(cc.raw) || 0);
   if (c <= 0) return '';
   const kinds = [...new Set(by[d].map(r => r.kind))];
   const from = kinds.length === 1 ? (ACT_WORD_C[kinds[0]] || 'Activity') : 'your activity';

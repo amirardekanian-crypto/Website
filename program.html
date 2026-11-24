@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=36"></script>
+<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=37"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -5151,6 +5151,13 @@
   .fw-mv-s b { color: var(--ink); font-weight: 600; }
   .fw-mv-help p { margin: 0 0 8px; font: 400 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); }
   .fw-mv-wk { flex: none; display: flex; align-items: baseline; gap: 6px; }
+  /* the one-time "add your other activity too" under Steps (2026-11-24): the Played today? row's look, said once */
+  .ah-wrap { margin-top: 6px; padding: 12px 14px; border-radius: 14px; background: var(--tint); }
+  .ah-box { display: flex; align-items: flex-start; gap: 10px; }
+  .ah-b { display: grid; gap: 2px; font: 400 var(--fs-small)/1.4 'Barlow', sans-serif; color: var(--grey); }
+  .ah-b b { font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); }
+  .ah-acts { display: flex; align-items: center; gap: 16px; margin-top: 10px; }
+  .ah-no { border: 0; background: none; padding: 8px 0; color: var(--grey); font: 600 var(--fs-small)/1 'Barlow', sans-serif; cursor: pointer; }
   .readiness-yday { margin: -4px 0 14px; padding: 8px 12px; border-radius: 10px; background: var(--tint); font: 500 var(--fs-small)/1.45 'Barlow', sans-serif; color: var(--ink); }   /* #127 */
   .act-from { margin: 6px 0 0; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }   /* #126 */
   .act-sec { margin: 14px 0 6px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
@@ -12949,6 +12956,7 @@ function habSetVal(id, v) {
   const was = habXpOf(h, k);
   HAB_LOG[k][id] = Math.max(0, Math.min(Number(v) || 0, ceiling));
   habSaveLog();
+  if (id === 'steps') actHintArm();   // the one-time "add your other activity too" (2026-11-24)
   paintTodayCard();
   // What it just paid (2026-10-20, Amir: "It doesnt show xp so the people dont fill like their progressing"). Habits have always
   // paid; this is the app finally saying so, at the moment of the tap. It rises off the row and goes: a toast would be a box to
@@ -13088,7 +13096,7 @@ function todayCardHtml() {
   const k = H.AKEY(), isToday = k === H.TKEY();
   const v = H.verdict(k);
   const list = H.rosterOn(k);
-  const rows = list.map(hb => habRowHtml(hb, k) + (hb.id === 'steps' ? playedRowHtml(k) : '')).join('');   // #126 under Steps
+  const rows = list.map(hb => habRowHtml(hb, k) + (hb.id === 'steps' ? actHintHtml() + playedRowHtml(k) : '')).join('');   // #126 under Steps
   const streak = H.dayStreak();
   // ⚠️ THE HEADLINE AND THE RING COUNT THE SAME THING (2026-10-20). They did not: the headline said what the GATE still wants
   // (dayToGo(), weighted, and a day counts with one missing), so a card showing two ticks of five said "1 to go" and the three
@@ -13193,16 +13201,21 @@ function habRowHtml(hb, k) {
   // ⚠️ THE NUMBER ON THE ROW IS THE NUMBER THAT COUNTS (2026-11-23, Amir picked direction A "Total first"). Until then the button showed
   // the typed 2,000 and the activity's 7,000 lived only in a grey line, so Tara logged an hour of tennis and read "it doesn't add to my
   // steps" while the server was scoring 9,000. scripts/headless/move-credit.js holds the button equal to H.valOf() on every count habit.
+  // ⚠️ ALL OF IT SHOWS, ONLY UP TO THE TARGET COUNTS (2026-11-24, Amir: "if i play 4 hours of tennis, why doesnt it go over the 10,000? ...
+  // it should go up, doesnt need to give xp if its more than enough"). The line and the big number show the activity's whole worth
+  // (mv.raw: four hours of tennis is 46,800); the tick, the meter, the XP and every step total still read the scored number, the credit
+  // capped at the day's target (mv.steps, stepsScored()), so nothing a long court day adds past the target pays or counts anywhere.
   const mv = hb.id === 'steps' ? moveCreditOn(k) : null, raw = hb.id === 'steps' ? habRaw(k, hb.id) : val;
+  const mvAll = mv ? Math.max(mv.steps, Number(mv.raw) || 0) : 0;
   const mvFrom = mv ? (mv.kinds.length === 1 ? (ACT_LABEL[mv.kinds[0]] || 'Activity') : 'your activity') : '';
   const mvLine = !mv ? ''
-    : _habTyping === hb.id ? `Type the steps you walked. ${mvFrom.charAt(0).toUpperCase() + mvFrom.slice(1)} adds ${H.fmtVal(hb, mv.steps)}.`
-    : raw > 0 ? `${H.fmtVal(hb, raw)} walked + ${H.fmtVal(hb, mv.steps)} from ${mvFrom}`
-    : `+${H.fmtVal(hb, mv.steps)} from ${mvFrom}`;
+    : _habTyping === hb.id ? `Type the steps you walked. ${mvFrom.charAt(0).toUpperCase() + mvFrom.slice(1)} adds ${H.fmtVal(hb, mvAll)}.`
+    : raw > 0 ? `${H.fmtVal(hb, raw)} walked + ${H.fmtVal(hb, mvAll)} from ${mvFrom}`
+    : `+${H.fmtVal(hb, mvAll)} from ${mvFrom}`;
   // #130 Your Number: a target Amir set shows in the name; the big number and what is left are real steps against it (the scorers
   // see the day scaled to everyone's target, H.valOf(), which would read 7,143 for 5,000 of 7,000)
   const tg = hb.id === 'steps' ? stepsTargetOn(k) : 0, ownT = hb.id === 'steps' && tg !== stepsGlobal();
-  const shown = ownT ? raw + (mv ? mv.steps : 0) : val;
+  const shown = hb.id === 'steps' && (ownT || mv) ? raw + mvAll : val;
   const name = ownT ? 'Walk ' + Number(tg).toLocaleString('en-US') + ' steps' : (H.splitEmoji(hb.name)[1] || hb.name);
   const hue = H.hue(hb) || [];
   const mark = `<span class="hb-ic" aria-hidden="true">${done ? HAB_TICK : window.ICON(habIconKey(hb), 2)}</span>`;
@@ -19348,6 +19361,36 @@ function actLast() {
   return best;
 }
 function playedKey() { return ATHLETE_ID + '_played_no'; }
+// ── ADD YOUR OTHER ACTIVITY TOO — once ever (2026-11-24, Amir: "add a reminder to the app as well, just a one time reminder, when people
+// adding to the steps, to add their other activity as well") ─────────────────────────────────────────────────────────────────────
+// The first time the athlete changes their Steps, a small box under the row says that tennis, padel or anything else counts toward
+// their steps too, with Add activity. It is drawn once: it is marked seen the moment it opens (<id>_act_hint, the phone only, never
+// synced), so ignoring it, closing the app or tapping Got it all end it for good. An athlete who already logs activity never sees it.
+// Not a toast (docs/rules/habits-in-app.md: a box with a button on every tap is a chore); the demo and the coach's preview never show it.
+let _actHint = false;
+function actHintKey() { return ATHLETE_ID + '_act_hint'; }
+function actHintArm() {
+  try {
+    if (_actHint || !ATHLETE_ID || window.IS_DEMO || window.IS_PREVIEW) return;
+    if (localStorage.getItem(actHintKey())) return;
+    _lsRawSet(actHintKey(), new Date().toISOString().slice(0, 10));   // seen from this moment, whatever happens next
+    if (actLast()) return;                                             // they already add their activity
+    _actHint = true;
+  } catch (e) { /* no storage: say nothing rather than every time */ }
+}
+function actHintHtml() {
+  if (!_actHint) return '';
+  return `<div class="hb-wrap ah-wrap" role="note">
+    <div class="ah-box">
+      <span class="hb-ic" aria-hidden="true">${window.ICON('court', 2)}</span>
+      <div class="ah-b"><b>Played tennis or padel today?</b><span>Add it, and anything else you did. It counts toward your steps too.</span></div>
+    </div>
+    <div class="ah-acts"><button type="button" class="pt-yes" onclick="actHintAdd()">Add activity</button><button type="button" class="ah-no" onclick="actHintClose()">Got it</button></div>
+  </div>`;
+}
+function actHintClose() { _actHint = false; paintTodayCard(); }
+function actHintAdd() { _actHint = false; paintTodayCard(); openActivitySheet(); }
+window.actHintClose = actHintClose; window.actHintAdd = actHintAdd;
 function playedRowHtml(k) {
   try {
     if (!ATHLETE_ID || window.IS_DEMO || window.IS_PREVIEW || !window.AAHabits) return '';

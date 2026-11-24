@@ -2,6 +2,26 @@
   "_about": "What's new in the app, shown in every athlete's Inbox for 14 days (program.html, newsRows/openNews). Newest first. Each entry: id (unique), at (ISO time), en and fa: { title, items: [one short line each], sign }. Written in Amir's voice (COM-3) in both languages (COM-1). THE RULE (docs/rules/working-with-amir.md): a change to program.html that an athlete would notice ships with its entry here in the same commit; .githooks/commit-msg blocks a program.html commit without this file unless the message says [no news].",
   "items": [
     {
+      "id": "2026-11-24-steps-show-all",
+      "at": "2026-11-24T23:00:00Z",
+      "en": {
+        "title": "Your steps show all of it",
+        "items": [
+          "Play four hours of tennis and your Steps now shows all of it, not just 10,000.",
+          "Reaching your number is still a full Steps day. Going past it shows, it just doesn't pay more."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "قدم‌هاتون کامل نشون داده می‌شه",
+        "items": [
+          "اگه چهار ساعت تنیس بازی کنید، حالا قدم‌هاتون همه‌ش رو نشون می‌ده، نه فقط ۱۰٬۰۰۰ تا.",
+          "رسیدن به عددتون هنوز یه روز کامل قدمه. بیشترش دیده می‌شه، فقط امتیاز بیشتری نمی‌ده."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-24-whole-week",
       "at": "2026-11-24T21:00:00Z",
       "en": {

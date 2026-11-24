@@ -15,7 +15,10 @@
     "Court and other": "زمین و سایر",
     "count what you add with + Add activity.": "چیزهایی رو حساب می‌کنن که با «+ اضافه کردن فعالیت» ثبت می‌کنید.",
     "counts the steps you type over 5,000. 100 steps is a minute, up to 60 a day.": "قدم‌هایی که بالای ۵٬۰۰۰ ثبت می‌کنید رو حساب می‌کنه. هر ۱۰۰ قدم یک دقیقه‌ست، تا ۶۰ دقیقه در روز.",
-    "A full moving week (300 Move minutes)": "یه هفتهٔ پرتحرک (۳۰۰ دقیقهٔ تحرک)"
+    "A full moving week (300 Move minutes)": "یه هفتهٔ پرتحرک (۳۰۰ دقیقهٔ تحرک)",
+    "Played tennis or padel today?": "امروز تنیس یا پدل بازی کردید؟",
+    "Add it, and anything else you did. It counts toward your steps too.": "ثبتش کنید، و هر فعالیت دیگه‌ای که داشتید. این‌ها هم جزو قدم‌هاتون حساب می‌شن.",
+    "Got it": "متوجه شدم"
   },
   "patterns": [
     ["of (\\d[\\d,]*)", "از {n1}"],

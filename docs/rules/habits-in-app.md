@@ -112,6 +112,15 @@ reference is [`../../HABITS.md`](../../HABITS.md). These are the rules for the h
   is their usual (the median typed steps of the last 14 days, 7 days or more needed) +10% to the nearest 500, 6,000 to 12,000 (the
   coach.html suggestion's rule); after that it goes up by at least 500 when it was met on 5 of the last 7 days, and **never goes down
   by itself**. A number Amir sets is left alone until he hands it back: `coach_set_steps_target(id, null)`. Forward only, like every number.
+- **Steps shows all of it; only up to the target counts** (2026-11-24, Amir: *"if i play 4 hours of tennis, why doesnt it go over the
+  10,000? ... it should go up, doesnt need to give xp if its more than enough"*). The Steps row and coach.html's grid show the typed steps
+  plus the activity's whole worth (`mvAll`, `habValC()`); the tick, the meter, the XP, the day gate and every step total still read the
+  scored number, the credit capped at the day's target (`stepsScored()`, `hab_log_credited()`), so a long court day pays and counts
+  nothing past it. `scripts/headless/move-credit.js` allows the drawn number to be MORE than the scored one on a met Steps day only.
+- **Add your other activity too, said once ever** (2026-11-24, Amir: *"just a one time reminder, when people adding to the steps, to
+  add their other activity as well"*). The first change to Steps (`habSetVal()` → `actHintArm()`) opens a small box under the row
+  (`actHintHtml()`: Add activity, Got it), marked seen the moment it opens (`<id>_act_hint`, never synced); an athlete who already
+  logs activity never sees it. Not a toast. `scripts/headless/act-hint.js` (10 checks).
 - **Move minutes are worked out once, on the server, and the phone never copies the arithmetic** (stage127, #134 and #135,
   2026-11-24, Amir: *"go with your picks but movement should give people xp"*). One weekly number from plan sessions, Library,
   Court Log and walking (minutes × MET ÷ 4, minutes at 3 MET or more; the numbers are `career/rulebook.toml` → `[fact.move_week]`),

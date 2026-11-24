@@ -645,7 +645,9 @@
 // on Your weeks (Move minutes, stage127), the Court Log credit filling the whole Steps day from today, a full moving week in How the XP works.
 // v297: program.html and i18n-fa.js (?v=36) changed (2026-11-24, Amir: "every session in the library needs to calculate this"): the Move minutes
 // sheet says a Library session counts by what it is (its own MET, stage129) and that care counts 0.
-const CACHE = 'aap-v297';
+// v298: program.html and i18n-fa.js (?v=37) changed (2026-11-24, Amir: "it should go up, doesnt need to give xp", "just a one time reminder"):
+// Steps shows all of a long court day (only up to the target counts), and a one-time box under Steps to add other activity too.
+const CACHE = 'aap-v298';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -686,7 +688,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=16',
-  '/assets/js/i18n-fa.js?v=36',
+  '/assets/js/i18n-fa.js?v=37',
   // The recovery rules (v295, round 14): Footprint's thresholds and The Last Word's lines, generated from recovery/*.toml. The finished card
   // reads them at Done, signal or not. By the exact URL the page asks for: a change is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/recovery.js?v=1',
