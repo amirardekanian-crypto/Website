@@ -5,6 +5,15 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-11-24 · Round 14 'The Changeover': "go with your picks and build all".** His words: *"go with your picks and build all. use
+  cheaper agents for easier tasks / if we need to add active recovery sessions, or suggest different sessions, we can build it if we dont
+  have it / start in a fresh chat"*. Earlier the same day he sent the article half (#145) to its own session: *"in another i want to write
+  some blogs about recovery, it can be one, or it can be many, with cheaper agent please / its gonna be for recreational and competetive
+  tennis / padel players"*. What it teaches (inferred): (1) an evidence brief that ends in a ranked plan gets a one-line answer; (2) "build
+  all" overrode my "later" and "park" calls (143, 144), so for a coaching-led round he wants the whole set built, not a trickle; (3) he
+  would rather grow the Library to fit a suggestion than bend the suggestion to the Library, so a missing session is a build, not a reason
+  to cut; (4) cheaper agents for the easy work stays a standing ask, and a big build goes to a fresh chat.
+
 - **2026-11-21 · 118 Pass It On, and a standing rule: athletes are told every change.** *"lets build 118 i like it"*, then *"yes i want it to
   be delivered in their inbox, if we add a function to the app, changed the function of the app. this should be a rule, that after any change
   to program.html people should know what have changed"*, and the same day *"have a read of what have changed in the app in last 3-4 days, send a
