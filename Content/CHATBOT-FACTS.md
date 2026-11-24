@@ -186,7 +186,7 @@ report, WhatsApp and email support, and a 10% loyalty discount when you renew.
 - Inside: 4 blocks, 3 main sessions a week (2 in the gym, 1 on court, each up to about 75 min),
   optional extra sessions (on-court endurance, speed and agility, home durability and mobility,
   30 to 50 min each), 114 exercises with cues, easier and harder versions and mostly a
-  no-equipment option, 22 short lessons, 7 simple tests (week zero, then every 4 weeks), and a
+  no-equipment option, 30 short lessons, 7 simple tests (week zero, then every 4 weeks), and a
   version for 13 to 15 year olds.
 - Works offline after the first sign-in (the first time needs internet; try a VPN if it does
   not connect).

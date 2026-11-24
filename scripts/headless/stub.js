@@ -89,6 +89,11 @@
       // stage126: `actTold` true = the server told the crew as it saved (the answer and acts say told)
       if (S.actTold) row.told = true;
       if (fw && Array.isArray(fw.acts) && !seen) fw.acts.push({ day: row.day, kind: row.kind, mins: row.minutes, effort: row.effort, id: row.id, told: !!S.actTold });
+      // #150 The Count-Up (scripts/headless/count-up.js): `moveAdd` = the Move minutes the server's move_week() would add for this row (a test knob,
+      // never the arithmetic), put on the week the row falls in; `moveXp` = what its move_week fact pays once the total reaches `fiveWeeks.move.line`.
+      if (fw && fw.weeks && !seen && S.moveAdd) fw.weeks.forEach(function (w) {
+        if (row.day >= w.from && row.day <= w.to && w.move) { w.move.total += S.moveAdd; if (w.move.total >= ((fw.move || {}).line || 300) && S.moveXp) w.move.xp = S.moveXp; }
+      });
       S.actLog = (S.actLog || []).concat(seen ? [] : [row]);
       try { var c1 = JSON.parse(localStorage.getItem('__stubcfg') || '{}'); c1.fiveWeeks = fw; localStorage.setItem('__stubcfg', JSON.stringify(c1)); } catch (e) {}
       return res({ data: row, error: null, status: 200 });

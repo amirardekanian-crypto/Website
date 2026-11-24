@@ -70,7 +70,7 @@ and Ryan 1999 (expected rewards undermine, positive feedback helps), Mazeas 2022
 
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
-| 29 | Hold Serve | A streak of held weeks (every session of the plan's week, any days; rest days never break it, pauses between cycles); later Proof's session ladder counts held weeks (settles the Proof audit's open decision 4), optionally STEP UP's metal standing that moves up and down | — | pitched · **recommended first** |
+| 29 | Hold Serve | A streak of held weeks (every session of the plan's week, any days; rest days never break it, pauses between cycles); later Proof's session ladder counts held weeks (settles the Proof audit's open decision 4), optionally STEP UP's metal standing that moves up and down | — | **picked** 2026-11-24 · build first |
 | 30 | Courtside | coach.html → Today "Worth a word": the week's wins (new best, effort-matched win, held-weeks mark, session mark, comeback) with a pre-filled WhatsApp in the athlete's language; not a reason | (37) | pitched · top 3 |
 | 31 | Signed Off | The training's first share card: Cycle complete → Story card with cycle art, sessions, weeks held, top 3 wins, retest, Amir's signature and photo, AMIRARDEKANI.COM; Farsi card later | — | **built** 2026-10-17 as **Highlight Reel** (design page https://claude.ai/artifact/SuyYRPeX9n2SdbiUvoHhkF, "go with your picks"): Signed Off with four more training cards (New Best, Same Effort, Retest, The Distance), Story or post, English or Farsi from the start, a one-time Cycle complete moment, and Career Mode's five reward cards drawn for phase 3 (`assets/js/sharecard.js`, PROGRAM-APP.md → Highlight Reel). Weeks held waits for Hold Serve (#29) |
 | 32 | Ring the Bell | Crew → Board \| Bell: automatic 7-day lines for a new best, a held-weeks mark or a session mark, 👏 once; consent asked at the first win | (37) | pitched |
@@ -642,6 +642,64 @@ Cut on the page (so they are not re-pitched): a recovery score or readiness ring
 stretch or breathing block at the end of every session, a muscle map with "recovered %" (#28 Body Weather stays where it is), a bedtime
 push after big days, recovery XP or a recovery mission, heart-rate variability from watches (round 12), a "how recovered do you feel"
 check-in question (validated, but the check-in already has five; only if he asks), product suggestions (massage guns, compression).
+
+## Round 15 · 2026-11-24 · "Over the Line" (achievements, medals and cards for the weekly total and for each activity)
+
+Page: https://claude.ai/artifact/3PxRLCNLFF8tDf3TudwBTx
+
+Brief: Amir, *"create some achievements/medals/congratz Cards and other things other achievement get, for weekly activity and the activity
+it self, give me some suggestions of what we can do"*, straight after The Whole Week (#134-#138) went live. Live numbers: `move_week()` run
+for 28 athletes over the 8 calendar weeks 28 Sep to 22 Nov: 122 active weeks, middle 203 Move minutes, 79 at the 150 mark (21 athletes),
+26 at the 300 line (15 athletes), 3 athletes at it 3 times, nobody 4, 5 weeks past 450, 1 past 600 (max 686); a week beating the
+athlete's own earlier best 28 times. Court Log: 6 activities ever, 3 athletes, 315 minutes, longest 60, no match; 1 `move_week` paid so
+far. 134 awards to 29 athletes in 28 days. Walking has five steps achievements (GROUND COVERED I-III, QUARTER OF A MILLION, THE
+MILLION); court time has none. Court Log writes no career fact today. Pay rule on the page: a one-time achievement pays XP (its own
+source, as Held on top of week_held; rulebook v14, `paid_from` per D21); anything that comes back is recognition only (GAME-6).
+Three directions: A Into the Cabinet (146-149, two new emblem shapes, ring and court roundel, steps Ink to Champion, never a metal) =
+pick, with 150 riding along; B The Week Ends Well (151-153); C Every Activity Answers (150, 151, 155).
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 146 | Full Week | Achievement family for weeks at the 300 line, counted in total, never a streak: Full Week (first, `repeats = "move_week"` for "Won N times"), 4, 12, 26 Full Weeks at 100 / 200 / 500 / 1000 XP; test `total` on `move_week`; a ring emblem | 135 | **picked** 2026-11-24 ("go with your picks"), with 148 in one stage |
+| 147 | Whole Week | Once: plan, court and walking (or Library) each 30+ Move minutes in one plan week, 150 XP; new test `week_parts` | 146 | pitched (once court data exists) |
+| 148 | Court Hours | 10 / 25 / 100 hours of Court Log activity, every kind together, 150 / 400 / 1000 XP (25 h is about 290,000 steps of work = QUARTER OF A MILLION's 400); a 0-XP `activity_done` fact from `log_activity()`, new test `sum`; a court roundel emblem | 123 | **picked** 2026-11-24, with 146 in one stage |
+| 149 | Match Day and Cross-Court | Firsts on 148's fact: the first Match logged (50 XP), three kinds in one cycle (100 XP); not results (#36 Silverware stays its own) | 148 | pitched |
+| 150 | The Count-Up | The Court Log save toast shows the activity's Move minutes and the week's bar filling in clay ("+68 Move minutes. 212 of 300"), from `get_five_weeks()`, no phone arithmetic; GAME-13; recognition only | 134 | **built** 2026-11-24 (37ad51a2): the save's box and the recovery offers carry it, `scripts/headless/count-up.js` |
+| 151 | Over the Line | A Bell moment card (#121 family) for the activity or session that takes a week past 300: ring emblem, "OVER THE LINE +24", once a week per person, sharers only; recognition only | 135, 121 | **picked** 2026-11-24 |
+| 152 | Best Week Yet | A clay "Best week yet" tag on Your weeks when the closing week beats the athlete's best of the previous eight (after three weeks), one Inbox line; no push, never "almost"; recognition only | 134 | pitched |
+| 153 | The Monday Card | A 9:16 share card for a week at the line: the Move minutes big, a plan / court / walking / Library split bar, AMIRARDEKANI.COM, English and Farsi; waits for the share-card design pass | 134 | pitched (after the card pass) |
+| 154 | Courtside Move Lines | The new awards in coach.html's Courtside with the WhatsApp line in the athlete's language (templates in `recognition.toml`); a tap per line | 146, 148 | pitched (comes with 146 and 148) |
+| 155 | Long Day | Grown along the way: a 120+ minute activity shows "Long day" on its crew post, beside the recovery offer (#128, #141); no achievement on purpose | 123 | pitched |
+
+**Picks, 2026-11-24:** Amir, *"go with your picks"* (direction A with 150, Court Hours pays like walking, the names Full Week and
+Court Hours, the Monday Card waits for the share-card pass), then the rule of three shapes: a single day, a month's total and days in a
+row (TASTE.md). It reversed the cut of "weeks at the line in a row". Live steps numbers that day (typed only, 377 days, 23 athletes since
+12 Jul): 91 days at 10,000 by 14 athletes; 4 athletes with 3 in a row, longest run 5, so nobody has ever held GROUND COVERED I (7);
+5 calendar months at 100,000 (4 athletes), 1 at 200,000, 0 at 300,000 (best 205,100). Grown from his answer, waiting on his calls:
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 156 | The Walking Ladder | Walking gets all three shapes: a first 10,000 day; 3 days in a row at your number below GROUND COVERED's 7 / 21 / 60 (and 10 if he wants it); 100,000 / 200,000 / 300,000 steps in a calendar month with "Won N times"; a day's steps as the app scores them (typed + Court Log credit) | 136 | **picked** 2026-11-24 ("i like your ladder"): 1 · 3 · 7 · 21 · 60, no 10 · **built in part** 2026-11-24 (rulebook v14): the first day, 3 in a row, GROUND COVERED says "your number"; the month totals wait for #159 phase 2 |
+| 157 | Full Weeks in a Row | 2 / 4 / 8 plan weeks in a row at the 300 line, beside 146's total count (4 athletes have done 2, nobody 3) | 146 | pitched (his idea) |
+| 158 | Court Every Week | The court family's in-a-row shape counted in weeks, never days (rest days): an activity logged in 4 / 8 / 12 plan weeks running; its month shape is hours in a calendar month (10 h) | 148 | pitched (his idea) |
+
+Statuses above: 146, 148, 150, 151 **picked** 2026-11-24; 154 picked (comes with 146 and 148); 153 picked to wait for the card pass;
+147, 149, 152, 155 picked in the order on the page.
+
+Cut on the page (so they are not re-pitched): ~~weeks at the line in a row (a count instead)~~ (reversed by Amir, #157), a 600-minute week (pays for too much), a medal
+per sport (collection), gold / silver / bronze (metals and the colour rule), XP per activity (the Steps credit pays), a Move minutes board
+(rounds 11 and 13), an "almost there" Sunday line (= Break Point), achievements for effort or one long day.
+
+**Three shapes, everywhere (2026-11-24).** Amir, *"i like your ladder"* (so #156 is 1 · 3 · 7 · 21 · 60, no 10), then *"have a look at
+other activities, other habits, workouts and etc and see where you can apply this as well"*. A section on the same page audits every
+family for one day · a month · in a row. Live numbers (habit log, every day ever, done = at Proof's target): sleep 392 days by 21
+athletes, 11 with 3 in a row, 6 months of 20+ nights (3 athletes); water 12 athletes, 8 with 3 running; protein 16, 7; mobility 9
+athletes, 4 with 3 running, longest 9; breathing 5 athletes, 27 days; supplements 13. Facts: 48 bests by 12 athletes, 9 calendar months
+with 3+ (7 athletes); 613 check-ins by 37, 10 at 25, 2 at 50; Library 5 sessions by 2; perfect days 14 by 4, one run of 3.
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 159 | Three Shapes, Everywhere | Every family gets one day · a month · in a row where it is missing: firsts for steps, sleep, water, protein, mobility, breathing and the first check-in; 3 in a row below each habit's 7 (and UNBROKEN's); mobility 3 · 7 · 21 and breathing 3 · 7 (no achievement today); 20 nights / days in a month for sleep, water, protein, days that count, 15 for mobility, 10 perfect days; perfect days 3 · 7 in a row; HOUSE RULES 3 · 7 · 21 for a habit of your own; Library 4 in a month and 3 · 6 weeks running; every session checked in 4 weeks running, check-ins 50 · 100; 3 bests in a month, a best in 3 cycles running; Full Moving Month. Left out: supplements (a product, the tick pays), months with Amir, comebacks, retests, cycles, cheers, effort, training days in a row. One-time achievements in rulebook v14 with `paid_from`; three phases (about 16 catalogue-only rows on existing tests, then two month tests and about 15 rows, then about 9 training rows); cabinet 162 → about 200 | 156 | **picked** 2026-11-24 · **phase 1 built** 2026-11-24 (rulebook v14, seeded on "Yes, seed v14"): 16 achievements, 130 won at 0 XP by 26 athletes, nobody moved (`PROCEDURES.md` → *Rulebook version 14*); phases 2 and 3 to come |
 
 ## Grown out of deep-dives
 

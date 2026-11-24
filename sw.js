@@ -651,10 +651,18 @@
 // cover is the article added last (each article carries an `added` stamp), not the first read of the first shelf.
 // v300: program.html changed (2026-11-24, Amir: "this shoule be notified once every day, untill they log in their first time"): the box
 // under Steps comes back once a day until the athlete logs their first activity.
-// v301: program.html and i18n-fa.js (?v=38) changed (2026-11-24, Amir: "all the similar activities should be in the same message like when people
+// v301: program.html and i18n-fa.js (?v=38) changed (2026-11-24, round 15 'Over the Line', Amir: "go with your picks"): The Count-Up, a
+// Court Log save says what it added to the week's Move minutes, with the bar, and "That's your line" on the save that reaches 300.
+// v302: program.html changed (2026-11-24, Amir: "everytime i open the app i see it. doesnt it have to go away"): the Cycle complete moment's
+// seen list (<id>_hl_seen) merges as a union, so a server copy without this cycle's mark can no longer take the phone's mark away at the next pull.
+// v303: program.html and i18n-fa.js (?v=39) changed (2026-11-24, Amir: "Build the fan (A)"): a Crew card whose day holds two or more achievements
+// or marks wears them all as a fan of emblems, "3 achievements", and its badge opens the list, each row its own door.
+// v304: program.html, emblems.js (?v=3) and i18n-fa.js (?v=40) changed (2026-11-24, round 15 'Over the Line', #159 phase 1, rulebook version 14): sixteen
+// new achievements in the cabinet (the first day of each habit, 3 in a row, mobility 7 and 21, breathing 7), two new rung glyphs, their Farsi.
+// v305: program.html and i18n-fa.js (?v=41) changed (2026-11-24, Amir: "all the similar activities should be in the same message like when people
 // did workout" and "the design looks really off"): Crew draws a day's plain activity posts of one kind as ONE card of faces with their minutes, and the
 // line under a name stops wearing the Like button's pill.
-const CACHE = 'aap-v301';
+const CACHE = 'aap-v305';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -683,7 +691,7 @@ const SHELL = [
   // The habit engine (v195): the training app owns the habits now, so this is shell, not an extra.
   '/assets/js/habits-core.js?v=1',
   // The emblem cabinet's art (v226): the achievements, the marks and the level medals, drawn in code. By the exact URL the page asks for.
-  '/assets/js/emblems.js?v=2',
+  '/assets/js/emblems.js?v=3',
   // The face the emblems' numbers are drawn in (the training day's title uses the 900 one above).
   '/assets/fonts/BarlowCondensed-800.woff2',
   // Off the Glass, the rest game (v162): loaded on the first tap on Play. Cache-first by this plain URL: a change needs a CACHE bump.
@@ -695,7 +703,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=16',
-  '/assets/js/i18n-fa.js?v=38',
+  '/assets/js/i18n-fa.js?v=41',
   // The recovery rules (v295, round 14): Footprint's thresholds and The Last Word's lines, generated from recovery/*.toml. The finished card
   // reads them at Done, signal or not. By the exact URL the page asks for: a change is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/recovery.js?v=1',

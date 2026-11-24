@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=38"></script>
+<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=41"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -199,7 +199,7 @@
 <!-- The emblem cabinet's art (2026-10-25, Amir: direction A of the Emblem Cabinet): every achievement, mark tier and level medal is drawn in
      code (window.AAEmblem), no pictures. `defer`, like the habit engine, so boot() can get here first: every caller asks for it only when it
      draws (cabEmblem()) and the page repaints itself once it has loaded (emblemsReady()). -->
-<script defer src="/assets/js/emblems.js?v=2" onload="window.emblemsReady && emblemsReady()"></script>
+<script defer src="/assets/js/emblems.js?v=3" onload="window.emblemsReady && emblemsReady()"></script>
 <!-- The recovery rules (round 14 'The Changeover', 2026-11-24): Footprint's thresholds, The Last Word's lines, Matched Pair's map, as
      window.AAREC, generated from recovery/*.toml by scripts/build_recovery.py (coach.html reads the same file). `defer`: whatever drew
      before it arrived is drawn again by recReady() (the finished cards, Home's suggestion). -->
@@ -2982,6 +2982,16 @@
   .aa-toast-k { display: flex; align-items: center; gap: 8px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.84); }
   .aa-toast-k::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
   .aa-toast-t { font: 500 var(--fs-body)/1.45 'Barlow', sans-serif; color: #fff; text-wrap: pretty; }
+  /* THE COUNT-UP (#150, 2026-11-24): a Court Log save says what it added to the week. The big number in the condensed face, "Move minutes" in the
+     clay that reads on the green, the week's bar with what was there in mint and what this save added in clay, the line as a tick when the week is past it. */
+  .aa-toast-mv { display: grid; gap: 6px; }
+  .aa-toast-mv b { font: 800 var(--fs-head)/1 'Barlow Condensed', sans-serif; letter-spacing: .3px; color: #fff; }
+  .aa-toast-mv b span { color: var(--clay-on-green); }
+  .aa-toast-mv p { margin: 0; font: 500 var(--fs-body)/1.35 'Barlow', sans-serif; color: rgba(255,255,255,.88); }
+  .aa-toast-bar { position: relative; height: 8px; border-radius: 99px; background: rgba(255,255,255,.18); overflow: hidden; }
+  .aa-toast-bar i { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 99px; background: var(--mint); }
+  .aa-toast-bar i.is-new { background: var(--clay-on-green); }
+  .aa-toast-bar s { position: absolute; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,.7); text-decoration: none; }
   .aa-toast-go, .aa-toast-x { min-height: 44px; padding: 0 20px; border: 0; border-radius: 8px; cursor: pointer; color: #fff;
     font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
   .aa-toast-x { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.5); }
@@ -6575,6 +6585,21 @@
   #screen-crew .cr-mc .cr-react.is-menu { grid-column: 1 / -1; margin: 2px 0 0; }
   #screen-crew .cr-mc .cr-mchi { align-self: center; margin: 0 6px 0 0; }
   #screen-crew .cr-mc .cr-hburst { width: 56px; height: 56px; margin: -28px 0 0 -28px; }
+  /* THE FAN (2026-11-24; Amir: "Build the fan (A)"): two or three emblems in the badge's own 56 px, the lead on top and leftmost, the others peeking out from behind it 10 px at a
+     time. A thin ring of the card's own colour (a drop-shadow, so it follows any emblem shape) keeps one from running into the next, in light and in dark. Still ONE button, one door. */
+  #screen-crew .cr-fan { position: relative; display: block; width: 56px; height: 56px; }
+  #screen-crew .cr-fan.n2 { width: 50px; }
+  #screen-crew .cr-fan svg { position: absolute; top: 10px; width: 36px; height: 36px;
+    filter: drop-shadow(1.5px 0 0 var(--row)) drop-shadow(-1.5px 0 0 var(--row)) drop-shadow(0 1.5px 0 var(--row)) drop-shadow(0 -1.5px 0 var(--row)); }
+  #screen-crew .cr-fan svg:nth-child(1) { left: 0; z-index: 3; }
+  #screen-crew .cr-fan svg:nth-child(2) { left: 10px; z-index: 2; }
+  #screen-crew .cr-fan.n2 svg:nth-child(2) { left: 14px; }
+  #screen-crew .cr-fan svg:nth-child(3) { left: 20px; z-index: 1; }
+  /* what the badge opens: one row per medal, its emblem, its name and kind, and the › of a door */
+  #hist-overlay .cr-mrow { grid-template-columns: 48px minmax(0, 1fr) auto; gap: 12px; min-height: 64px; }
+  #hist-overlay .cr-mre { display: block; width: 48px; height: 48px; }
+  #hist-overlay .cr-mre svg { display: block; width: 48px; height: 48px; }
+  #hist-overlay .cr-mrt { display: block; min-width: 0; }
   /* PLAYERS' LOUNGE · THE CYCLE BARS, PLAYER FACTS AND THE FACE STACK (steps 4 to 6, 2026-10-24). Week Bars, with the extra sessions as small round dots after the bar
      (Amir: "the workouts can be anything other than their cycles, they can do extra, it needs to show that as well"); Player Facts for every racket sport and for people
      who play none (Amir: "applicable to all racket sports, and general people as well"); the Face Stack on an achievement ("i like face stack a bit more"). Colours are the
@@ -8211,9 +8236,12 @@ function mergeStoredValue(key, localVal, cloudVal, preferLocal) {
       return JSON.stringify(win);
     } catch (e) { /* not parseable — fall through */ }
   }
-  // The rewards this athlete has seen (Career Mode phase 3, <id>_rw_seen: award id → when): a union, so a phone that missed one never hands
-  // it back to the other to show again.
-  if (key.slice(-8) === '_rw_seen') {
+  // The rewards this athlete has seen (Career Mode phase 3, <id>_rw_seen: award id → when) and the cycle and roadmap moments they have
+  // seen (the Highlight Reel, <id>_hl_seen: 'cycle2|2026-11-23' → when): a union, so a phone that missed one never hands it back to the
+  // other to show again. <id>_hl_seen had no branch of its own until 2026-11-24 and fell to the scalar rule below, where the cloud copy wins
+  // whole: a server copy without this cycle's mark took the phone's mark away at the next pull, and the Cycle complete moment came back at
+  // every open, for ever (the push that would have fixed the server's copy sent the list the pull had just cut down).
+  if (key.slice(-8) === '_rw_seen' || key.slice(-8) === '_hl_seen') {
     try {
       const L = JSON.parse(localVal) || {}, C = JSON.parse(cloudVal) || {}, out = {};
       Object.keys(L).concat(Object.keys(C)).forEach(id => { out[id] = Math.min(Number(L[id]) || Infinity, Number(C[id]) || Infinity); if (!isFinite(out[id])) out[id] = Date.now(); });
@@ -16779,6 +16807,27 @@ function crewMomentLead(it) {
   for (const k of CREW_MC_RANK) { const i = parts.findIndex(p => p && p.k === k); if (i >= 0) return { p: parts[i], i }; }
   return null;
 }
+// THE FAN (2026-11-24; Amir, asked how three achievements on one day should show: "Build the fan (A)"). Three won together were ONE emblem with a door and two names as plain words that
+// could not be tapped. Now a line that holds two or more achievements or marks that can be opened wears them all: the lead's emblem on top, the others peeking from behind it (three at most),
+// "3 achievements" as the fact, every name in the small line. The badge opens the list (openCrewMedals), and each row of it is a door to what that one is (openCrewAch, ‹ Back to the list).
+// A line with one is the card it always was. The lead keeps its place by CREW_MC_RANK, so an honour still leads (and the medals stay words under it).
+function crewMcMedals(it, lead) {
+  if (!lead || !lead.p || (lead.p.k !== 'achievement' && lead.p.k !== 'mark')) return [];
+  const out = [];
+  (it.parts || []).forEach((p, i) => {
+    if (!p || (p.k !== 'achievement' && p.k !== 'mark')) return;
+    const d = achDetailOf(p);
+    if (d) out.push({ p, i, d });
+  });
+  if (!out.some(m => m.i === lead.i)) return [];   // the lead cannot be opened (a mark with no badge): the card stays the one it was
+  return out.sort((a, b) => a.i === lead.i ? -1 : b.i === lead.i ? 1 : a.i - b.i);   // the lead first, the rest in the order sent
+}
+function crewMcFan(medals) {
+  const n = medals.length, shown = medals.slice(0, 3), ach = medals.every(m => m.p.k === 'achievement'), more = n - shown.length;
+  return { fan: n, badge: `<span class="cr-fan n${shown.length}" aria-hidden="true">${shown.map(m => m.d.svg).join('')}</span>`,
+    big: `${n} ${ach ? 'achievements' : 'trophies'}`,   // one text, so a Farsi phone says it with Persian digits ("(\d+) achievements?" in the word lists)
+    sub: shown.map(m => esc(m.d.name)).concat(more > 0 ? ['+' + more + ' more'] : []) };
+}
 function crewMcOn() { return crewPagesOn() && !!cabE(); }
 function crewMcDisc(t) { return `<span class="cr-mcd" aria-hidden="true">${t}</span>`; }
 const CREW_HONOUR_WORDS = { sessions: 'Most sessions', improved: 'Most improved', full_month: 'Full Month', pick: "Amir's Pick" };
@@ -16830,22 +16879,24 @@ function crewMomentCardHTML(it) {
   const lead = crewMomentLead(it);
   if (!lead) return '';
   const pp = crewPersonOf(it), who = it.me ? 'You' : (it.who || 'Someone'), first = it.me ? 'You' : String(it.who || 'them').split(/\s+/)[0];
-  let f = null;
-  try { f = crewMcFace(it, lead, first); } catch (e) { f = null; }   // an emblem that will not draw falls back to the slim row
+  let f = null, medals = [];
+  try { medals = crewMcMedals(it, lead); f = medals.length > 1 ? crewMcFan(medals) : crewMcFace(it, lead, first); } catch (e) { f = null; }   // an emblem that will not draw falls back to the slim row
   if (!f) return '';
-  // the other moments of the day, in words, after who
-  const rest = (it.parts || []).map((p, i) => i === lead.i ? '' : crewPartText(p)).filter(Boolean).map(esc);
+  // the other moments of the day, in words, after who (a fan names its medals itself, so they are not said twice)
+  const named = f.fan ? medals.map(m => m.i) : [lead.i];
+  const rest = (it.parts || []).map((p, i) => named.indexOf(i) >= 0 ? '' : crewPartText(p)).filter(Boolean).map(esc);
   const badge = f.face
     ? `<span class="cr-mcf">${crewFace(pp, 'tt')}<i class="cr-mcnew" aria-hidden="true">NEW</i></span>`
+    : f.fan ? `<button type="button" class="cr-mcb cr-mcfan" onclick="openCrewMedals('${esc(it.key)}')" aria-label="What these are">${f.badge}</button>`
     : (f.door ? `<button type="button" class="cr-mcb" onclick="openCrewAch('${esc(it.key)}', ${lead.i})" aria-label="What this is">${f.badge}</button>` : `<span class="cr-mcb" aria-hidden="true">${f.badge}</span>`);
   const kw = crewKudosWords(it.kudos);
   const canHello = !it.me && pp.ck && crewMe().can_post && lead.p.k === 'joined';
   const right = canHello
     ? `<button type="button" class="cr-sayhi cr-mchi" onclick="crewSayHello('${esc(pp.ck)}')" aria-label="Say hello to ${esc(first)}">Say hello</button>`
     : `<span class="cr-react on-line${_crewOpenEm[it.key] ? ' is-menu' : ''}" data-row="${esc(it.key)}" data-mode="heart" data-count="1">${crewHeartHTML(it.key, it.kudos, it.me, true)}</span>`;
-  return `<div class="cr-line cr-mc cr-mc-${esc(lead.p.k)}" data-key="${esc(it.key)}" onclick="crewTwoTap(event, '${esc(it.key)}')">${badge}
+  return `<div class="cr-line cr-mc cr-mc-${esc(lead.p.k)}${f.fan ? ' cr-mc-fan' : ''}" data-key="${esc(it.key)}" onclick="crewTwoTap(event, '${esc(it.key)}')">${badge}
     <span class="cr-mct"><span class="cr-mcbig" dir="auto">${f.big}</span>
-      <span class="cr-mcsub">${crewNameHTML(pp, who)} · ${[f.sub].concat(rest).map(t => `<span>${t}</span>`).join(' · ')}</span>
+      <span class="cr-mcsub">${crewNameHTML(pp, who)} · ${[].concat(f.sub, rest).map(t => `<span>${t}</span>`).join(' · ')}</span>
       <small data-kw="${esc(it.key)}">${crewLineMeta(it, kw)}</small></span>${right}</div>`;
 }
 // The small line under a moment: who liked it, then when. Each in its own element, so a Farsi phone translates each one alone
@@ -16921,6 +16972,26 @@ function openCrewAch(key, idx) {
   achDetailSheet(Object.assign(d, { meta: 'Won by ' + (it.who || 'someone in the crew') + (day ? ' · ' + cabDay(day) : '') }));
 }
 window.openCrewAch = openCrewAch;
+// The fan's list (2026-11-24): every achievement or mark a line holds, one row each, each row a door to what it is (openCrewAch, wrapped like this one, so ‹ Back from it comes
+// back here). Reads the line from the phone's copy of the Bell by its key, as openCrewAch does.
+function openCrewMedals(key) {
+  const ov = document.getElementById('hist-overlay'), it = ((BELL && BELL.items) || []).find(x => x && String(x.key) === String(key));
+  if (!ov || !it || !cabE()) return;
+  const medals = crewMcMedals(it, crewMomentLead(it));
+  if (medals.length < 2) return;
+  const ach = medals.every(m => m.p.k === 'achievement'), at = Date.parse(it.at), day = at ? cabDay(ymdLocal(new Date(at))) : '';
+  const rows = medals.map(m => `<button type="button" class="cr-bt pl-row cr-mrow" onclick="openCrewAch('${esc(it.key)}', ${m.i})">
+    <span class="cr-mre" role="img" aria-label="${esc(m.d.name).replace(/"/g, '&quot;')}">${m.d.svg}</span>
+    <span class="cr-mrt"><span class="t" dir="auto">${esc(m.d.name)}</span>${m.d.kind ? `<span class="q">${esc(m.d.kind)}</span>` : ''}</span>
+    <span class="c" aria-hidden="true">›</span></button>`).join('');
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">${ach ? 'Achievements' : 'Trophies'}</div>
+    <h2 class="readiness-title">${medals.length} ${ach ? 'achievements' : 'trophies'}</h2>
+    <p class="readiness-sub">${it.me ? (day ? 'Won ' + esc(day) : 'Won') : 'Won by ' + esc(it.who || 'someone in the crew') + (day ? ' · ' + esc(day) : '')}</p>
+    <div class="pl-list">${rows}</div>`;
+  ov.classList.add('visible');
+}
+window.openCrewMedals = openCrewMedals;
 // ONE ladder on one block (2026-10-20). It used to read "1. Ehsan A. LV 14 — 3,153" above "4. Elmira A. LV 29 — 1,114": the
 // level is lifetime and the number that sorts is this SEASON's, and the season was two days old, so a level-29 athlete sat
 // below a level-14 one with both numbers on the same row. The LV chip is gone and the block is titled *This season*, which is
@@ -19263,6 +19334,7 @@ window.paintTrend = paintTrend;
 // hint at pain). The phone keeps a copy (<id>_fwcache, never synced) so the card still shows offline. Court and other activity
 // (#123 Court Log) will be a third kind here.
 let FW = null;
+let FW_LIVE = false;   // FW is the server's answer from this visit, not the phone's copy: The Count-Up (#150) only trusts that one
 const FW_SHELF = { strength: 'Strength', conditioning: 'Conditioning', 'on-court': 'On-Court', mobility: 'Mobility', recovery: 'Recovery', breath: 'Breath', care: 'Care' };
 function fwKey() { return ATHLETE_ID + '_fwcache'; }
 function fwOk(c) { return !!c && Array.isArray(c.weeks) && c.weeks.some(w => w && /^\d{4}-\d{2}-\d{2}$/.test(String(w.from || ''))); }
@@ -19280,10 +19352,14 @@ async function loadFiveWeeks() {
     const res = await _withTimeout(sb.rpc('get_five_weeks', { p_athlete_id: ATHLETE_ID }), 8000);
     if (!res || res.error) return;   // offline, or a server without stage115: the copy (or nothing) stays
     FW = fwOk(res.data) ? res.data : null;
+    FW_LIVE = !!FW;
     try { if (FW) _lsRawSet(fwKey(), JSON.stringify(FW)); else localStorage.removeItem(fwKey()); } catch (e) { /* storage full: shown this visit */ }
     paintFiveWeeks();
+    loadStepsTargets();   // #130 Your Number
+    return FW_LIVE;
   } catch (e) { /* the copy above stays */ }
   loadStepsTargets();   // #130 Your Number
+  return false;
 }
 window.loadFiveWeeks = loadFiveWeeks;
 // ── YOUR NUMBER — #130 (round 12, 2026-11-23; Amir: "App suggests, you approve", "Full XP at their number") ─────────────────────
@@ -19543,13 +19619,45 @@ function actTold(id) { const a = moveActs().find(x => x && String(x.id) === Stri
 function actMarkTold(id) {
   try { if (FW && Array.isArray(FW.acts)) FW.acts.forEach(a => { if (a && String(a.id) === String(id)) a.told = true; }); } catch (e) { /* the next read says it */ }
 }
+// ── THE COUNT-UP — #150 (round 15 'Over the Line', 2026-11-24; Amir: "go with your picks") ──────────────────────────────────────
+// A Court Log save answers with what it added to the week: "+68 Move minutes. 212 of 300 this week.", the bar with the new part in clay, and
+// on the save that takes the week to the line, "That's your line. +150 XP." (GAME-13; recognition only, it pays nothing itself). ⚠️ BOTH
+// NUMBERS ARE THE SERVER'S: the week's Move minutes from get_five_weeks() as it stood before the save (this visit's answer, never the phone's
+// copy) and from a fresh read after it. The phone only subtracts one from the other: there is no phone copy of move_week()'s arithmetic.
+// The XP is the week's own move_week fact (move.xp), so a week before 24 November, or a server without stage127, says no XP.
+function mvWeekOf(day) {
+  if (!FW || !fwOk(FW)) return null;
+  const w = FW.weeks.find(x => x && day >= String(x.from) && day <= String(x.to));
+  return w && w.move && typeof w.move.total === 'number' ? w.move : null;
+}
+function mvBefore(day) { const m = FW_LIVE ? mvWeekOf(day) : null; return m ? Math.round(m.total) : null; }
+async function mvCountUp(day, before) {
+  if (before == null) return null;
+  try {
+    const live = await Promise.race([loadFiveWeeks(), new Promise(r => setTimeout(() => r(false), 9000))]);
+    if (!live) return null;
+    const m = mvWeekOf(day);
+    if (!m) return null;
+    const total = Math.round(m.total), add = total - before, line = Number((FW.move || {}).line) || 300;
+    if (!(add > 0)) return null;   // a gym row on a plan-session day counts once (the plan's), so a save can add nothing
+    return { add, total, before, line, crossed: before < line && total >= line, xp: Math.round(Number(m.xp) || 0) };
+  } catch (e) { return null; }
+}
+// The block inside the note box. Only numbers go in (built here, never from text a person typed).
+function mvToastHtml(mv) {
+  const top = Math.max(mv.line, mv.total), pc = n => Math.min(n, top) / top * 100;
+  const say = mv.crossed ? `That's your line.${mv.xp > 0 ? ` +${fwNum(mv.xp)} XP.` : ''}` : `${fwNum(mv.total)} of ${fwNum(mv.line)} this week.`;
+  return `<div class="aa-toast-mv"><b>+${fwNum(mv.add)} <span>Move minutes</span></b><p>${say}</p>` +
+    `<div class="aa-toast-bar" aria-hidden="true"><i style="width:${pc(mv.before).toFixed(2)}%"></i><i class="is-new" style="left:${pc(mv.before).toFixed(2)}%;width:${(pc(mv.total) - pc(mv.before)).toFixed(2)}%"></i>` +
+    (mv.total > mv.line ? `<s style="left:calc(${pc(mv.line).toFixed(2)}% - 1px)"></s>` : '') + `</div></div>`;
+}
 const COOL_MIN = 60;   // the fallback: the hour is recovery/footprint.toml [court] hard_min (window.AAREC) since round 14
 // ── BACK-TO-BACK — #142 (round 14 'The Changeover', 2026-11-24; Amir: "go with your picks and build all") ──────────────────────────
 // Cool Down Call learns two moments. Saving a hard activity on the day after another hard day (a hard activity of an hour or more, or
 // a big gym session: Footprint, #139) says the days are piling up, with the day-after session. Saving a match offers Final Whistle,
 // for the hour after it. The words and the sessions are recovery/last-word.toml [back_to_back] and [after_match]. Information only
 // (REC-7): nothing in the plan changes. Only for an activity saved for today: "tonight" and "tomorrow" mean nothing for last Friday.
-async function backToBackCall(act, day) {
+async function backToBackCall(act, day, mv) {
   const A = window.AAREC;
   if (!A || !act || String(day || '') !== ymdLocal(new Date())) return false;
   const hard = recHardAct({ effort: act.effort, mins: act.minutes });
@@ -19560,20 +19668,22 @@ async function backToBackCall(act, day) {
   if (!w) return false;
   aaToast(say.en, {
     kicker: act.told === true ? 'Added. The crew sees it.' : 'Added to your weeks.',
+    move: mv || null,
     action: w.title,
     run: () => { _wsReturn = { day: null, y: window.scrollY }; openWorkout(w.file); }
   });
   return true;
 }
-async function coolDownCall(act, day) {
+async function coolDownCall(act, day, mv) {
   try {
-    if (await backToBackCall(act, day)) return true;   // #142 first: two hard days running, or a match
+    if (await backToBackCall(act, day, mv)) return true;   // #142 first: two hard days running, or a match
     const R = window.AAREC && AAREC.fp;
     if (!act || act.effort !== 'hard' || !(Number(act.minutes) >= (R ? R.court.hard_min : COOL_MIN))) return false;
     await ensureLibManifests();
     const w = libPickItem(LIB_PICKS.sore.id);
     if (!w || !w.file) return false;
     aaToast(`Added to your weeks. A hard one: ${w.title}, tonight or tomorrow${w.duration ? ', ' + w.duration : ''}.`, {
+      move: mv || null,
       action: 'Open it',
       run: () => { _wsReturn = { day: null, y: window.scrollY }; openWorkout(w.file); }
     });
@@ -20147,16 +20257,17 @@ async function saveActivity() {
     if (!sb) throw new Error('offline');
     const res = await _withTimeout(sb.rpc('log_activity', { p_athlete_id: ATHLETE_ID, p_id: _act.key, p_day: _act.day, p_kind: _act.kind, p_minutes: mins, p_effort: _act.effort }), 10000);
     if (!res || res.error) throw (res && res.error) || new Error('no answer');
-    const day = _act.day, quick = !!_act.quick;
+    const day = _act.day, quick = !!_act.quick, mvB = mvBefore(day);   // #150: the week as the server last said, before this row
     _act = null;
     if (!quick) document.getElementById('hist-overlay').classList.remove('visible');
     const r0 = res.data || {}, told = r0.told === true;   // stage126: log_activity() told the crew as it saved
     aaToast(told ? 'Added. The crew sees it.' : 'Added to your weeks.');
-    coolDownCall(r0, day).then(cool => {   // #128: a hard hour or more offers the day-after session instead (#142: two hard days, a match)
+    mvCountUp(day, mvB).then(mv => coolDownCall(r0, day, mv).then(cool => {   // #150 first (the fresh read, which also repaints Your weeks); then #128: a hard hour or more offers the day-after session instead (#142: two hard days, a match)
       if (cool || !r0.id) return;
-      if (told) { if (crewCanTell()) aaToast('Added. The crew sees it.', { action: 'Add a photo', run: () => tellActivity(r0.id, true) }); }   // stage126
-      else if (crewCanTell()) aaToast('Added to your weeks.', { action: 'Tell the crew', run: () => tellActivity(r0.id) });   // #131
-    });
+      if (told) { if (crewCanTell()) aaToast('Added. The crew sees it.', { move: mv, action: 'Add a photo', run: () => tellActivity(r0.id, true) }); else if (mv) aaToast('Added. The crew sees it.', { move: mv }); }   // stage126
+      else if (crewCanTell()) aaToast('Added to your weeks.', { move: mv, action: 'Tell the crew', run: () => tellActivity(r0.id) });   // #131
+      else if (mv) aaToast('Added to your weeks.', { move: mv });   // #150
+    }));
     if (told) { _bellAt = 0; try { refreshBell(); } catch (e2) { /* the Bell catches up on its own */ } }
     if (FW && fwOk(FW)) {   // shown at once, before the server's own answer replaces it
       const r = r0, wk = FW.weeks.find(w => w && day >= String(w.from) && day <= String(w.to));
@@ -20164,7 +20275,7 @@ async function saveActivity() {
       if (Array.isArray(FW.acts) && r.id && !FW.acts.some(a => a && String(a.id) === String(r.id))) FW.acts = FW.acts.concat([{ day, kind: r.kind, mins: r.minutes, effort: r.effort, id: r.id, told }]);   // stage122: Steps follows at once
       paintFiveWeeks();
     }
-    loadFiveWeeks();
+    if (mvB == null) loadFiveWeeks();   // with a count-up, mvCountUp() above is the read
     try { paintTodayCard(); } catch (e2) { /* the card paints itself next time */ }   // #126: Played today? goes once the day has one
   } catch (e) {
     const m = String((e && e.message) || '');
@@ -26887,7 +26998,7 @@ function aaToast(text, opts) {
   _toastOff = opts.off || null;
   el.toggleAttribute('data-pass', !!opts.pass);
   if (opts.tone) el.setAttribute('data-tone', opts.tone); else el.removeAttribute('data-tone');
-  el.innerHTML = (opts.kicker ? '<div class="aa-toast-k"></div>' : '') + '<div class="aa-toast-t"></div><div class="aa-toast-row">' +
+  el.innerHTML = (opts.kicker ? '<div class="aa-toast-k"></div>' : '') + (opts.move ? mvToastHtml(opts.move) : '') + '<div class="aa-toast-t"></div><div class="aa-toast-row">' +
     (opts.action ? '<button type="button" class="aa-toast-go"></button>' : '') + '<button type="button" class="aa-toast-x"></button></div>';
   if (opts.kicker) el.querySelector('.aa-toast-k').textContent = opts.kicker;
   el.querySelector('.aa-toast-t').textContent = text;
@@ -28138,6 +28249,7 @@ function wrapSheetOpeners() {
   openPlayerWeek = sheetWrap(openPlayerWeek); window.openPlayerWeek = openPlayerWeek;   // a Player Page's week of sessions (This cycle)
   openPlayerTrophy = sheetWrap(openPlayerTrophy); window.openPlayerTrophy = openPlayerTrophy;   // a trophy: ‹ Back to "All n" when it was opened from there
   openCrewAch = sheetWrap(openCrewAch); window.openCrewAch = openCrewAch;   // an achievement opened from a Crew line
+  openCrewMedals = sheetWrap(openCrewMedals); window.openCrewMedals = openCrewMedals;   // the fan's list (3 achievements on one line); a row opens its own, ‹ Back to the list
   openFacePhoto = sheetWrap(openFacePhoto); window.openFacePhoto = openFacePhoto;   // Your photo: opened from your page, or from the account's Profile group (‹ Back to it)
   openYourGame = sheetWrap(openYourGame); window.openYourGame = openYourGame;   // Your game: the account's Profile group; ‹ Back to the account
   openCheer = sheetWrap(openCheer); window.openCheer = openCheer;   // Cheer Sara: opened from her page
@@ -29626,7 +29738,8 @@ function hlCopy() {
 
 // ── The moment: a cycle (or the whole roadmap) complete, once, full screen, at the first open after the end date ──
 // The Welcome's recipe (.wel): the cycle's own cover with a burst of court lines, then the card itself on the paper, signed. Shown once
-// per cycle (<id>_hl_seen, synced, so another phone does not show it again), never over the Welcome, never in the demo or the coach's
+// per cycle (<id>_hl_seen, synced and merged as a UNION by mergeStoredValue(), so another phone does not show it again and a server copy
+// without the mark cannot take it back: that was the "it comes back at every open" bug, 2026-11-24), never over the Welcome, never in the demo or the coach's
 // preview. Back closes it (topLayer()).
 //
 // IT WAITS FOR THE ATHLETE (2026-10-20, Amir: "even if the window is small, the person should still get all those, the first time

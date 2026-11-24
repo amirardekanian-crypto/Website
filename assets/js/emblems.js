@@ -108,6 +108,9 @@
     rock: c => `<path d="M2.5 20.5h19l-2.2-4.6H4.7zM5 14.4h14l-2.2-4.6H7.2zM7.5 8.3h9l-2.2-4.6H9.7z" ${S(c)}/>`,
     snow: c => `<path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7" ${S('none', c, 2.2, RC)}/><path d="M9.3 3.6 12 6.3l2.7-2.7M9.3 20.4 12 17.7l2.7 2.7" ${S('none', c, 1.6, RJ)}/>`,
     flag: c => `<path d="M6 21.5V2.5M3 21.5h7" ${S('none', c, 2.4, RC)}/><path d="M6.5 3.5h12.5l-3.2 4.2 3.2 4.3H6.5z" ${S(c)}/>`,
+    // version 14 (#159): mobility, a body bending into a stretch; breathing, three slow lines of air
+    stretch: c => `<circle cx="17.5" cy="4" r="2.6" ${S(c)}/><path d="M16 7.5C13 10.5 10.5 14.5 9.5 21.5M15 9.5 21 13.5M10 21.5H4M12.5 14.5 6 11" ${S('none', c, 2.4, RC)}/>`,
+    breath: c => `<path d="M2.5 8h11.5a3 3 0 1 0-3-3M2.5 13h16a3 3 0 1 1-3 3M2.5 18h8" ${S('none', c, 2.4, RC)}/>`,
     star: c => `<path d="M12 2.5 14.6 9l7 .4-5.4 4.4 1.8 6.8L12 16.8l-6 3.8 1.8-6.8L2.4 9.4l7-.4z" ${S(c)}/>`,
   };
 
@@ -272,7 +275,17 @@
     ['link', ['week_that_counted', 'thirty_days_running', 'unbroken_3']], ['sweep', ['complete_day', 'ten_complete_days', 'clean_sweep_3']],
     ['sunrise', ['dawn_patrol_1', 'dawn_patrol_2', 'dawn_patrol_3']], ['target', ['on_target_1', 'on_target_2', 'on_target_3']], ['dumbbell', ['heavy_metal_1', 'heavy_metal_2']],
   ];
+  LADDERS.push(['stretch', ['oiled_up_1', 'oiled_up_2']], ['breath', ['slow_exhale']]);   // version 14 (#159): mobility and breathing get their own
   LADDERS.forEach(([glyph, ids], li) => ids.forEach((id, i) => put(id, { sec: 'habits', fam: 'rung', glyph, rn: ['I', 'II', 'III'][i], tier: i, order: li * 10 + i, ladder: glyph })));
+  // Version 14 (#159 Three Shapes, Everywhere): the ladders start lower, where people are. The first day and 3 in a row sit in front of
+  // rung I, the same coin in Ink, the banner saying 1 DAY or 3 DAYS. UNBROKEN's 3 sits in front of its own I.
+  [['steps', 'first_steps', 'three_on_your_feet'], ['sleep', 'first_real_night', 'three_good_nights'], ['water', 'first_eight_glasses', 'three_days_hydrated'],
+   ['food', 'first_full_plate', 'three_days_fuelled'], ['stretch', 'first_stretch', 'three_days_loose'], ['breath', 'first_breath', 'three_calm_days'], ['link', null, 'three_that_counted']]
+    .forEach(([glyph, one, three]) => {
+      const li = LADDERS.findIndex(l => l[0] === glyph);
+      if (one) put(one, { sec: 'habits', fam: 'rung', glyph, rn: '1 DAY', tier: 0, order: li * 10 - 2, ladder: glyph });
+      put(three, { sec: 'habits', fam: 'rung', glyph, rn: '3 DAYS', tier: 0, order: li * 10 - 1, ladder: glyph });
+    });
   put('full_stack', { sec: 'habits', fam: 'trophy', frame: 'oct', glyph: 'stack', xp: 200, order: 1001 });
   put('quarter_million', { sec: 'habits', fam: 'trophy', frame: 'notch', text: '250K', xp: 400, order: 1002 });
   put('the_foundry', { sec: 'habits', fam: 'trophy', frame: 'oct', glyph: 'anvil', xp: 500, order: 1003 });

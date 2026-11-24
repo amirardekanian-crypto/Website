@@ -599,7 +599,7 @@ test = "proof"
 proof_code = "ev_onyourfeet"
 proof_measure = "streak:steps"
 proof_need = 7
-rule = "10,000 steps, 7 days in a row."
+rule = "Your steps number, 7 days in a row."
 xp = 150
 size = "highlight"
 caption = "A week on your feet."
@@ -824,7 +824,7 @@ test = "proof"
 proof_code = "ev_ground2"
 proof_measure = "streak:steps"
 proof_need = 21
-rule = "10,000 steps, 21 days in a row."
+rule = "Your steps number, 21 days in a row."
 xp = 350
 size = "milestone"
 caption = "Three weeks on your feet."
@@ -839,7 +839,7 @@ test = "proof"
 proof_code = "ev_ground3"
 proof_measure = "streak:steps"
 proof_need = 60
-rule = "10,000 steps, 60 days in a row."
+rule = "Your steps number, 60 days in a row."
 xp = 700
 size = "milestone"
 caption = "Two months on your feet."
@@ -1543,3 +1543,282 @@ free = false
 origin = "new"
 added_in = 11
 paid_from = "2026-10-25"
+
+
+# ── Version 14 (2026-11-24): #159 Three Shapes, Everywhere, phase 1 ─────────────────────────────────────────────
+# Amir, round 15 'Over the Line': every behaviour gets one day, a month's total and days in a row (TASTE.md), "i like your ladder" (1 · 3 · 7 · 21 · 60).
+# Phase 1 is catalogue only, on tests that exist: the first day of each habit, 3 in a row below each habit's 7 and UNBROKEN's, mobility 7 · 21
+# and breathing 7 (neither had any). A first day pays 30, 3 in a row 60, the rest as their neighbours. paid_from is the day AFTER the seed, so
+# anything already done is won at 0 XP and nobody's XP or level moves on the day (D21). Supplements are left out on purpose.
+
+[achievement.first_steps]
+name = "FIRST STEPS"
+meaning = "commitment"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v14_first_steps"
+proof_measure = "daysHit:steps"
+proof_need = 1
+rule = "Your steps number in one day, for the first time."
+xp = 30
+size = "win"
+caption = "Your first full day on your feet."
+free = true
+origin = "new"
+added_in = 14
+paid_from = "2026-11-25"
+
+[achievement.first_real_night]
+name = "FIRST REAL NIGHT"
+meaning = "commitment"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v14_first_real_night"
+proof_measure = "daysHit:sleep"
+proof_need = 1
+rule = "7.5 hours of sleep, for the first time."
+xp = 30
+size = "win"
+caption = "Seven and a half hours. That's the start."
+free = true
+origin = "new"
+added_in = 14
+paid_from = "2026-11-25"
+
+[achievement.first_eight_glasses]
+name = "EIGHT GLASSES"
+meaning = "commitment"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v14_first_eight_glasses"
+proof_measure = "daysHit:water"
+proof_need = 1
+rule = "8 glasses of water in one day, for the first time."
+xp = 30
+size = "win"
+caption = "Eight glasses in one day."
+free = true
+origin = "new"
+added_in = 14
+paid_from = "2026-11-25"
+
+[achievement.first_full_plate]
+name = "FIRST FULL PLATE"
+meaning = "commitment"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v14_first_full_plate"
+proof_measure = "daysHit:fuel"
+proof_need = 1
+rule = "3 proper meals in one day, for the first time."
+xp = 30
+size = "win"
+caption = "Three proper meals in one day."
+free = true
+origin = "new"
+added_in = 14
+paid_from = "2026-11-25"
+
+[achievement.first_stretch]
+name = "FIRST STRETCH"
+meaning = "commitment"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v14_first_stretch"
+proof_measure = "daysHit:mobility"
+proof_need = 1
+rule = "Your first mobility day."
+xp = 30
+size = "win"
+caption = "Your body will thank you for it."
+free = true
+origin = "new"
+added_in = 14
+paid_from = "2026-11-25"
+
+[achievement.first_breath]
+name = "FIRST BREATH"
+meaning = "commitment"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v14_first_breath"
+proof_measure = "daysHit:breathe"
+proof_need = 1
+rule = "Your first breathing day."
+xp = 30
+size = "win"
+caption = "A few slow minutes. That counts."
+free = true
+origin = "new"
+added_in = 14
+paid_from = "2026-11-25"
+
+[achievement.three_on_your_feet]
+name = "THREE ON YOUR FEET"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v14_three_on_your_feet"
+proof_measure = "streak:steps"
+proof_need = 3
+rule = "Your steps number, 3 days in a row."
+xp = 60
+size = "win"
+caption = "Three days on your feet, back to back."
+free = true
+origin = "new"
+added_in = 14
+paid_from = "2026-11-25"
+
+[achievement.three_good_nights]
+name = "THREE GOOD NIGHTS"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v14_three_good_nights"
+proof_measure = "streak:sleep"
+proof_need = 3
+rule = "7.5 hours of sleep, 3 nights in a row."
+xp = 60
+size = "win"
+caption = "Three nights of real sleep in a row."
+free = true
+origin = "new"
+added_in = 14
+paid_from = "2026-11-25"
+
+[achievement.three_days_hydrated]
+name = "THREE DAYS HYDRATED"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v14_three_days_hydrated"
+proof_measure = "streak:water"
+proof_need = 3
+rule = "8 glasses of water, 3 days in a row."
+xp = 60
+size = "win"
+caption = "Three days of water done right."
+free = true
+origin = "new"
+added_in = 14
+paid_from = "2026-11-25"
+
+[achievement.three_days_fuelled]
+name = "THREE DAYS FUELLED"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v14_three_days_fuelled"
+proof_measure = "streak:fuel"
+proof_need = 3
+rule = "3 proper meals, 3 days in a row."
+xp = 60
+size = "win"
+caption = "Three days of eating like an athlete."
+free = true
+origin = "new"
+added_in = 14
+paid_from = "2026-11-25"
+
+[achievement.three_days_loose]
+name = "THREE DAYS LOOSE"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v14_three_days_loose"
+proof_measure = "streak:mobility"
+proof_need = 3
+rule = "Mobility, 3 days in a row."
+xp = 60
+size = "win"
+caption = "Three days of looking after your body."
+free = true
+origin = "new"
+added_in = 14
+paid_from = "2026-11-25"
+
+[achievement.three_calm_days]
+name = "THREE CALM DAYS"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v14_three_calm_days"
+proof_measure = "streak:breathe"
+proof_need = 3
+rule = "Breathing, 3 days in a row."
+xp = 60
+size = "win"
+caption = "Three days with time to breathe."
+free = true
+origin = "new"
+added_in = 14
+paid_from = "2026-11-25"
+
+[achievement.three_that_counted]
+name = "THREE THAT COUNTED"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v14_three_that_counted"
+proof_measure = "dayStreak"
+proof_need = 3
+rule = "3 days in a row that counted. One miss is allowed in a day, not two."
+xp = 60
+size = "win"
+caption = "Three days in a row that counted."
+free = true
+origin = "new"
+added_in = 14
+paid_from = "2026-11-25"
+
+[achievement.oiled_up_1]
+name = "OILED UP I"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v14_oiled_up_1"
+proof_measure = "streak:mobility"
+proof_need = 7
+rule = "Mobility, 7 days in a row."
+xp = 150
+size = "highlight"
+caption = "A week of mobility, every day."
+free = true
+origin = "new"
+added_in = 14
+paid_from = "2026-11-25"
+
+[achievement.oiled_up_2]
+name = "OILED UP II"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v14_oiled_up_2"
+proof_measure = "streak:mobility"
+proof_need = 21
+rule = "Mobility, 21 days in a row."
+xp = 350
+size = "milestone"
+caption = "Three weeks of mobility, every day."
+free = true
+origin = "new"
+added_in = 14
+paid_from = "2026-11-25"
+
+[achievement.slow_exhale]
+name = "SLOW EXHALE"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v14_slow_exhale"
+proof_measure = "streak:breathe"
+proof_need = 7
+rule = "Breathing, 7 days in a row."
+xp = 150
+size = "highlight"
+caption = "A week of breathing, every day."
+free = true
+origin = "new"
+added_in = 14
+paid_from = "2026-11-25"

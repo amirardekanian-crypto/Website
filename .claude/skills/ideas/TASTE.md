@@ -5,6 +5,16 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-11-24 · Round 15 'Over the Line': "go with your picks", then the three shapes of an achievement.** His words: *"about any medals
+  or achievements, some achievements should always be like this : lets think about walking, walking 10 steps for a day / walking 100,000
+  in a month , or walking 300,000 a month / but walking 10,000 for 3 days, 7 days, and 10 days in a row shows consistency as well and
+  needs to be recognised as well"*. What it teaches: (1) every behaviour he rewards wants three shapes, a single day (the moment), a
+  month's total (the volume) and days in a row (the consistency); pitch all three for anything new, and check which of the three an
+  existing family is missing; (2) he overrode my cut of "weeks at the line in a row" (I pitched a count instead), so in-a-row
+  consistency is wanted, and the only limit is the coaching one: never days in a row of training (HEAVY METAL stops at two rungs);
+  steps daily and weeks in a row are fine; (3) he wants the ladder to start low (one day, three in a row), where people actually are
+  (nobody has ever walked 10,000 seven days running; four have done three).
+
 - **2026-11-24 · Round 14 'The Changeover': "go with your picks and build all".** His words: *"go with your picks and build all. use
   cheaper agents for easier tasks / if we need to add active recovery sessions, or suggest different sessions, we can build it if we dont
   have it / start in a fresh chat"*. Earlier the same day he sent the article half (#145) to its own session: *"in another i want to write

@@ -1775,6 +1775,113 @@ const waitTab = p => p.waitForFunction(() => !!document.querySelector('#global-t
       C.check('without stage96 (no `lounge`) the slim rows are drawn even with emblems loaded', s.em === 'object' && s.cards === 0 && s.slim === 12, JSON.stringify(s));
       await ctx.close();
     }
+
+    // THE FAN (2026-11-24, Amir, asked how three achievements on one day should show: "Build the fan (A)"). Three won together were one emblem with a door and two names that could not be
+    // tapped. A line with two or more achievements or marks that can be opened is one card whose badge is a fan of their emblems (three at most, the lead on top), "3 achievements" (or "trophies"
+    // when a mark is in it), every name in the small line; the badge opens a list and each row is its own door, ‹ Back to the list. An honour still leads; a line with one is the old card.
+    {
+      const A = (id, name) => ({ k: 'achievement', id, name });
+      const FL = [
+        ln(21, CKP, [A('big_apple', 'Big Apple'), A('first_blood', 'First Blood'), A('back_to_back', 'Back To Back')]),
+        ln(22, CKR, [{ k: 'level', n: 9 }, A('big_apple', 'Big Apple'), { k: 'mark', item: 'century', at: 100 }]),
+        ln(23, CKS, [A('double_up', 'Double Up'), A('big_apple', 'Big Apple'), A('first_blood', 'First Blood'), A('back_to_back', 'Back To Back')]),
+        ln(24, CKO, [{ k: 'honour', honour: 'sessions', month: '2026-10-01' }, A('big_apple', 'Big Apple'), A('first_blood', 'First Blood')]),
+        ln(25, CKM, [A('big_apple', 'Big Apple'), A('first_blood', 'First Blood')], { me: true }),
+        ln(26, CKL, [A('big_apple', 'Big Apple')]),
+      ];
+      const fanBell = () => { const b = mkCards(); b.items = FL.map(l => JSON.parse(JSON.stringify(l))); return b; };
+      const fanOf = (p, n) => p.evaluate(k => {
+        const c = document.querySelector('#crew-body .cr-line[data-key="' + k + '"]');
+        if (!c) return null;
+        const it = BELL.items.find(x => x.key === k); let md = []; try { md = crewMcMedals(it, crewMomentLead(it)); } catch (e) { md = []; }   // an emblem that throws has no medals to name
+        return { cls: c.className, slim: c.classList.contains('cr-slim'), big: (c.querySelector('.cr-mcbig') || {}).textContent, clay: [...c.querySelectorAll('.cr-mcbig .c')].map(x => x.textContent).join(),
+          svgs: c.querySelectorAll('.cr-fan svg').length, fanCls: (c.querySelector('.cr-fan') || {}).className || '', btns: c.querySelectorAll('button.cr-mcb').length, fanBtn: c.querySelectorAll('button.cr-mcfan').length,
+          aria: c.querySelector('button.cr-mcfan') ? c.querySelector('button.cr-mcfan').getAttribute('aria-label') : null, spans: [...c.querySelectorAll('.cr-mcsub > span:not(.cr-nb)')].map(x => x.textContent.replace(/\s+/g, ' ').trim()),
+          names: md.map(m => m.d.name), sub: (c.querySelector('.cr-mcsub') || c).textContent.replace(/\s+/g, ' ').trim(), h: c.getBoundingClientRect().height, w: c.getBoundingClientRect().width, heart: !!c.querySelector('.cr-ht') };
+      }, K(n));
+      const sheetOf = p => p.evaluate(() => {
+        const ov = document.getElementById('hist-overlay'), m = ov.querySelector('.readiness-modal'), q = s => (m.querySelector(s) || {}).textContent || '';
+        return { open: ov.classList.contains('visible'), eyebrow: q('.readiness-eyebrow'), title: q('.readiness-title'), sub: q('.readiness-sub').replace(/\s+/g, ' ').trim(), meta: q('.cab-meta'),
+          rows: [...m.querySelectorAll('.cr-mrow')].map(r => ({ t: r.querySelector('.t').textContent, q: (r.querySelector('.q') || {}).textContent || '', svg: !!r.querySelector('.cr-mre svg'), c: r.querySelector('.c').textContent })),
+          back: !!m.querySelector('.sheet-back'), em: !!m.querySelector('.cab-sh-em svg') };
+      });
+      {
+        const { ctx, p } = await openCards({}, { bell: fanBell() });
+        const f = {}; for (let n = 21; n <= 26; n++) f[n] = await fanOf(p, n);
+        const J = n => JSON.stringify(f[n]);
+        C.check('fan: three achievements on one line are ONE card, `cr-mc-fan`, "3 achievements" as one text (no clay part), a fan of three emblems in a single button', !!f[21] && f[21].cls.includes('cr-mc-fan') && !f[21].slim && f[21].big === '3 achievements' && f[21].clay === ''
+          && f[21].svgs === 3 && f[21].fanCls.includes('n3') && f[21].btns === 1 && f[21].fanBtn === 1 && f[21].aria === 'What these are', J(21));
+        C.check('fan: every name is in the small line, each in its own span, the lead first, none said twice or as "earned …"', !!f[21] && f[21].names.length === 3
+          && f[21].spans.join('|') === f[21].names.join('|') && !/earned/.test(f[21].sub) && f[21].names[0] === 'Big Apple', J(21));
+        C.check('fan: the card keeps its heart and its width (the same card, not a new kind of row), and is not much taller than a one-medal card', !!f[21] && !!f[26] && f[26].cls.includes('cr-mc-achievement') && !f[26].cls.includes('cr-mc-fan')
+          && f[21].h <= f[26].h + 48 && f[21].heart && f[21].w === f[26].w, [f[21] && f[21].h, f[26] && f[26].h, f[21] && f[21].w, f[26] && f[26].w].join(' vs '));
+        C.check('fan: one achievement stays the card it was (no fan, its own badge button, "a new achievement")', !!f[26] && f[26].svgs === 0 && f[26].btns === 1 && f[26].fanBtn === 0 && f[26].big === 'Big Apple' && /a new achievement$/.test(f[26].sub), J(26));
+        C.check('fan: a mark and an achievement together are "2 trophies", two emblems, the lead (the mark) first, and the level is still said in words', !!f[22] && f[22].cls.includes('cr-mc-fan') && f[22].cls.includes('cr-mc-mark')
+          && f[22].big === '2 trophies' && f[22].svgs === 2 && f[22].fanCls.includes('n2') && f[22].names[0] === '100 sessions with Amir' && f[22].names[1] === 'Big Apple' && /reached level 9/.test(f[22].sub) && !/earned/.test(f[22].sub), J(22));
+        C.check('fan: four medals show three emblems and "4 achievements", the three names and "+1 more"', !!f[23] && f[23].big === '4 achievements' && f[23].svgs === 3 && f[23].spans[f[23].spans.length - 1] === '+1 more' && f[23].names.length === 4
+          && f[23].spans.slice(0, 3).join('|') === f[23].names.slice(0, 3).join('|'), J(23));
+        C.check('fan: an honour still leads (no fan), the achievements stay as words under it', !!f[24] && f[24].cls.includes('cr-mc-honour') && f[24].svgs === 0 && /earned Big Apple/.test(f[24].sub), J(24));
+        C.check('fan: your own line is a fan too, with no heart (your own item never carries one)', !!f[25] && f[25].cls.includes('cr-mc-fan') && f[25].big === '2 achievements' && f[25].svgs === 2 && !f[25].heart, J(25));
+        // the badge opens the list: one row per medal, its emblem, its name, its kind, a ›
+        await p.evaluate(k => document.querySelector('#crew-body .cr-line[data-key="' + k + '"] button.cr-mcfan').click(), K(21)); await p.waitForTimeout(350);
+        const sh = await sheetOf(p);
+        C.check('fan: the badge opens the list: "Achievements", "3 achievements", "Won by Mina S. · <day>", three rows each with its emblem, its name and a ›, no ‹ Back (nothing is behind it)', sh.open && sh.eyebrow === 'Achievements' && sh.title === '3 achievements'
+          && /^Won by Mina S\. · \S/.test(sh.sub) && sh.rows.length === 3 && sh.rows.every(r => r.svg && r.t && r.c === '›') && sh.rows.map(r => r.t).join('|') === f[21].names.join('|') && !sh.back, JSON.stringify(sh));
+        // a row is a door to that one; ‹ Back comes back to the list
+        await p.evaluate(() => document.querySelectorAll('#hist-overlay .cr-mrow')[1].click()); await p.waitForTimeout(350);
+        const d1 = await sheetOf(p);
+        C.check('fan: the second row opens that one\'s own sheet (its emblem, its name, "Won by Mina S.") with a ‹ Back', d1.open && d1.em && d1.title === f[21].names[1] && /^Won by Mina S\./.test(d1.meta) && d1.back, JSON.stringify(d1));
+        await p.evaluate(() => document.querySelector('#hist-overlay .sheet-back').click()); await p.waitForTimeout(350);
+        const d2 = await sheetOf(p);
+        C.check('fan: ‹ Back puts the list back, three rows, and nothing is behind it any more', d2.open && d2.rows.length === 3 && d2.title === '3 achievements' && !d2.back, JSON.stringify(d2));
+        await p.evaluate(() => history.back()); await p.waitForTimeout(300);
+        const closed = await p.evaluate(() => !document.getElementById('hist-overlay').classList.contains('visible'));
+        C.check('fan: the phone\'s Back closes the list', closed, String(closed));
+        // the mixed line says "Trophies"; the four-medal line lists all four, not three
+        await p.evaluate(k => document.querySelector('#crew-body .cr-line[data-key="' + k + '"] button.cr-mcfan').click(), K(22)); await p.waitForTimeout(350);
+        const m2 = await sheetOf(p);
+        C.check('fan: the list of a mark and an achievement says "Trophies", "2 trophies", two rows', m2.eyebrow === 'Trophies' && m2.title === '2 trophies' && m2.rows.length === 2 && m2.rows[0].t === '100 sessions with Amir', JSON.stringify(m2));
+        await p.evaluate(() => history.back()); await p.waitForTimeout(300);
+        await p.evaluate(k => document.querySelector('#crew-body .cr-line[data-key="' + k + '"] button.cr-mcfan').click(), K(23)); await p.waitForTimeout(350);
+        const m4 = await sheetOf(p);
+        C.check('fan: the list holds all four medals (the card shows three emblems, the list is never cut)', m4.title === '4 achievements' && m4.rows.length === 4, JSON.stringify(m4));
+        await p.evaluate(() => history.back()); await p.waitForTimeout(300);
+        await p.evaluate(k => document.querySelector('#crew-body .cr-line[data-key="' + k + '"] button.cr-mcfan').click(), K(25)); await p.waitForTimeout(350);
+        const mm = await sheetOf(p);
+        C.check('fan: your own list reads "Won <day>", not "Won by You"', mm.open && mm.rows.length === 2 && /^Won \S/.test(mm.sub) && !/Won by/.test(mm.sub), JSON.stringify(mm));
+        C.check('fan: no page errors', !p.errs.length, p.errs.join(' | '));
+        await ctx.close();
+      }
+      // an emblem that will not draw: the fan line is a slim row again, and the rest stay cards
+      {
+        const { ctx, p } = await openCards({}, { bell: fanBell() });
+        await p.evaluate(() => { window.AAEmblem.ach = () => { throw new Error('no drawing'); }; renderCrew(); }); await p.waitForTimeout(300);
+        const a = await fanOf(p, 21), b = await fanOf(p, 22);
+        C.check('fan: an emblem that throws turns that line into the slim row, no fan, and nothing errors', !!a && a.slim && a.svgs === 0 && !!b && !p.errs.length, JSON.stringify([a && a.cls, b && b.cls, p.errs.join(' | ')]));
+        await ctx.close();
+      }
+      // 320 px, in dark mode: the three emblems and the words fit, nothing runs off the card
+      {
+        const { ctx, p } = await openCards({}, { bell: fanBell(), opts: { w: 320, h: 700 } });
+        await p.evaluate(() => document.body.setAttribute('data-dark', '1')); await p.waitForTimeout(200);
+        const g = await p.evaluate(k => {
+          const c = document.querySelector('#crew-body .cr-line[data-key="' + k + '"]'), r = c.getBoundingClientRect(), t = c.querySelector('.cr-mct').getBoundingClientRect(), b = c.querySelector('button.cr-mcfan').getBoundingClientRect();
+          const fan = [...c.querySelectorAll('.cr-fan svg')].map(s => s.getBoundingClientRect()), last = fan[fan.length - 1];
+          return { card: Math.round(r.width), text: Math.round(t.width), badge: [Math.round(b.width), Math.round(b.height)], inside: fan.every(s => s.left >= b.left - 1 && s.right <= b.right + 1), overflowX: document.documentElement.scrollWidth > innerWidth + 1, lastLeft: Math.round(last.left - fan[0].left) };
+        }, K(21));
+        C.check('fan: at 320 px in dark mode the badge is still 56 × 56 (a target you can hit), the three emblems sit inside it, the words keep some width and the page does not scroll sideways', g.badge[0] >= 44 && g.badge[1] >= 44 && g.inside && g.text >= 100 && !g.overflowX, JSON.stringify(g));
+        await ctx.close();
+      }
+      // in Farsi the count, the word and the badge's label are Farsi (the names are the catalogue's, in its own word list)
+      {
+        const { ctx, p } = await openCards({}, { bell: fanBell(), opts: { init: "localStorage.setItem('aa_lang_beta', '1'); localStorage.setItem('aa_lang', 'fa');" } });
+        await p.waitForTimeout(400);
+        const s = await p.evaluate(k => { const c = document.querySelector('#crew-body .cr-line[data-key="' + k + '"]'); return { big: c.querySelector('.cr-mcbig').textContent.replace(/\s+/g, ' ').trim(), aria: c.querySelector('button.cr-mcfan').getAttribute('aria-label') }; }, K(21));
+        const s4 = await p.evaluate(k => [...document.querySelectorAll('#crew-body .cr-line[data-key="' + k + '"] .cr-mcsub > span')].map(x => x.textContent.trim()).pop(), K(23));
+        C.check('fan, in Farsi: "۳ دستاورد", the badge\'s label "این‌ها چه هستند", and the "+1 more" is Farsi', /^۳\s*دستاورد$/.test(s.big) && s.aria === 'این‌ها چه هستند' && /^۱\s*مورد دیگر$/.test(s4), JSON.stringify([s, s4]));
+        await ctx.close();
+      }
+    }
   }
 
   // ── 22. VOTE TO SEE, CAUGHT UP, SHOW YOUR FACE (ideas 116, 117, 119; Amir 2026-11-20 "build 116, 117 and 119") ───────────────────────────────────────

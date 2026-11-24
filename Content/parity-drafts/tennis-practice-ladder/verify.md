@@ -90,6 +90,9 @@ number and verdict above carries over unchanged ("match facts, not wording"). Wh
 - **Published 2026-11-24.** The three Farsi lessons were appended to `learn-4` one at a time, each under a row lock with a `_notes` entry and `version` re-hashed,
   and the English twins went into `course_en` (sort 54, 55, 56). A text check ran inside every statement, and afterwards each stored lesson, Farsi and English,
   was compared with its draft file by checksum: all six match. The other lessons in `learn-4` were left as they were.
+- **The article Farsi was rewritten the same way and published 2026-11-24** (Amir: "Yes, publish"). Same facts, numbers and blocks; the titles, search titles and
+  descriptions are untouched; 74 of the 96 blocks were reworded (33, 23 and 18). The three `.fa.json` files, the three website pages and the app copies
+  (`public.library`, in `data` and `data.fa`) carry it, and each stored article matches its file by checksum.
 
 ## Parity ledger (now in `Content/CONTENT-PARITY.md`)
 
