@@ -76,6 +76,20 @@
           "category": "Training",
           "readMins": 6,
           "file": "articles/training/rpe-explained.json"
+        },
+        {
+          "id": "tennis-practice-ladder",
+          "title": "The Practice Ladder",
+          "category": "Training",
+          "readMins": 6,
+          "file": "articles/training/tennis-practice-ladder.json"
+        },
+        {
+          "id": "why-it-breaks-in-matches",
+          "title": "Why It Breaks in Matches",
+          "category": "Training",
+          "readMins": 4,
+          "file": "articles/training/why-it-breaks-in-matches.json"
         }
       ]
     },
@@ -184,6 +198,13 @@
           "category": "Mental",
           "readMins": 6,
           "file": "articles/mental/turn-match-experiences-into-training-goals.json"
+        },
+        {
+          "id": "train-under-pressure",
+          "title": "Practise Under Pressure",
+          "category": "Mental",
+          "readMins": 3,
+          "file": "articles/mental/train-under-pressure.json"
         }
       ]
     },

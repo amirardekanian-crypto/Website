@@ -70,6 +70,9 @@ lesson changes are in `Content/parity-drafts/<slug>/lesson-changes.md`. The Fars
 | Match reflection and goal setting (2026-11-19) | `match-reflection` (learn-4, order 52, **new**; `course_en` twin) | `turn-match-experiences-into-training-goals` (Mental shelf) |
 | What actually helps after training (2026-11-24) | none yet (adult article; the course's `recovery-adaptation` and `sleep-recovery` cover the junior basics) | `what-helps-recovery` (Recovery shelf) |
 | Recovery after a match and between matches (2026-11-24) | none yet | `recovery-between-matches` (Recovery shelf) |
+| How to structure on-court practice, the ladder (2026-11-24; research in `Content/parity-drafts/tennis-practice-ladder/verify.md`) | none yet | `tennis-practice-ladder` (Training shelf) |
+| Why a drill skill breaks in matches (2026-11-24) | none yet | `why-it-breaks-in-matches` (Training shelf) |
+| Practising under pressure (2026-11-24) | none yet (a junior version needs the ESSA wellbeing cautions and a parent in the loop first) | `train-under-pressure` (Mental shelf) |
 | How to read the card · parents' guide · ready for level 3 | n/a | n/a (stay in the course) |
 
 The 17 course lessons became athlete-voiced articles under a new **Training** shelf (`articles/training/`), plus
