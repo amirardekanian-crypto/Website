@@ -3638,7 +3638,14 @@ const COURT_LINES = {
   honour_improved: "Most improved in {month}. {lift} up {pct}% at the same effort. That's real strength.",
   honour_full_month: 'Every plan session in {month}. Full Month. Respect.',
   amirs_pick: "You're my pick for {month}. Can I put you in my story?",
+  full_week: 'First full week of moving. Everything you did counted.',
+  full_weeks: '{n} full weeks of moving now. Keep it going.',
+  court_hours: '{n} hours on court, logged. All of it counts.',
+  court_weeks: "{n} weeks running on court. That's commitment.",
+  match_day: 'Saw your first match in your weeks. How did it feel?',
 };
+// Round 15 (#154): which line an achievement of the week and the court drafts, by its id without the number (full_weeks_12 → full_weeks, n = 12).
+const COURT_ROUND15 = { full_week: 'full_week', full_weeks: 'full_weeks', full_weeks_row: 'full_weeks', court_hours: 'court_hours', court_weeks: 'court_weeks', match_day: 'match_day' };
 const COURT_SIZE = { highlight: 2, milestone: 3, legend: 4 };
 const COURT_MARK_LINE = { held_weeks: 'week_held', century: 'century', bests: 'bests', comebacks: 'comebacks' };
 const COURT_CAP = 5;
@@ -3751,6 +3758,9 @@ function courtLine(row) {
   else if (row.item === 'first_cycle') { key = 'cycle_finished'; const x = (courtFact(row, 'cycle_finished') || {}).value; if (x) Object.assign(v, { cycle: 'Cycle ' + x.cycle, sessions: x.done, planned: x.planned }); }
   else if (row.item === 'held') key = 'held';
   else if (row.item === 'back') key = 'comeback';
+  else if (row.kind === 'achievement' && COURT_ROUND15[String(row.item).replace(/_\d+$/, '')]) {   // round 15 (#154): the week and the court
+    key = COURT_ROUND15[String(row.item).replace(/_\d+$/, '')]; const m = String(row.item).match(/_(\d+)$/); if (m) v.n = Number(m[1]);
+  }
   return (key && fillLine(COURT_LINES[key], v)) || fillLine(COURT_LINES.achievement, { achievement: s.name, caption: s.caption }) || s.name || row.item;
 }
 function courtSendHtml(id, msg, onSend, waLabel) {

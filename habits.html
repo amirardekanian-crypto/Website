@@ -5449,7 +5449,8 @@ function awardMeasures(inp, cat) {
 // What the phone counts as earned and the server has not confirmed: the crossings of awardMeasures() on a day AFTER
 // the switch (the switch day is history on both sides), inside the open window (today and BACKFILL_DAYS before it, plus
 // one: a settled day never changes on the server), not owned, not withdrawn. Priced as the server prices it (§3.6: the
-// tier's xp, the achievement's xp; size from the tier, the entry, else 'win'). PURE: o = { S, today, backfill_days,
+// tier's xp, the achievement's xp; size from the tier, the entry, else 'win'; D21: a win on a day before the entry's paid_from is 0 XP, as
+// career_mint() mints it). PURE: o = { S, today, backfill_days,
 // owned: [ids] (the core's list; the older { id: day } reads the same), withdrawn: [ids] } → [{ award_id, xp, size, day }]
 // by day, then id.
 function phoneAwardsFrom(meas, cat, o) {
@@ -5460,19 +5461,20 @@ function phoneAwardsFrom(meas, cat, o) {
   const ow = o.owned, wd = Array.isArray(o.withdrawn) ? o.withdrawn : [];
   const own = Array.isArray(ow) ? new Set(ow) : null, owns = id => (own ? own.has(id) : !!(ow && typeof ow === 'object' && ow[id]));
   const out = [];
-  const add = (kind, item, tier, d, xp, size) => {
+  const add = (kind, item, tier, d, xp, size, paidFrom) => {
     const id = awardId(kind, item, tier, '');
     if (!d || !(d > S) || d < floor || d > o.today || owns(id) || wd.indexOf(id) >= 0) return;
+    if (paidFrom && d < String(paidFrom)) xp = 0;   // D21 (stage99): won before the entry started paying
     out.push({ award_id: id, xp: Math.max(0, Math.round(Number(xp) || 0)), size: size || 'win', day: d });
   };
   Object.keys(meas).forEach(item => {
     const m = meas[item];
     if (C.badge[item] && m && typeof m === 'object') {
       const b = C.badge[item];
-      Object.keys(m.crossed || {}).forEach(t => { const tb = (b.tiers || [])[Number(t) - 1] || {}; add('badge', item, Number(t), m.crossed[t], tb.xp, tb.size || b.size); });
+      Object.keys(m.crossed || {}).forEach(t => { const tb = (b.tiers || [])[Number(t) - 1] || {}; add('badge', item, Number(t), m.crossed[t], tb.xp, tb.size || b.size, b.paid_from); });
     } else if (C.achievement[item] && typeof m === 'string') {
       const b = C.achievement[item];
-      add('achievement', item, null, m, b.xp, b.size);
+      add('achievement', item, null, m, b.xp, b.size, b.paid_from);
     }
   });
   out.sort((a, b) => (a.day < b.day ? -1 : a.day > b.day ? 1 : a.award_id < b.award_id ? -1 : a.award_id > b.award_id ? 1 : 0));

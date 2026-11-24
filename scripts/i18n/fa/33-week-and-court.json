@@ -1,0 +1,92 @@
+{
+  "area": "Career catalogue, rulebook version 15 (2026-11-24, stage130): round 15 'Over the Line', the week and the court. Full Week and its runs (The Line, a ring emblem), Court Hours, Match Day, Cross-Court, the weeks on court and the Ten-Hour Month (Court, a roundel), the cabinet's new section Moving, and the words on the emblems. 'Move minutes' is دقیقهٔ تحرک (28-whole-week.json). Formal (شما), as every new Farsi text since 2026-11-21. Drafts until Amir has read them. Also the crew's Over the Line card (#151): the week that went over 300 Move minutes, and what took it there.",
+  "exact": {
+    "Moving": "تحرک",
+    "WEEK": "هفته",
+    "WEEKS": "هفته",
+    "IN A ROW": "پشت هم",
+    "MATCH": "مسابقه",
+    "3 KINDS": "۳ نوع",
+    "MONTH": "ماه",
+    "10H": "۱۰ ساعت",
+    "25H": "۲۵ ساعت",
+    "100H": "۱۰۰ ساعت",
+    "4 WKS": "۴ هفته",
+    "8 WKS": "۸ هفته",
+    "12 WKS": "۱۲ هفته",
+    "Full Week": "هفتهٔ کامل",
+    "A week at 300 Move minutes, the first time.": "اولین هفته‌ای که به ۳۰۰ دقیقهٔ تحرک رسیدید.",
+    "300 Move minutes in one week. Everything counted.": "۳۰۰ دقیقهٔ تحرک توی یه هفته. همه‌ش حساب شد.",
+    "4 Full Weeks": "۴ هفتهٔ کامل",
+    "4 weeks at 300 Move minutes. They don't have to be in a row.": "۴ هفته با ۳۰۰ دقیقهٔ تحرک. لازم نیست پشت هم باشن.",
+    "Four full weeks of moving.": "چهار هفتهٔ کامل پرتحرک.",
+    "12 Full Weeks": "۱۲ هفتهٔ کامل",
+    "12 weeks at 300 Move minutes.": "۱۲ هفته با ۳۰۰ دقیقهٔ تحرک.",
+    "Twelve full weeks. That's a habit.": "دوازده هفتهٔ کامل. دیگه عادت شده.",
+    "26 Full Weeks": "۲۶ هفتهٔ کامل",
+    "26 weeks at 300 Move minutes.": "۲۶ هفته با ۳۰۰ دقیقهٔ تحرک.",
+    "Half a year of full weeks.": "نیم سال هفته‌های کامل.",
+    "2 Full Weeks in a Row": "۲ هفتهٔ کامل پشت هم",
+    "2 weeks in a row at 300 Move minutes.": "۲ هفته پشت هم با ۳۰۰ دقیقهٔ تحرک.",
+    "Two full weeks, back to back.": "دو هفتهٔ کامل، پشت سر هم.",
+    "4 Full Weeks in a Row": "۴ هفتهٔ کامل پشت هم",
+    "4 weeks in a row at 300 Move minutes.": "۴ هفته پشت هم با ۳۰۰ دقیقهٔ تحرک.",
+    "A full month of full weeks.": "یه ماه کامل، همه‌ش هفته‌های کامل.",
+    "8 Full Weeks in a Row": "۸ هفتهٔ کامل پشت هم",
+    "8 weeks in a row at 300 Move minutes.": "۸ هفته پشت هم با ۳۰۰ دقیقهٔ تحرک.",
+    "Two months without dropping a week.": "دو ماه، بدون اینکه یه هفته رو از دست بدید.",
+    "10 Hours": "۱۰ ساعت",
+    "10 hours of activity in Court Log, every kind together.": "۱۰ ساعت فعالیت توی ثبت فعالیت‌ها، همهٔ نوع‌ها با هم.",
+    "10 hours of tennis, padel and the rest. It all counts.": "۱۰ ساعت تنیس، پدل و بقیه. همه‌ش حساب می‌شه.",
+    "25 Hours": "۲۵ ساعت",
+    "25 hours of activity in Court Log.": "۲۵ ساعت فعالیت توی ثبت فعالیت‌ها.",
+    "25 hours of playing and moving.": "۲۵ ساعت بازی و تحرک.",
+    "100 Hours": "۱۰۰ ساعت",
+    "100 hours of activity in Court Log.": "۱۰۰ ساعت فعالیت توی ثبت فعالیت‌ها.",
+    "100 hours. That's a lot of court.": "۱۰۰ ساعت. این یعنی کلی زمین.",
+    "Match Day": "روز مسابقه",
+    "Your first match in Court Log.": "اولین مسابقه‌ای که ثبت کردید.",
+    "Your first match in your weeks.": "اولین مسابقه‌تون توی هفته‌هاتون ثبت شد.",
+    "Cross-Court": "کراس‌کورت",
+    "3 different kinds of activity in one cycle.": "۳ نوع فعالیت مختلف توی یه دوره.",
+    "Three ways of moving in one cycle.": "سه جور تحرک توی یه دوره.",
+    "4 Weeks on Court": "۴ هفته توی زمین",
+    "An activity in Court Log, 4 weeks in a row.": "یه فعالیت ثبت‌شده، ۴ هفته پشت هم.",
+    "Four weeks running, you got out and played.": "چهار هفته پشت هم رفتید و بازی کردید.",
+    "8 Weeks on Court": "۸ هفته توی زمین",
+    "An activity in Court Log, 8 weeks in a row.": "یه فعالیت ثبت‌شده، ۸ هفته پشت هم.",
+    "Eight weeks running on court.": "هشت هفته پشت هم توی زمین.",
+    "12 Weeks on Court": "۱۲ هفته توی زمین",
+    "An activity in Court Log, 12 weeks in a row.": "یه فعالیت ثبت‌شده، ۱۲ هفته پشت هم.",
+    "Twelve weeks running. Your sport is part of the plan.": "دوازده هفته پشت هم. ورزشتون جزو برنامه شده.",
+    "Ten-Hour Month": "ماه ده‌ساعته",
+    "10 hours of activity in Court Log in one calendar month.": "۱۰ ساعت فعالیت ثبت‌شده توی یه ماه.",
+    "10 hours in one month. A big month.": "۱۰ ساعت توی یه ماه. ماه پرباری بود.",
+    "Over the line": "از خط رد شد",
+    "a session": "یه جلسه",
+    "a full moving week": "یه هفتهٔ پرتحرک",
+    "went over the line": "از خط رد شد"
+  },
+  "patterns": [
+    [
+      "([A-Za-z][A-Za-z ]+), (\\d+) min",
+      "{t1}، {n2} دقیقه"
+    ],
+    [
+      "this took your week to (\\d+)",
+      "هفته‌تون رو رسوند به {n1}"
+    ],
+    [
+      "this took their week to (\\d+)",
+      "هفته‌شون رو رسوند به {n1}"
+    ],
+    [
+      "(\\d+) Move minutes this week",
+      "این هفته {n1} دقیقهٔ تحرک"
+    ],
+    [
+      "went over the line, (\\d+) Move minutes",
+      "از خط رد شد، {n1} دقیقهٔ تحرک"
+    ]
+  ]
+}

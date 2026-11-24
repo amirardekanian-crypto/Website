@@ -660,15 +660,15 @@ pick, with 150 riding along; B The Week Ends Well (151-153); C Every Activity An
 
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
-| 146 | Full Week | Achievement family for weeks at the 300 line, counted in total, never a streak: Full Week (first, `repeats = "move_week"` for "Won N times"), 4, 12, 26 Full Weeks at 100 / 200 / 500 / 1000 XP; test `total` on `move_week`; a ring emblem | 135 | **picked** 2026-11-24 ("go with your picks"), with 148 in one stage |
+| 146 | Full Week | Achievement family for weeks at the 300 line, counted in total, never a streak: Full Week (first, `repeats = "move_week"` for "Won N times"), 4, 12, 26 Full Weeks at 100 / 200 / 500 / 1000 XP; test `total` on `move_week`; a ring emblem | 135 | **picked** 2026-11-24 ("go with your picks"), with 148 in one stage · **built** 2026-11-24 (stage130, rulebook v15) |
 | 147 | Whole Week | Once: plan, court and walking (or Library) each 30+ Move minutes in one plan week, 150 XP; new test `week_parts` | 146 | pitched (once court data exists) |
-| 148 | Court Hours | 10 / 25 / 100 hours of Court Log activity, every kind together, 150 / 400 / 1000 XP (25 h is about 290,000 steps of work = QUARTER OF A MILLION's 400); a 0-XP `activity_done` fact from `log_activity()`, new test `sum`; a court roundel emblem | 123 | **picked** 2026-11-24, with 146 in one stage |
-| 149 | Match Day and Cross-Court | Firsts on 148's fact: the first Match logged (50 XP), three kinds in one cycle (100 XP); not results (#36 Silverware stays its own) | 148 | pitched |
+| 148 | Court Hours | 10 / 25 / 100 hours of Court Log activity, every kind together, 150 / 400 / 1000 XP (25 h is about 290,000 steps of work = QUARTER OF A MILLION's 400); a 0-XP `activity_done` fact from `log_activity()`, new test `sum`; a court roundel emblem | 123 | **picked** 2026-11-24, with 146 in one stage · **built** 2026-11-24 (stage130, rulebook v15) |
+| 149 | Match Day and Cross-Court | Firsts on 148's fact: the first Match logged (50 XP), three kinds in one cycle (100 XP); not results (#36 Silverware stays its own) | 148 | pitched · **built** 2026-11-24 (stage130, rulebook v15) |
 | 150 | The Count-Up | The Court Log save toast shows the activity's Move minutes and the week's bar filling in clay ("+68 Move minutes. 212 of 300"), from `get_five_weeks()`, no phone arithmetic; GAME-13; recognition only | 134 | **built** 2026-11-24 (37ad51a2): the save's box and the recovery offers carry it, `scripts/headless/count-up.js` |
-| 151 | Over the Line | A Bell moment card (#121 family) for the activity or session that takes a week past 300: ring emblem, "OVER THE LINE +24", once a week per person, sharers only; recognition only | 135, 121 | **picked** 2026-11-24 |
+| 151 | Over the Line | A Bell moment card (#121 family) for the activity or session that takes a week past 300: ring emblem, "OVER THE LINE +24", once a week per person, sharers only; recognition only | 135, 121 | **picked** 2026-11-24 · **built** 2026-11-24 (stage130: get_bell() line part, crewMcFace 'line', scripts/headless/over-the-line.js) |
 | 152 | Best Week Yet | A clay "Best week yet" tag on Your weeks when the closing week beats the athlete's best of the previous eight (after three weeks), one Inbox line; no push, never "almost"; recognition only | 134 | pitched |
 | 153 | The Monday Card | A 9:16 share card for a week at the line: the Move minutes big, a plan / court / walking / Library split bar, AMIRARDEKANI.COM, English and Farsi; waits for the share-card design pass | 134 | pitched (after the card pass) |
-| 154 | Courtside Move Lines | The new awards in coach.html's Courtside with the WhatsApp line in the athlete's language (templates in `recognition.toml`); a tap per line | 146, 148 | pitched (comes with 146 and 148) |
+| 154 | Courtside Move Lines | The new awards in coach.html's Courtside with the WhatsApp line in the athlete's language (templates in `recognition.toml`); a tap per line | 146, 148 | pitched (comes with 146 and 148) · **built** 2026-11-24 (recognition.toml + coach.html COURT_LINES) |
 | 155 | Long Day | Grown along the way: a 120+ minute activity shows "Long day" on its crew post, beside the recovery offer (#128, #141); no achievement on purpose | 123 | pitched |
 
 **Picks, 2026-11-24:** Amir, *"go with your picks"* (direction A with 150, Court Hours pays like walking, the names Full Week and
@@ -680,8 +680,8 @@ row (TASTE.md). It reversed the cut of "weeks at the line in a row". Live steps 
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
 | 156 | The Walking Ladder | Walking gets all three shapes: a first 10,000 day; 3 days in a row at your number below GROUND COVERED's 7 / 21 / 60 (and 10 if he wants it); 100,000 / 200,000 / 300,000 steps in a calendar month with "Won N times"; a day's steps as the app scores them (typed + Court Log credit) | 136 | **picked** 2026-11-24 ("i like your ladder"): 1 · 3 · 7 · 21 · 60, no 10 · **built in part** 2026-11-24 (rulebook v14): the first day, 3 in a row, GROUND COVERED says "your number"; the month totals wait for #159 phase 2 |
-| 157 | Full Weeks in a Row | 2 / 4 / 8 plan weeks in a row at the 300 line, beside 146's total count (4 athletes have done 2, nobody 3) | 146 | pitched (his idea) |
-| 158 | Court Every Week | The court family's in-a-row shape counted in weeks, never days (rest days): an activity logged in 4 / 8 / 12 plan weeks running; its month shape is hours in a calendar month (10 h) | 148 | pitched (his idea) |
+| 157 | Full Weeks in a Row | 2 / 4 / 8 plan weeks in a row at the 300 line, beside 146's total count (4 athletes have done 2, nobody 3) | 146 | pitched (his idea) · **built** 2026-11-24 (stage130 weeks_running, rulebook v15) |
+| 158 | Court Every Week | The court family's in-a-row shape counted in weeks, never days (rest days): an activity logged in 4 / 8 / 12 plan weeks running; its month shape is hours in a calendar month (10 h) | 148 | pitched (his idea) · **built** 2026-11-24 (stage130 weeks_running + month_sum, rulebook v15) |
 
 Statuses above: 146, 148, 150, 151 **picked** 2026-11-24; 154 picked (comes with 146 and 148); 153 picked to wait for the card pass;
 147, 149, 152, 155 picked in the order on the page.

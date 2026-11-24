@@ -1291,7 +1291,8 @@ async function proofXp(browser, C) {
   // the phone-decided habit_water tier: its XP at once, then withdrawn when the server said no. That path stays in habits.html for any badge the
   // catalogue may hold again; with none, it is dormant.)
   {
-    const prof = rwProfile(10000), waterLog = {};
+    // version 14 (2026-11-24) brought habit ACHIEVEMENTS back (the first day, 3 in a row): owned here, so the phone has nothing of its own to decide
+    const prof = rwProfile(10000, { owned: ['achievement:first_eight_glasses', 'achievement:three_days_hydrated'] }), waterLog = {};
     for (let i = 1; i <= 4; i++) waterLog[at(-i)] = { water: 8 };       // four days of full water: today's tick makes five
     const { ctx, p } = await H.openProof(browser, rwProof(prof, { log: waterLog, cfg: { catalogueSeen: S3 } }));
     await p.waitForTimeout(2500);

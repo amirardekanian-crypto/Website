@@ -98,13 +98,18 @@ ORIGINS = ["new", "proof"]
 RUNS = ["plan_weeks", "days", "iso_weeks"]    # rule 17: what a best_run badge's "run" is
 ACHIEVEMENT_TESTS = ["first", "proof", "goals", "cycle_all_held", "cycle_by_the_book", "cycle_with_broken", "runs_together",
                       "best_value", "patterns_in_cycle", "cycle_proving", "run_regained", "total", "best_run", "month_held",
-                      "on_dates", "slam_year", "clock"]
+                      "on_dates", "slam_year", "clock",
+                      # stage130 (rulebook version 15, round 15 'Over the Line'): the court family, the run and the month shapes
+                      "sum", "kind_first", "kinds_in_cycle", "weeks_running", "days_running", "month_sum", "month_days"]
 # Rule 18: the keys each test carries, and no others (a stray one is an error).
 TEST_PARAMS = {"first": set(), "proof": {"proof_measure", "proof_need"}, "goals": {"goals"}, "cycle_all_held": set(),
                "cycle_by_the_book": set(), "cycle_with_broken": set(), "runs_together": {"habits", "run"},
                "best_value": {"at"}, "patterns_in_cycle": {"groups"}, "cycle_proving": {"bests", "retests"},
                "run_regained": {"away_weeks"}, "total": {"at"}, "best_run": {"at"}, "month_held": {"weeks"},
-               "on_dates": {"windows"}, "slam_year": {"of"}, "clock": set()}
+               "on_dates": {"windows"}, "slam_year": {"of"}, "clock": set(),
+               "sum": {"at"}, "kind_first": {"at", "kinds"}, "kinds_in_cycle": {"at"}, "weeks_running": {"at"}, "days_running": {"at"},
+               "month_sum": {"at"}, "month_days": {"at"}}
+MORE_TESTS = ["sum", "kind_first", "kinds_in_cycle", "weeks_running", "days_running", "month_sum", "month_days"]   # stage130: career_more_key()
 # stage99: a test that takes ONE of several keys (clock: finish_before or finish_from, exactly one)
 TEST_ONE_OF = {"clock": {"finish_before", "finish_from"}}
 FACT_TESTS = ["on_dates", "slam_year", "clock"]   # stage99: these three read the finished-session fact (reads = "session_finished")
@@ -155,7 +160,8 @@ KNOWN_KEYS = {
     "achievement": {"name", "meaning", "reads", "rule", "xp", "size", "caption", "free", "origin", "title", "proof_code",
                     "retire_at", "starts_at", "superseded_by", "test", "goals", "habits", "run", "at", "groups", "bests",
                     "retests", "away_weeks", "weeks", "proof_measure", "proof_need", "patterns", "qualities", "exclude",
-                    "windows", "of", "finish_before", "finish_from", "added_in", "paid_from", "repeats"},   # stage99
+                    "windows", "of", "finish_before", "finish_from", "added_in", "paid_from", "repeats",   # stage99
+                    "kinds", "field", "habit"},   # stage130
     "title": {"name", "meaning", "from", "metal", "origin", "template", "proof_id", "retire_at", "superseded_by", "size"},
     "skin": {"name", "from", "origin", "proof_id"},
     "mission": {"name", "slot", "meaning", "asks", "counts", "habit", "measure", "target", "picked_when", "free",
@@ -946,6 +952,8 @@ def check_test(c, a, w):
         c.error(f'test "{test}" reads the fact week_held (rule 18)')
     if test in FACT_TESTS and reads != "session_finished":   # stage99: a finished session (the early kind counts with it)
         c.error(f'test "{test}" reads the fact session_finished (the early finish counts with it) (rule 18)')
+    if test in MORE_TESTS:
+        check_more_test(c, a, w, test)
     if test == "goals":
         if "goals" in a:
             check_goals(c, a["goals"], w)
@@ -1000,6 +1008,33 @@ def check_test(c, a, w):
                 c.error(f'{key} must be a time of day, "HH:MM" on a 24-hour clock, found {a[key]!r} (rule 18)')
             elif key == "finish_before" and a[key] == "00:00":
                 c.error('finish_before = "00:00" leaves no time before it (rule 18)')
+
+
+def check_more_test(c, a, w, test):
+    """Rule 18, stage130. The seven tests career_more_key() reads: each reads a rulebook fact and `at` (a whole number, 1 or more; a run 2 or
+    more). sum and month_sum add value.<field> (a word, default mins). kind_first counts the facts whose value.kind is one of `kinds`.
+    month_sum and month_days may name a habit instead (reads = "habit_done"): its logged numbers added, or the days it was done."""
+    reads = a.get("reads")
+    if reads == "proof" or isinstance(reads, list) or (w.facts is not None and not (isinstance(reads, str) and reads in w.facts)):
+        c.error(f'test "{test}" reads one fact from rulebook.toml (rule 18)')
+    if "at" in a:
+        get_number(c, a, "at", ge=2 if test in ("weeks_running", "days_running") else 1, integer=True)
+    if "field" in a and (test not in ("sum", "month_sum") or "habit" in a or not (is_text(a["field"]) and SNAKE_CASE.match(a["field"]))):
+        c.error(f'field is a word naming a number in the fact (sum and month_sum, without habit), found {a["field"]!r} (rule 18)')
+    if "habit" in a:
+        known = list(w.weights or []) + ["custom"]
+        if test not in ("month_sum", "month_days"):
+            c.error(f'habit belongs to month_sum and month_days, not to test "{test}" (rule 18)')
+        elif reads != "habit_done":
+            c.error('a month test with a habit reads "habit_done" (rule 18)')
+        elif w.weights is not None and a["habit"] not in known:
+            c.error(f"habit {a['habit']!r} is not a habit in [habits.weights] (rule 18)")
+    elif test in ("month_sum", "month_days") and reads == "habit_done":
+        c.error('reads "habit_done" needs habit: the habit whose month it counts (rule 18)')
+    if test == "kind_first":
+        k = a.get("kinds")
+        if "kinds" in a and not (isinstance(k, list) and k and all(is_text(x) for x in k)):
+            c.error(f"kinds must be a non-empty list of activity kinds, found {k!r} (rule 18)")
 
 
 def check_achievements(data, w, rep):

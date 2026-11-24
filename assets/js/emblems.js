@@ -138,6 +138,23 @@
 
   // ── the families ──
   const DRAW = {
+    // version 15 (round 15 'Over the Line'): THE LINE, a ring for weeks at 300 Move minutes: the week as a ring nearly closed, the line as a
+    // mark at the top, the count in the middle and what it counts under it (WEEK, WEEKS, IN A ROW)
+    ring(s, p) {
+      return `<circle cx="60" cy="60" r="52" ${S('none', p.fr, 5)}/><circle cx="60" cy="60" r="45.5" ${S('none', p.ed, 1, `opacity:${p.edOp}`)}/><circle cx="60" cy="60" r="42" ${S(p.ink)}/>`
+        + `<circle cx="60" cy="60" r="33" ${S('none', p.lk ? GPAPER : p.det, 4.5, 'stroke-dasharray:178 30;opacity:.9')} transform="rotate(-78 60 60)"/>`
+        + `<rect x="57" y="16" width="6" height="17" rx="2" ${S(p.lk ? GHOST_DK : p.acc)}/>`
+        + num(s.n, 60, 56, p.nu, nsz(s.n, 26, 24, 19)) + word(s.w || '', 60, 75, 6.5, p.lk ? GPAPER : p.det, 1.2);
+    },
+    // COURT, a roundel for Court Log: a racket head with its strings, the handle in the accent, a short word under it (10H, MATCH, 4 WKS)
+    roundel(s, p) {
+      return `<path d="M60 6 L108 32 L108 88 L60 114 L12 88 L12 32 Z" ${S('none', p.fr, 4.5, 'stroke-linejoin:round')}/>`
+        + `<path d="M60 16 L99 37 L99 83 L60 104 L21 83 L21 37 Z" ${S(p.ink, p.ink, 2, 'stroke-linejoin:round')}/>`
+        + `<ellipse cx="60" cy="47" rx="17" ry="21" ${S('none', p.nu, 3.6)}/>`
+        + `<path d="M49 37h22M46 47h28M49 57h22M53 28v38M60 26v42M67 28v38" ${S('none', p.lk ? GPAPER : p.det, 1.4, 'opacity:.6')}/>`
+        + `<rect x="57" y="67" width="6" height="12" rx="2" ${S(p.lk ? GHOST_DK : p.acc)}/>`
+        + word(s.text || '', 60, 92, s.text && s.text.length > 4 ? 8 : 10, p.nu, 1);
+    },
     // sessions: Nike's object ladder. A ball for the first, a kettlebell to 7, a dumbbell 10 to 25 (its digits on the two heads), a plate from 30
     sessions(s, p) { const n = +s.n; return diamond(p) + (n === 1 ? ball(p, n) : n < 10 ? bell(p, n) : n < 30 ? dumb(p, n) : plate(p, n)) + aa(60, 99, AA_DK(p), 7); },
     // weeks in a row: a medal on a ribbon; the ribbon changes with the step
@@ -294,6 +311,15 @@
   put('still_standing', { sec: 'habits', fam: 'trophy', frame: 'oct', glyph: 'flag', xp: 600, order: 1006 });
   put('million_steps', { sec: 'habits', fam: 'trophy', frame: 'notch', text: '1M', xp: 1000, order: 1007 });
   put('the_centurion', { sec: 'habits', fam: 'gem', n: 100, xp: 1200, order: 1008 });
+  // Moving (version 15, round 15 'Over the Line'): The Line's rings (weeks at 300 Move minutes) and Court Log's roundels. Colour is the step,
+  // Ink to Champion, never a metal.
+  [[1, 0, 'WEEK'], [4, 1, 'WEEKS'], [12, 2, 'WEEKS'], [26, 4, 'WEEKS']].forEach(([n, tier, w]) => put(n === 1 ? 'full_week' : 'full_weeks_' + n, { sec: 'move', fam: 'ring', n, w, tier, order: n, ladder: 'line' }));
+  [[2, 1], [4, 2], [8, 3]].forEach(([n, tier]) => put('full_weeks_row_' + n, { sec: 'move', fam: 'ring', n, w: 'IN A ROW', tier, order: 100 + n, ladder: 'linerow' }));
+  [[10, 1], [25, 2], [100, 3]].forEach(([n, tier]) => put('court_hours_' + n, { sec: 'move', fam: 'roundel', text: n + 'H', tier, order: 200 + n, ladder: 'court' }));
+  [[4, 1], [8, 2], [12, 3]].forEach(([n, tier]) => put('court_weeks_' + n, { sec: 'move', fam: 'roundel', text: n + ' WKS', tier, order: 400 + n, ladder: 'courtrow' }));
+  put('match_day', { sec: 'move', fam: 'roundel', text: 'MATCH', tier: 0, order: 501 });
+  put('cross_court', { sec: 'move', fam: 'roundel', text: '3 KINDS', tier: 1, order: 502 });
+  put('court_month', { sec: 'move', fam: 'roundel', text: 'MONTH', tier: 2, order: 503 });
   // With Amir: a ticket
   put('month_one', { sec: 'amir', fam: 'ticket', n: 1, tier: 0, order: 1, v11: true });
   put('season_ticket', { sec: 'amir', fam: 'ticket', n: 3, tier: 1, order: 3 });
@@ -333,7 +359,7 @@
 
   const SECTIONS = [
     { k: 'sessions', t: 'Sessions' }, { k: 'weeks', t: 'Weeks in a row', group: 'streaks' }, { k: 'months', t: 'Months in a row', group: 'streaks' },
-    { k: 'stronger', t: 'Getting stronger' }, { k: 'comebacks', t: 'Comebacks' }, { k: 'habits', t: 'Habits' }, { k: 'amir', t: 'With Amir' }, { k: 'trophies', t: 'Trophies' },
+    { k: 'stronger', t: 'Getting stronger' }, { k: 'comebacks', t: 'Comebacks' }, { k: 'habits', t: 'Habits' }, { k: 'move', t: 'Moving' }, { k: 'amir', t: 'With Amir' }, { k: 'trophies', t: 'Trophies' },
   ];
 
   function svgWrap(inner, label) {

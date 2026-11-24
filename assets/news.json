@@ -96,6 +96,28 @@
       }
     },
     {
+      "id": "2026-11-24-week-and-court",
+      "at": "2026-11-24T17:30:00Z",
+      "en": {
+        "title": "Your sport gets its own achievements",
+        "items": [
+          "Tennis, padel and everything else you add now count toward achievements: 10, 25 and 100 hours, your first match, and weeks in a row on court.",
+          "A week at 300 Move minutes is a Full Week. Count them up, or string them together.",
+          "When your week goes over the line, the crew sees it, if you share your weeks."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "ورزشتون دستاوردهای خودش رو داره",
+        "items": [
+          "تنیس، پدل و هر فعالیتی که ثبت می‌کنید حالا برای دستاوردها حساب می‌شه: ۱۰ و ۲۵ و ۱۰۰ ساعت، اولین مسابقه، و هفته‌های پشت هم توی زمین.",
+          "هفته‌ای که به ۳۰۰ دقیقهٔ تحرک برسه یه هفتهٔ کامله. جمعشون کنید، یا پشت هم نگهشون دارید.",
+          "وقتی هفته‌تون از خط رد بشه، اگه هفته‌هاتون رو با تیم به اشتراک بذارید، تیم هم می‌بینه."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-24-three-shapes",
       "at": "2026-11-24T17:00:00Z",
       "en": {

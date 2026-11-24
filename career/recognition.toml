@@ -236,6 +236,32 @@ used_for = "Amir's Pick"
 en = "You're my pick for {month}. Can I put you in my story?"
 fa = ""
 
+# Round 15 (2026-11-24, #154): the week and the court.
+[message.full_week]
+used_for = "the Full Week achievement (the first week at 300 Move minutes, round 15)"
+en = "First full week of moving. Everything you did counted."
+fa = ""
+
+[message.full_weeks]
+used_for = "4 / 12 / 26 Full Weeks, and Full Weeks in a row ({n} is the number in its name)"
+en = "{n} full weeks of moving now. Keep it going."
+fa = ""
+
+[message.court_hours]
+used_for = "Court Hours 10 / 25 / 100 ({n} hours of Court Log activity)"
+en = "{n} hours on court, logged. All of it counts."
+fa = ""
+
+[message.court_weeks]
+used_for = "Weeks on Court 4 / 8 / 12 ({n} weeks in a row with an activity)"
+en = "{n} weeks running on court. That's commitment."
+fa = ""
+
+[message.match_day]
+used_for = "Match Day (the first match in Court Log; never the score)"
+en = "Saw your first match in your weeks. How did it feel?"
+fa = ""
+
 [message.badge_tier]
 used_for = "any other badge tier from highlight up"
 en = "{badge}, {metal}. {caption}"

@@ -1822,3 +1822,256 @@ free = true
 origin = "new"
 added_in = 14
 paid_from = "2026-11-25"
+
+
+# ── Version 15 (2026-11-24): round 15 'Over the Line', the week and the court ─────────────────────────────────────────
+# Amir: "go with your picks" (direction A, Court Hours pays like walking, the names Full Week and Court Hours), then the three shapes (TASTE.md).
+# #146 Full Week counts weeks at the line (move_week), never a streak; #157 adds the in-a-row shape. #148 Court Hours is GROUND COVERED's twin for
+# players: 25 hours is about 290,000 steps of work, so it pays what QUARTER OF A MILLION pays. #149 Match Day and Cross-Court. #158 weeks with
+# court time in a row (weeks, never days: rest days) and 10 hours in a calendar month. Court Log's fact is activity_done (0 XP, stage130).
+# paid_from is the day AFTER the seed, so anything already done is won at 0 XP and nobody moves on the day (D21).
+
+[achievement.full_week]
+name = "Full Week"
+meaning = "commitment"
+reads = "move_week"
+test = "first"
+repeats = "move_week"
+rule = "A week at 300 Move minutes, the first time."
+xp = 100
+size = "highlight"
+caption = "300 Move minutes in one week. Everything counted."
+free = false
+origin = "new"
+added_in = 15
+paid_from = "2026-11-25"
+
+[achievement.full_weeks_4]
+name = "4 Full Weeks"
+meaning = "commitment"
+reads = "move_week"
+test = "total"
+at = 4
+rule = "4 weeks at 300 Move minutes. They don't have to be in a row."
+xp = 200
+size = "highlight"
+caption = "Four full weeks of moving."
+free = false
+origin = "new"
+added_in = 15
+paid_from = "2026-11-25"
+
+[achievement.full_weeks_12]
+name = "12 Full Weeks"
+meaning = "commitment"
+reads = "move_week"
+test = "total"
+at = 12
+rule = "12 weeks at 300 Move minutes."
+xp = 500
+size = "milestone"
+caption = "Twelve full weeks. That's a habit."
+free = false
+origin = "new"
+added_in = 15
+paid_from = "2026-11-25"
+
+[achievement.full_weeks_26]
+name = "26 Full Weeks"
+meaning = "commitment"
+reads = "move_week"
+test = "total"
+at = 26
+rule = "26 weeks at 300 Move minutes."
+xp = 1000
+size = "legend"
+caption = "Half a year of full weeks."
+free = false
+origin = "new"
+added_in = 15
+paid_from = "2026-11-25"
+
+[achievement.full_weeks_row_2]
+name = "2 Full Weeks in a Row"
+meaning = "consistency"
+reads = "move_week"
+test = "weeks_running"
+at = 2
+rule = "2 weeks in a row at 300 Move minutes."
+xp = 150
+size = "highlight"
+caption = "Two full weeks, back to back."
+free = false
+origin = "new"
+added_in = 15
+paid_from = "2026-11-25"
+
+[achievement.full_weeks_row_4]
+name = "4 Full Weeks in a Row"
+meaning = "consistency"
+reads = "move_week"
+test = "weeks_running"
+at = 4
+rule = "4 weeks in a row at 300 Move minutes."
+xp = 200
+size = "milestone"
+caption = "A full month of full weeks."
+free = false
+origin = "new"
+added_in = 15
+paid_from = "2026-11-25"
+
+[achievement.full_weeks_row_8]
+name = "8 Full Weeks in a Row"
+meaning = "consistency"
+reads = "move_week"
+test = "weeks_running"
+at = 8
+rule = "8 weeks in a row at 300 Move minutes."
+xp = 400
+size = "milestone"
+caption = "Two months without dropping a week."
+free = false
+origin = "new"
+added_in = 15
+paid_from = "2026-11-25"
+
+[achievement.court_hours_10]
+name = "10 Hours"
+meaning = "commitment"
+reads = "activity_done"
+test = "sum"
+field = "mins"
+at = 600
+rule = "10 hours of activity in Court Log, every kind together."
+xp = 150
+size = "highlight"
+caption = "10 hours of tennis, padel and the rest. It all counts."
+free = false
+origin = "new"
+added_in = 15
+paid_from = "2026-11-25"
+
+[achievement.court_hours_25]
+name = "25 Hours"
+meaning = "commitment"
+reads = "activity_done"
+test = "sum"
+field = "mins"
+at = 1500
+rule = "25 hours of activity in Court Log."
+xp = 400
+size = "milestone"
+caption = "25 hours of playing and moving."
+free = false
+origin = "new"
+added_in = 15
+paid_from = "2026-11-25"
+
+[achievement.court_hours_100]
+name = "100 Hours"
+meaning = "commitment"
+reads = "activity_done"
+test = "sum"
+field = "mins"
+at = 6000
+rule = "100 hours of activity in Court Log."
+xp = 1000
+size = "legend"
+caption = "100 hours. That's a lot of court."
+free = false
+origin = "new"
+added_in = 15
+paid_from = "2026-11-25"
+
+[achievement.match_day]
+name = "Match Day"
+meaning = "commitment"
+reads = "activity_done"
+test = "kind_first"
+kinds = ["match"]
+at = 1
+rule = "Your first match in Court Log."
+xp = 50
+size = "win"
+caption = "Your first match in your weeks."
+free = false
+origin = "new"
+added_in = 15
+paid_from = "2026-11-25"
+
+[achievement.cross_court]
+name = "Cross-Court"
+meaning = "commitment"
+reads = "activity_done"
+test = "kinds_in_cycle"
+at = 3
+rule = "3 different kinds of activity in one cycle."
+xp = 100
+size = "highlight"
+caption = "Three ways of moving in one cycle."
+free = false
+origin = "new"
+added_in = 15
+paid_from = "2026-11-25"
+
+[achievement.court_weeks_4]
+name = "4 Weeks on Court"
+meaning = "consistency"
+reads = "activity_done"
+test = "weeks_running"
+at = 4
+rule = "An activity in Court Log, 4 weeks in a row."
+xp = 200
+size = "highlight"
+caption = "Four weeks running, you got out and played."
+free = false
+origin = "new"
+added_in = 15
+paid_from = "2026-11-25"
+
+[achievement.court_weeks_8]
+name = "8 Weeks on Court"
+meaning = "consistency"
+reads = "activity_done"
+test = "weeks_running"
+at = 8
+rule = "An activity in Court Log, 8 weeks in a row."
+xp = 400
+size = "milestone"
+caption = "Eight weeks running on court."
+free = false
+origin = "new"
+added_in = 15
+paid_from = "2026-11-25"
+
+[achievement.court_weeks_12]
+name = "12 Weeks on Court"
+meaning = "consistency"
+reads = "activity_done"
+test = "weeks_running"
+at = 12
+rule = "An activity in Court Log, 12 weeks in a row."
+xp = 600
+size = "milestone"
+caption = "Twelve weeks running. Your sport is part of the plan."
+free = false
+origin = "new"
+added_in = 15
+paid_from = "2026-11-25"
+
+[achievement.court_month]
+name = "Ten-Hour Month"
+meaning = "commitment"
+reads = "activity_done"
+test = "month_sum"
+field = "mins"
+at = 600
+rule = "10 hours of activity in Court Log in one calendar month."
+xp = 250
+size = "milestone"
+caption = "10 hours in one month. A big month."
+free = false
+origin = "new"
+added_in = 15
+paid_from = "2026-11-25"
