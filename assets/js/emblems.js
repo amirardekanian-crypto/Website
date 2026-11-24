@@ -320,6 +320,29 @@
   put('match_day', { sec: 'move', fam: 'roundel', text: 'MATCH', tier: 0, order: 501 });
   put('cross_court', { sec: 'move', fam: 'roundel', text: '3 KINDS', tier: 1, order: 502 });
   put('court_month', { sec: 'move', fam: 'roundel', text: 'MONTH', tier: 2, order: 503 });
+  // Version 16 (#159 phases 2 and 3): the month shape on the habit coins (the banner says how many days), the steps totals as one-offs, HOUSE
+  // RULES as its own ladder (the star: a rule of your own), Full Moving Month as The Line's ring in Night, and the training ones as trophies.
+  [['steps', 'steps_month_100k', '100K', 1], ['steps', 'steps_month_200k', '200K', 2], ['steps', 'steps_month_300k', '300K', 4]].forEach(([g, id, text, tier], i) =>
+    put(id, { sec: 'habits', fam: 'trophy', frame: 'notch', text, tier, order: 1010 + i }));
+  [['sleep', 'sleep_month', '20/MONTH'], ['water', 'water_month', '20/MONTH'], ['food', 'fuel_month', '20/MONTH'], ['stretch', 'mobility_month', '15/MONTH'],
+   ['link', 'counted_month', '20/MONTH'], ['sweep', 'perfect_month', '10/MONTH']].forEach(([glyph, id, rn]) => {
+    const li = LADDERS.findIndex(l => l[0] === glyph);
+    put(id, { sec: 'habits', fam: 'rung', glyph, rn, tier: 1, order: li * 10 + 5, ladder: glyph });
+  });
+  { const li = LADDERS.findIndex(l => l[0] === 'sweep');
+    put('perfect_row_3', { sec: 'habits', fam: 'rung', glyph: 'sweep', rn: '3 DAYS', tier: 1, order: li * 10 + 6, ladder: 'sweep' });
+    put('perfect_row_7', { sec: 'habits', fam: 'rung', glyph: 'sweep', rn: '7 DAYS', tier: 3, order: li * 10 + 7, ladder: 'sweep' }); }
+  ['house_rules_1', 'house_rules_2', 'house_rules_3'].forEach((id, i) => put(id, { sec: 'habits', fam: 'rung', glyph: 'star', rn: ['I', 'II', 'III'][i], tier: i, order: 200 + i, ladder: 'house' }));
+  put('full_moving_month', { sec: 'move', fam: 'ring', n: 4, w: 'A MONTH', tier: 3, order: 150, ladder: 'line' });
+  put('library_month', { sec: 'trophies', fam: 'trophy', frame: 'square', glyph: 'book', tier: 2, order: 40 });
+  put('library_weeks_3', { sec: 'trophies', fam: 'trophy', frame: 'square', text: '3 WKS', tier: 1, order: 41 });
+  put('library_weeks_6', { sec: 'trophies', fam: 'trophy', frame: 'square', text: '6 WKS', tier: 2, order: 42 });
+  put('first_checkin', { sec: 'trophies', fam: 'trophy', frame: 'notch', glyph: 'bubble', tier: 0, order: 43 });
+  put('checkins_50', { sec: 'trophies', fam: 'trophy', frame: 'notch', text: '50', tier: 2, order: 44 });
+  put('checkins_100', { sec: 'trophies', fam: 'trophy', frame: 'notch', text: '100', tier: 3, order: 45 });
+  put('checked_in_4', { sec: 'trophies', fam: 'trophy', frame: 'square', glyph: 'bubble', tier: 2, order: 46 });
+  put('bests_month_3', { sec: 'stronger', fam: 'trophy', frame: 'shield', text: '3', tier: 2, order: 1010 });
+  put('best_cycles_3', { sec: 'stronger', fam: 'trophy', frame: 'crest', glyph: 'cycle', tier: 3, order: 1011 });
   // With Amir: a ticket
   put('month_one', { sec: 'amir', fam: 'ticket', n: 1, tier: 0, order: 1, v11: true });
   put('season_ticket', { sec: 'amir', fam: 'ticket', n: 3, tier: 1, order: 3 });

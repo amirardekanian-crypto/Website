@@ -96,6 +96,28 @@
       }
     },
     {
+      "id": "2026-11-24-month-and-training",
+      "at": "2026-11-24T19:30:00Z",
+      "en": {
+        "title": "Achievements for your month and your training",
+        "items": [
+          "Your habits now have month achievements too: 20 good nights, 100,000 steps, 10 perfect days and more.",
+          "A habit you added yourself has its own: HOUSE RULES, for 3, 7 and 21 days in a row.",
+          "Training gets new ones: Library sessions, check-ins, and bests in a month or across cycles."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "دستاوردهایی برای ماهتون و تمریناتون",
+        "items": [
+          "عادت‌هاتون حالا دستاوردهای ماهانه هم دارن: بیست شب خواب خوب، صد هزار قدم، ده روز بی‌نقص و بیشتر.",
+          "عادتی که خودتون اضافه کردید هم دستاورد خودش رو داره: «قانون خودم»، برای ۳ و ۷ و ۲۱ روز پشت هم.",
+          "تمرین هم دستاوردهای تازه داره: جلسه‌های کتابخانه، چک‌این‌ها، و رکوردها توی یه ماه یا چند دوره پشت هم."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-24-week-and-court",
       "at": "2026-11-24T17:30:00Z",
       "en": {

@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=42"></script>
+<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=43"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -199,7 +199,7 @@
 <!-- The emblem cabinet's art (2026-10-25, Amir: direction A of the Emblem Cabinet): every achievement, mark tier and level medal is drawn in
      code (window.AAEmblem), no pictures. `defer`, like the habit engine, so boot() can get here first: every caller asks for it only when it
      draws (cabEmblem()) and the page repaints itself once it has loaded (emblemsReady()). -->
-<script defer src="/assets/js/emblems.js?v=4" onload="window.emblemsReady && emblemsReady()"></script>
+<script defer src="/assets/js/emblems.js?v=5" onload="window.emblemsReady && emblemsReady()"></script>
 <!-- The recovery rules (round 14 'The Changeover', 2026-11-24): Footprint's thresholds, The Last Word's lines, Matched Pair's map, as
      window.AAREC, generated from recovery/*.toml by scripts/build_recovery.py (coach.html reads the same file). `defer`: whatever drew
      before it arrived is drawn again by recReady() (the finished cards, Home's suggestion). -->

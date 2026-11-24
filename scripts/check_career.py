@@ -100,7 +100,9 @@ ACHIEVEMENT_TESTS = ["first", "proof", "goals", "cycle_all_held", "cycle_by_the_
                       "best_value", "patterns_in_cycle", "cycle_proving", "run_regained", "total", "best_run", "month_held",
                       "on_dates", "slam_year", "clock",
                       # stage130 (rulebook version 15, round 15 'Over the Line'): the court family, the run and the month shapes
-                      "sum", "kind_first", "kinds_in_cycle", "weeks_running", "days_running", "month_sum", "month_days"]
+                      "sum", "kind_first", "kinds_in_cycle", "weeks_running", "days_running", "month_sum", "month_days",
+                      # stage131 (#159 phases 2 and 3): Full Moving Month, counts in a month, checked-in weeks in a row, cycles in a row
+                      "month_count", "month_all", "weeks_checked_in", "cycles_running"]
 # Rule 18: the keys each test carries, and no others (a stray one is an error).
 TEST_PARAMS = {"first": set(), "proof": {"proof_measure", "proof_need"}, "goals": {"goals"}, "cycle_all_held": set(),
                "cycle_by_the_book": set(), "cycle_with_broken": set(), "runs_together": {"habits", "run"},
@@ -108,8 +110,10 @@ TEST_PARAMS = {"first": set(), "proof": {"proof_measure", "proof_need"}, "goals"
                "run_regained": {"away_weeks"}, "total": {"at"}, "best_run": {"at"}, "month_held": {"weeks"},
                "on_dates": {"windows"}, "slam_year": {"of"}, "clock": set(),
                "sum": {"at"}, "kind_first": {"at", "kinds"}, "kinds_in_cycle": {"at"}, "weeks_running": {"at"}, "days_running": {"at"},
-               "month_sum": {"at"}, "month_days": {"at"}}
-MORE_TESTS = ["sum", "kind_first", "kinds_in_cycle", "weeks_running", "days_running", "month_sum", "month_days"]   # stage130: career_more_key()
+               "month_sum": {"at"}, "month_days": {"at"},
+               "month_count": {"at"}, "month_all": {"at"}, "weeks_checked_in": {"at"}, "cycles_running": {"at"}}
+MORE_TESTS = ["sum", "kind_first", "kinds_in_cycle", "weeks_running", "days_running", "month_sum", "month_days",
+              "month_count", "month_all", "weeks_checked_in", "cycles_running"]   # stage130 / stage131: career_more_key()
 # stage99: a test that takes ONE of several keys (clock: finish_before or finish_from, exactly one)
 TEST_ONE_OF = {"clock": {"finish_before", "finish_from"}}
 FACT_TESTS = ["on_dates", "slam_year", "clock"]   # stage99: these three read the finished-session fact (reads = "session_finished")
@@ -134,7 +138,8 @@ LIMIT_PER = ["plan_day_week", "week", "cycle"]
 # ladder is the first entry to ask for a day on target by itself rather than inside a goals list.
 # "total:<habit>" and "dayStreak" joined on 2026-10-20 with the plain achievements: career_measures() has always kept
 # sum:<habit> and daystreak, and career_proof_key() now names them (supabase/stage93).
-PROOF_MEASURES = ["streak:<habit>", "daysHit:<habit>", "total:<habit>", "daysWith3", "perfectDays", "dayStreak",
+# "streak:custom" (version 16, HOUSE RULES): the best run of any habit the athlete added (career_measures() run:custom, since stage70).
+PROOF_MEASURES = ["streak:<habit>", "streak:custom", "daysHit:<habit>", "total:<habit>", "daysWith3", "perfectDays", "dayStreak",
                   "qualify", "comebackRun", "comebacksStuck"]
 PROOF_KINDS = ["daysHit:<habit>", "total:<habit>", "qualify", "perfect"]
 PROOF_SNAPSHOT = ROOT / "supabase" / "xp_rules_snapshot.json"
@@ -1018,7 +1023,11 @@ def check_more_test(c, a, w, test):
     if reads == "proof" or isinstance(reads, list) or (w.facts is not None and not (isinstance(reads, str) and reads in w.facts)):
         c.error(f'test "{test}" reads one fact from rulebook.toml (rule 18)')
     if "at" in a:
-        get_number(c, a, "at", ge=2 if test in ("weeks_running", "days_running") else 1, integer=True)
+        get_number(c, a, "at", ge=2 if test in ("weeks_running", "days_running", "weeks_checked_in", "cycles_running") else 1, integer=True)
+    if test == "weeks_checked_in" and reads != "checkin_done":
+        c.error('test "weeks_checked_in" reads the fact checkin_done (rule 18)')
+    if test == "month_all" and reads != "move_week":
+        c.error('test "month_all" reads the fact move_week (each plan week of the month, dated its first day) (rule 18)')
     if "field" in a and (test not in ("sum", "month_sum") or "habit" in a or not (is_text(a["field"]) and SNAKE_CASE.match(a["field"]))):
         c.error(f'field is a word naming a number in the fact (sum and month_sum, without habit), found {a["field"]!r} (rule 18)')
     if "habit" in a:

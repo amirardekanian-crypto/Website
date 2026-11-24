@@ -2075,3 +2075,381 @@ free = false
 origin = "new"
 added_in = 15
 paid_from = "2026-11-25"
+
+
+# ── Version 16 (2026-11-24): #159 Three Shapes, Everywhere, phases 2 and 3 ──────────────────────────────────────────────
+# The month shape for the habits (steps summed, days done in a month), perfect days in a row, HOUSE RULES (a habit you added), Full Moving Month,
+# and training: the Library in a month and weeks running, check-ins (the first, 50, 100, every session for 4 weeks), bests in a month and in
+# cycles running. Supplements are left out on purpose. Tests from stage130 and stage131. paid_from the day after the seed (D21).
+
+[achievement.steps_month_100k]
+name = "100K MONTH"
+meaning = "commitment"
+reads = "habit_done"
+test = "month_sum"
+habit = "steps"
+at = 100000
+rule = "100,000 steps in one calendar month, counted as your Steps habit counts them."
+xp = 250
+size = "milestone"
+caption = "A hundred thousand steps in one month."
+free = true
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.steps_month_200k]
+name = "200K MONTH"
+meaning = "commitment"
+reads = "habit_done"
+test = "month_sum"
+habit = "steps"
+at = 200000
+rule = "200,000 steps in one calendar month."
+xp = 500
+size = "milestone"
+caption = "Two hundred thousand steps in one month."
+free = true
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.steps_month_300k]
+name = "300K MONTH"
+meaning = "commitment"
+reads = "habit_done"
+test = "month_sum"
+habit = "steps"
+at = 300000
+rule = "300,000 steps in one calendar month."
+xp = 1000
+size = "legend"
+caption = "Three hundred thousand. That's ten thousand a day, every day."
+free = true
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.sleep_month]
+name = "TWENTY NIGHTS"
+meaning = "consistency"
+reads = "habit_done"
+test = "month_days"
+habit = "sleep"
+at = 20
+rule = "7.5 hours of sleep on 20 nights of one calendar month."
+xp = 250
+size = "milestone"
+caption = "Twenty good nights in one month."
+free = true
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.water_month]
+name = "TWENTY DAYS HYDRATED"
+meaning = "consistency"
+reads = "habit_done"
+test = "month_days"
+habit = "water"
+at = 20
+rule = "8 glasses of water on 20 days of one calendar month."
+xp = 250
+size = "milestone"
+caption = "Twenty days of water done right in one month."
+free = true
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.fuel_month]
+name = "TWENTY DAYS FUELLED"
+meaning = "consistency"
+reads = "habit_done"
+test = "month_days"
+habit = "fuel"
+at = 20
+rule = "3 proper meals on 20 days of one calendar month."
+xp = 250
+size = "milestone"
+caption = "Twenty days of eating like an athlete in one month."
+free = true
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.mobility_month]
+name = "FIFTEEN DAYS LOOSE"
+meaning = "consistency"
+reads = "habit_done"
+test = "month_days"
+habit = "mobility"
+at = 15
+rule = "Mobility on 15 days of one calendar month."
+xp = 250
+size = "milestone"
+caption = "Fifteen days of mobility in one month."
+free = true
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.counted_month]
+name = "TWENTY THAT COUNTED"
+meaning = "consistency"
+reads = "day_on_target"
+test = "month_days"
+at = 20
+rule = "20 days that counted in one calendar month."
+xp = 250
+size = "milestone"
+caption = "Twenty days that counted in one month."
+free = true
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.perfect_month]
+name = "TEN PERFECT DAYS"
+meaning = "commitment"
+reads = "perfect_day"
+test = "month_days"
+at = 10
+rule = "10 perfect days in one calendar month."
+xp = 250
+size = "milestone"
+caption = "Ten perfect days in one month."
+free = true
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.perfect_row_3]
+name = "THREE PERFECT DAYS"
+meaning = "consistency"
+reads = "perfect_day"
+test = "days_running"
+at = 3
+rule = "3 perfect days in a row."
+xp = 100
+size = "highlight"
+caption = "Three perfect days, back to back."
+free = true
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.perfect_row_7]
+name = "SEVEN PERFECT DAYS"
+meaning = "consistency"
+reads = "perfect_day"
+test = "days_running"
+at = 7
+rule = "7 perfect days in a row."
+xp = 300
+size = "milestone"
+caption = "A perfect week. Every habit, every day."
+free = true
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.house_rules_1]
+name = "HOUSE RULES I"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v16_house_rules_1"
+proof_measure = "streak:custom"
+proof_need = 3
+rule = "A habit you added yourself, 3 days in a row."
+xp = 60
+size = "win"
+caption = "Your own rule, three days running."
+free = true
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.house_rules_2]
+name = "HOUSE RULES II"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v16_house_rules_2"
+proof_measure = "streak:custom"
+proof_need = 7
+rule = "A habit you added yourself, 7 days in a row."
+xp = 150
+size = "highlight"
+caption = "Your own rule, a full week."
+free = true
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.house_rules_3]
+name = "HOUSE RULES III"
+meaning = "consistency"
+reads = "proof"
+test = "proof"
+proof_code = "ev_v16_house_rules_3"
+proof_measure = "streak:custom"
+proof_need = 21
+rule = "A habit you added yourself, 21 days in a row."
+xp = 350
+size = "milestone"
+caption = "Three weeks of keeping your own rule."
+free = true
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.full_moving_month]
+name = "Full Moving Month"
+meaning = "commitment"
+reads = "move_week"
+test = "month_all"
+at = 1
+rule = "Every training week of a calendar month at 300 Move minutes (4 weeks or more)."
+xp = 400
+size = "milestone"
+caption = "A whole month of full weeks."
+free = false
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.library_month]
+name = "Library Regular"
+meaning = "commitment"
+reads = "library_session"
+test = "month_count"
+at = 4
+rule = "4 Library sessions in one calendar month."
+xp = 250
+size = "milestone"
+caption = "Four extra sessions in one month."
+free = false
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.library_weeks_3]
+name = "3 Weeks of Extras"
+meaning = "consistency"
+reads = "library_session"
+test = "weeks_running"
+at = 3
+rule = "A Library session, 3 weeks in a row."
+xp = 175
+size = "highlight"
+caption = "Something extra, three weeks running."
+free = false
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.library_weeks_6]
+name = "6 Weeks of Extras"
+meaning = "consistency"
+reads = "library_session"
+test = "weeks_running"
+at = 6
+rule = "A Library session, 6 weeks in a row."
+xp = 300
+size = "milestone"
+caption = "Six weeks running with something extra."
+free = false
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.first_checkin]
+name = "First Check-In"
+meaning = "commitment"
+reads = "checkin_done"
+test = "first"
+rule = "Your first check-in after a session."
+xp = 30
+size = "win"
+caption = "You told me how it went. That helps."
+free = false
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.checkins_50]
+name = "50 Check-Ins"
+meaning = "commitment"
+reads = "checkin_done"
+test = "total"
+at = 50
+rule = "50 check-ins after your sessions."
+xp = 300
+size = "milestone"
+caption = "Fifty times you told me how it went."
+free = false
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.checkins_100]
+name = "100 Check-Ins"
+meaning = "commitment"
+reads = "checkin_done"
+test = "total"
+at = 100
+rule = "100 check-ins after your sessions."
+xp = 600
+size = "milestone"
+caption = "A hundred check-ins. I read every one."
+free = false
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.checked_in_4]
+name = "Every Session Told"
+meaning = "consistency"
+reads = "checkin_done"
+test = "weeks_checked_in"
+at = 4
+rule = "Every session checked in, 4 training weeks in a row."
+xp = 250
+size = "milestone"
+caption = "Four weeks, every session checked in."
+free = false
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.bests_month_3]
+name = "Three-Best Month"
+meaning = "progress"
+reads = "personal_best"
+test = "month_count"
+at = 3
+rule = "3 personal bests in one calendar month."
+xp = 250
+size = "milestone"
+caption = "Three bests in one month."
+free = false
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"
+
+[achievement.best_cycles_3]
+name = "Always Improving"
+meaning = "progress"
+reads = "personal_best"
+test = "cycles_running"
+at = 3
+rule = "A personal best in 3 cycles in a row."
+xp = 400
+size = "milestone"
+caption = "A new best in three cycles running."
+free = false
+origin = "new"
+added_in = 16
+paid_from = "2026-11-25"

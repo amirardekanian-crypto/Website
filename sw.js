@@ -665,7 +665,9 @@
 // v306: program.html, habits.html, emblems.js (?v=4) and i18n-fa.js (?v=42) changed (2026-11-24, round 15 'Over the Line', stage130, rulebook
 // version 15): the week and the court in the cabinet (Full Week, Court Hours, Match Day, Cross-Court, weeks on court), their ring and roundel, Over
 // the Line on Crew; AA Proof prices a phone-decided win before its paid_from at 0, as the server does (D21).
-const CACHE = 'aap-v306';
+// v307: program.html, emblems.js (?v=5) and i18n-fa.js (?v=43) changed (2026-11-24, #159 Three Shapes phases 2 and 3, stage131, rulebook version 16):
+// the month shape for the habits, perfect days in a row, HOUSE RULES, Full Moving Month, the Library, check-ins and bests in the cabinet.
+const CACHE = 'aap-v307';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -694,7 +696,7 @@ const SHELL = [
   // The habit engine (v195): the training app owns the habits now, so this is shell, not an extra.
   '/assets/js/habits-core.js?v=1',
   // The emblem cabinet's art (v226): the achievements, the marks and the level medals, drawn in code. By the exact URL the page asks for.
-  '/assets/js/emblems.js?v=4',
+  '/assets/js/emblems.js?v=5',
   // The face the emblems' numbers are drawn in (the training day's title uses the 900 one above).
   '/assets/fonts/BarlowCondensed-800.woff2',
   // Off the Glass, the rest game (v162): loaded on the first tap on Play. Cache-first by this plain URL: a change needs a CACHE bump.
@@ -706,7 +708,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=16',
-  '/assets/js/i18n-fa.js?v=42',
+  '/assets/js/i18n-fa.js?v=43',
   // The recovery rules (v295, round 14): Footprint's thresholds and The Last Word's lines, generated from recovery/*.toml. The finished card
   // reads them at Done, signal or not. By the exact URL the page asks for: a change is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/recovery.js?v=1',
