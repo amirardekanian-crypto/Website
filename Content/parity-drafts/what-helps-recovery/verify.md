@@ -52,4 +52,4 @@ text pulled from PubMed, and the wording was then fitted to what the abstract sa
 
 - **Farsi:** written by Amir. Facts match the English, wording does not (Content/CONTENT-PARITY.md).
 - **TPS course lesson:** none. These are adult articles and the course is for juniors and parents. A juniors' version needs its own under-18 rules for cold water and protein, and a doctor's check.
-- **Keep Your Edge** says nobody has tested an exact time before a match. Thomas 2018 is now the closest evidence (jumps about 48 h, heavy squats and sprints about 72 h). Update that line, its Farsi, its stamp and its library row together when that article is next edited.
+- **Keep Your Edge** now cites Thomas 2018 for the time before a match (done 2026-11-24, with its Farsi, stamp and library row).

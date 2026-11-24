@@ -166,6 +166,4 @@ Amir said "fix everything with your own recommendation", so these were decided b
    when one of those lessons is next edited.
 6. **The two recovery articles** (2026-11-24, `what-helps-recovery` and `recovery-between-matches`): written for adults, so no TPS lesson was
    written. A juniors' version needs its own under-18 rules for cold water and protein and a doctor's check first. Science in
-   `Content/parity-drafts/<slug>/verify.md`. **`training-around-matches` (Keep Your Edge)** still says nobody has tested an exact time before a
-   match: Thomas 2018 is now the closest evidence (jumps about 48 h, heavy squats and sprints about 72 h). Fix that line with its Farsi, its
-   stamp and its library row the next time that article is edited.
+   `Content/parity-drafts/<slug>/verify.md`. Keep Your Edge now cites Thomas 2018 for the time before a match, and the older Recovery, Nutrition and Pre-Competition articles point to the two new ones (2026-11-24).
