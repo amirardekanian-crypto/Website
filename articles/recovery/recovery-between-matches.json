@@ -1,0 +1,118 @@
+{
+  "id": "recovery-between-matches",
+  "title": "Match Again Tomorrow",
+  "category": "Recovery",
+  "readMins": 5,
+  "date": "November 2026",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Most players plan for the first match of a tournament and improvise the rest. The studies suggest the later matches are the ones that cost you. This is what piles up when matches stack, what to do between two matches and tonight, and how long your legs really need afterwards. The research is on tennis. I found no recovery trial in padel, so I borrow from tennis and say where."
+    },
+    {
+      "type": "p",
+      "text": "One warning first. The studies are small, mostly in men, and the matches are longer than most club matches. Read them as a direction, not as exact numbers."
+    },
+    {
+      "type": "h",
+      "text": "What piles up when matches stack"
+    },
+    {
+      "type": "p",
+      "text": "In one study, 7 trained men played 4-hour matches on 4 days in a row. From day 2 their sprint got slower and their jump got lower. Serve accuracy after play was worse. Soreness and fatigue rose every day, and they moved less as the days went on (Gescheit 2015). In another, 8 men played three 2-hour matches in 3 days. Their leg strength and how fast their legs produced force were lower before matches 2 and 3, and stayed down after 1 to 2 days of rest (Ojala and Häkkinen, 2013)."
+    },
+    {
+      "type": "p",
+      "text": "Padel is thinner. In 52 amateur players, a match of about 57 minutes pushed heart load up set by set. Jump height and grip strength didn't drop after any set (Marcos-Rivero 2025). Stack the matches and the head tires too. In 14 professionals, mental fatigue rose after each match and built up across two matches in one day. Motivation and reaction time fell (Díaz-García 2021)."
+    },
+    {
+      "type": "callout",
+      "label": "Honest Limit",
+      "text": "None of this is padel recovery research. It describes the load, not what fixes it. The fixes below come from tennis and general sports science, and I mark my own suggestions."
+    },
+    {
+      "type": "h",
+      "text": "Between two matches on the same day"
+    },
+    {
+      "type": "p",
+      "text": "Between matches your job isn't repair. Repair takes sleep. Your job is to stay loose, fed and calm. Walk for a few minutes before you sit down. Eat and drink early, and stay out of the sun. Skip long stretches. A hold of 60 seconds or more can trim strength and power by a few percent, as The Tennis Warm-Up explains. Then do Turnaround in the last 20 to 30 minutes of the gap, and go straight into your normal warm-up. It doesn't replace the warm-up. This is my routine, not a tested protocol."
+    },
+    {
+      "type": "workout",
+      "file": "workouts/recovery/between-matches.json",
+      "label": "Turnaround",
+      "meta": "10 min · Bodyweight · Recovery"
+    },
+    {
+      "type": "p",
+      "text": "If you play again within hours, food is the priority. The numbers are in Match-Day Fuel. A padel tournament day tires your head as much as your legs, so give your head a break too. Find a quiet spot, away from your phone. That's my suggestion. The study only shows the fatigue builds."
+    },
+    {
+      "type": "h",
+      "text": "Tonight"
+    },
+    {
+      "type": "p",
+      "text": "After the last match you're still wired. Adrenaline doesn't switch off because you sat down. Final Whistle is 18 minutes for the hour after a match. Move first, then breathe."
+    },
+    {
+      "type": "workout",
+      "file": "workouts/breath/post-competition.json",
+      "label": "Final Whistle",
+      "meta": "18 min · Bodyweight · Breath"
+    },
+    {
+      "type": "p",
+      "text": "Then eat a proper meal with protein and carbohydrate, drink water, and protect your sleep. In the tennis study, sleep advice went with significantly less soreness and fatigue (Duffield 2014). After a late finish, wind down and keep your bedtime close to normal. Alcohol works against you. In 8 active men after hard training, about 12 standard drinks cut muscle rebuilding by 24 to 37% compared with protein alone (Parr 2014). That's far more than one beer, but it shows which way it pushes."
+    },
+    {
+      "type": "h",
+      "text": "Is an ice bath worth it?"
+    },
+    {
+      "type": "p",
+      "text": "This is the one place I'd use cold water. When you play again tomorrow, 15 minutes in cold water after tonight's match is a fair tool. In 52 studies, it improved muscular power 24 hours later, and after high-intensity exercise it improved soreness and how recovered people felt (Moore 2022). In the tennis study it came with 3 hours of compression clothing and the sleep advice. That mix went with large gains in time in play and stroke rate in the next match, though not significant with 8 players (Duffield 2014). Compression has a small benefit on its own, clearest for getting strength back after lifting (Brown 2017)."
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "Cold water is a tournament tool. Regular use after gym sessions cuts strength and muscle gains (Roberts 2015, Malta 2021). Using it after your last match of the day, when you play again tomorrow, is my suggestion, because the studies looked at training, not tournaments. With a heart or blood pressure problem, ask a doctor first."
+    },
+    {
+      "type": "h",
+      "text": "The morning after"
+    },
+    {
+      "type": "p",
+      "text": "Move easy for 10 minutes, a walk or a gentle ride. The evidence on easy movement is mixed (Van Hooren and Peake, 2018). Don't expect much, but it costs nothing and it gets you going. If your legs are heavy, The Morning After is 17 minutes. If you play again that day, skip it and warm up as normal."
+    },
+    {
+      "type": "workout",
+      "file": "workouts/recovery/day-after.json",
+      "label": "The Morning After",
+      "meta": "17 min · Bodyweight · Recovery"
+    },
+    {
+      "type": "p",
+      "text": "Leave the gym out on match days. Keep Your Edge has the full tournament week, and What Actually Helps sorts every other recovery tool."
+    },
+    {
+      "type": "h",
+      "text": "When your legs are really back"
+    },
+    {
+      "type": "p",
+      "text": "Two rest days may not be enough. After a three-match tournament, explosive leg power was still impaired after two days of rest, and one day was clearly not enough (Ojala and Häkkinen, 2013). Fatigue from heavy squats and maximal sprints took up to 72 hours to clear in a lab study (Thomas 2018). So after a long tournament weekend, I'd keep the first gym session light on legs. Heavy squats, sprints and big jumps can wait until day 3 or later. That's my suggestion, built on those two studies."
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "Plan the second match like the first. Eat, warm up and sleep. Use cold water when you play again tomorrow, never after the gym."
+    },
+    {
+      "type": "p",
+      "text": "Based on Gescheit et al. (2015), Ojala and Häkkinen (2013), Duffield et al. (2014), Marcos-Rivero et al. (2025), Díaz-García et al. (2021), Moore et al. (2022), Roberts et al. (2015), Malta et al. (2021), Brown et al. (2017), Van Hooren and Peake (2018), Thomas et al. (2018) and Parr et al. (2014)."
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+{
+  "id": "what-helps-recovery",
+  "title": "What Actually Helps",
+  "category": "Recovery",
+  "readMins": 7,
+  "date": "November 2026",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Most players finish a session and reach for something. A foam roller, a stretch, an ice bath, a massage. Very little of it does the repairing. Sleep, food and the space between hard days do that. The rest mostly changes how you feel. Here's what the research says about each tool."
+    },
+    {
+      "type": "p",
+      "text": "Most studies are on adults in the gym or in other sports. A few are on tennis players. I found no recovery trial in padel, so I borrow from tennis and say so."
+    },
+    {
+      "type": "h",
+      "text": "Three questions for every tool"
+    },
+    {
+      "type": "p",
+      "text": "A tool can do one of three things. It can make you feel better today. It can help you play better tomorrow. Or it can help you get fitter over the weeks. Most do just one, and a few work against another."
+    },
+    {
+      "type": "callout",
+      "label": "Key",
+      "text": "Feeling better and playing better are not the same thing. Check which one a tool does."
+    },
+    {
+      "type": "h",
+      "text": "Sleep and food do the repairing"
+    },
+    {
+      "type": "p",
+      "text": "Start with sleep. Elite athletes often sleep under 7 hours, and a fixed 7 to 9 isn't right for everyone (Walsh 2021). Of the sleep interventions reviewed in athletes, sleeping more did the most for later performance (Bonnar 2018). Few trials have tested it. In those, people added 26 to 106 minutes in bed or asleep, and the reviewers call the evidence limited (Silva 2021). After a big day, I'd go to bed a bit earlier. Sleep Is Training has the routine."
+    },
+    {
+      "type": "p",
+      "text": "Then protein. In a meta-analysis of 49 trials, extra protein on top of lifting added a little strength and lean mass. Above about 1.6 g per kg of body weight a day it added no more lean mass (Morton 2018). That's about 110 g for a 70 kg player. The International Society of Sports Nutrition suggests 20 to 40 g every 3 to 4 hours, a dose within 2 hours after training, and 30 to 40 g of casein before bed (Kerksick 2017). Casein is the main protein in milk and yoghurt. Eat to Train has the meals."
+    },
+    {
+      "type": "p",
+      "text": "Fast carbohydrate matters most when your next hard session is under 4 hours away (Kerksick 2017). Otherwise I'd think about the day's total, not the clock. Alcohol works against you. In 8 active men after hard training, about 12 standard drinks (1.5 g per kg) cut muscle rebuilding by 24% with protein and 37% with carbohydrate, compared with protein alone (Parr 2014). That's far more than one beer, and it's one small study. It still shows which way alcohol pushes."
+    },
+    {
+      "type": "h",
+      "text": "Space your hard days"
+    },
+    {
+      "type": "p",
+      "text": "A big day takes time to clear. In 10 male athletes, fatigue from 10 sets of 5 jump squats was gone by 48 hours. After 10 sets of 5 heavy squats, or 15 maximal 30 m sprints, it took up to 72 hours (Thomas 2018). In 10 trained men, sets to failure slowed recovery for up to 24 to 48 hours compared with the same work stopped short (Morán-Navarro 2017). Anything new hurts more than work you're used to, because muscle adapts after a damaging bout (Hyldahl 2017)."
+    },
+    {
+      "type": "p",
+      "text": "Hard work stacks when it sits too close together. If you lift and then do hard conditioning, leave 6 hours or more. In a 7-week trial of 58 amateur rugby players, strength gains were lower with no gap than with 6 or 24 hours (Robineau 2016). Keep Your Edge covers gym and court on the same day."
+    },
+    {
+      "type": "h",
+      "text": "Massage, rolling and compression"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Massage: the best of the routines for soreness (Dupuy 2018, 99 studies). Across 29 studies it showed no benefit for strength, jumping, sprinting or endurance (Davis 2020).",
+        "Foam rolling: small. Muscle pain was about 6% lower (Wiewelhove 2019).",
+        "Compression clothing: a small benefit overall, clearest for getting strength back after lifting (Brown 2017)."
+      ]
+    },
+    {
+      "type": "h",
+      "text": "Is an ice bath worth it?"
+    },
+    {
+      "type": "p",
+      "text": "After one hard session, cold water helps. In 52 studies, it improved muscular power 24 hours later. After high-intensity exercise it also improved soreness and how recovered people felt. Strength didn't change (Moore 2022). The catch is regular use. When men lifted for 12 weeks and sat in cold water for 10 minutes after each session, they gained less strength and less muscle than men who did active recovery (Roberts 2015). A meta-analysis of 8 studies agreed on strength (Malta 2021)."
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "Don't make cold water a habit after gym sessions. It's a tool for a tournament weekend, when you need your legs again tomorrow. That's my suggestion, since the studies looked at training, not tournaments. With a heart or blood pressure problem, ask a doctor first."
+    },
+    {
+      "type": "h",
+      "text": "Stretching, cool-downs and slow breathing"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Stretching: still no effect. After exercise it did nothing for strength recovery, or for soreness at 24, 48 or 72 hours, compared with rest, and the certainty is very low (Afonso 2021). A 2025 review of 15 studies agreed (Zhang 2025). Do it if you like it. Just don't count it as recovery.",
+        "An active cool-down: largely ineffective for same-day and next-day performance, and most evidence says it doesn't cut soreness. It may help your heart and breathing settle (Van Hooren and Peake, 2018).",
+        "Slow breathing: it raises heart rate variability, a marker of calm, while you do it (Laborde 2022). Use it to switch off before sleep, not to repair muscle."
+      ]
+    },
+    {
+      "type": "h",
+      "text": "What's changed lately"
+    },
+    {
+      "type": "p",
+      "text": "Three things have moved. The soreness benefit of foam rolling was tiny straight after and clearer at 24 to 72 hours (Zhou 2024), so the next day is a good time to roll. A 2026 trial of 34 people found that 10 minutes of slow breathing after each sprint interval session and before bed for 4 weeks added no performance or recovery benefit (Raidl 2026). And cold water still looks good for soreness, but a 2026 review of 14 reviews rated 12 of them critically low in confidence and called the size of the benefit uncertain (Liang 2026)."
+    },
+    {
+      "type": "h",
+      "text": "Tennis and padel"
+    },
+    {
+      "type": "p",
+      "text": "Tennis has a few small studies. After two-a-day court sessions, 8 highly trained players tried cold water, compression clothing and sleep advice together, against stretching and no sleep advice. Time in play and stroke rate went up in the next match by a large amount, but with 8 players most differences weren't statistically significant (Duffield 2014). Match Again Tomorrow has more on it."
+    },
+    {
+      "type": "p",
+      "text": "Padel has no recovery trials that I know of. In 52 amateur players, a match of about 57 minutes pushed heart load up set by set, but jump height and grip strength didn't drop after any set (Marcos-Rivero 2025). So a club match looks more like a heart-and-lungs load than a leg-damage one. That's one study. For padel I borrow from tennis."
+    },
+    {
+      "type": "h",
+      "text": "Tonight and the next 48 hours"
+    },
+    {
+      "type": "callout",
+      "label": "Tonight",
+      "text": "Eat a proper meal with protein within a couple of hours of finishing, and drink water. Be in bed on time, or a little earlier. If you like rolling, Night Shift is 20 minutes. If you're wired, Lights Out is a 10-minute wind-down."
+    },
+    {
+      "type": "callout",
+      "label": "Tomorrow",
+      "text": "Move easy for 10 minutes. Walk or ride. The evidence on easy movement is mixed, so don't expect much, but it costs nothing. If your legs are heavy, do The Morning After. Sore is normal. Sharp or one-sided pain is not, so read Sore or Hurt."
+    },
+    {
+      "type": "callout",
+      "label": "The day after",
+      "text": "After a normal session you're back. After a big one, with jumps, heavy legs, sprints, sets to failure or anything new, give it 48 to 72 hours before the next hard leg day or hard match."
+    },
+    {
+      "type": "workout",
+      "file": "workouts/recovery/day-after.json",
+      "label": "The Morning After",
+      "meta": "17 min · Bodyweight · Recovery"
+    },
+    {
+      "type": "workout",
+      "file": "workouts/recovery/evening-release.json",
+      "label": "Night Shift",
+      "meta": "20 min · Foam Roller · Recovery"
+    },
+    {
+      "type": "workout",
+      "file": "workouts/breath/pre-sleep.json",
+      "label": "Lights Out",
+      "meta": "10 min · Bodyweight · Breath"
+    },
+    {
+      "type": "h",
+      "text": "The short version"
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "Sleep, food and spacing do the repairing. Everything else changes how you feel. Cold water never follows a gym session."
+    },
+    {
+      "type": "p",
+      "text": "Based on Walsh et al. (2021), Bonnar et al. (2018), Silva et al. (2021), Morton et al. (2018), Kerksick et al. (2017), Parr et al. (2014), Thomas et al. (2018), Morán-Navarro et al. (2017), Robineau et al. (2016), Hyldahl et al. (2017), Dupuy et al. (2018), Davis et al. (2020), Wiewelhove et al. (2019), Zhou et al. (2024), Brown et al. (2017), Moore et al. (2022), Roberts et al. (2015), Malta et al. (2021), Afonso et al. (2021), Zhang et al. (2025), Van Hooren and Peake (2018), Laborde et al. (2022), Raidl et al. (2026), Liang et al. (2026), Duffield et al. (2014) and Marcos-Rivero et al. (2025)."
+    }
+  ]
+}

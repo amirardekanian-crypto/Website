@@ -108,6 +108,20 @@
       "banner": "assets/art/library/read-recovery-v1.webp",
       "articles": [
         {
+          "id": "what-helps-recovery",
+          "title": "What Actually Helps",
+          "category": "Recovery",
+          "readMins": 7,
+          "file": "articles/recovery/what-helps-recovery.json"
+        },
+        {
+          "id": "recovery-between-matches",
+          "title": "Match Again Tomorrow",
+          "category": "Recovery",
+          "readMins": 5,
+          "file": "articles/recovery/recovery-between-matches.json"
+        },
+        {
           "id": "training-with-injury",
           "title": "The Comeback Rules",
           "category": "Recovery",

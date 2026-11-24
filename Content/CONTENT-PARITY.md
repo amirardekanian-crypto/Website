@@ -68,6 +68,8 @@ lesson changes are in `Content/parity-drafts/<slug>/lesson-changes.md`. The Fars
 | RPE and choosing a weight | `rpe-weights` (learn-3) | `rpe-explained` (the app keeps its own `APP_GUIDE`) |
 | Training alongside tennis and tournaments | `tennis-tournaments` (learn-4) | `training-around-matches` |
 | Match reflection and goal setting (2026-11-19) | `match-reflection` (learn-4, order 52, **new**; `course_en` twin) | `turn-match-experiences-into-training-goals` (Mental shelf) |
+| What actually helps after training (2026-11-24) | none yet (adult article; the course's `recovery-adaptation` and `sleep-recovery` cover the junior basics) | `what-helps-recovery` (Recovery shelf) |
+| Recovery after a match and between matches (2026-11-24) | none yet | `recovery-between-matches` (Recovery shelf) |
 | How to read the card · parents' guide · ready for level 3 | n/a | n/a (stay in the course) |
 
 The 17 course lessons became athlete-voiced articles under a new **Training** shelf (`articles/training/`), plus
@@ -159,3 +161,8 @@ Amir said "fix everything with your own recommendation", so these were decided b
    course register from his approved article text).
 5. **English twin paragraphs** over 3 sentences in a few lessons this port did not rewrite (pre-existing); lint and trim
    when one of those lessons is next edited.
+6. **The two recovery articles** (2026-11-24, `what-helps-recovery` and `recovery-between-matches`): written for adults, so no TPS lesson was
+   written. A juniors' version needs its own under-18 rules for cold water and protein and a doctor's check first. Science in
+   `Content/parity-drafts/<slug>/verify.md`. **`training-around-matches` (Keep Your Edge)** still says nobody has tested an exact time before a
+   match: Thomas 2018 is now the closest evidence (jumps about 48 h, heavy squats and sprints about 72 h). Fix that line with its Farsi, its
+   stamp and its library row the next time that article is edited.
