@@ -2,6 +2,30 @@
   "_about": "What's new in the app, shown in every athlete's Inbox for 14 days (program.html, newsRows/openNews). Newest first. Each entry: id (unique), at (ISO time), en and fa: { title, items: [one short line each], sign }. Written in Amir's voice (COM-3) in both languages (COM-1). THE RULE (docs/rules/working-with-amir.md): a change to program.html that an athlete would notice ships with its entry here in the same commit; .githooks/commit-msg blocks a program.html commit without this file unless the message says [no news].",
   "items": [
     {
+      "id": "2026-11-24-court-day-one-card",
+      "at": "2026-11-24T23:30:00Z",
+      "en": {
+        "title": "Court days in one card",
+        "items": [
+          "Tennis, padel or a run: when a few of you do the same thing on the same day, Crew now shows one card, with everyone's face and minutes.",
+          "Tap a face to see their page. Double-tap to cheer.",
+          "A post with a photo or words is still its own post. So is one someone replied to.",
+          "The empty box under a name is gone."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "روزهای زمین، توی یه کارت",
+        "items": [
+          "تنیس، پدل یا دویدن: وقتی چند نفرتون توی یه روز یه کار رو انجام می‌دید، تیم حالا فقط یه کارت نشون می‌ده، با عکس و دقیقه‌های همه.",
+          "روی عکس یه نفر بزنید تا صفحه‌ش رو ببینید. دو بار بزنید تا تشویقش کنید.",
+          "پستی که عکس یا نوشته داره هنوز پست جداست. پستی که کسی بهش جواب داده هم همین‌طور.",
+          "اون کادر خالی زیر اسم‌ها هم رفت."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-24-steps-show-all",
       "at": "2026-11-24T23:00:00Z",
       "en": {

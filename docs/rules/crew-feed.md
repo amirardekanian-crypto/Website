@@ -102,3 +102,19 @@ Amir, 2026-11-20, "build 116, 117 and 119". The build record is `docs/ref/progra
   note cards are one row that says how many (`nc`, opens the Coach tab at the first new card). A new cycle's row (`cy`) and a change to the
   road inside a cycle (`pl`, a fingerprint of every cycle's name, weeks, focus, aims and teaser) open Progress at the Game Plan with the
   current cycle's row open and lit (`inboxShowPlan()`). All worked out on the phone (`inboxScan()`), no server change.
+
+## Court Told, grouped (2026-11-24)
+
+Amir, 2026-11-24, from his phone, with a screenshot of three tennis cards in a row: *"All the similar activities should be in the same message like when people did workout. The design looks really off."*
+Since stage126 every activity an athlete saves goes to the crew by itself, so a court day was one card per person.
+
+- **A day's plain activity posts of one kind are ONE card** (`crewActGroups()`, `crewActGroupHTML()`), built like Trained today: the kind and **N people**, then a face for each person with
+  their minutes under the name. *Plain* is a kind and minutes and nothing else: no photo, no words, no reply. Two or more make a card; it stands where the newest of them was, under that day's heading.
+- **A post that carries something stays its own post**, because that is what people answer: a photo, words, a reply. So does a lone activity (it keeps its heart and its reply bubble).
+  Only with stage96, because the faces need a crew key; without it every activity is a post, as it was.
+- **The faces are Trained today's** (`cr-ttp`): you first, a double-tap cheers, a tap opens the page, a cheer turns the face clay in both cards. A post's heart is not on the card.
+- **Delete is a post's, and a face has none**: your own plain post in a card has **Delete your post** at the foot of the card, two taps, and it takes only that post.
+- **Caught Up counts the card once** (one clay dot, one in the day's "N new"). A grouped post is still found by its id (`crewPostSel()`): an Inbox row, a post just made and a Player Page row land on its card.
+- **The line under a name is `cr-kind`, never `cr-kd`.** `cr-kd` is the Like button's pill (44 px, bordered); the activity label had borrowed its name and drew an empty pill. A plain activity post draws its card
+  (kind and minutes) and says nothing under the name; an activity with a photo says *Tennis · 90 min* there.
+- Tests: `scripts/headless/court-told.js`, the feed section. Farsi: `21-crew-feed.json` (*N people*, *Delete your post*).

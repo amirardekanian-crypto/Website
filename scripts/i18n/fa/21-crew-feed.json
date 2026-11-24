@@ -6,7 +6,8 @@
     "Double-tap a face to cheer. Tap for their page.": "دو بار بزن روی عکس تا تشویقش کنی. یه بار بزن تا صفحه‌اش باز شه.",
     "Liked by": "لایک از طرف",
     "Add a photo from today's session": "یه عکس از تمرین امروز بذار",
-    "You": "تو"
+    "You": "تو",
+    "Delete your post": "حذف پست شما"
   },
   "patterns": [
     [
@@ -16,6 +17,10 @@
     [
       "View all (\\d+) replies",
       "دیدن همهٔ {n1} جواب"
+    ],
+    [
+      "(\\d+) people",
+      "{n1} نفر"
     ],
     [
       "(.+), their page\\. Double-tap to cheer",

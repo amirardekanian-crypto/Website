@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=37"></script>
+<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=38"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -5119,7 +5119,10 @@
   .pl-row > .act-ic + div { flex: 1; min-width: 0; }
   .act-btns { display: flex; gap: 12px; align-items: center; flex: none; }
   .act-tell { border: 0; background: none; padding: 6px 0; color: var(--green-ink); font: 600 var(--fs-small)/1 'Barlow', sans-serif; cursor: pointer; }
-  .cr-kd { display: inline-flex; align-items: center; gap: 4px; }
+  /* The line under a name that says what a post was (2026-11-24, Amir: "the design looks really off"). It was `.cr-kd`, the Like button's class, so it drew the
+     Like's 44 px bordered pill, empty, with the word stuck in its corner. Its own class now, and a plain small line. */
+  .cr-nm .cr-kind { display: flex; align-items: center; gap: 4px; }
+  .cr-kind .cr-kdm::before { content: '·'; margin-right: 4px; }
   .cr-kic { display: inline-grid; color: var(--grey); }
   .cr-kic svg { width: 13px; height: 13px; }
   .cr-actcard { display: flex; align-items: center; gap: 12px; margin: 8px 0 4px; padding: 12px 14px; border-radius: 14px; background: var(--tint); }
@@ -6536,6 +6539,16 @@
   .cr-ttplus { background: var(--btn); color: var(--on-accent); font: 700 var(--fs-body)/1 'Barlow', sans-serif; }
   #screen-crew .cr-ttn { max-width: 54px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 var(--fs-label)/1.2 'Barlow', sans-serif; color: var(--grey); }
   #screen-crew .cr-tth { margin: 8px 0 0; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  /* Court Told, grouped (2026-11-24, Amir: "all the similar activities should be in the same message like when people did workout"): the card is Trained today's
+     (.cr-tt), headed by the kind and the count, a face for each person with their minutes under the name. The faces ARE Trained today's (.cr-ttp), so a cheer shows on both. */
+  #screen-crew .cr-ag { position: relative; }
+  #screen-crew .cr-ag.is-new::before { content: ''; position: absolute; left: 4px; top: 14px; width: 7px; height: 7px; border-radius: 50%; background: var(--clay); z-index: 2; }
+  #screen-crew .cr-ag .cr-agh { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+  #screen-crew .cr-ag .cr-agh .cr-kic svg { width: 18px; height: 18px; }
+  #screen-crew .cr-ag .cr-agm { max-width: 54px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 var(--fs-label)/1.2 'Barlow', sans-serif; color: var(--ink); }
+  #screen-crew .cr-ag .cr-agft { display: flex; justify-content: flex-end; }
+  #screen-crew .cr-ag .cr-agft .cr-del { min-width: 44px; min-height: 44px; }   /* a 44 px target, as on a post's foot */
+  .cr-ag.pl-hit { box-shadow: 0 0 0 2px var(--fill); }
   @media (prefers-reduced-motion: reduce) { .cr-hburst { display: none; } }
   /* ── MOMENT CARDS (2026-11-20; Amir: "go with your picks", direction A "Trophy Rows") ─────────────────────────────────────────────────────
      One card per moment line: the badge (the cabinet's emblem, a green disc for NEW BEST and CYCLE, a new member's face with NEW), one big fact in Barlow
@@ -16277,8 +16290,10 @@ function crewPostHTML(it) {
   const name = it.amir ? 'Amir' : it.me ? 'You' : (it.who || 'Athlete');
   const person = crewPersonOf(it);
   const act = crewPostAct(it);   // #131 Court Told: { kind, mins } when the post tells an activity
-  const sub = it.amir ? '<small>to the crew</small>' : (it.kind === 'session' ? `<small class="cr-kd">${actIconHtml('gym', 'cr-kic')}<span>${it.session && it.session.day ? 'Day ' + Number(it.session.day) + ' done' : 'A session done'}</span></small>`
-    : act ? `<small class="cr-kd">${actIconHtml(act.kind, 'cr-kic')}<span>${esc(ACT_LABEL[act.kind] || 'Activity')}</span></small>` : '');
+  // The line under the name says what the post was. A plain activity post draws its card (kind and minutes) right below, so the line would only say it twice:
+  // it is there for an activity that has a photo instead of the card, and then carries the minutes too (2026-11-24: `cr-kind`, no longer the Like button's `cr-kd`).
+  const sub = it.amir ? '<small>to the crew</small>' : (it.kind === 'session' ? `<small class="cr-kind">${actIconHtml('gym', 'cr-kic')}<span>${it.session && it.session.day ? 'Day ' + Number(it.session.day) + ' done' : 'A session done'}</span></small>`
+    : act && it.photo ? `<small class="cr-kind">${actIconHtml(act.kind, 'cr-kic')}<span>${esc(ACT_LABEL[act.kind] || 'Activity')}</span>${act.mins > 0 ? `<span class="cr-kdm">${act.mins} min</span>` : ''}</small>` : '');
   const top = it.pinned ? `<span class="cr-pin${_crewFreshPin === it.id ? ' is-new' : ''}">Pinned</span>` : `<span class="cr-when">${esc(crewWhen(it.at))}</span>`;
   const ph = it.photo ? `<button type="button" class="cr-ph" data-ph="${esc(it.id)}" onclick="crewPhotoTap(event, '${esc(it.id)}')" aria-label="Open ${esc(it.amir ? "Amir's" : it.me ? 'your' : (it.who || 'their') + "'s")} photo"><img alt=""><span class="cr-ph-wait">Photo</span>${crewStampHTML(it)}</button>` : '';
   // The post's own Delete now sits in the REACTION foot, beside what the post got (2026-10-20). It used to sit on the
@@ -16308,6 +16323,56 @@ function crewPostAct(it) {
 }
 function crewActCardHtml(a) {
   return `<div class="cr-actcard">${actIconHtml(a.kind, 'cr-acti')}<span><b>${esc(ACT_LABEL[a.kind] || 'Activity')}</b>${a.mins > 0 ? `<span>${a.mins} min</span>` : ''}</span></div>`;
+}
+// ── COURT TOLD, GROUPED (2026-11-24; Amir, from his phone: "all the similar activities should be in the same message like when people did workout") ──
+// Since stage126 every activity an athlete saves goes to the crew by itself, so a court day was three identical cards in a row. A PLAIN activity post (a kind and
+// minutes: no photo, no words, nothing replied to it) tells the crew only who and what, so two or more of the same kind on the same day are ONE card, built like
+// Trained today: the kind and the count, then a face for each person with their minutes under the name. A post that carries something (a photo, words, a reply) stays
+// its own post, because that is what people answer; so does a lone activity. The faces work as Trained today's do (a double-tap cheers, a tap opens the page), and the
+// one thing a post had that a face has not, Delete, is at the foot of the card for your own, two taps. Only with stage96 (the faces need a crew key).
+function crewActPlain(it) {
+  return !!(it && it.t === 'post' && !it.pinned && !it.amir && !it.photo && !String(it.body || '').trim() && !(Array.isArray(it.replies) && it.replies.length) && crewPostAct(it));
+}
+function crewItemYmd(it) {
+  const raw = String(it.at || ''), at = /\d[T ]\d/.test(raw) ? new Date(raw) : null;   // a stamp with a time is filed under the athlete's own day, as the feed's headings do
+  return at && !isNaN(at) ? ymdLocal(at) : raw.slice(0, 10);
+}
+// { first: Map(the newest post of a group → the group, newest first), skip: Set(the other posts of every group) }
+function crewActGroups(items) {
+  const by = {}, first = new Map(), skip = new Set();
+  if (!crewPagesOn()) return { first, skip };
+  items.forEach(it => {
+    if (!crewActPlain(it)) return;
+    const day = crewItemYmd(it);
+    if (!day) return;
+    const k = day + '|' + crewPostAct(it).kind;
+    (by[k] = by[k] || []).push(it);
+  });
+  Object.keys(by).forEach(k => { const l = by[k]; if (l.length < 2) return; first.set(l[0], l); l.slice(1).forEach(x => skip.add(x)); });
+  return { first, skip };
+}
+function crewActGroupHTML(list) {
+  const kind = crewPostAct(list[0]).kind, ymd = crewItemYmd(list[0]), today = crewDayWord(ymd) === 'Today', canCheer = crewCanLike();
+  const mine = list.find(x => x.me) || null;
+  const faces = list.slice().sort((a, b) => (b.me ? 1 : 0) - (a.me ? 1 : 0)).map(it => {   // you first, then the crew in the feed's order (Trained today's)
+    const pp = crewPersonOf(it), a = crewPostAct(it), mins = a && a.mins > 0 ? `<span class="cr-agm">${a.mins} min</span>` : '';
+    const first = pp.me ? 'You' : String(pp.who || it.who || '').split(/\s+/)[0], face = crewFace(pp, 'tt');
+    if (!pp.me && !pp.ck) return `<span class="cr-fc cr-ttp">${face}<span class="cr-ttn" dir="auto">${esc(first)}</span>${mins}</span>`;   // no key, no door (a face still shows)
+    const ck = pp.me ? 'me' : pp.ck, done = !pp.me && today && crewCheeredToday(ck);
+    const label = pp.me ? 'Your page' : crewDoorLabel(pp) + (canCheer && today ? (done ? '. You cheered them today' : '. Double-tap to cheer') : '');
+    return `<span class="cr-fc cr-ttp${done ? ' is-cheered' : ''}${pp.me ? ' is-me' : ''}" data-ck="${esc(ck)}"><button type="button" class="cr-bt cr-ttb" onclick="crewBandTap(event, '${esc(ck)}')" aria-label="${esc(label)}">${face}`
+      + `${done ? `<i class="cr-ttc" aria-hidden="true">${CLAP_SVG}</i>` : ''}</button><span class="cr-ttn" dir="auto">${esc(first)}</span>${mins}</span>`;
+  }).join('');
+  // Delete is a post's, and a face has none: yours goes at the foot, two taps, and takes only your own post (the card turns back into a post if one is left)
+  const del = mine ? `<div class="cr-agft"><button type="button" class="cr-del" onclick="armedTap(this, 'Tap again to delete the post', () => crewDelete('${esc(mine.id)}'))">Delete your post</button></div>` : '';
+  return `<div class="cr-tt cr-ag" data-key="${esc('ag:' + ymd + ':' + kind)}" data-ids="${esc(list.map(x => x.id).join(' '))}">`
+    + `<div class="cr-tthd"><span class="cr-agh">${actIconHtml(kind, 'cr-kic')}<span>${esc(ACT_LABEL[kind] || 'Activity')}</span></span><small>${list.length} people</small></div>`
+    + `<div class="cr-ttf-row">${faces}</div>${del}</div>`;
+}
+// A post's place in the feed by its id: its own card, or the card that holds it (a lit post, an Inbox row's target, a post just made).
+function crewPostSel(id) {
+  const e = CSS.escape(String(id));
+  return `#crew-body .cr-post[data-id="${e}"], #crew-body .cr-ag[data-ids~="${e}"]`;
 }
 // ── Replies (stage92, 2026-10-20) ────────────────────────────────────────────────────────────────────────────────────────
 // Amir: *"replies and likes like instagram"*. He had chosen likes only, and the first week produced Ehsan posting
@@ -16970,13 +17035,16 @@ function renderCrew() {
   // openCrew(), before this render writes the new time) wears a small clay dot, the day heading says how many, and one quiet line marks where the new part
   // ends: "You're all caught up". Your own posts and moments are never new to you; the day's "trained" line has no time of its own and is left out.
   const dayOf = i => { const raw = String(i.at || ''), at = /\d[T ]\d/.test(raw) ? new Date(raw) : null; return crewDayWord(i.t === 'sess' ? i.day : (at && !isNaN(at) ? ymdLocal(at) : raw.slice(0, 10))); };
+  // Court Told, grouped (2026-11-24): the day's plain activity posts of one kind are one card, drawn where the newest of them is; the others are skipped, and the card counts once.
+  const grp = crewActGroups(items), isFresh = i => grp.first.has(i) ? grp.first.get(i).some(crewIsNew) : crewIsNew(i);
   const newPerDay = {};
-  items.forEach(i => { if (!(i.t === 'post' && i.pinned) && crewIsNew(i)) { const d = dayOf(i); newPerDay[d] = (newPerDay[d] || 0) + 1; } });
+  items.forEach(i => { if (!(i.t === 'post' && i.pinned) && !grp.skip.has(i) && isFresh(i)) { const d = dayOf(i); newPerDay[d] = (newPerDay[d] || 0) + 1; } });
   let sawNew = false, caught = false;
   items.forEach(i => {
     if (i.t !== 'line') closeLines();
     if (i.t === 'post' && i.pinned) { feed += crewPostHTML(i); return; }
-    const fresh = crewIsNew(i);
+    if (grp.skip.has(i)) return;   // it is in its group's card
+    const fresh = isFresh(i);
     if (fresh) sawNew = true;
     else if (sawNew && !caught && i.t !== 'sess') { closeLines(); feed += `<p class="cr-caught" role="status">You're all caught up</p>`; caught = true; }
     // A post is filed under the athlete's own day, as a session is: its stamp's UTC date put a post made at 00:30 in Tehran under "Yesterday".
@@ -16990,7 +17058,7 @@ function renderCrew() {
       if (row.indexOf('cr-mc ') > 0) { closeLines(); feed += row; return; }   // a moment card stands on its own (2026-11-20)
       if (row && !inLines) { feed += '<div class="cr-lines">'; inLines = true; }
       feed += row;
-    } else feed += i.t === 'post' ? mark(crewPostHTML(i)) : crewSessHTML(i);
+    } else feed += i.t === 'post' ? mark(grp.first.has(i) ? crewActGroupHTML(grp.first.get(i)) : crewPostHTML(i)) : crewSessHTML(i);
   });
   closeLines();
   h += feed || `<p class="cr-quiet">Quiet so far this week.${me.can_post ? ' Share a photo from training and get it going.' : ''}</p>`;
@@ -17710,7 +17778,7 @@ function playerPostRow(it) {
 function crewShowPost(id) {
   goTo('crew');
   requestAnimationFrame(() => {
-    const el = [...document.querySelectorAll('#crew-body .cr-post')].find(e => e.dataset.id === String(id));
+    const el = document.querySelector(crewPostSel(id));   // its own card, or the Court Told card that holds it
     if (!el) return;
     el.scrollIntoView({ block: 'center' });
     el.classList.add('pl-hit'); setTimeout(() => el.classList.remove('pl-hit'), 1800);
@@ -18973,7 +19041,7 @@ async function crewSend(go, ta, err) {
     if (crewMinePosts() > before) {
       _crewDraft = null; crewForgetKept(); closeHistorySheet(); aaToast('It went. See it on Crew.');
       const fresh = ((BELL && BELL.items) || []).find(i => i && i.t === 'post' && i.me && !beforeIds.has(i.id));
-      if (fresh) crewLight(`#crew-body .cr-post[data-id="${CSS.escape(String(fresh.id))}"]`, 'new');   // idea 77: the new post comes into view and lights
+      if (fresh) crewLight(crewPostSel(fresh.id), 'new');   // idea 77: the new post comes into view and lights
       return;
     }
     err.textContent = 'No signal. Your post is still here: tap Post again when you have signal.';
@@ -18991,7 +19059,7 @@ async function crewSend(go, ta, err) {
   aaToast(onCrew() ? 'Posted to the crew.' : 'Posted. See it on Crew.');
   _bellAt = 0;
   refreshBell();
-  if (r.data.id) crewLight(`#crew-body .cr-post[data-id="${CSS.escape(String(r.data.id))}"]`, 'new');   // idea 77 (Land on It): on Crew, the new post comes into view and lights for about 2 seconds
+  if (r.data.id) crewLight(crewPostSel(r.data.id), 'new');   // idea 77 (Land on It): on Crew, the new post comes into view and lights for about 2 seconds
 }
 // stage126: activity_post_edit() finds the post by the activity's id (the post's key). The words take the place of the old ones (none
 // typed keeps them), and a photo is added or takes the place of the one there. One key per activity, so a second tap after a timeout
@@ -19010,7 +19078,7 @@ async function crewSendEdit(d, go, ta, err, label) {
   aaToast('Added to your post.');
   _bellAt = 0;
   refreshBell();
-  if (r.data.id) crewLight(`#crew-body .cr-post[data-id="${CSS.escape(String(r.data.id))}"]`, 'new');
+  if (r.data.id) crewLight(crewPostSel(r.data.id), 'new');
 }
 window.openCrewPost = openCrewPost;
 window.openCrewSettings = openCrewSettings;
@@ -30062,12 +30130,12 @@ function inboxGo(i) {
     case 'reply': case 'mention': {
       goTo('crew');
       if (r.reply) { crewUnfoldReply(r.reply); inboxLight(`#crew-body .cr-rep[data-rid="${CSS.escape(String(r.reply))}"]`); }
-      else if (r.post) inboxLight(`#crew-body .cr-post[data-id="${CSS.escape(String(r.post))}"]`);
+      else if (r.post) inboxLight(crewPostSel(r.post));
       break;
     }
     case 'like': {
       goTo('crew');
-      if (r.post) inboxLight(`#crew-body .cr-post[data-id="${CSS.escape(String(r.post))}"]`);
+      if (r.post) inboxLight(crewPostSel(r.post));
       else if (r.day && mine) inboxLight(`#crew-body .cr-line[data-key="${CSS.escape(mine + ':' + String(r.day))}"]`);
       break;
     }
