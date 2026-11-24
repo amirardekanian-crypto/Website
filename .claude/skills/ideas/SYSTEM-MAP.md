@@ -130,7 +130,7 @@ tempo said once, fixed block order, 10–20 sets per muscle per week.
 Exercises: `purpose`, `tennis`, `cues`, `avoid`, `mistakes`, **`easier`/`harder` as free text, not
 links**, `equipment`, `tags[]` (regions), `impact`, `u16`, `slot`. **"Used in" is computed at
 runtime** in `viewExercise` by walking the programme. The only id-to-id link is a programme item's
-`{ex, alt}`. Also: 16 weeks × 4 blocks, step mode, 22 lessons, 7 tests, 1RM calculator, Yo-Yo
+`{ex, alt}`. Also: 16 weeks × 4 blocks, step mode, 30 lessons, 7 tests, 1RM calculator, Yo-Yo
 player, results sheet (not saved), guide, tour. No "quality" field.
 
 ## AA Proof (`habits.html`)

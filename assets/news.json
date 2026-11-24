@@ -72,6 +72,24 @@
       }
     },
     {
+      "id": "2026-11-24-playbook-latest",
+      "at": "2026-11-24T15:50:00Z",
+      "en": {
+        "title": "The newest article, on top",
+        "items": [
+          "The big card at the top of the Playbook now shows the article I added last. Before, it was the same one every time."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "تازه‌ترین مقاله، بالای راهنمای بازی",
+        "items": [
+          "کارت بزرگ بالای راهنمای بازی حالا آخرین مقاله‌ای رو نشون می‌ده که اضافه کردم. قبلاً هر بار یه مقالهٔ ثابت بود."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-23-your-number",
       "at": "2026-11-23T22:45:00Z",
       "en": {

@@ -12,7 +12,7 @@ update it in the same commit.
 | Surface | Where it lives | Language | Audience and voice | Source of truth |
 |---|---|---|---|---|
 | **TPS course lesson** | `public.tps_content` (keys `learn` to `learn-5`), read by `/tennis/app/` | Farsi | Juniors and their parents. Plain and careful, refers to the course's own sessions, age rules (under 16 / under 18) | The row. Edit with SQL, and **re-hash `version`** or phones keep the old copy |
-| **English course twin** | `public.course_en` (22 lessons, 7 tests, test day) | English | Same audience as the lesson | The row. Its program.html screen (Playbook + Tests door) is **still parked** on branch `claude/course-lessons-en` |
+| **English course twin** | `public.course_en` (30 lessons on 2026-11-24, 7 tests, test day) | English | Same audience as the lesson | The row. Its program.html screen (Playbook + Tests door) is **still parked** on branch `claude/course-lessons-en` |
 | **Blog (website)** | `/fa/articles/<slug>.html` and `/en/articles/<slug>.html`, generated | Farsi + English | Public: players, coaches, parents; found on Google (SEO gate) | `articles/<cat>/<slug>.json` + `.fa.json` |
 | **Playbook (athletes' app)** | `public.library` (kind `article`), Library → Playbook in `program.html` | English | Coached athletes. Amir's voice (COM-3) | The same `articles/<cat>/<slug>.json` as the blog, published with coach.html or SQL |
 

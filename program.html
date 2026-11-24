@@ -21322,6 +21322,17 @@ window.wsBack = wsBack;
 
 // ── PLAYBOOK pane — the latest read as the cover, then each category with reads as a section of rows (2026-10-13). ──
 // A category with no reads is not drawn (it used to say "coming soon").
+// The cover is the read ADDED last (fixed 2026-11-24, Amir: the "last blog added" was not working). It used to be the first read of
+// the first shelf, and get_library() sorts a shelf by sort_order and name, so it was the same article every time and a new one sank
+// to the bottom of its shelf. Each article now carries `added`, an ISO UTC time stamped once when it is first published (SCHEMA.md,
+// An article file), and the cover is the greatest one. A read with no stamp is older than any stamped one and never competes. With
+// no stamp anywhere (a copy of the library from before this), the cover is the first read of the first shelf, as it was.
+function latestRead(cats) {
+  const when = a => { const t = Date.parse(a && a.added); return isNaN(t) ? 0 : t; };
+  let best = 0, cat = null, art = null;
+  cats.forEach(c => (c.articles || []).forEach(a => { if (when(a) > best) { best = when(a); cat = c; art = a; } }));
+  return art ? { cat, art } : { cat: cats[0], art: cats[0].articles[0] };
+}
 async function renderPlaybook() {
   if (_playbookRendered) return;
   const host = document.getElementById('lib-playbook');
@@ -21331,7 +21342,7 @@ async function renderPlaybook() {
   const cats = (_readManifest.categories || []).filter(c => (c.articles || []).length);
   if (!cats.length) { host.innerHTML = '<div class="pb-empty">Your coach is adding the Playbook. Check back soon.</div>'; _playbookRendered = true; return; }
   const mins = n => n ? esc(String(n)) + ' min read' : '';
-  const first = cats[0], latest = first.articles[0];
+  const lr = latestRead(cats), first = lr.cat, latest = lr.art;   // first: the shelf the cover's read sits on
   const cover = `<button type="button" class="pb-cover" data-file="${esc(latest.file || '')}" onclick="openArticle(this.dataset.file)">`
     + (first.banner ? `<img class="pb-img" src="${esc(first.banner)}" alt="" aria-hidden="true" decoding="async" onerror="this.remove()">` : '')
     + `<span class="pb-scrim" aria-hidden="true"></span><span class="pb-body"><span class="pb-eb">Latest · ${esc(first.title || '')}</span>`
