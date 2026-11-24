@@ -1,0 +1,49 @@
+# Footprint (#139) · what a finished session left behind
+#
+# One read of a finished session: big, normal or easy, plus the facts the other recovery ideas use (the body areas it
+# loaded, jumps and landings, hard sets, new exercises, the cycle week, the finish time, court the day before).
+# program.html works it out at Done and again the next morning; coach.html draws the same read as a small "big day" mark
+# beside the session's RPE. It is NEVER shown to the athlete as a number or a score (rounds 5 and 12 cut that).
+#
+# Change a number here, then run:
+#     python scripts/build_recovery.py      (writes assets/js/recovery.js and the Farsi part)
+#     python scripts/check_recovery.py      (the checker; the pre-commit hook runs it too)
+# and ship it like any app change (recovery/PROCEDURES.md). Why each number is what it is: recovery/RECOVERY.md.
+version = 1
+
+[big]
+# A session is BIG when ANY one of these is true.
+session_rpe = 8          # rated 8 or more at Done
+load_over_usual = 1.33   # session RPE x minutes at least a third above the athlete's usual...
+usual_days = 28          # ...where the usual is the middle (median) load of their sessions in the 28 days before
+usual_min = 4            # and fewer than 4 sessions with a load in those days means the load rule says nothing
+hard_set_rpe = 9         # a set logged at RPE 9 or 10 is a hard set...
+hard_sets = 3            # ...and 3 or more of them make the day big
+impact_sets = 3          # 3 or more working sets of jumps or landings (the Spine's `impact`)...
+impact_kinds = ["plyometric", "landing"]
+impact_lower = true      # ...count only on a lower-body day
+
+[easy]
+session_rpe = 4          # rated 4 or less, and nothing above is true: easy. The Week Line (#134) calls 1 to 4 easy too.
+
+[lower]
+# A lower-body day: at least half of its working sets load one of these Spine body areas.
+areas = ["ankle-foot", "calf-achilles", "knee", "hip-groin", "hamstring"]
+share = 0.5
+
+[sets]
+# Working sets only. A block whose title has one of these words is a warm-up or a cool-down, and its sets never count.
+# The same words the Quality check uses (program.html isPrepBlockTitle(), coach.html QM_PREP); the checker holds them equal.
+prep_words = ["warm", "mobility", "activation", "cool", "prime", "prep"]
+
+[late]
+from = "20:00"           # finished at 20:00 or later: a late finish
+
+[evening]
+from = "17:00"           # finished at 17:00 or later: the finish card's leg pick is for tonight (Night Shift), before it for tomorrow morning
+
+[new]
+days = 180               # an exercise with no logged set in the 180 days before is new (The Card Remembers has no last time)
+
+[court]
+hard_min = 60            # a hard activity in Court Log: logged Hard, 60 minutes or more (the same hour Cool Down Call, #128, uses)

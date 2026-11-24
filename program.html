@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=34"></script>
+<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=35"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -200,6 +200,10 @@
      code (window.AAEmblem), no pictures. `defer`, like the habit engine, so boot() can get here first: every caller asks for it only when it
      draws (cabEmblem()) and the page repaints itself once it has loaded (emblemsReady()). -->
 <script defer src="/assets/js/emblems.js?v=2" onload="window.emblemsReady && emblemsReady()"></script>
+<!-- The recovery rules (round 14 'The Changeover', 2026-11-24): Footprint's thresholds, The Last Word's lines, Matched Pair's map, as
+     window.AAREC, generated from recovery/*.toml by scripts/build_recovery.py (coach.html reads the same file). `defer`: whatever drew
+     before it arrived is drawn again by recReady() (the finished cards, Home's suggestion). -->
+<script defer src="/assets/js/recovery.js?v=1" onload="window.recReady && recReady()"></script>
 <!-- `async`, not `defer`: analytics has no ordering dependency on anything, and
      on `defer` it shares one ordered execution queue with the SDK above. -->
 <script async data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
@@ -629,6 +633,16 @@
   #hist-overlay .fs-row.done .fs-dot::after { content: ''; position: absolute; left: 5px; top: 1px; width: 5px; height: 10px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
   .complete-sugg-slot:not(:empty) { margin: 0 0 4px; }
   .session-complete .lib-sugg { background: var(--grey-bg); }
+  /* #140 The Last Word (2026-11-24): tonight and tomorrow, in the suggestion's slot on the finished card. A Space Mono label in green
+     ink (Your rating's), two or three short lines in ink, the first on the green stripe (stripes are green, DS-01), then the one Library
+     row and the one article. No clay but the Library row's kicker, which asks the athlete to look; the article's kicker is grey. */
+  .lw { display: grid; gap: 10px; }
+  .lw-k { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  .lw-ls { display: grid; gap: 8px; }
+  .lw-l { margin: 0; padding-block: 1px; padding-inline: 12px 0; border-inline-start: 2px solid var(--hair); font: 400 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .lw-l:first-child { border-inline-start-color: var(--fill); }   /* logical sides: the stripe follows the reading direction in Farsi */
+  .lw-rows { display: grid; gap: 8px; margin-top: 2px; }
+  .lw-art .lib-sugg-k { color: var(--grey-text); }
   /* "2 of 3 sessions done this week" (HOME-01), from paintWeek(). */
   /* An unfinished day filed by itself (DATA-02, fileUnfinished()): one banner above This Week (.uf-*: the banner look, the SHEETS AND NOTICES block). */
   .home-week-sum { font-family: 'Barlow', sans-serif; font-size: var(--fs-body); color: var(--grey-text);
@@ -4047,9 +4061,9 @@
 
   /* 9. After Done: the finished card, signed. A grid; its ::before paints the green band behind the picture (when the session
      was finished whole), DAY N DONE, the message with the clay quote and Amir's signature and photo (.complete-by: WN_SIG and
-     .wn-av, the About sheet's sign-off). On the paper under it: the send status (the card's one ✓), AA Proof as a row with an
-     open-out glyph, the WhatsApp row (.complete-wa, Amir 2026-10-13: always one tap, outside the fold), the day-after suggestion,
-     the "Your rating" row (.rate-fold) with the rating and the note folded behind it (moveRatePanel() moves them into the slot;
+     .wn-av, the About sheet's sign-off). On the paper under it: the send status (the card's one ✓), The Last Word or the day-after
+     suggestion (#140, 2026-11-24), AA Proof as a row with an open-out glyph, the WhatsApp row (.complete-wa, Amir 2026-10-13: always
+     one tap, outside the fold), the "Your rating" row (.rate-fold) with the rating and the note folded behind it (moveRatePanel() moves them into the slot;
      closed every time the card is shown), then Send the update and Reset Session. Send the update and the send status stay
      outside the fold. Rows are placed by class, so the DOM order stays as it was. */
   :where(#day-view) .session-complete { margin: 28px 0 0; padding: 0 0 32px; border: 0; border-radius: 0; background: none; text-align: left; overflow: hidden; }
@@ -4078,12 +4092,14 @@
   :where(#day-view) .complete-earn .earn-share { margin-left: auto; min-height: 36px; padding: 0 12px; border: 1px solid rgba(255,255,255,.3); border-radius: 999px;
     background: transparent; color: #fff; cursor: pointer; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
   :where(#day-view) .session-complete > .complete-habit + .complete-actions { grid-row: 6; display: block; margin: 0; padding: 20px var(--g) 0; }
-  :where(#day-view) .session-complete > .complete-habit { grid-row: 7; width: auto; max-width: none; margin: 12px var(--g) 0; cursor: pointer; }
+  :where(#day-view) .session-complete > .complete-habit { grid-row: 8; width: auto; max-width: none; margin: 12px var(--g) 0; cursor: pointer; }
   :where(#day-view) .session-complete > .complete-habit[hidden] { display: none; }
-  /* the WhatsApp row (outside the fold), then the day-after suggestion, then the "Your rating" row and the folded panel */
-  :where(#day-view) .session-complete > .complete-wa { grid-row: 8; margin: 12px var(--g) 0; }
-  :where(#day-view) .session-complete > .complete-sugg-slot { grid-row: 9; margin: 0 var(--g); }
-  :where(#day-view) .session-complete > .complete-sugg-slot:not(:empty) { margin-top: 12px; }
+  /* The Last Word (#140) or the day-after suggestion right under the send status (since 2026-11-24: Amir's words for tonight come
+     before the doors), then the habit, the WhatsApp row (outside the fold), then the "Your rating" row and the folded panel */
+  :where(#day-view) .session-complete > .complete-wa { grid-row: 9; margin: 12px var(--g) 0; }
+  :where(#day-view) .session-complete > .complete-sugg-slot { grid-row: 7; margin: 0 var(--g); }
+  :where(#day-view) .session-complete > .complete-sugg-slot:not(:empty) { margin-top: 16px; }
+  :where(#day-view) .session-complete > .complete-sugg-slot.has-lw { margin-top: 20px; margin-bottom: 4px; }
   :where(#day-view) .session-complete .lib-sugg { min-height: 64px; border-color: var(--box); border-radius: 14px; background: var(--row); }
   /* "Your rating": a door row (Home's .hrow recipe): white, 1 px edge, 12 px corners, 64 px tall, the label in Space Mono over
      the saved rating and note, a grey ⌄ that turns when it is open. Folded every time the card is shown (setRateFold()). */
@@ -7170,7 +7186,7 @@
      or via ?article= deep-link. Mirrors #screen-workout: a cover in the Centre Court look, then the reading layout. -->
 <div id="screen-article" class="screen">
   <div class="ar-hero">
-    <button class="nav-back" onclick="goTo('workouts')" aria-label="Back to library">←</button>
+    <button class="nav-back" onclick="arBack()" aria-label="Back to library">←</button>
     <div class="ar-cap">
       <div class="ar-kicker" id="ar-eyebrow"></div>
       <h1 class="ar-htitle" id="ar-title"></h1>
@@ -7795,6 +7811,8 @@ function _snapshot() {
     if (k === prefix + 'holdcache') continue;
     // Your weeks (#122): a cache of get_five_weeks(), the server's own facts, never progress.
     if (k === prefix + 'fwcache') continue;
+    // Footprint (#139): what this phone worked out about the days it finished, for the next morning (Day Two). A view, never progress.
+    if (k === prefix + 'fpdays') continue;
     // When a day was last touched (markTouched(), 2026-11-02): this phone's clock for its own reminder and rescue, never progress.
     if (k && k.indexOf(prefix + 'lastact_d') === 0) continue;
     // The career's profile (Career Mode phase 2): a cache of get_profile(); and what a finished day earned, this phone's view of it.
@@ -10918,7 +10936,7 @@ function openDayView(dayId) {
   switchDay(n);
   renderTimer(String(dayId));   // the bar as of now (the week's limits row may have changed since boot)
   paintWeekTargets(String(dayId)).forEach(c => { if (c._paintSets) c._paintSets(); });   // and the colours' target
-  paintSoreSugg(String(dayId));
+  paintLastWord(String(dayId));   // The Last Word on a day finished today (#140); otherwise LIB-01's sore row
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
@@ -11156,7 +11174,8 @@ function renderHome() {
       <div class="complete-by"><span class="complete-earn" id="earn-${day.id}" hidden aria-live="polite"></span>${WN_SIG}<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></div>
       <!-- Highlight Reel (2026-10-17): a New best or a Retest beaten in this session, each with Share (paintWinBand()) -->
       <div class="hl-band-slot" id="hlwin-${day.id}"></div>
-      <!-- After a sore check-in: the day-after session, until it has been opened (LIB-01, paintSoreSugg()) -->
+      <!-- The Last Word (#140, paintLastWord()): tonight and tomorrow on the day it was finished, then one Library row and one article;
+           on any other day, after a sore check-in, the day-after session until it has been opened (LIB-01, paintSoreSugg()) -->
       <div class="complete-sugg-slot" id="sugg-${day.id}"></div>
       <!-- The session habit, ticked on this screen by habTickSession(). It was a door into AA Proof until that app
            was retired into this one (2026-10-19); now it is a line that says what just happened. -->
@@ -12386,6 +12405,9 @@ const APP_GUIDE = [
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finishing a session',
     body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal. The card says where it is. In <strong>Guided</strong> mode, <strong>Finish session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Stop here</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. Rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>If something isn't logged, the card says what, under <strong>Still to log</strong>: a set not ticked, a set with no weight or no effort, a round not ticked. Tap a line to go straight to it. It goes from the list as soon as you log it.</p><p>One session at a time. While a day is under way, Home shows it with <strong>Resume</strong>, and the other days wait until you finish it or stop it.</p><p>Once Career Mode is on, the card also says what the session earns, like <strong>This session earns +470 XP</strong>, and after Done the green card shows what it added and your level.</p><p>The card also shows the marks the session moves you toward, like <strong>24 of 25 sessions with Amir</strong>. It shows three lines at most. A line that ends <strong>when the week counts</strong> waits for my side to confirm it. After <strong>Done</strong>, a mark or an achievement you earned shows on the green card. While it says <strong>Adding it up</strong>, my side hasn't confirmed it yet. Once it has, <strong>Share</strong> is there. The big ones open full screen.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> clears the clock, the check-in, your ticks and your RPEs. It's in the bar at the top (under <strong>⋯</strong> once the clock is going) and takes two taps. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your programme properly. Forget to tap Done? If your notifications are on, your phone reminds you 10 minutes after your last set. Tap it and you land on this card. And the next time you open the app, it asks how hard that session was, so I still get it.</p>` },
+  // 2026-11-24: The Last Word (#140) and Matched Pair (#143), round 14 'The Changeover', told here by the What's new rule.
+  { icon: 'moon', key: 'recovery', title: 'After a session: tonight and tomorrow',
+    body: `<p>On the day you finish a session, under the green card, I write you two or three lines called <strong>Tonight and tomorrow</strong>: what to eat, when to sleep, what tomorrow may feel like, and when your next hard day fits. A big session gets different words from an easy one.</p><p>Under them there may be one session from the Library that fits where the work landed, and one article. Sore at the check-in? It's still The Morning After.</p><p>Sleep and food do the repairing. The sessions help you move and feel better.</p>` },
   { icon: 'activity', key: 'career', title: 'Career: your level',
     body: `<p>Your level is the number in the ring on Home's habit card. Tap the ring to open Your numbers. The weeks you've held in a row sit beside <strong>This Week</strong>. Your level counts everything you do with me: every session you finish, your daily habits and the weeks you hold. It never goes back to zero.</p><p>When a session is ready to finish, its card says what it earns. Logging every set and answering the check-in first add to it, and so does a week you hold. After <strong>Done</strong>, the green card shows what the session added and your level. It says <strong>adding it up</strong> until my side has it.</p><p>Your four numbers are in <strong>Your numbers</strong> on Progress: the weeks you've held in a row, your sessions with me, your personal bests and your comebacks, with your level under them. Reach a mark and it opens full screen.</p><p><strong>Achievements</strong> is a row under your numbers. It says how many you have and which one you're closest to. Open it and you see your cabinet. Every achievement is an emblem. In colour, you have won it. In grey, you have not, and it says what is left. <strong>Latest</strong> comes first, and <strong>New</strong> sits on what you have not seen yet. A small dot on <strong>Progress</strong> says there is something new in there. The chips under <strong>All achievements</strong> show only what you have won, or what is left, or one kind: consistency, commitment, progress or resilience. Tap an emblem to see what it asks for and how far along you are. Every ten levels you win a new level medal. When a session leaves you one step short of an achievement, its card tells you.</p><p>When I set you a job for the month, it sits right under this cycle's card, with a ring beside it. It is something to do, not a target for your training — I tick it off when you have done it. <strong>Achievements</strong> is the last row of <strong>Your numbers</strong>, with your three newest. Tap it to open your cabinet. The short notes I send you are on the <strong>Coach</strong> tab, under <strong>Notes from Amir</strong>. A new one shows on Home until you open it.</p>` },
   { icon: 'check-circle', key: 'hold', title: 'Hold Serve: weeks in a row you trained',
@@ -12513,6 +12535,7 @@ function coachContactHtml() {
 // returns there, not to the top of the shelves. Any other route to the Library forgets it.
 let _libScrollY = null;
 let _wsReturn = null;   // where a suggested Library session's ← goes (LIB-01): wsBack()
+let _arReturn = null;   // where an article opened from the finished card goes back to (The Last Word, #140): arBack()
 // A page of Progress's "Your numbers" can also be opened from Home (New from Amir, the habit card's ›): its ← and the phone's Back return to the tab
 // that opened it, Progress otherwise. Set on the way in; a page reached from another page (the manual) keeps the tab it first came from.
 const SUB_FROM = {};
@@ -12522,6 +12545,7 @@ function goTo(screen, historyId, keepContent) {
   dropClockOffer();
   stopInlineVideos();
   if (screen !== 'workout') _wsReturn = null;
+  if (screen !== 'article') _arReturn = null;
   if (screen !== 'crewplayer') { _playerFrom = null; _playerTrail = []; }   // a Player Page's ← goes where it was opened from; nowhere else remembers it
   const was = (document.querySelector('.screen.active') || {}).id || '';
   if (screen in { weight: 1, habits: 1, achievements: 1, moments: 1 }) {
@@ -19406,10 +19430,33 @@ function actTold(id) { const a = moveActs().find(x => x && String(x.id) === Stri
 function actMarkTold(id) {
   try { if (FW && Array.isArray(FW.acts)) FW.acts.forEach(a => { if (a && String(a.id) === String(id)) a.told = true; }); } catch (e) { /* the next read says it */ }
 }
-const COOL_MIN = 60;
-async function coolDownCall(act) {
+const COOL_MIN = 60;   // the fallback: the hour is recovery/footprint.toml [court] hard_min (window.AAREC) since round 14
+// ── BACK-TO-BACK — #142 (round 14 'The Changeover', 2026-11-24; Amir: "go with your picks and build all") ──────────────────────────
+// Cool Down Call learns two moments. Saving a hard activity on the day after another hard day (a hard activity of an hour or more, or
+// a big gym session: Footprint, #139) says the days are piling up, with the day-after session. Saving a match offers Final Whistle,
+// for the hour after it. The words and the sessions are recovery/last-word.toml [back_to_back] and [after_match]. Information only
+// (REC-7): nothing in the plan changes. Only for an activity saved for today: "tonight" and "tomorrow" mean nothing for last Friday.
+async function backToBackCall(act, day) {
+  const A = window.AAREC;
+  if (!A || !act || String(day || '') !== ymdLocal(new Date())) return false;
+  const hard = recHardAct({ effort: act.effort, mins: act.minutes });
+  const say = hard && recHardDay(recDayBefore(day, 1), act.id) ? A.lw.b2b : act.kind === 'match' ? A.lw.match : null;
+  if (!say) return false;
+  await ensureLibManifests();
+  const w = recFirst(say.sessions);
+  if (!w) return false;
+  aaToast(say.en, {
+    kicker: act.told === true ? 'Added. The crew sees it.' : 'Added to your weeks.',
+    action: w.title,
+    run: () => { _wsReturn = { day: null, y: window.scrollY }; openWorkout(w.file); }
+  });
+  return true;
+}
+async function coolDownCall(act, day) {
   try {
-    if (!act || act.effort !== 'hard' || !(Number(act.minutes) >= COOL_MIN)) return false;
+    if (await backToBackCall(act, day)) return true;   // #142 first: two hard days running, or a match
+    const R = window.AAREC && AAREC.fp;
+    if (!act || act.effort !== 'hard' || !(Number(act.minutes) >= (R ? R.court.hard_min : COOL_MIN))) return false;
     await ensureLibManifests();
     const w = libPickItem(LIB_PICKS.sore.id);
     if (!w || !w.file) return false;
@@ -19419,6 +19466,327 @@ async function coolDownCall(act) {
     });
     return true;
   } catch (e) { return false; }
+}
+// ── FOOTPRINT — #139 (round 14 'The Changeover', 2026-11-24; Amir: "go with your picks and build all") ──────────────────────────
+// One read of a finished session: big, normal or easy, plus what the other recovery ideas use (the body areas it loaded, jumps and
+// landings, hard sets, new exercises, the cycle week, the finish time, court the day before and the same day). The thresholds are
+// recovery/footprint.toml, read as window.AAREC.fp (assets/js/recovery.js, built by scripts/build_recovery.py). NEVER shown to the
+// athlete as a number or a score (rounds 5 and 12 cut that): The Last Word and Day Two turn it into words, coach.html into a mark.
+// It reads the session the way it was saved and changes nothing (finishDay()'s save path is never touched).
+// ⚠️ A TWIN: coach.html's footprintOfC() is the same function, and scripts/check_twins.js runs both on the same sessions. Pure: the
+// session { date, rpe, mins, fin, log } and ctx { rules: AAREC, earlier: [{ date, rpe, mins, log }], spineOf(name), week, acts }.
+// Like #134 The Week Line it starts from session RPE x minutes; its easy band (1 to 4) is the Week Line's.
+function footprintOf(s, ctx) {
+  const R = ctx && ctx.rules && ctx.rules.fp;
+  if (!s || !R) return null;
+  const B = R.big;
+  const dayNo = v => { const m = String(v == null ? '' : v).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) / 86400000 : NaN; };
+  const norm = n => String(n == null ? '' : n).toLowerCase().replace(/\s+/g, ' ').trim();
+  const num = v => { if (v === '' || v == null) return null; const n = Number(v); return isFinite(n) ? n : null; };
+  const prep = t => { const x = String(t == null ? '' : t).toLowerCase(); return (R.sets.prep_words || []).some(w => x.indexOf(w) >= 0); };
+  const logged = st => !!(st && (st.w || st.r || st.d));
+  const spineOf = typeof ctx.spineOf === 'function' ? ctx.spineOf : () => null;
+  const low = R.lower.areas || [], kinds = B.impact_kinds || [];
+  const d0 = dayNo(s.date), rpe = num(s.rpe), mins = num(s.mins);
+  let sets = 0, withAreas = 0, lowerSets = 0, hard = 0, impact = 0;
+  const areas = {}, names = [];
+  const tally = (en, n) => {
+    sets += n;
+    const L = en && Array.isArray(en.loads) ? en.loads : [];
+    if (L.length) {
+      withAreas += n;
+      L.forEach(a => { areas[a] = (areas[a] || 0) + n; });
+      if (L.some(a => low.indexOf(a) >= 0)) lowerSets += n;
+    }
+    if (en && kinds.indexOf(en.impact) >= 0) impact += n;
+  };
+  (Array.isArray(s.log) ? s.log : []).forEach(e => {
+    if (!e || prep(e.block)) return;
+    if (e.circuit) {   // a round counts once it is rated (the record keeps only the rated rounds), once for each movement in it
+      const rounds = (Array.isArray(e.rounds) ? e.rounds : []).filter(r => r && r.r).length;
+      if (rounds) (Array.isArray(e.items) ? e.items : []).forEach(it => tally(it && it.name ? spineOf(it.name) : null, rounds));
+      return;
+    }
+    const done = (Array.isArray(e.sets) ? e.sets : []).filter(logged);
+    if (!done.length) return;
+    names.push(norm(e.ex));
+    hard += done.filter(st => { const r = num(st.r); return r != null && r >= B.hard_set_rpe; }).length;
+    tally(spineOf(e.ex), done.length);
+  });
+  const lower = withAreas > 0 && lowerSets / withAreas >= R.lower.share;
+  // The athlete's usual (the middle load of their sessions in the days before) and the exercises they have done before.
+  let usual = null, newEx = 0;
+  if (Array.isArray(ctx.earlier) && isFinite(d0)) {
+    const loads = [], seen = new Set();
+    ctx.earlier.forEach(h => {
+      const d = dayNo(h && h.date);
+      if (!isFinite(d) || d >= d0) return;
+      const hr = num(h.rpe), hm = num(h.mins);
+      if (d0 - d <= B.usual_days && hr != null && hm != null && hm > 0) loads.push(hr * hm);
+      if (d0 - d <= R.new.days) (Array.isArray(h.log) ? h.log : []).forEach(e => {
+        if (e && !e.circuit && !prep(e.block) && (Array.isArray(e.sets) ? e.sets : []).some(logged)) seen.add(norm(e.ex));
+      });
+    });
+    if (loads.length >= B.usual_min) {
+      loads.sort((a, b) => a - b);
+      const m = loads.length >> 1;
+      usual = loads.length % 2 ? loads[m] : (loads[m - 1] + loads[m]) / 2;
+    }
+    newEx = names.filter((n, i) => n && names.indexOf(n) === i && !seen.has(n)).length;
+  }
+  const load = rpe != null && mins != null && mins > 0 ? rpe * mins : null;
+  const why = [];
+  if (rpe != null && rpe >= B.session_rpe) why.push('rpe');
+  if (load != null && usual != null && usual > 0 && load >= usual * B.load_over_usual) why.push('load');
+  if (hard >= B.hard_sets) why.push('hardsets');
+  if (impact >= B.impact_sets && (!B.impact_lower || lower)) why.push('impact');
+  const level = why.length ? 'big' : (rpe != null && rpe <= R.easy.session_rpe ? 'easy' : 'normal');
+  const acts = Array.isArray(ctx.acts) ? ctx.acts : [];
+  const hardAct = a => !!(a && a.effort === 'hard' && Number(a.mins) >= R.court.hard_min);
+  const fin = /^\d{2}:\d{2}$/.test(String(s.fin || '')) ? String(s.fin) : '';
+  return {
+    level, why, rpe, mins, load, usual: usual == null ? null : Math.round(usual), sets, hard, impact, areas, lower, newEx,
+    week1: ctx.week === 1, fin, late: !!fin && fin >= R.late.from, evening: !!fin && fin >= R.evening.from,
+    courtBefore: isFinite(d0) && acts.some(a => hardAct(a) && dayNo(a.day) === d0 - 1),
+    courtToday: isFinite(d0) && acts.some(a => hardAct(a) && dayNo(a.day) === d0)
+  };
+}
+// The phone's side of the read. Its history is HIST (get_my_history(): session RPE, and minutes and the finish time since stage128),
+// its body areas the Spine the phone has (approved entries), its court days Your weeks' copy (moveActs()).
+function fpCtx(week) {
+  try { fwFromCache(); } catch (e) { /* no copy yet: no court days */ }
+  return {
+    rules: window.AAREC || null,
+    earlier: Array.isArray(HIST) ? HIST.map(h => ({ date: h.date, rpe: h.rpe, mins: h.mins, log: h.entries })) : null,
+    spineOf: n => spineFor(n), week, acts: moveActs()
+  };
+}
+// Today's finished day, from its own record (buildSessionData(), read only: the same record recordSessionToCloud() sends).
+function footprintOfDay(day) {
+  try {
+    if (!window.AAREC || window.IS_PREVIEW) return null;
+    const D = buildSessionData(day);
+    if (!D) return null;
+    const cw = cycleWeekInfo(currentCycle());
+    return footprintOf({ date: sessionDateFor(day), rpe: D.sRpe, mins: D.hasDur ? D.durMin : null, fin: finOf(day), log: D.log },
+      fpCtx(cw && !cw.before && !cw.after ? cw.wk : null));
+  } catch (e) { return null; }
+}
+// What a finished day left behind, kept on this phone for the next morning (Day Two, #141): { 'YYYY-MM-DD|day': footprint }, the
+// last 10. A view this phone worked out, never progress: never synced (_snapshot() skips it). The history is the other source.
+function fpDaysKey() { return ATHLETE_ID + '_fpdays'; }
+function fpDays() {
+  try { const o = JSON.parse(localStorage.getItem(fpDaysKey()) || '{}'); return o && typeof o === 'object' && !Array.isArray(o) ? o : {}; }
+  catch (e) { return {}; }
+}
+function fpKeep(date, day, fp) {
+  if (!ATHLETE_ID || window.IS_DEMO || window.IS_PREVIEW || !fp) return;
+  const o = fpDays();
+  o[date + '|' + day] = fp;
+  const keys = Object.keys(o).sort();
+  keys.slice(0, Math.max(0, keys.length - 10)).forEach(k => { delete o[k]; });
+  try { _lsRawSet(fpDaysKey(), JSON.stringify(o)); } catch (e) { /* storage full: the history still has the session */ }
+}
+// ── MATCHED PAIR — #143: the one Library session follows the body areas the session loaded (recovery/matched-pair.toml) ──────────
+// The pick whose most-loaded area has the most working sets; a tie goes to the one higher in the file; nothing loaded: the fallback.
+function fpPick(fp) {
+  const M = window.AAREC && AAREC.mp;
+  if (!M || !fp) return null;
+  let best = null, top = 0;
+  (M.picks || []).forEach(p => {
+    const n = Math.max(0, ...(p.areas || []).map(a => Number(fp.areas && fp.areas[a]) || 0));
+    if (n > top) { top = n; best = p; }
+  });
+  return best || (M.picks || []).find(p => p.id === M.fallback) || null;
+}
+// The first of a list of Library sessions the Library has (one not published yet is skipped), or null.
+function recFirst(ids) {
+  for (const id of (ids || [])) { const w = libPickItem(id); if (w && w.file) return w; }
+  return null;
+}
+// Every session and article the recovery rules can offer: these are the ones markLibSeen() keeps (LIB-01's seen rule).
+function recOffers() {
+  const A = window.AAREC;
+  if (!A) return [];
+  const M = A.mp || {}, L = A.lw || {}, d2 = M.dayTwo || {};
+  const out = [].concat(...(M.picks || []).map(p => (p.evening || []).concat(p.morning || [])), (M.late || {}).sessions || [],
+    d2.hardS || [], d2.matchS || [], d2.twoS || [], (L.b2b || {}).sessions || [], (L.match || {}).sessions || []);
+  ((L.article || {}).rules || []).forEach(r => (r.articles || []).forEach(a => out.push('a:' + a)));
+  return out;
+}
+// A recovery row in the Library suggestion's own grammar (LIB-01): the kicker in clay, the session's name, the words after it, then
+// its minutes, its kit and the habit it ticks, read off the session. Each piece is its own text, so the word lists find it in Farsi.
+function recSuggHtml(w, kick, say, tag) {
+  const kit = /^(bodyweight|none|no kit)$/i.test(w.equipment || '') ? 'no kit' : String(w.equipment || '').toLowerCase();
+  const tick = libTickLabel(w.countsAs);
+  const tail = [w.duration, kit, tick && 'ticks ' + tick].filter(Boolean).join(', ');
+  return `<button type="button" class="lib-sugg" data-sugg="${esc(tag)}" data-id="${esc(w.id || '')}" data-file="${esc(w.file || '')}" onclick="openLibSugg(this)">
+      <span class="lib-sugg-b"><span class="lib-sugg-k">${esc(kick)}</span>
+        <span class="lib-sugg-q"><b>${esc(w.title || '')}</b>: <span>${esc(say)}</span>.${tail ? ` <span>${esc(tail)}</span>.` : ''}</span></span>
+      <span class="lib-sugg-a" aria-hidden="true">›</span></button>`;
+}
+// ── THE LAST WORD — #140: tonight and tomorrow, on the finished card (recovery/last-word.toml) ──────────────────────────────────
+// Two or three short lines under the day's message, chosen by the Footprint, in Amir's words, English and Farsi (COM-1, COM-3): one
+// for tonight, one for tomorrow when there is something to say about it, one for the next hard day after a big one. Then at most
+// one Library row and one article. Only on the day the session was finished (until 6 the next morning): "tonight" is no use on
+// Thursday. Before and after that day, and with no rules, the finished card is as it was (LIB-01's sore row). Never a rest day.
+function lastWordDay(day) {
+  if (window.IS_PREVIEW || !window.AAREC || !ATHLETE_ID) return false;
+  if (!completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + day))) return false;
+  const on = sessionDateFor(day), now = new Date();
+  if (on === ymdLocal(now)) return true;
+  return on === ymdLocal(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)) && now.getHours() < 6;
+}
+function lwFacts(fp) {
+  return { big: fp.level === 'big', normal: fp.level === 'normal', easy: fp.level === 'easy', late: !!fp.late, new: fp.newEx > 0,
+    week1: !!fp.week1, lower: !!fp.lower, hardsets: fp.hard >= window.AAREC.fp.big.hard_sets, court_before: !!fp.courtBefore, court_today: !!fp.courtToday };
+}
+function lwWhen(facts, w) { return Array.isArray(w) && w.length > 0 && w.every(f => facts[f] === true); }
+// The words, the Library row's candidates (first unseen wins) and the article's, for one footprint. Pure, given AAREC.
+function lastWordOf(fp, sore) {
+  const A = window.AAREC, L = A && A.lw, M = A && A.mp;
+  if (!fp || !L || !M) return null;
+  const f = lwFacts(fp);
+  const lines = ['tonight', 'tomorrow', 'next'].map(slot => ((L.lines || []).find(x => x.slot === slot && lwWhen(f, x.when)) || {}).en).filter(Boolean);
+  const rows = [];
+  if (sore) rows.push({ sore: true });   // a sore check-in still brings The Morning After, in its own words (LIB-01)
+  if (f.big && f.late) rows.push({ ids: (M.late || {}).sessions, kick: (M.late || {}).kick, tag: 'late' });
+  if (f.big || f.new) { const p = fpPick(fp); if (p) rows.push({ ids: fp.evening ? p.evening : p.morning, kick: p.kick, tag: 'pair-' + p.id }); }
+  const rule = ((L.article || {}).rules || []).find(r => lwWhen(f, r.when));
+  return { lines, rows, articles: rule ? rule.articles : [] };
+}
+// The article a slug names, as the Library has it (get_library(), or the files), or null while it is not published.
+function recArticle(slug) {
+  for (const c of ((_readManifest && _readManifest.categories) || [])) {
+    const a = (c.articles || []).find(x => x && (x.slug === slug || x.id === slug));
+    if (a && a.file) return a;
+  }
+  return null;
+}
+// When the finished day's moment began: the clock's end, else the day's own midnight. A row opened after it goes (libSeen()).
+function lwSince(day) {
+  const t = loadTimer(day);
+  if (t && t.sessionEnd && isFinite(Number(t.sessionEnd))) return Number(t.sessionEnd);
+  return new Date(sessionDateFor(day) + 'T00:00:00').getTime();
+}
+async function paintLastWord(day) {
+  const slot = document.getElementById('sugg-' + day);
+  if (!slot) return;
+  const fp = lastWordDay(day) ? footprintOfDay(day) : null;
+  if (!fp) { slot.classList.remove('has-lw'); return paintSoreSugg(day); }   // not today, or no rules: as before (LIB-01)
+  fpKeep(sessionDateFor(day), day, fp);
+  const sore = soreSuggWanted(day);
+  await ensureLibManifests();
+  const lw = lastWordOf(fp, sore);
+  if (!lw || !lastWordDay(day)) return;
+  const seen = libSeen(), since = lwSince(day), A = window.AAREC;
+  const cands = [];
+  for (const r of lw.rows) {
+    if (r.sore) { const w = soreSuggWanted(day) && libPickItem(LIB_PICKS.sore.id); if (w) cands.push({ w, html: () => libSuggHtml('sore', w) }); continue; }
+    const w = recFirst(r.ids), say = w && (A.mp.say || {})[w.id];
+    if (w && say) cands.push({ w, html: () => recSuggHtml(w, r.kick, say, r.tag) });
+  }
+  // One offer per finished day: once any of them has been opened since the finish, none comes back in its place.
+  const row = cands.length && !cands.some(c => (seen[c.w.id] || 0) >= since) ? cands[0].html() : '';
+  let art = '';
+  for (const slug of lw.articles) {
+    const a = recArticle(slug), say = ((A.lw.article || {}).say || {})[slug];
+    if (!a || !say) continue;
+    if ((seen['a:' + slug] || 0) < since) art = `<button type="button" class="lib-sugg lw-art" data-slug="${esc(slug)}" data-file="${esc(a.file)}" onclick="openLwArticle(this)">
+      <span class="lib-sugg-b"><span class="lib-sugg-k">${esc(A.lw.article.kick)}</span>
+        <span class="lib-sugg-q"><b>${esc(a.title || '')}</b>: <span>${esc(say)}</span>.${a.readMins ? ` <span>${esc(a.readMins + ' min read')}</span>.` : ''}</span></span>
+      <span class="lib-sugg-a" aria-hidden="true">›</span></button>`;
+    break;
+  }
+  slot.classList.add('has-lw');
+  slot.innerHTML = `<div class="lw" data-fp="${esc(fp.level)}">
+      <div class="lw-k">${esc(A.lw.label)}</div>
+      <div class="lw-ls">${lw.lines.map(t => `<p class="lw-l">${esc(t)}</p>`).join('')}</div>
+      ${row || art ? `<div class="lw-rows">${row}${art}</div>` : ''}
+    </div>`;
+}
+// recovery.js is deferred: a finished card or Home's suggestion drawn before it arrived is drawn again once it has.
+function recReady() {
+  try { document.querySelectorAll('.session-complete.visible').forEach(c => { paintLastWord(c.id.replace('complete-', '')); }); } catch (e) { /* the next paint */ }
+  try { Promise.resolve(paintWeekSugg()).catch(() => {}); } catch (e) { /* the next paint */ }
+}
+window.recReady = recReady;
+// An article opened from the finished card: noted as seen (it goes from the card), and its ← comes back to the card (arBack()).
+function openLwArticle(btn) {
+  const card = btn.closest('.session-complete');
+  markLibSeen('a:' + btn.dataset.slug);
+  const back = { day: card ? card.id.replace('complete-', '') : null, y: window.scrollY };
+  openArticle(btn.dataset.file);
+  _arReturn = back;   // after openArticle()'s goTo(), which forgets any way back
+}
+window.openLwArticle = openLwArticle;
+// ── DAY TWO — #141: the recovery session offered the morning after (round 14; recovery/matched-pair.toml [day_two]) ──────────────
+// The Morning After was written "for the morning after, when your legs are heavy and stiff", and the app offered it only the evening
+// before. Now, the morning after a big day, new exercises or a hard activity of an hour or more, Home offers one session in the
+// Library suggestion's slot (Green Light's row), the morning it was written for: the Matched Pair's morning pick after a gym day,
+// [day_two]'s lists after court. It goes once it is opened today (libSeen()), once a session is started or a check-in is done today
+// (a sore check-in already lowers the day, REC-2), and at the day's end: it is only ever about yesterday. Information, never a plan.
+// A day's footprints: this phone's own reads (fpDays(), from Done) first, then the history for any session it did not finish here.
+function fpOnDate(date) {
+  const out = {}, own = fpDays();
+  Object.keys(own).forEach(k => { const i = k.indexOf('|'); if (k.slice(0, i) === date && own[k]) out[k.slice(i + 1)] = own[k]; });
+  (Array.isArray(HIST) ? HIST : []).forEach(h => {
+    if (h.date !== date || out[String(h.day)]) return;
+    const fp = footprintOf({ date: h.date, rpe: h.rpe, mins: h.mins, fin: h.fin, log: h.entries }, fpCtx(null));
+    if (fp) out[String(h.day)] = fp;
+  });
+  return Object.values(out);
+}
+function recHardAct(a) {
+  const R = window.AAREC && AAREC.fp;
+  return !!(R && a && a.effort === 'hard' && Number(a.mins) >= R.court.hard_min);
+}
+// Was `date` a hard day: a big gym session, or a hard activity of an hour or more (Court Log, `skip` aside: the one being saved)?
+function recHardDay(date, skip) {
+  try { fwFromCache(); } catch (e) { /* no copy */ }
+  if (moveActs().some(a => a && String(a.day) === date && String(a.id) !== String(skip || '') && recHardAct(a))) return true;
+  return fpOnDate(date).some(f => f.level === 'big');
+}
+function recDayBefore(date, n) {
+  const m = String(date).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? ymdLocal(new Date(+m[1], +m[2] - 1, +m[3] - (n || 1))) : '';
+}
+// What Day Two offers this morning: { kick, ids } or null.
+function dayTwoWhat() {
+  const A = window.AAREC;
+  if (!A || window.IS_PREVIEW || !ATHLETE_ID || !DATA) return null;
+  const today = ymdLocal(new Date()), y = recDayBefore(today, 1);
+  // Today has begun for training: a session started, finished or checked in today. Then the plan of the day speaks, not yesterday.
+  const started = planDayIds().concat(((DATA.workouts && DATA.workouts.days) || []).map(d => String(d.id))).some(id => {
+    const c = completedDate(localStorage.getItem(ATHLETE_ID + '_completed_d' + id));
+    if (c && ymdLocal(new Date(c)) === today) return true;
+    const t = loadTimer(id);
+    if (t && t.sessionStart && ymdLocal(new Date(t.sessionStart)) === today) return true;
+    const r = loadReadiness(id);
+    return !!(r && r.timestamp && ymdLocal(new Date(r.timestamp)) === today);
+  });
+  if (started) return null;
+  try { fwFromCache(); } catch (e) { /* no copy */ }
+  const acts = moveActs().filter(a => a && String(a.day) === y && recHardAct(a));
+  const fps = fpOnDate(y), big = fps.find(f => f.level === 'big'), neu = fps.find(f => f.newEx > 0);
+  const M = A.mp, D2 = M.dayTwo || {};
+  if (!acts.length && !big && !neu) return null;
+  if ((acts.length || big) && recHardDay(recDayBefore(today, 2))) return { kick: D2.two, ids: D2.twoS, tag: 'two' };
+  if (acts.some(a => a.kind === 'match')) return { kick: D2.match, ids: D2.matchS, tag: 'match' };
+  if (big) { const p = fpPick(big); if (p) return { kick: D2.big, ids: p.morning, tag: 'big-' + p.id }; }
+  if (acts.length) return { kick: D2.hard, ids: D2.hardS, tag: 'hard' };
+  const p = fpPick(neu);
+  return p ? { kick: D2.new, ids: p.morning, tag: 'new-' + p.id } : null;
+}
+// Home's row, in the Library suggestion's grammar, or '' (the library must be loaded: ensureLibManifests()).
+function dayTwoHtml() {
+  const d2 = dayTwoWhat();
+  if (!d2) return '';
+  const w = recFirst(d2.ids), say = w && ((window.AAREC.mp || {}).say || {})[w.id];
+  if (!w || !say) return '';
+  const now = new Date();
+  if ((libSeen()[w.id] || 0) >= new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()) return '';   // opened today
+  return recSuggHtml(w, d2.kick, say, 'daytwo');
 }
 // A day's title on the phone: a logged activity says the app's own word for its kind; otherwise the server's title. A plan day's name
 // stays English on a Farsi phone too, like an exercise's (Amir, 2026-11-22), so stage117's `title_fa` is not read.
@@ -19671,7 +20039,7 @@ async function saveActivity() {
     if (!quick) document.getElementById('hist-overlay').classList.remove('visible');
     const r0 = res.data || {}, told = r0.told === true;   // stage126: log_activity() told the crew as it saved
     aaToast(told ? 'Added. The crew sees it.' : 'Added to your weeks.');
-    coolDownCall(r0).then(cool => {   // #128: a hard hour or more offers the day-after session instead
+    coolDownCall(r0, day).then(cool => {   // #128: a hard hour or more offers the day-after session instead (#142: two hard days, a match)
       if (cool || !r0.id) return;
       if (told) { if (crewCanTell()) aaToast('Added. The crew sees it.', { action: 'Add a photo', run: () => tellActivity(r0.id, true) }); }   // stage126
       else if (crewCanTell()) aaToast('Added to your weeks.', { action: 'Tell the crew', run: () => tellActivity(r0.id) });   // #131
@@ -20679,7 +21047,8 @@ function libSeen() {
   catch (e) { return {}; }
 }
 function markLibSeen(id) {
-  if (!ATHLETE_ID || window.IS_PREVIEW || !Object.values(LIB_PICKS).some(p => p.id === id)) return;
+  // The picks, and since round 14 (#140-#143) every session or article the recovery rules can offer (recOffers()).
+  if (!ATHLETE_ID || window.IS_PREVIEW || !(Object.values(LIB_PICKS).some(p => p.id === id) || recOffers().indexOf(id) >= 0)) return;
   const o = libSeen(); o[id] = Date.now();
   try { localStorage.setItem(libSeenKey(), JSON.stringify(o)); } catch (e) {}
 }
@@ -20864,6 +21233,12 @@ async function paintWeekSugg() {
   if (firstServeSheetOpen()) { const m = document.querySelector('#hist-overlay .readiness-modal'); if (m) m.innerHTML = firstServeSheetHTML(); }   // the sheet follows the steps
   // First Serve comes FIRST while the athlete is new (Amir, 2026-10-24); then the week's own suggestion, then the crew's invitation
   if (firstServeWanted()) { wrap.innerHTML = firstServeHTML(); return; }
+  // Day Two (#141): the morning after a big or hard day, its recovery session, before the week's own suggestion (it is only for today)
+  if (dayTwoWhat()) {
+    await ensureLibManifests();
+    const d2 = dayTwoHtml();
+    if (d2) { wrap.innerHTML = d2; return; }
+  }
   if (!weekSuggWanted()) { wrap.innerHTML = crewInvWanted() ? crewInvHTML() : ''; return; }
   await ensureLibManifests();
   const w = weekSuggWanted() && libPickItem(LIB_PICKS.weekDone.id);
@@ -20877,6 +21252,15 @@ function openLibSugg(btn) {
   openWorkout(btn.dataset.file);
 }
 window.openLibSugg = openLibSugg;
+// An article opened from the finished card (The Last Word, #140) comes back the same way; from anywhere else, to the Library.
+function arBack() {
+  const r = _arReturn;
+  _arReturn = null;
+  if (!r) { goTo('workouts'); return; }
+  _wsReturn = r;
+  wsBack();
+}
+window.arBack = arBack;
 function wsBack() {
   const r = _wsReturn;
   _wsReturn = null;
@@ -22662,7 +23046,7 @@ function finishDayNow(day, card) {
       }
     }
   }
-  paintSoreSugg(day);   // a sore check-in: the day-after session (LIB-01)
+  paintLastWord(day);   // tonight and tomorrow (#140), with a sore check-in's day-after session (LIB-01)
   paintResetBtn(day);
   markSuggestedDay();
   try { if (window.Rally && Rally.endSession) Rally.endSession(day); } catch (e) {}   // Full time: Done ends the session, and its Off the Glass match with it (that day's only)
@@ -23454,7 +23838,7 @@ function restoreState() {
     if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + day))) {
       const el = document.getElementById('complete-' + day);
       if (el) el.classList.add('visible');
-      paintSoreSugg(day);
+      paintLastWord(day);
       paintWinBand(day, true);   // the session's New best or Retest band, as it was at Done (quietly: no burst again)
       paintCareerEarn(day);      // and what it earned (Career Mode), as this phone kept it
     }
@@ -27013,6 +27397,10 @@ function histFromRows(rows) {
     readiness: (typeof r.readiness === 'number') ? r.readiness : null,
     // The whole check-in (stage40), for the athlete's own usual in readinessBase().
     ready: (r.ready && typeof r.ready === 'object') ? r.ready : null,
+    // Footprint (#139) reads the session's load: its RPE, and its minutes and finish time since stage128 (absent before: no load).
+    rpe: r.session_rpe == null || r.session_rpe === '' ? null : r.session_rpe,
+    mins: r.duration_min == null || r.duration_min === '' ? null : r.duration_min,
+    fin: typeof r.fin === 'string' ? r.fin : '',
     entries: Array.isArray(r.log) ? r.log : parseSummaryLog(r.summary)
   })).filter(s => s.date);
 }

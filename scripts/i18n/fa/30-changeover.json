@@ -1,0 +1,10 @@
+{
+  "area": "Round 14 'The Changeover' (2026-11-24): the words around the recovery lines that are not in recovery/*.toml, the guide's card (How the app works: After a session) and the like. The lines themselves are in 29-recovery.json, generated from the toml. Formal (شما), as every new Farsi text since 2026-11-21. Drafts until Amir has read them.",
+  "exact": {
+    "After a session: tonight and tomorrow": "بعد از جلسه: امشب و فردا",
+    "On the day you finish a session, under the green card, I write you two or three lines called": "روزی که یه جلسه رو تموم می‌کنید، زیر کارت سبز، دو سه خط براتون می‌نویسم به اسم",
+    ": what to eat, when to sleep, what tomorrow may feel like, and when your next hard day fits. A big session gets different words from an easy one.": ": چی بخورید، کی بخوابید، فردا ممکنه چه حسی داشته باشید، و جلسهٔ سنگین بعدی کِی جا می‌شه. یه جلسهٔ سنگین حرف‌های متفاوتی از یه جلسهٔ سبک می‌گیره.",
+    "Under them there may be one session from the Library that fits where the work landed, and one article. Sore at the check-in? It's still The Morning After.": "زیرشون ممکنه یه جلسه از کتابخانه باشه که با جایی که بیشتر کار کردید جور درمیاد، و یه مقاله. سر چک‌این کوفته بودید؟ باز هم The Morning After میاد.",
+    "Sleep and food do the repairing. The sessions help you move and feel better.": "خواب و غذا کار ترمیم رو انجام می‌دن. این جلسه‌ها کمک می‌کنن راحت‌تر حرکت کنید و حس بهتری داشته باشید."
+  }
+}

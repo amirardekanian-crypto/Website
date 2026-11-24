@@ -62,6 +62,9 @@
      unitWord                    / recUnitC (+ REC_UNIT_C)        a measure printed as a word ("plate", "plates", "lb", "kg"). They differed on a measure
                                                                   that is none of the three: the app printed it as stored, the dashboard said kg;
                                                                   the app says kg too since 2026-10-20.
+     footprintOf                 / footprintOfC                   Footprint (#139, 2026-11-24): what a finished session left behind (big, normal or easy, its
+                                                                  body areas, jumps, hard sets, new exercises, court around it), from recovery/footprint.toml
+                                                                  as assets/js/recovery.js; the app's words at Done and the dashboard's "big day" pill. Section 12
 
    Same name, NOT twins (they answer different questions, so do not make one the other's copy): daysSince (the app's returns null
    for a bad date, the dashboard's 9999, and they feed different screens), loadHistory, markNoteRead, histKey. And estimateOneRM in the
@@ -1344,6 +1347,77 @@ run('a day\'s Steps against the athlete\'s own target (stepsScored / hab_log_cre
   [[5000, 3000, 7000, 10000], [8500, 0, 8500, 10000], [2000, 11700, 10000, 10000], [0, 0, 10000, 10000], [6000, 0, 6000, 10000], [3000, 9000, 6500, 10000], [12000, 0, 12000, 10000]]
     .forEach(v => ['2026-11-23', '2026-11-24'].forEach(day => same('stepsScored vs hab_log_credited()', v.concat(day), A_NUM.stepsScored(...v, day), sql(...v, day))));
   expect('8,500 of an 8,500 target scores as a full 10,000', null, A_NUM.stepsScored(8500, 0, 8500, 10000, '2026-11-24'), 10000);
+});
+
+/* ── 12. Footprint: what a finished session left behind (#139, round 14 'The Changeover', 2026-11-24) ───────────────────── */
+// program.html footprintOf() (The Last Word on the finished card, Day Two on Home) and coach.html footprintOfC() (the "big day" pill beside a
+// session's RPE) are one function in two copies. Both read recovery/footprint.toml as window.AAREC (assets/js/recovery.js, built by
+// scripts/build_recovery.py). Here both run on the SAME sessions, histories, Court Log rows and weeks, with the real rules and a stub Spine,
+// and must give the same answer; a few answers are pinned too, so the two cannot drift together into nonsense.
+const REC_RULES = (() => {
+  const c = vm.createContext({});
+  c.window = c;
+  try { vm.runInContext(read('assets/js/recovery.js'), c); } catch (e) { bail('assets/js/recovery.js does not run: ' + e.message + ' (python scripts/build_recovery.py)'); }
+  if (!c.AAREC || !c.AAREC.fp) bail('assets/js/recovery.js sets no window.AAREC.fp (python scripts/build_recovery.py)');
+  return JSON.parse(JSON.stringify(c.AAREC));
+})();
+const A_FP = sandbox(null, fromA('footprintOf'), ['footprintOf']);
+const D_FP = sandbox(null, fromD('footprintOfC'), ['footprintOfC']);
+run('Footprint, a finished session\'s read (footprintOf / footprintOfC, recovery/footprint.toml)', () => {
+  const SP = {
+    'Barbell Back Squat': { loads: ['knee', 'hip-groin', 'low-back'], impact: 'none' }, 'Box Jump': { loads: ['knee', 'ankle-foot', 'calf-achilles'], impact: 'plyometric' },
+    'Drop Landing': { loads: ['knee', 'ankle-foot'], impact: 'landing' }, 'Bench Press': { loads: ['shoulder', 'elbow-forearm-wrist'], impact: 'none' },
+    'Wrist Curl': { loads: ['elbow-forearm-wrist'], impact: 'none' }, 'Sprint': { loads: ['hamstring', 'calf-achilles'], impact: 'running' },
+    'Pallof Press': { loads: ['trunk'], impact: 'none' }, 'Rowing': { loads: [], impact: 'none' }
+  };
+  const spineOf = n => SP[n] || null;
+  const NAMES = Object.keys(SP).concat(['Mystery Carry', 'barbell  back squat', 'BOX JUMP']);
+  const rnd = mulberry32(139);
+  const pick = a => a[Math.floor(rnd() * a.length)];
+  const set = () => ({ w: pick(['', '60', '2x20']), n: pick(['', 5, '8']), r: pick(['', '6', '8', '9', '10', 9, 10, 'x']), d: pick([true, false]) });
+  const entry = () => rnd() < 0.15
+    ? { ex: 'Engine', block: pick(['Finisher', 'Conditioning', 'Cool Down']), circuit: true, items: [{ name: pick(NAMES) }, { name: pick(NAMES) }],
+        rounds: pick([[], [{ round: 1, r: '8' }], [{ round: 1, r: '7' }, { round: 2, r: '' }, { round: 3, r: '9' }]]) }
+    : { ex: pick(NAMES), block: pick(['Strength', 'Power', 'Warm-Up', 'Activation', 'Plyometrics', '', undefined]), sets: Array.from({ length: Math.floor(rnd() * 5) }, set) };
+  const log = () => rnd() < 0.85 ? Array.from({ length: 1 + Math.floor(rnd() * 6) }, entry) : pick([null, [], 'nope', undefined]);
+  const DATES = ['2026-11-24', '2026-11-24', '2026-11-24', '', 'bad', '2026-11-01'];
+  const ago = (d, n) => { const t = Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10)) - n * 86400000; return new Date(t).toISOString().slice(0, 10); };
+  const vecs = [];
+  for (let i = 0; i < 400; i++) {
+    const date = pick(DATES), base = /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : '2026-11-24';
+    const s = { date, rpe: pick(['', null, '8', 8, '7', '4', 3, 10, 'x']), mins: pick([null, '', 45, '60', 0, 90]), fin: pick(['', '20:00', '19:59', '21:30', '16:59', '17:00', 'bad']), log: log() };
+    const earlier = pick([null, [], 'many']) === 'many' || rnd() < 0.5
+      ? Array.from({ length: Math.floor(rnd() * 9) }, () => ({ date: pick([ago(base, Math.floor(rnd() * 40)), ago(base, 200), '', base]),
+          rpe: pick(['7', 6, 8, null, '']), mins: pick([60, '45', null, 0]), log: log() }))
+      : pick([null, []]);
+    const acts = Array.from({ length: Math.floor(rnd() * 4) }, () => ({ day: pick([ago(base, 1), base, ago(base, 2), '']), kind: pick(['tennis', 'padel', 'match', 'run']),
+      mins: pick([30, 59, 60, 90, '75']), effort: pick(['easy', 'normal', 'hard']) }));
+    vecs.push([s, earlier, acts, pick([1, 2, null, 3])]);
+  }
+  vecs.forEach(([s, earlier, acts, week]) => {
+    const ctx = { rules: REC_RULES, earlier, spineOf, week, acts };
+    same('footprintOf vs footprintOfC', [s, earlier, acts, week], A_FP.footprintOf(s, ctx), D_FP.footprintOfC(s, ctx));
+  });
+  // Pinned: the rules as recovery/RECOVERY.md states them (with the toml's numbers as shipped on 2026-11-24).
+  const B = REC_RULES.fp.big, D0 = '2026-11-24';
+  const sq = (r, n) => ({ ex: 'Barbell Back Squat', block: 'Strength', sets: Array.from({ length: n }, () => ({ w: '80', n: '', r: String(r), d: true })) });
+  const fp = (s, earlier, acts, week) => A_FP.footprintOf(Object.assign({ date: D0, fin: '' }, s), { rules: REC_RULES, earlier: earlier || [], spineOf, week: week || null, acts: acts || [] });
+  expect('a session rated at big.session_rpe is big', null, fp({ rpe: B.session_rpe, mins: 50, log: [sq(6, 3)] }).level, 'big');
+  expect('one point under it, with nothing else, is normal', null, fp({ rpe: B.session_rpe - 1, mins: 50, log: [sq(6, 3)] }).level, 'normal');
+  expect('rated at easy.session_rpe is easy', null, fp({ rpe: REC_RULES.fp.easy.session_rpe, mins: 30, log: [sq(5, 2)] }).level, 'easy');
+  expect('big.hard_sets sets at big.hard_set_rpe make a moderate session big', null, fp({ rpe: 6, mins: 50, log: [sq(B.hard_set_rpe, B.hard_sets)] }).why, ['hardsets']);
+  expect('a warm-up block\'s sets never count', null, fp({ rpe: 6, mins: 50, log: [Object.assign(sq(10, 5), { block: 'Warm-Up' })] }).hard, 0);
+  const jumps = { ex: 'Box Jump', block: 'Power', sets: Array.from({ length: B.impact_sets }, () => ({ w: '', n: 4, r: '7', d: true })) };
+  expect('jumps on a lower-body day are big', null, fp({ rpe: 6, mins: 50, log: [jumps, sq(6, 3)] }).why, ['impact']);
+  expect('the same jumps on a day mostly upper body are not', null, fp({ rpe: 6, mins: 50, log: [jumps, { ex: 'Bench Press', block: 'Strength', sets: Array.from({ length: 12 }, () => ({ w: '60', r: '7', d: true })) }] }).level, 'normal');
+  const usual = Array.from({ length: B.usual_min }, (_, i) => ({ date: ago(D0, 2 + i * 3), rpe: 7, mins: 60, log: [] }));
+  expect('a load a third above the usual is big', null, fp({ rpe: 7, mins: Math.ceil(60 * B.load_over_usual), log: [] }, usual).why, ['load']);
+  expect('the load rule says nothing with fewer than big.usual_min sessions', null, fp({ rpe: 7, mins: 200, log: [] }, usual.slice(1)).why, []);
+  expect('an exercise with no logged set before is new', null, fp({ rpe: 6, mins: 50, log: [sq(6, 3), jumps] }, [{ date: ago(D0, 3), rpe: 6, mins: 50, log: [sq(6, 3)] }]).newEx, 1);
+  expect('court: hard and long enough the day before', null, fp({ rpe: 6, mins: 50, log: [] }, [], [{ day: ago(D0, 1), kind: 'padel', mins: REC_RULES.fp.court.hard_min, effort: 'hard' }]).courtBefore, true);
+  expect('court: a minute short is not', null, fp({ rpe: 6, mins: 50, log: [] }, [], [{ day: ago(D0, 1), kind: 'padel', mins: REC_RULES.fp.court.hard_min - 1, effort: 'hard' }]).courtBefore, false);
+  const before = t => { const m = +t.slice(0, 2) * 60 + +t.slice(3) - 1; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
+  expect('finished at late.from is late, a minute before is not', null, [fp({ rpe: 6, mins: 50, fin: REC_RULES.fp.late.from, log: [] }).late, fp({ rpe: 6, mins: 50, fin: before(REC_RULES.fp.late.from), log: [] }).late], [true, false]);
 });
 
 /* ── report ───────────────────────────────────────────────────────────────── */

@@ -76,7 +76,8 @@ athlete ids replaced by plain descriptions (the repo is public).
 | 60 | [🏆 Moment cards (2026-11-20): every Bell moment is one card, a badge, one big fact and the heart](docs/ref/program-app/60-moment-cards.md) | 5 KB |
 | 61 | [🗳️ Vote to See, Caught Up, Show Your Face (2026-11-20): the Toss waits for your vote, the feed says what is new, a cheer asks for your face](docs/ref/program-app/61-vote-caught-up-face.md) | 4 KB |
 | 62 | [🗓️ Your weeks (round 11, 2026-11-21): the cycle's weeks as a grid of days, on Progress and in coach.html, and Court Log](docs/ref/program-app/62-your-weeks.md) | 7 KB |
+| 63 | [🌙 The Changeover (round 14, 2026-11-24): what the app says after a session, tonight and tomorrow, Footprint, Day Two, Back-to-Back, Matched Pair](docs/ref/program-app/63-the-changeover.md) | 6 KB |
 
 ---
 
-*62 sections. The first 50 were split out of this file on 2026-10-19, every word where it was; only the file changed. A reference written "`PROGRAM-APP.md` → *Section*" is the row with that name.*
+*63 sections. The first 50 were split out of this file on 2026-10-19, every word where it was; only the file changed. A reference written "`PROGRAM-APP.md` → *Section*" is the row with that name.*

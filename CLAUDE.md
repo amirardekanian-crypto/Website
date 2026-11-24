@@ -54,6 +54,8 @@ Each line is the short form. The file beside it holds the full wording, which is
   [`docs/record/`](docs/record/INDEX.md), never in a rules file. → [`docs/README.md`](docs/README.md)
 - **Every change athletes notice is told**: a `program.html` change ships with its entry in `assets/news.json`
   (their Inbox, English and Farsi), or `[no news]` in the message. → [`docs/rules/working-with-amir.md`](docs/rules/working-with-amir.md)
+- **Every article is also a TPS lesson** (Amir, 2026-11-24): whenever a blog goes out, the course gets its lesson in the
+  same sitting, Farsi in the course's register plus its `course_en` twin, and Amir reads the Farsi. → [`docs/rules/seo.md`](docs/rules/seo.md)
 - **Run the hooks.** `git config core.hooksPath .githooks`, once per clone; a habits.html or
   sw.js commit that skips them has reached the live site before.
   → [`docs/rules/working-with-amir.md`](docs/rules/working-with-amir.md)
@@ -69,6 +71,7 @@ section. A reference `INDEX.md` is one line per section — read the index, open
 | **Change an exercise card** (the card, its ⓘ, cues, pill, note) | [`docs/rules/program-app-look.md`](docs/rules/program-app-look.md) + [`docs/rules/program-app.md`](docs/rules/program-app.md) → the twins rule + rows 36 (*The working card*), 06 (*The Spine*) and 15 (*Every other screen in the Centre Court look*, which holds the About sheet) of [`PROGRAM-APP.md`](PROGRAM-APP.md) — about 45 KB in all, against 391 KB before |
 | **Change any other screen of the athlete app** | [`docs/rules/program-app-look.md`](docs/rules/program-app-look.md) + that screen's section from [`PROGRAM-APP.md`](PROGRAM-APP.md) |
 | **Change how a session is logged, saved or synced** | [`docs/rules/program-app.md`](docs/rules/program-app.md) + the set-log and session-queue sections from [`PROGRAM-APP.md`](PROGRAM-APP.md) |
+| **Change the recovery suggestions** (Footprint, The Last Word, Day Two, Back-to-Back, Matched Pair) | [`docs/rules/recovery.md`](docs/rules/recovery.md) + [`recovery/RECOVERY.md`](recovery/RECOVERY.md); the numbers and words are `recovery/*.toml`, then `python scripts/build_recovery.py` and `scripts/check_recovery.py` |
 | **Change the habits** (Today's card, the habit half of Progress, the list) | [`docs/rules/habits-in-app.md`](docs/rules/habits-in-app.md) + [`docs/rules/program-app-look.md`](docs/rules/program-app-look.md); the engine is generated, so a behaviour change goes in habits.html and `node scripts/build_habits_core.js` |
 | **Change AA Proof** (habits.html, being retired) | [`docs/rules/habits.md`](docs/rules/habits.md) + the tab or feature's section from [`HABITS.md`](HABITS.md); an XP number also means [`XP_SYSTEM.md`](XP_SYSTEM.md) |
 | **Change the coach dashboard** | [`docs/rules/coach-dashboard.md`](docs/rules/coach-dashboard.md) + the section from [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md); then `node scripts/headless/coach/run.js` |

@@ -453,6 +453,8 @@
   function intakeFriend(i) { var p = i.payload || {}; return (i.name && String(i.name).trim()) || [p['First Name'], p['Last Name']].filter(Boolean).join(' ').trim() || null; }
   function errCode(msg, code) { var e = new Error(msg); e.code = code; return e; }
   var RPC = {
+    // Your weeks (stage115/122): get_five_weeks(p_athlete_id) answers window.__STUB.fiveWeeks[<athlete id>] as given ({ weeks, acts, ... }), null for anyone not in it (scenario stacked-panel).
+    get_five_weeks: function (p) { var m = ST.fiveWeeks || {}; return m[p.p_athlete_id] || null; },
     // ---- stage102: the weekly crew (the Toss, the bank, the Mailbag). Every write answers coach_crew_weekly() again, as the SQL does. ----
     coach_crew_weekly: function () { return weeklyOut(); },
     coach_crew_week_set: function (p) {

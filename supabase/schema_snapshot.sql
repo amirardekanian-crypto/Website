@@ -9008,6 +9008,8 @@ begin
   select coalesce(jsonb_agg(r order by r.completed_on desc, r.day desc), '[]'::jsonb) into v
   from (
     select s.completed_on, s.day, s.focus, s.session_rpe,
+           s.duration_min,   -- stage128: the load is session RPE x minutes (#139 Footprint)
+           s.fin,            -- stage128: the phone's local finish time, "HH:MM" (stage99)
            s.readiness->'composite' as readiness,
            s.readiness as ready,
            s.log,

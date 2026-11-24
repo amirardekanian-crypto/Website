@@ -3,7 +3,7 @@
   "items": [
     {
       "id": "2026-11-24-whole-week",
-      "at": "2026-11-24T18:00:00Z",
+      "at": "2026-11-24T21:00:00Z",
       "en": {
         "title": "Everything you do now counts",
         "items": [
@@ -21,6 +21,32 @@
           "«هفته‌هاتون» در صفحهٔ پیشرفت یه خط جدید داره: تحرک این هفته. برنامه، کتابخانه، ورزشتون و پیاده‌روی، همه در یک عدد.",
           "اگه توی یه هفته به ۳۰۰ برسید، ۱۵۰ امتیاز می‌گیرید. از هفتهٔ جدید بعدی‌تون شروع می‌شه.",
           "عدد قدم‌تون حالا هر دوشنبه خودش تنظیم می‌شه، از روی چیزی که معمولاً راه می‌رید. من هم هنوز می‌تونم براتون عوضش کنم."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
+      "id": "2026-11-24-tonight-and-tomorrow",
+      "at": "2026-11-24T20:00:00Z",
+      "en": {
+        "title": "Tonight and tomorrow",
+        "items": [
+          "When you finish a session, you now get a few lines from me about tonight and tomorrow: food, sleep and how you may feel.",
+          "A big session gets different words from an easy one. Under them, one Library session that fits what you trained.",
+          "The morning after a big or hard day, Home offers it again. That's the morning it was written for.",
+          "Add a second hard day in a row, or a match, and the app tells you what helps tonight.",
+          "New in the Library: Talking Pace, an easy session for the day after a match."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "امشب و فردا",
+        "items": [
+          "وقتی یه جلسه رو تموم می‌کنید، حالا چند خط از من دربارهٔ امشب و فردا می‌گیرید: غذا، خواب و اینکه ممکنه چه حسی داشته باشید.",
+          "یه جلسهٔ سنگین حرف‌های متفاوتی از یه جلسهٔ سبک می‌گیره. زیرش یه جلسه از کتابخانه که با تمرینتون جور درمیاد.",
+          "صبح بعد از یه روز سنگین یا سخت، صفحهٔ خانه دوباره همون رو پیشنهاد می‌ده. این جلسه برای همون صبح نوشته شده.",
+          "اگه دومین روز سنگین پشت سر هم یا یه مسابقه رو اضافه کنید، اپ بهتون می‌گه امشب چی کمک می‌کنه.",
+          "تازه در کتابخانه: Talking Pace، یه جلسهٔ سبک برای روز بعد از مسابقه."
         ],
         "sign": "امیر"
       }

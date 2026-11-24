@@ -139,11 +139,7 @@ Reference, section by section: [`PROGRAM-APP.md`](../../PROGRAM-APP.md).
 - **Clay means "look here"** (DS-01, Amir 2026-09-27; `PROGRAM-APP.md` → *Clay means look here*): the Coach's note,
   a Because, an RPE over target, the tempo digit, a banner that asks for something, the one number on a dark Home card, the numbers in a week note's headline and on the session bar's limits row, the fault cue's bar in How to do it.
   Block titles, stripes and done tints, the running bar, labels and buttons are green or grey.
-- **The Library offers a session at two moments only** (LIB-01, Amir 2026-09-27; `PROGRAM-APP.md` → *The Library's
-  Sessions*): a sore check-in (soreness 1 or 2, on the finished card) and a finished week (Home, under This Week), never
-  a rest day. The picks are `LIB_PICKS`, one line each; a line goes once its session has been opened (`<id>_libseen`,
-  never synced). Every ✓ in the Library asks `libTickLabel()`. The Sessions shelves are a list: a photo band, three
-  rows, **All N ›** for the rest.
+- **The Library's moments (LIB-01) and the recovery lines after a session** are in [`recovery.md`](recovery.md) (moved 2026-11-24, wording unchanged).
 - **No yellow, gold, ochre or amber in either app**, AA Proof's metals included (its gold tier became
   emerald on 2026-09-26; Amir, asked whether Proof was an exception: *"fix"*).
 - **The exercise card is not frozen** (Amir, 2026-09-27: *"dont freeze anything"*, lifting Five Forks fork 4 B).

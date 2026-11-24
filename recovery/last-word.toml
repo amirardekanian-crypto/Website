@@ -1,0 +1,165 @@
+# The Last Word (#140) · tonight and tomorrow, on the finished card
+#
+# Two or three short lines under the day's completion message, in Amir's voice (COM-3), English and Farsi (COM-1), chosen by
+# the session's Footprint (footprint.toml). Then at most one Library row (matched-pair.toml) and at most one article.
+#
+# HOW A LINE IS CHOSEN. Each line has a `slot`: tonight, tomorrow or next (the next hard day). The finished card shows at
+# most ONE line per slot, in that order: the FIRST line in this file whose `when` is all true. So the specific goes above the
+# general. A slot with nothing true says nothing.
+#
+# `when` is a list of facts, all of which must be true. The facts:
+#   big · normal · easy     the Footprint's read (exactly one is true)
+#   late                    finished at [late] from or later (footprint.toml)
+#   new                     at least one exercise with no last time
+#   week1                   week 1 of the cycle
+#   lower                   a lower-body day
+#   hardsets                3+ sets at RPE 9-10
+#   court_before            a hard activity in Court Log the day before
+#   court_today             a hard activity in Court Log the same day
+#
+# THE RULES OF THE WORDS. Plain words, short sentences, no em-dashes or semicolons (COM-3). Never name a rest day (athletes move
+# their days). Sleep, food and spacing do the recovering: never cold water after a session, never breathing or stretching as
+# repair. The Farsi is formal (شما) and a draft until Amir has read it. The checker (scripts/check_recovery.py) enforces the
+# mechanical half of this.
+version = 1
+
+[label]
+en = "Tonight and tomorrow"
+fa = "امشب و فردا"
+
+# ── Tonight ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+[[line]]
+id = "tonight-court-today"
+slot = "tonight"
+when = ["big", "court_today"]
+en = "Court and a big session in one day. Eat a proper dinner with protein, and get to bed on time."
+fa = "بازی و یه جلسهٔ سنگین توی یه روز. یه شام حسابی با پروتئین بخورید و سر وقت بخوابید."
+
+[[line]]
+id = "tonight-big-late"
+slot = "tonight"
+when = ["big", "late"]
+en = "Big one, and a late finish. Have protein with dinner, then give yourself time to wind down before bed."
+fa = "جلسهٔ سنگینی بود و دیر تموم شد. شام رو با پروتئین بخورید و قبل از خواب به خودتون وقت بدید که آروم بشید."
+
+[[line]]
+id = "tonight-big"
+slot = "tonight"
+when = ["big"]
+en = "Big one today. Protein with dinner and a bit more before bed. Then bed on time."
+fa = "امروز جلسهٔ سنگینی بود. شام با پروتئین، یه کم هم قبل از خواب. بعد سر وقت بخوابید."
+
+[[line]]
+id = "tonight-normal"
+slot = "tonight"
+when = ["normal"]
+en = "Good session. Eat well tonight and sleep your usual. That's the recovery."
+fa = "جلسهٔ خوبی بود. امشب خوب غذا بخورید و مثل همیشه بخوابید. ریکاوری همینه."
+
+[[line]]
+id = "tonight-easy"
+slot = "tonight"
+when = ["easy"]
+en = "Easy one. Nothing extra needed."
+fa = "جلسهٔ سبکی بود. کار اضافه‌ای لازم نیست."
+
+# ── Tomorrow ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+[[line]]
+id = "tomorrow-new-legs"
+slot = "tomorrow"
+when = ["new", "lower"]
+en = "New exercises today, so your legs may be sore for a day or two. That's normal, and it's less next time."
+fa = "امروز حرکت جدید داشتید، پس ممکنه پاهاتون یکی دو روز کوفته باشه. طبیعیه و دفعهٔ بعد کمتر می‌شه."
+
+[[line]]
+id = "tomorrow-new"
+slot = "tomorrow"
+when = ["new"]
+en = "New exercises today, so you may be sore for a day or two. That's normal, and it's less next time."
+fa = "امروز حرکت جدید داشتید، پس ممکنه یکی دو روز کوفته باشید. طبیعیه و دفعهٔ بعد کمتر می‌شه."
+
+[[line]]
+id = "tomorrow-week1"
+slot = "tomorrow"
+when = ["week1"]
+en = "First week of a new cycle, so some soreness is normal. It's less by next week."
+fa = "هفتهٔ اول یه دورهٔ جدیده، پس یه کم کوفتگی طبیعیه. تا هفتهٔ بعد کمتر می‌شه."
+
+[[line]]
+id = "tomorrow-court-before"
+slot = "tomorrow"
+when = ["big", "court_before"]
+en = "Hard court yesterday and a big session today. If you play tomorrow, keep it easy."
+fa = "دیروز بازی سنگین، امروز هم جلسهٔ سنگین. اگه فردا بازی دارید، سبک بازی کنید."
+
+[[line]]
+id = "tomorrow-big-legs"
+slot = "tomorrow"
+when = ["big", "lower"]
+en = "Your legs may feel heavy tomorrow. A walk helps. If you play, keep it easy."
+fa = "ممکنه فردا پاهاتون سنگین باشه. پیاده‌روی کمک می‌کنه. اگه بازی دارید، سبک بازی کنید."
+
+[[line]]
+id = "tomorrow-big"
+slot = "tomorrow"
+when = ["big"]
+en = "You may feel it tomorrow. Easy movement helps. If you play, keep it easy."
+fa = "ممکنه فردا حسش کنید. حرکت سبک کمک می‌کنه. اگه بازی دارید، سبک بازی کنید."
+
+# ── The next hard day ───────────────────────────────────────────────────────────────────────────────────────────────────────
+[[line]]
+id = "next-legs"
+slot = "next"
+when = ["big", "lower"]
+en = "Your next hard leg day or hard court day: give it two days if you can."
+fa = "جلسهٔ سنگین بعدی پا یا بازی سنگین بعدی: اگه می‌تونید دو روز فاصله بدید."
+
+[[line]]
+id = "next-hardsets"
+slot = "next"
+when = ["hardsets"]
+en = "A few sets went to your limit today. Give those muscles two days before you push them hard again."
+fa = "امروز چندتا ست رو تا تهِ توانتون رفتید. قبل از اینکه دوباره سنگین کار کنید، دو روز به اون عضله‌ها فرصت بدید."
+
+# ── The one article ─────────────────────────────────────────────────────────────────────────────────────────────────────────
+# At most one, the first rule whose `when` is all true. `articles` is a list: the first one the Library has is used, so an
+# article that is not published yet is simply skipped (What Actually Helps, #145, until recovery-blogs publishes it).
+[article]
+kick_en = "Read"
+kick_fa = "بخونید"
+
+[[article.rule]]
+when = ["big", "late"]
+articles = ["sleep-and-recovery"]
+
+[[article.rule]]
+when = ["big"]
+articles = ["what-helps-recovery", "training-nutrition"]
+
+[[article.say]]
+slug = "sleep-and-recovery"
+en = "why sleep does the repairing"
+fa = "چرا خواب کار ترمیم رو انجام می‌ده"
+
+[[article.say]]
+slug = "training-nutrition"
+en = "what to eat around training"
+fa = "دور و بر تمرین چی بخورید"
+
+[[article.say]]
+slug = "what-helps-recovery"
+en = "what works after training, and what doesn't"
+fa = "بعد از تمرین چی جواب می‌ده و چی نه"
+
+# ── Back-to-Back (#142) · the Court Log's saved message ─────────────────────────────────────────────────────────────────────
+# Saving a hard activity (Hard, [court] hard_min minutes or more) on the day after another hard activity or a big gym day, or
+# saving a Match. Information only (REC-7): nothing in the plan changes.
+[back_to_back]
+en = "Second hard day in a row. Tomorrow easy if you can. Tonight: food and sleep."
+fa = "دومین روز سنگین پشت سر هم. اگه می‌تونید فردا رو سبک بگیرید. امشب: غذا و خواب."
+sessions = ["day-after"]
+
+[after_match]
+en = "For the hour after a match: move first, then breathe."
+fa = "برای یک ساعت بعد از مسابقه: اول حرکت، بعد نفس."
+sessions = ["post-competition"]

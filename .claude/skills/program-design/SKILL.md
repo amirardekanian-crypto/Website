@@ -210,6 +210,10 @@ cycle's log entry).
   the check-in chat. Separate training fatigue from life load. Close with a concrete
   consequence (session length, frequency, autoregulation, deload) or an explicit "no
   adjustment needed" + why. Never ignore the chat.
+  **Stacked** (#144, the Debrief's Training line, or cycle-report's Q8 through `scripts/recovery/stacked.js`): big gym days within a
+  day of hard court, hard days in a row, leg days with failure sets followed within two days by another leg day, check-ins after big
+  days. The same as Court time: a fact, a question for Amir at the STEP 1 checkpoint when it seems to matter, and **never a change to
+  load or days on your own** (REC-7, REC-5).
   **Court time** (the Debrief's Training line, or cycle-report's Q5): hours a week, the hard sessions, a match the day before
   a heavy session. It is read here as a fact, **and only Amir turns it into a change (REC-7)**: never cut or add sets, reps,
   RPE, days or volume because of it on your own. A change it suggests is a question at the STEP 1 checkpoint (item 4 below),

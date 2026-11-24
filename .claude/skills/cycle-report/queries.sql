@@ -148,3 +148,37 @@ select to_char(months.m, 'FMMonth YYYY') as month, g.line, g.done_at::date as do
 from months cross join params
 left join public.career_goals g on g.athlete_id = params.id and g.month = months.m
 order by months.m;
+
+-- ─── Q8 · Stacked (#144, round 14, 2026-11-24): the bundle scripts/recovery/stacked.js reads. INFORMATION ONLY (REC-7) ──────
+-- The same line coach.html shows on the athlete's file (The work → Stacked): big gym days next to hard court, hard days in a row,
+-- leg days with 3+ sets at RPE 9-10 followed within two days by another leg day, check-ins after big days against the rest. The
+-- script runs coach.html's own functions on this bundle, so the numbers are the dashboard's. Field selection only, no rules here:
+-- the sessions from 30 days before the window (the athlete's usual load) with the parts of each log the read uses, the Court Log
+-- around the window, and the approved Spine entries the logs name (their body areas and impact).
+with params as (select 'ATHLETE_ID'::text id, date 'START' s, date 'END' e),
+ses as (
+  select s.completed_on, s.day, s.session_rpe, s.duration_min, s.fin, s.readiness,
+         (select coalesce(jsonb_agg(jsonb_strip_nulls(jsonb_build_object(
+             'ex', x->>'ex', 'block', x->>'block', 'circuit', (x->>'circuit')::boolean,
+             'items', (select jsonb_agg(jsonb_build_object('name', it->>'name')) from jsonb_array_elements(coalesce(x->'items', '[]'::jsonb)) it),
+             'rounds', (select jsonb_agg(jsonb_build_object('r', ro->>'r')) from jsonb_array_elements(coalesce(x->'rounds', '[]'::jsonb)) ro),
+             'sets', (select jsonb_agg(jsonb_build_object('r', st->>'r', 'w', nullif(st->>'w', ''), 'd', (st->>'d')::boolean))
+                      from jsonb_array_elements(coalesce(x->'sets', '[]'::jsonb)) st)))), '[]'::jsonb)
+          from jsonb_array_elements(case when jsonb_typeof(s.log) = 'array' then s.log else '[]'::jsonb end) x) as log
+  from public.session_history s, params
+  where s.athlete_id = params.id and s.hidden_at is null and s.completed_on between params.s - 30 and params.e),
+names as (
+  select distinct lower(n) n from ses, jsonb_array_elements(ses.log) x,
+    lateral (select x->>'ex' union all select it->>'name' from jsonb_array_elements(coalesce(x->'items', '[]'::jsonb)) it) v(n)
+  where n is not null)
+select jsonb_build_object(
+  'from', (select s from params)::text, 'to', (select e from params)::text,
+  'sessions', (select coalesce(jsonb_agg(to_jsonb(ses) order by ses.completed_on, ses.day), '[]'::jsonb) from ses),
+  'acts', (select coalesce(jsonb_agg(jsonb_build_object('day', a.day, 'kind', a.kind, 'mins', a.minutes, 'effort', a.effort) order by a.day), '[]'::jsonb)
+           from public.activity_log a, params where a.athlete_id = params.id and a.day between params.s - 3 and params.e + 1),
+  'spine', (select coalesce(jsonb_agg(jsonb_build_object('id', e.id, 'name', e.name, 'aliases', e.aliases, 'status', e.status,
+                                                          'loads', e.loads, 'impact', e.impact)), '[]'::jsonb)
+            from public.exercises e
+            where e.status = 'approved' and (lower(e.name) in (select n from names)
+               or exists (select 1 from unnest(coalesce(e.aliases, '{}'::text[])) al where lower(al) in (select n from names))))
+) as bundle;
