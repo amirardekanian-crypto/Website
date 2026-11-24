@@ -117,10 +117,11 @@ reference is [`../../HABITS.md`](../../HABITS.md). These are the rules for the h
   plus the activity's whole worth (`mvAll`, `habValC()`); the tick, the meter, the XP, the day gate and every step total still read the
   scored number, the credit capped at the day's target (`stepsScored()`, `hab_log_credited()`), so a long court day pays and counts
   nothing past it. `scripts/headless/move-credit.js` allows the drawn number to be MORE than the scored one on a met Steps day only.
-- **Add your other activity too, said once ever** (2026-11-24, Amir: *"just a one time reminder, when people adding to the steps, to
-  add their other activity as well"*). The first change to Steps (`habSetVal()` → `actHintArm()`) opens a small box under the row
-  (`actHintHtml()`: Add activity, Got it), marked seen the moment it opens (`<id>_act_hint`, never synced); an athlete who already
-  logs activity never sees it. Not a toast. `scripts/headless/act-hint.js` (10 checks).
+- **Add your other activity too, once a day until the first one** (2026-11-24, Amir: *"just a one time reminder, when people adding to
+  the steps, to add their other activity as well"*, then *"this shoule be notified once every day, untill they log in their first
+  time"*). The first change to Steps each day (`habSetVal()` → `actHintArm()`) opens a small box under the row (`actHintHtml()`: Add
+  activity, Got it), marked seen for that day the moment it opens (`<id>_act_hint` holds the day, never synced); from the day they log
+  their first activity it never shows again. Not a toast. `scripts/headless/act-hint.js` (11 checks).
 - **Move minutes are worked out once, on the server, and the phone never copies the arithmetic** (stage127, #134 and #135,
   2026-11-24, Amir: *"go with your picks but movement should give people xp"*). One weekly number from plan sessions, Library,
   Court Log and walking (minutes × MET ÷ 4, minutes at 3 MET or more; the numbers are `career/rulebook.toml` → `[fact.move_week]`),

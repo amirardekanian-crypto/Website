@@ -19362,19 +19362,21 @@ function actLast() {
 }
 function playedKey() { return ATHLETE_ID + '_played_no'; }
 // ── ADD YOUR OTHER ACTIVITY TOO — once ever (2026-11-24, Amir: "add a reminder to the app as well, just a one time reminder, when people
-// adding to the steps, to add their other activity as well") ─────────────────────────────────────────────────────────────────────
-// The first time the athlete changes their Steps, a small box under the row says that tennis, padel or anything else counts toward
-// their steps too, with Add activity. It is drawn once: it is marked seen the moment it opens (<id>_act_hint, the phone only, never
-// synced), so ignoring it, closing the app or tapping Got it all end it for good. An athlete who already logs activity never sees it.
+// adding to the steps, to add their other activity as well"; then "this shoule be notified once every day, untill they log in their first
+// time") ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+// The first change to Steps each day, a small box under the row says that tennis, padel or anything else counts toward their steps
+// too, with Add activity. Once a day: the day it opened is kept (<id>_act_hint, the phone only, never synced), so ignoring it, closing
+// the app or tapping Got it end it until tomorrow. From the day they log their first activity it never shows again (actLast()).
 // Not a toast (docs/rules/habits-in-app.md: a box with a button on every tap is a chore); the demo and the coach's preview never show it.
 let _actHint = false;
 function actHintKey() { return ATHLETE_ID + '_act_hint'; }
 function actHintArm() {
   try {
     if (_actHint || !ATHLETE_ID || window.IS_DEMO || window.IS_PREVIEW) return;
-    if (localStorage.getItem(actHintKey())) return;
-    _lsRawSet(actHintKey(), new Date().toISOString().slice(0, 10));   // seen from this moment, whatever happens next
-    if (actLast()) return;                                             // they already add their activity
+    if (actLast()) return;                                             // they add their activity: never again
+    const today = window.AAHabits ? window.AAHabits.TKEY() : new Date().toISOString().slice(0, 10);
+    if (localStorage.getItem(actHintKey()) === today) return;          // already shown today
+    _lsRawSet(actHintKey(), today);                                    // seen today from this moment, whatever happens next
     _actHint = true;
   } catch (e) { /* no storage: say nothing rather than every time */ }
 }
