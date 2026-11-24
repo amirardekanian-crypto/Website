@@ -958,11 +958,11 @@ class CareerCheckerTests(unittest.TestCase):
 
     def test_rule_18_every_real_achievement_has_a_test(self):
         # 65 since rulebook version 10 (2026-10-20): AA Proof's habit ladders, 20 of them, on top of version 9's ten. 98 since version 11
-        # (2026-10-25): the Emblem Cabinet's 33.
+        # (2026-10-25): the Emblem Cabinet's 33. 114 since version 14 (2026-11-24): #159 phase 1's 16.
         text = (self.dir / "achievements.toml").read_text(encoding="utf-8")
-        self.assertEqual(len(re.findall(r"(?m)^test = ", text)), 98)
+        self.assertEqual(len(re.findall(r"(?m)^test = ", text)), 114)
         self.assertEqual(text.count('test = "goals"'), 5)
-        self.assertEqual(text.count('test = "proof"'), 33)
+        self.assertEqual(text.count('test = "proof"'), 49)   # 33, and version 14's 16
 
     def test_rule_18_a_missing_or_unknown_test_fails(self):
         self.append("achievements.toml", swap(GOOD_ACHIEVEMENT, 'test = "first"\n', ""))
@@ -1123,7 +1123,8 @@ class CareerCheckerTests(unittest.TestCase):
     def test_rule_22_the_real_emblem_cabinet_entries_carry_paid_from(self):
         text = (self.dir / "achievements.toml").read_text(encoding="utf-8")
         self.assertEqual(text.count("added_in = 11"), 33)
-        self.assertEqual(len(re.findall(r'(?m)^paid_from = "\d{4}-\d{2}-\d{2}"', text)), 33)
+        self.assertEqual(text.count("added_in = 14"), 16)   # version 14 (2026-11-24): #159 phase 1
+        self.assertEqual(len(re.findall(r'(?m)^paid_from = "\d{4}-\d{2}-\d{2}"', text)), 49)
         for aid, fact in (("held", "week_held"), ("rebound", "bounce_back"), ("rematch_won", "retest_beaten"), ("complete_day", "perfect_day")):
             block = text.split(f"[achievement.{aid}]")[1].split("[achievement.")[0]
             self.assertIn(f'repeats = "{fact}"', block)

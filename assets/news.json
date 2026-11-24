@@ -72,6 +72,28 @@
       }
     },
     {
+      "id": "2026-11-24-three-shapes",
+      "at": "2026-11-24T17:00:00Z",
+      "en": {
+        "title": "New achievements for your habits",
+        "items": [
+          "Your habits now have achievements that start small: your first day, then 3 days in a row, before the 7, 21 and 60.",
+          "Mobility and breathing get their own for the first time.",
+          "Anything you've already done is in your cabinet now. From tomorrow, new ones pay XP."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "دستاوردهای تازه برای عادت‌هاتون",
+        "items": [
+          "عادت‌هاتون حالا دستاوردهایی دارن که از کم شروع می‌شن: اولین روز، بعد ۳ روز پشت هم، قبل از ۷ و ۲۱ و ۶۰.",
+          "تحرک‌پذیری و تنفس هم برای اولین بار دستاورد خودشون رو دارن.",
+          "هر کدوم رو که قبلاً انجام داده باشید، همین الان توی کابینتتونه. از فردا، دستاوردهای جدید امتیاز می‌دن."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-24-count-up",
       "at": "2026-11-24T16:20:00Z",
       "en": {

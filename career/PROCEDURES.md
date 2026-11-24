@@ -79,7 +79,8 @@ files: a procedure never hard-codes a number (GAME-10).
 | 38 | [Stage 109: an optional day (2026-11-18, applied)](../docs/ref/career-procedures/38-stage-109-the-optional-day.md) | 4 KB |
 | 39 | [Stage 120: the Race on Crew (2026-11-22, applied)](../docs/ref/career-procedures/39-stage-120-the-race.md) | 2 KB |
 | 40 | [Stage 127: the whole week, a full moving week pays (2026-11-24, applied)](../docs/ref/career-procedures/40-stage-127-the-whole-week.md) | 4 KB |
+| 41 | [Rulebook version 14: Three Shapes, Everywhere, phase 1 (2026-11-24, seeded)](../docs/ref/career-procedures/41-rulebook-v14-three-shapes.md) | 4 KB |
 
 ---
 
-*40 sections, split 2026-10-19. Every word is where it was; only the file changed. A reference written "`PROCEDURES.md` → *Section*" is the row with that name.*
+*41 sections, split 2026-10-19. Every word is where it was; only the file changed. A reference written "`PROCEDURES.md` → *Section*" is the row with that name.*
