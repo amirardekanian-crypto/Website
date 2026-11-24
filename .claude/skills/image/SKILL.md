@@ -259,7 +259,7 @@ Write one before the next round there rather than re-deriving the numbers; the c
   was stopped by the app, restart it.
 - **Verify live** by polling a served file for a marker only the new build has (`curl -sL .../app.js | grep -c
   '<slug>'`, and a new asset returning 200), not the rate-limited GitHub API. Then count the covers that load
-  (`.ph img` with `naturalWidth > 0`: 22 lessons, 7 tests), check the console, and take one screenshot. ⚠️ A
+  (`.ph img` with `naturalWidth > 0`: 30 lessons, 7 tests), check the console, and take one screenshot. ⚠️ A
   phone that already has the app gets the new build on its **second** open: the new worker installs in the
   background first. That is the design, not a failed deploy.
 - **Update the record:** the pictures section of `FARSI-PRODUCTS.md` (course app) or `IMAGES.md` §0 (program.html), `LEDGER.md` (what the new pictures show, their job

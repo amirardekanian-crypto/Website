@@ -22,7 +22,9 @@ USAGE
   SELECT of the row: published must be true (or false only if Amir hid it on purpose).
 """
 import json
+import re
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -40,6 +42,16 @@ def main(path):
         sys.exit(f'{p}: no "id"')
     if not cat:
         sys.exit(f'{p}: no "category", which decides its shelf')
+    # The Playbook's cover is the article with the newest "added" (2026-11-24, Amir: the "last blog added" was not working),
+    # stamped ONCE when the article is created. A missing stamp only warns, because an older article is republished without one
+    # on purpose; a NEW article must carry it. It travels in data and again in data.fa (the fa copy is built from d below).
+    added = d.get('added')
+    if added is None:
+        print(f'WARNING {p}: no "added" stamp, so this article can never be the Playbook cover. A NEW article needs '
+              f'"added": "{datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}" in its file, set once and never changed '
+              f'(SCHEMA.md, An article file).', file=sys.stderr)
+    elif not re.fullmatch(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z', str(added)):
+        sys.exit(f'{p}: "added" must be an ISO UTC time like 2026-11-24T11:55:09Z, not "{added}"')
     manifest = json.loads((ROOT / 'articles' / 'index.json').read_text(encoding='utf-8'))
     shelf = next((c['id'] for c in manifest['categories']
                   if c['id'] == cat.lower() or c['title'].lower() == cat.lower()), None)

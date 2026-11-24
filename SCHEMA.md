@@ -1484,6 +1484,7 @@ Lists the categories (with their icon and banner image) and, per category, the a
   "category": "For Coaches",
   "readMins": 7,
   "date": "June 2026",
+  "added": "2026-06-12T09:30:00Z",
   "blocks": [
     { "type": "p", "text": "Opening paragraph..." },
     { "type": "h", "text": "Section heading" },
@@ -1495,6 +1496,8 @@ Lists the categories (with their icon and banner image) and, per category, the a
   ]
 }
 ```
+
+`added` is the ISO UTC time the article was first published (`2026-11-24T11:55:09Z`). It is stamped **once**, when the article is created, and an edit never changes it (2026-11-24, Amir: the Playbook's "last blog added" showed the same article every time). The Playbook's cover is the article with the newest `added`, so an article without one can never be the cover; the articles written before this carry none on purpose, except the six of November 2026. The published copy (`public.library`) holds it in `data` and again in `data.fa`, like every other field. `date` stays the month label the web pages show.
 
 ### Article block types
 
@@ -1517,7 +1520,7 @@ The first block never appears in the hero — the hero is built from the article
 ### Adding an article
 
 Use the `/article` skill (`.claude/skills/article/SKILL.md`), which does the whole chain:
-1. The article JSON in `articles/<category-id>/<slug>.json` (with `id`, `title`, `category`, `readMins`, `date`, `blocks`) and its entry in that category's `articles` array in `articles/index.json` (with `id`, `title`, `category`, `readMins`, `file`).
+1. The article JSON in `articles/<category-id>/<slug>.json` (with `id`, `title`, `category`, `readMins`, `date`, `added`, `blocks`) and its entry in that category's `articles` array in `articles/index.json` (with `id`, `title`, `category`, `readMins`, `file`).
 2. The Farsi translation, read and approved by Amir, then `scripts/build_article_pages.py` for the web pages.
 3. Commit + push, then coach.html → Library → **+ Publish article**. The Playbook shows it once it is published.
 

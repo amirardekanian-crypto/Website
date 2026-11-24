@@ -143,12 +143,14 @@ Create **`articles/<category-id>/<slug>.json`**:
   "category": "<Category display name>",
   "readMins": <number>,
   "date": "<Month YYYY>",
+  "added": "<now, ISO UTC, e.g. 2026-11-24T11:55:09Z>",
   "blocks": [ … ]
 }
 ```
 
 `category` is the display name (e.g. `"For Coaches"`), not the ID (e.g. `"for-coaches"`).
 `date` must be `"<Month> <YYYY>"` in English (e.g. `"September 2026"`) — the web pages read it.
+`added` is the time you create the article (`date -u +%Y-%m-%dT%H:%M:%SZ`), set ONCE and never changed by a later edit. The Playbook's cover in the app is the article with the newest `added` (SCHEMA.md → *An article file*), so an article without it can never be the cover. `scripts/publish_article_sql.py` warns when it is missing.
 
 ## Step 4 — Register in the manifest
 

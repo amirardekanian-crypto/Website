@@ -3,8 +3,8 @@
 // folded row after that). This checks the behaviour (the switch, the pane memory, Back from a pane, a session and an article coming
 // back to their pane at the same scroll, a suggestion's ←, the shelves, the ✓ labels, the Playbook, Exercises, Before you start, Mark
 // as done, the deep links) and the look at 320, 375 and 390 px, light and dark.
-// The harness answers get_library from workouts/ and articles/ (lib.js library(): 42 sessions on 7 shelves, 21 reads in 4 categories
-// that have reads and 3 that do not).
+// The harness answers get_library from workouts/ and articles/ (lib.js library(): every session and every read the repo holds, in its
+// shelves; the counts are read from it, never typed here).
 // Serve the repo first (python -m http.server 8781 --bind 127.0.0.1, see lib.js), then:
 //   node scripts/headless/library.js [--out <dir>]
 'use strict';
@@ -257,18 +257,45 @@ const OVERLAP = `(() => {
       };
       function r0(r) { return r.querySelector('.sr-name').textContent; }
     });
-    const firstRead = withReads[0].items[0];
-    t.check('the cover is the latest read: "Latest · Training", its title, its minutes, --hero, 16 px corners, the whole cover one button',
-      a.cover.tag === 'BUTTON' && a.cover.eb === 'Latest · ' + withReads[0].title && a.cover.title === firstRead.title && a.cover.min === firstRead.readMins + ' min read' && a.cover.bg === 'radial-gradient' && a.cover.radius === '16px' && a.cover.titleCase === 'uppercase' && a.cover.h >= 44, JSON.stringify(a.cover));
-    t.check('only categories that have reads are drawn (4), each a green section title with a hairline and its count at the right; For Coaches, Mental and Supplements are not there, and nothing says "coming soon"',
-      a.secs.map(s => s.t).join() === withReads.map(c => c.title).join() && a.secs.every((s, i) => s.n === withReads[i].items.length + (withReads[i].items.length === 1 ? ' read' : ' reads') && s.color === 'rgb(14, 74, 54)' && s.line === '1px') && without.every(c => !a.secs.some(s => s.t === c.title)) && without.length === 3 && !a.soon, JSON.stringify([a.secs, a.soon]));
+    // The cover is the read ADDED last (2026-11-24, Amir: the "last blog added" was not working; it was the first read of the first shelf,
+    // always the same one): the greatest `added`. A read with no usable stamp is older than any stamped one; with none anywhere it is the
+    // first read of the first shelf, as it was. The harness library comes from the articles/ files, so it carries the real stamps.
+    const stamp = it => { const x = Date.parse(it.added); return isNaN(x) ? 0 : x; };
+    let newest = null;
+    withReads.forEach(c => c.items.forEach(it => { if (stamp(it) > (newest ? stamp(newest.it) : 0)) newest = { c, it }; }));
+    const coverCat = newest ? newest.c : withReads[0], coverRead = newest ? newest.it : withReads[0].items[0];
+    t.check('the cover is the read added last: "Latest · its shelf", its title, its minutes, --hero, 16 px corners, the whole cover one button',
+      a.cover.tag === 'BUTTON' && a.cover.eb === 'Latest · ' + coverCat.title && a.cover.title === coverRead.title && a.cover.min === coverRead.readMins + ' min read' && a.cover.bg === 'radial-gradient' && a.cover.radius === '16px' && a.cover.titleCase === 'uppercase' && a.cover.h >= 44, JSON.stringify(a.cover));
+    t.check('the articles carry added stamps, and the cover is not just the first read of the first shelf (the old fault)',
+      !!newest && newest.it.title !== withReads[0].items[0].title, JSON.stringify([newest && newest.it.title, withReads[0].items[0].title]));
+    t.check(`only categories that have reads are drawn (${withReads.length}), each a green section title with a hairline and its count at the right; the empty shelves (${without.map(c => c.title).join(', ')}) are not there, and nothing says "coming soon"`,
+      a.secs.map(s => s.t).join() === withReads.map(c => c.title).join() && a.secs.every((s, i) => s.n === withReads[i].items.length + (withReads[i].items.length === 1 ? ' read' : ' reads') && s.color === 'rgb(14, 74, 54)' && s.line === '1px') && without.every(c => !a.secs.some(s => s.t === c.title)) && !a.soon, JSON.stringify([a.secs, a.soon]));
     t.check(`every read is a paper row under its category (${reads.length}): the title in Barlow, "N min read" in mono capitals, a ›`, a.rows === reads.length && a.kids.join('|') === [].concat(...withReads.map(c => c.items.map(() => c.title))).join('|') && /min read$/.test(a.row.meta) && a.row.case === 'uppercase' && a.row.go === '›' && a.row.bg === 'rgba(0, 0, 0, 0)', JSON.stringify(a.row));
     t.check('no clay header, no clay tiles: nothing in the pane is drawn in clay, and the old hero, number tiles and latest card are gone', a.clay.length === 0 && a.old === 0 && a.nav === 0, JSON.stringify([a.clay, a.old, a.nav]));
     await p.evaluate(() => document.querySelector('#lib-playbook .pb-cover').click()); await sleep(p, 700);
     const open1 = await p.evaluate(() => ({ screen: document.querySelector('.screen.active').id, title: document.getElementById('ar-title').textContent }));
-    t.check('the cover opens its article', open1.screen === 'screen-article' && open1.title === firstRead.title, JSON.stringify(open1));
+    t.check('the cover opens its article', open1.screen === 'screen-article' && open1.title === coverRead.title, JSON.stringify(open1));
     t.check('no page errors (the Playbook)', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
+    // Two other libraries, to pin the rule itself and not only today's stamps.
+    const coverOf = async lib => {
+      const r = await open(browser, { stub: { library: lib } });
+      await goLib(r.p);
+      await r.p.evaluate(() => setLibPane('playbook')); await sleep(r.p, 700);
+      const c = await r.p.evaluate(() => { const e = document.querySelector('#lib-playbook .pb-cover'); return e && { eb: e.querySelector('.pb-eb').textContent, title: e.querySelector('.pb-title').textContent, file: e.dataset.file }; });
+      await r.ctx.close();
+      return c;
+    };
+    const clone = () => JSON.parse(JSON.stringify(LIB));
+    const lib1 = clone(), lastShelf = lib1.article.filter(c => c.items.length).pop();
+    lastShelf.items[0].added = '2099-01-01T00:00:00Z';
+    const s1 = await coverOf(lib1);
+    t.check('a read stamped newer, on the LAST shelf, becomes the cover, under its own shelf name', !!s1 && s1.title === lastShelf.items[0].title && s1.eb === 'Latest · ' + lastShelf.title, JSON.stringify(s1));
+    const lib2 = clone();
+    lib2.article.forEach(c => c.items.forEach(it => { delete it.added; }));
+    lib2.article.filter(c => c.items.length)[0].items.forEach(it => { it.added = 'not a date'; });   // a stamp that is not a time counts as none
+    const s2 = await coverOf(lib2);
+    t.check('with no usable stamp anywhere the cover is the first read of the first shelf, as it was', !!s2 && s2.title === withReads[0].items[0].title && s2.eb === 'Latest · ' + withReads[0].title, JSON.stringify(s2));
   }
 
   // ── 9. Exercises: search and chips filter, the rows, the About sheet ──

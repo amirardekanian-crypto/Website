@@ -647,7 +647,9 @@
 // sheet says a Library session counts by what it is (its own MET, stage129) and that care counts 0.
 // v298: program.html and i18n-fa.js (?v=37) changed (2026-11-24, Amir: "it should go up, doesnt need to give xp", "just a one time reminder"):
 // Steps shows all of a long court day (only up to the target counts), and a one-time box under Steps to add other activity too.
-const CACHE = 'aap-v298';
+// v299: program.html changed (2026-11-24, Amir: "in the app, where it says last blog or lesson added isn't functioning well"): the Playbook's
+// cover is the article added last (each article carries an `added` stamp), not the first read of the first shelf.
+const CACHE = 'aap-v299';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
