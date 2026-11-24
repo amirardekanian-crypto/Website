@@ -486,6 +486,8 @@
       'tennis-demands': { f: 'rally-map', pos: '50% 50%' },
       'read-your-card': { f: 'clock-and-chalk', pos: '50% 50%' },
       'recovery-adaptation': { f: 'ice-and-clay', pos: '50% 62%' },
+      'what-helps-recovery': { f: 'ice-and-clay', pos: '50% 40%' },
+      'recovery-between-matches': { f: 'the-bag', pos: '50% 62%' },
       'robustness': { f: 'armour', pos: '50% 50%' },
       'rpe-weights': { f: 'which-one', pos: '50% 55%' },
       'sleep-recovery': { f: 'lights-out', pos: '50% 55%' },
