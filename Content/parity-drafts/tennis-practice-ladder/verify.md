@@ -58,13 +58,46 @@ Verdicts: supported / supported but limited / practice-based / inference / absen
 | Pressure can help or hurt; pressure training has to be delivered with care for wellbeing, ideally with a sport psychologist | supported (position statement) | Schweickle, Appaneal, Jackman et al. (2026). Sports Med. PMID 42271117. doi 10.1007/s40279-026-02472-x |
 | The list of ways to add pressure, "add one pressure at a time", "pressure belongs on the top steps", "start small" | practice-based: **Amir to confirm or cut**. "Start small" and "calm skill first" agree with Schweickle (practise coping strategies in non-competitive settings before pressure training or competition) | none |
 
-## Parity ledger (to add to `Content/CONTENT-PARITY.md` when these ship)
+## TPS course lessons derived from the three articles (live 2026-11-24: Farsi in `tps_content` `learn-4`, English twins in `course_en`)
+
+Lessons `practice-ladder` (54), `drill-to-match` (55) and `pressure-practice` (56; order 53 belongs to `recovery-between-matches`), group «تنیس و مسابقه», published to `tps_content` key `learn-4`
+(the group's key) plus `course_en` twins. Drafts: `lesson.fa.json` and `lesson.en.json` in the folder of each article slug. Every study,
+number and verdict above carries over unchanged ("match facts, not wording"). What differs from the articles, on purpose:
+
+- **Register and voice.** Course register (formal شما, written verbs, «دربارهٔ»), players and parents, same shape as `match-reflection`:
+  9, 7 and 7 sections, every section carries h, p, ol, list, warn, callout; paragraphs of at most 3 sentences; one-sentence summary.
+- **The course's own sessions.** The ladder lesson says it is about tennis practice with the coach, not the gym sessions, which are done as written.
+  The pressure lesson keeps pressure work in tennis practice, never in the course sessions.
+- **Practice-based lines are labelled** "the course's own advice, not a study result" (the ladder's check-your-week questions and drop-back rule,
+  the time-split sentence, the drill-to-match rule of thumb, the four upgrades, the parents' lists).
+- **Junior cautions added to the pressure lesson** (the evidence is experts and adults; the ESSA statement names wellbeing risk): a warn box
+  saying no study of practising under pressure with young tennis players was found; pressure is run by the coach, never a punishment, stop and go
+  back a step when the player dreads the session; "family doctor or a sport psychologist" if nerves are strong or tennis stops being fun.
+  Removed for juniors: "play with someone watching or film the session" and "the loser collects the balls" (replaced by "something light that
+  nobody minds"). Parents' list: leave pressure practice to the coach, never tie rewards or punishments to a result, say nerves are normal.
+- **Not claimed:** no number from the articles was changed and none was added, and padel is named only where the Finnish studies are.
+- **Cross-references use real titles:** «روش تمرین تنیس: پنج پله تا مسابقه», «استرس مسابقه تنیس: تمرین زیر فشار» (English “The practice
+  ladder”, “Practising under pressure”). Checked by script against the lessons' own titles.
+- **Farsi rewritten to read as Farsi (2026-11-24).** Amir's note that day, on the recovery lessons: Farsi carried over word by word is hard to
+  follow. The first drafts followed the English sentence by sentence, so each lesson's Farsi was rewritten from the ideas: short sentences, plain
+  verbs, no stacked noun phrases, a result explained instead of named. Every fact and number is unchanged, checked section by section against the
+  English twin by script. The first version is kept aside, not committed.
+- **Covers (decided 2026-11-24, no new pictures):** each lesson reuses a picture another card already shows: `practice-ladder` gets `court-room` (a basket and a
+  ladder on the clay), `drill-to-match` gets `the-split-second` (a live ball) and `pressure-practice` gets `last-ball` (a ball on the lines), by id in `ART.lesson`
+  in `tennis/app/app.js`, and the app was re-stamped (`scripts/stamp_tps_app.py`). `assets/tps/` has no unused picture, so a different cover means a new picture
+  (the `/image` skill, about 1 credit a candidate, 3 candidates a slot, Amir's yes first). The Library still `sessions-on-court-v1` (a basket of balls at the
+  net post) is free and fits the ladder.
+- **Published 2026-11-24.** The three Farsi lessons were appended to `learn-4` one at a time, each under a row lock with a `_notes` entry and `version` re-hashed,
+  and the English twins went into `course_en` (sort 54, 55, 56). A text check ran inside every statement, and afterwards each stored lesson, Farsi and English,
+  was compared with its draft file by checksum: all six match. The other lessons in `learn-4` were left as they were.
+
+## Parity ledger (now in `Content/CONTENT-PARITY.md`)
 
 | Topic | TPS lesson | Blog + Playbook slug |
 |---|---|---|
-| How to structure on-court practice (the ladder) | none yet: decide whether juniors and parents get a lesson | `tennis-practice-ladder` (Training) |
-| Why a drill skill breaks in matches | none yet | `why-it-breaks-in-matches` (Training) |
-| Practising under pressure | none yet (a junior version needs the wellbeing cautions of the ESSA statement and a parent in the loop) | `train-under-pressure` (Mental) |
+| How to structure on-court practice (the ladder) | `practice-ladder` (learn-4, order 54) | `tennis-practice-ladder` (Training) |
+| Why a drill skill breaks in matches | `drill-to-match` (learn-4, order 55) | `why-it-breaks-in-matches` (Training) |
+| Practising under pressure | `pressure-practice` (learn-4, order 56; the junior cautions of the ESSA statement are in it) | `train-under-pressure` (Mental) |
 
 Phrase-log guesses (Farsi, none searched in Google's box yet; Google's autocomplete returned nothing usable for these on 2026-11-24):
 `tennis-practice-ladder` «روش تمرین تنیس»; `why-it-breaks-in-matches` «چرا در مسابقه خوب بازی نمی کنم»; `train-under-pressure` «استرس مسابقه تنیس».

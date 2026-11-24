@@ -1,0 +1,101 @@
+{
+  "id": "drill-to-match",
+  "icon": "🎯",
+  "group": "Tennis & competition",
+  "order": 55,
+  "title": "Why it breaks in matches",
+  "summary": "Why a shot that works in practice can disappear in a match, what the research says, and four ways to move a skill from the basket into your matches.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "A shot that works in practice and disappears in a match",
+      "p": [
+        "It can look like bad luck or nerves. Sometimes it is nerves, and the lesson “Practising under pressure” covers that.",
+        "This lesson covers the other cause: the shot was learned in conditions a match doesn't give you. It follows on from “The practice ladder”."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "A drill shows what works right now, in those conditions. A match changes the conditions."
+    },
+    {
+      "h": "A basket feed hides your opponent",
+      "p": [
+        "In a basket drill the ball arrives with no body behind it. In a match, your opponent's body tells you things before the ball does, like where they'll hit it and how hard. You pick that up without trying.",
+        "Skilled tennis players predict the direction of an opponent's stroke faster than less skilled players, partly because they look in better places. In another study, when players could see the ball in flight, they predicted a serve's direction better with a real return movement than with a spoken answer."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "A basket feed gives you none of this. There's nothing to read, so that part of your game isn't being trained."
+    },
+    {
+      "h": "The closest test is in cricket",
+      "p": [
+        "Teenage cricket batters faced a bowling machine and a real bowler, both at the same speed. Against the machine they started their movement later and moved differently. The researchers warned against leaning on machines in development programmes.",
+        "A basket feed is the tennis version of that machine. Nobody has tested it on tennis players, so this is an expectation, not a result."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": ""
+    },
+    {
+      "h": "A friendly drill proves less than it feels",
+      "p": [
+        "Drills are kind: the ball comes where you expect, and you always get another go. So the shot looks great, and you feel it's ready.",
+        "Researchers have long found that people mistake how they perform during practice for what they've learned."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Change the conditions and you find out what you really have."
+    },
+    {
+      "h": "Four ways to make a drill travel",
+      "p": [
+        "Drills still work. In a study of ten-year-old girls learning a forehand, one group did repetitive drills and the other played games with changed equipment and rules, and both groups got more accurate.",
+        "Change one thing at a time, so the drill gets closer to a match. Ask your tennis coach to build these in, one at a time:"
+      ],
+      "ol": [
+        "The opponent: serve to a returner, not to an empty box, and hit with a practice partner who hits back instead of a basket.",
+        "The next shot: serve and then hit one more.",
+        "A choice: give yourself two targets and pick one as the ball comes, or let your partner decide where the ball goes.",
+        "The score: play the same pattern as a point and keep score."
+      ],
+      "list": [],
+      "warn": "",
+      "callout": "Change one thing, then watch what changes. In the junior serve study the players traded one thing for another, speed for placement, so notice what you give up each time you add a piece."
+    },
+    {
+      "h": "When it still breaks in a match",
+      "p": [
+        "A match isn't the place to rebuild a stroke, because you have too much else to think about. Step back down the ladder instead: find the step where the shot still holds, make it solid there and climb again.",
+        "Where it breaks tells you what's missing. This is the course's own rule of thumb, not a study result:"
+      ],
+      "ol": [],
+      "list": [
+        "Holds in drills, breaks in rallies: the live ball is the problem. Work on reading the ball.",
+        "Holds in rallies, breaks in points: the decision is the problem. Add a choice.",
+        "Holds in points, breaks in practice matches: the stakes are the problem. Add some pressure."
+      ],
+      "warn": "",
+      "callout": "Judge a drill by what shows up in your next match."
+    },
+    {
+      "h": "For parents",
+      "p": [
+        "If your child plays well in practice and badly in matches, it doesn't mean a lack of effort or ability. These suggestions are the course's own practical advice, not a study result:"
+      ],
+      "ol": [],
+      "list": [
+        "Tell the tennis coach where it breaks, for example “fine in rallies, gone in points”.",
+        "Leave the changes to the coach, and don't coach it from the side or in the car.",
+        "Ask “what felt different?” instead of “why can't you do it in matches like you do in practice?”.",
+        "A harder drill can look worse at first. That is expected, so praise the trying."
+      ],
+      "warn": "",
+      "callout": "Your job is to keep practice a safe place to try things."
+    }
+  ]
+}

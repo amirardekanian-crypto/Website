@@ -1,0 +1,138 @@
+{
+  "id": "practice-ladder",
+  "icon": "🎾",
+  "group": "Tennis & competition",
+  "order": 54,
+  "title": "The practice ladder",
+  "summary": "Coached drills, rallies, practice points, practice matches and competitions: what each step adds, why you need all five and what the research does and doesn't say.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "Five ways to practise, in this order",
+      "p": [
+        "Most players practise tennis one way. Some only hit baskets with a coach, and others only play sets. A 2007 review of tennis practice said both leave learning short of its best.",
+        "This lesson is about tennis practice with your coach, not the sessions in this course. The course sessions are done as written.",
+        "Pick one thing you're working on, like a kick serve or a backhand slice, and take it up these five steps:"
+      ],
+      "ol": [
+        "Coached drills: your coach feeds you balls from a basket and you work on the technique. There's no opponent and no score.",
+        "Rallies: the same thing with a live ball and a practice partner.",
+        "Practice points: the same thing again, but now you play points and choose the shot.",
+        "Practice matches: the same thing in a full match against someone who wants to win. Nothing is on the line.",
+        "Competitions: the same thing when the result counts."
+      ],
+      "list": [],
+      "warn": "",
+      "callout": "The skill stays the same all the way up. What changes is how much your head has to do."
+    },
+    {
+      "h": "What changes on each step",
+      "p": [
+        "Every step up adds something the step below can't give you:"
+      ],
+      "ol": [],
+      "list": [
+        "What you can see: a basket feed has no body behind it, while a real opponent shows you where the ball is going before it leaves the racket.",
+        "What you have to decide: a drill tells you what to hit, but points and matches don't.",
+        "What's at stake: miss in a drill and you hit another one, miss in a match and you lose the point."
+      ],
+      "warn": "",
+      "callout": "Take one of these away and you're training a different skill. A serve to an empty box isn't the same job as a serve to someone about to return it."
+    },
+    {
+      "h": "What a study of match-like practice found",
+      "p": [
+        "In a six-week study, 33 junior players practised serving in one of three ways: to nobody, to a returner, or to a returner plus one more shot. More match-like practice didn't simply mean a better serve, and the groups behaved differently in matches.",
+        "On second serves, the group with the most match-like practice went for placement and the other two went for speed. A second study found that elite juniors spent under 13% of their practice time on serve and return, and mostly practised each one on its own."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "More match-like isn't automatically better. How much suits you is a call for your coach."
+    },
+    {
+      "h": "Why you start with coached drills",
+      "p": [
+        "A new shot, or a change to an old one, is hard on its own, and your head can only hold so much. So you start where the load is lowest.",
+        "In a study of 83 college students in tennis classes, the weaker players learned groundstrokes better from blocked practice (all forehands, then all backhands) than from mixed practice. For the stronger players it made no difference.",
+        "Don't overdo the mixing. A 2024 review of 54 studies found that mixed practice beats repetition in lab tasks, but in real sport and PE settings the gain was small and not reliable."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Thinking about the movement helps while a skill is new. In studies with golfers and soccer players, step-by-step thinking helped beginners and made well-learned skills worse, so the later steps are where you stop thinking about it."
+    },
+    {
+      "h": "Why you can't stay on the first step",
+      "p": [
+        "A basket session feels great: the balls land where you want them and the shot looks good. But how you perform during practice is often a poor guide to what you've learned.",
+        "Games don't replace drills either. A 2020 review of mostly school and university studies found that teaching through games improved decision making more than technical teaching did, but it didn't clearly improve skill execution.",
+        "A 2021 review of 34 soccer papers found that game-like practice with room to explore improved technique and tactics, and that plain repetition improved technique too. What repetition does to match play, nobody knows yet."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "A clean drill shows you can do it now, in these conditions. It doesn't show you can do it next week against an opponent."
+    },
+    {
+      "h": "Why you can't skip to matches",
+      "p": [
+        "A match asks a lot of your head. You read an opponent, pick tactics, keep score and deal with nerves, all while you hit the ball, and a shot you haven't fully learned suffers most.",
+        "In a table tennis study, players returned balls from a machine while doing a memory task in their heads. Experts lost about 10% of their performance and novices lost 30 to 50%.",
+        "Pressure is its own load. A 2021 review of 14 studies found that practising under pressure improved performance under pressure. The lesson “Practising under pressure” covers it."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "When a shot falls apart in matches, find the step where it still holds and rebuild from there."
+    },
+    {
+      "h": "What nobody has tested",
+      "p": [
+        "We found no study that tests this exact ladder, step by step, and no study says how much time each step should get. How you split your time depends on the player and the skill, and your coach decides it. That is the course's own advice, not a study result.",
+        "What the studies do give us are the pieces:"
+      ],
+      "ol": [],
+      "list": [
+        "Take the opponent out and you learn something different.",
+        "Easy practice often feels better than it works.",
+        "Pressure needs practice of its own.",
+        "No one way of practising covers all of it."
+      ],
+      "warn": "",
+      "callout": "Someone rebuilding a serve needs more of the early steps. Someone who plays well and loses the close ones needs more of the last two."
+    },
+    {
+      "h": "Check your tennis week",
+      "p": [
+        "Write down your last two weeks of tennis and mark which step each session was. These questions and the rule below are the course's own practical advice, not a study result.",
+        "Then answer these:"
+      ],
+      "ol": [],
+      "list": [
+        "Which step has most of your hours?",
+        "Which step is empty?",
+        "Does the skill you're working on show up on more than one step, or does every session train something different?",
+        "Do you play competitions, or only practice matches?"
+      ],
+      "warn": "",
+      "callout": "Take one skill up the whole ladder. If it falls apart on a step, drop back one and make it solid there before you climb again."
+    },
+    {
+      "h": "For parents",
+      "p": [
+        "You don't need to plan the ladder, because your tennis coach does that. These suggestions are the course's own practical advice, not a study result:"
+      ],
+      "ol": [],
+      "list": [
+        "Ask the coach which step your child's week is missing, instead of adding more of what they already do.",
+        "Keep practice matches light. Their job is learning, not a verdict on your child.",
+        "Don't coach technique from the side. One voice at a time is enough.",
+        "Notice effort and whether they used what they practised, not only the score.",
+        "If your child avoids one step, for example practice matches, ask why before you push."
+      ],
+      "warn": "",
+      "callout": "Your job is to support the learning, not to run the ladder."
+    }
+  ]
+}

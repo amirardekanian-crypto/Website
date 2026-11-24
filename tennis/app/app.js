@@ -504,7 +504,10 @@
       'why-strength': { f: 'iron-pair', pos: '50% 55%' },
       'training-on-period': { f: 'warm-seat', pos: '50% 35%' },
       'training-with-injury': { f: 'long-way-back', pos: '50% 55%' },
-      'match-reflection': { f: 'ball-row', pos: '50% 50%' }                // the bench alt-spider-drill, 2026-11-19
+      'match-reflection': { f: 'ball-row', pos: '50% 50%' },               // the bench alt-spider-drill, 2026-11-19
+      'practice-ladder': { f: 'court-room', pos: '50% 50%' },              // reused: the court session cards' basket and ladder, 2026-11-24
+      'drill-to-match': { f: 'the-split-second', pos: '50% 30%' },         // reused from agility-reaction, 2026-11-24
+      'pressure-practice': { f: 'last-ball', pos: '50% 45%' }              // reused: the session-complete picture, 2026-11-24
     },
     test: {                                                                // by test id
       'broad-jump': { f: 'the-coin', pos: '50% 45%' },

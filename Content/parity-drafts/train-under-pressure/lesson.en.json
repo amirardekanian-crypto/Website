@@ -1,0 +1,97 @@
+{
+  "id": "pressure-practice",
+  "icon": "⏱️",
+  "group": "Tennis & competition",
+  "order": 56,
+  "title": "Practising under pressure",
+  "summary": "A practice match isn't a tournament: what pressure does to a shot, what the research says about practising under pressure, and how a coach can add a little of it safely.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "A practice match isn't a tournament",
+      "p": [
+        "The stakes are lower, so the nerves are lower. That's fine while you're learning, but it means practice can't fully show you how you'll play when it counts.",
+        "So pressure needs its own practice. This lesson follows on from “The practice ladder”."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Pressure can be practised, but it has to be added with care."
+    },
+    {
+      "h": "What pressure does to a good shot",
+      "p": [
+        "When the score matters, the shot you trust can disappear. Researchers don't agree on exactly why.",
+        "One idea says you start thinking about your technique, and another says you start worrying about the result. In one study, 70 expert athletes described what they focused on in high-pressure competition. Often it was worries, and hardly ever the movement itself."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "There are two jobs: make the shot solid enough to survive, and learn to handle the worry that comes with the score."
+    },
+    {
+      "h": "Pressure can be practised",
+      "p": [
+        "A 2021 review pooled 14 studies of practising under simulated pressure, ten of them in sport. It improved performance under pressure by a medium amount, for beginners and experienced performers, on open and closed tasks. The authors' advice was to build pressure into training instead of just doing more training.",
+        "In one experiment, 17 expert basketball players practised free throws for five weeks, some with anxiety added and some without. Only the ones who trained with anxiety kept their accuracy when the pressure went up at the end. A second experiment with expert dart players, throwing from high up on a climbing wall, found the same."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "The experiments were with expert players doing free throws and darts, not rallies. We found no study of practising under pressure with young tennis players, so a coach should treat the idea with extra care for juniors.",
+      "callout": ""
+    },
+    {
+      "h": "Why a practice match isn't enough",
+      "p": [
+        "Padel research from Finland compared high-level men's practice matches played under pressure with official competition. Over 4,417 points in 38 matches, winners and errors looked about the same. A separate small study of 10 players found more body tension and more self-confidence before competition than before practice matches.",
+        "So a practice match can copy how you play. It can't fully copy how competition feels, which is why competition is its own step on the ladder."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": ""
+    },
+    {
+      "h": "Adding a little pressure, safely",
+      "p": [
+        "Add pressure only to a skill that already holds when you're calm, and start small. Pressure comes from consequences. These ideas are the course's own, not a study result, and your tennis coach should choose and run them:"
+      ],
+      "ol": [],
+      "list": [
+        "Keep score, and start games from a tight score like 30-40.",
+        "Give yourself one serve, with no second.",
+        "Start the session with a tie-break.",
+        "Play for something light that nobody minds, like who chooses the next drill."
+      ],
+      "warn": "Pressure is never a punishment. Stop as soon as the player dreads the session, and go back a step.",
+      "callout": "Add one pressure at a time. If the shot falls apart, you added too much, so drop back one."
+    },
+    {
+      "h": "Pressure is a dose",
+      "p": [
+        "Pressure can help or hurt. Australia's sport science body made that point in a 2026 position statement. It says pressure training has to be delivered with care because it can affect an athlete's wellbeing, ideally with a sport psychologist.",
+        "So keep it small and short, and keep it in tennis practice, not in this course's sessions. If nerves are strong, or tennis has stopped being fun, talk to your coach and then to your family doctor or a sport psychologist."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Pressure belongs on the top steps: practice points and practice matches. The early steps stay calm on purpose, because that's where the shot is built."
+    },
+    {
+      "h": "For parents",
+      "p": [
+        "Some nerves before a match are part of playing. These suggestions are the course's own practical advice, not a study result:"
+      ],
+      "ol": [],
+      "list": [
+        "Leave pressure practice to the tennis coach, and don't add it at home.",
+        "Never tie rewards or punishments to a result.",
+        "Say that nerves are normal and ask what would help, instead of saying “calm down”.",
+        "Notice effort and how they handled a hard point, not only the score.",
+        "If the nerves are strong or tennis stops being fun, talk to the coach, then to a doctor or a sport psychologist."
+      ],
+      "warn": "",
+      "callout": "Your job is to be the one place where the result doesn't matter."
+    }
+  ]
+}
