@@ -96,6 +96,24 @@
       }
     },
     {
+      "id": "2026-11-24-whole-week-ach",
+      "at": "2026-11-24T19:50:00Z",
+      "en": {
+        "title": "Whole Week",
+        "items": [
+          "A new achievement: one week where your plan, your sport, and your walking or the Library each add 30 Move minutes. Everything you do counts."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "هفتهٔ همه‌جانبه",
+        "items": [
+          "یه دستاورد تازه: هفته‌ای که برنامه‌تون، ورزشتون، و پیاده‌روی یا کتابخانه هر کدوم ۳۰ دقیقهٔ تحرک اضافه کنن. هر کاری که می‌کنید حساب می‌شه."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-24-best-week-long-day",
       "at": "2026-11-24T19:45:00Z",
       "en": {

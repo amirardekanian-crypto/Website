@@ -669,7 +669,9 @@
 // the month shape for the habits, perfect days in a row, HOUSE RULES, Full Moving Month, the Library, check-ins and bests in the cabinet.
 // v308: program.html and i18n-fa.js (?v=44) changed (2026-11-24, round 15 'Over the Line', step 6): Best Week Yet on Your weeks (#152) and
 // Long Day on a crew activity of two hours or more (#155).
-const CACHE = 'aap-v308';
+// v309: program.html, emblems.js (?v=6) and i18n-fa.js (?v=45) changed (2026-11-24, round 15 step 6, stage132, rulebook version 17): Whole Week
+// in the cabinet (#147), The Line's ring with 3 KINDS.
+const CACHE = 'aap-v309';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -698,7 +700,7 @@ const SHELL = [
   // The habit engine (v195): the training app owns the habits now, so this is shell, not an extra.
   '/assets/js/habits-core.js?v=1',
   // The emblem cabinet's art (v226): the achievements, the marks and the level medals, drawn in code. By the exact URL the page asks for.
-  '/assets/js/emblems.js?v=5',
+  '/assets/js/emblems.js?v=6',
   // The face the emblems' numbers are drawn in (the training day's title uses the 900 one above).
   '/assets/fonts/BarlowCondensed-800.woff2',
   // Off the Glass, the rest game (v162): loaded on the first tap on Play. Cache-first by this plain URL: a change needs a CACHE bump.
@@ -710,7 +712,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=16',
-  '/assets/js/i18n-fa.js?v=44',
+  '/assets/js/i18n-fa.js?v=45',
   // The recovery rules (v295, round 14): Footprint's thresholds and The Last Word's lines, generated from recovery/*.toml. The finished card
   // reads them at Done, signal or not. By the exact URL the page asks for: a change is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/recovery.js?v=1',

@@ -102,7 +102,8 @@ ACHIEVEMENT_TESTS = ["first", "proof", "goals", "cycle_all_held", "cycle_by_the_
                       # stage130 (rulebook version 15, round 15 'Over the Line'): the court family, the run and the month shapes
                       "sum", "kind_first", "kinds_in_cycle", "weeks_running", "days_running", "month_sum", "month_days",
                       # stage131 (#159 phases 2 and 3): Full Moving Month, counts in a month, checked-in weeks in a row, cycles in a row
-                      "month_count", "month_all", "weeks_checked_in", "cycles_running"]
+                      "month_count", "month_all", "weeks_checked_in", "cycles_running",
+                      "week_parts"]   # stage132 (#147 Whole Week)
 # Rule 18: the keys each test carries, and no others (a stray one is an error).
 TEST_PARAMS = {"first": set(), "proof": {"proof_measure", "proof_need"}, "goals": {"goals"}, "cycle_all_held": set(),
                "cycle_by_the_book": set(), "cycle_with_broken": set(), "runs_together": {"habits", "run"},
@@ -111,9 +112,10 @@ TEST_PARAMS = {"first": set(), "proof": {"proof_measure", "proof_need"}, "goals"
                "on_dates": {"windows"}, "slam_year": {"of"}, "clock": set(),
                "sum": {"at"}, "kind_first": {"at", "kinds"}, "kinds_in_cycle": {"at"}, "weeks_running": {"at"}, "days_running": {"at"},
                "month_sum": {"at"}, "month_days": {"at"},
-               "month_count": {"at"}, "month_all": {"at"}, "weeks_checked_in": {"at"}, "cycles_running": {"at"}}
+               "month_count": {"at"}, "month_all": {"at"}, "weeks_checked_in": {"at"}, "cycles_running": {"at"},
+               "week_parts": {"at", "each"}}
 MORE_TESTS = ["sum", "kind_first", "kinds_in_cycle", "weeks_running", "days_running", "month_sum", "month_days",
-              "month_count", "month_all", "weeks_checked_in", "cycles_running"]   # stage130 / stage131: career_more_key()
+              "month_count", "month_all", "weeks_checked_in", "cycles_running", "week_parts"]   # stage130 / 131 / 132: career_more_key()
 # stage99: a test that takes ONE of several keys (clock: finish_before or finish_from, exactly one)
 TEST_ONE_OF = {"clock": {"finish_before", "finish_from"}}
 FACT_TESTS = ["on_dates", "slam_year", "clock"]   # stage99: these three read the finished-session fact (reads = "session_finished")
@@ -166,7 +168,7 @@ KNOWN_KEYS = {
                     "retire_at", "starts_at", "superseded_by", "test", "goals", "habits", "run", "at", "groups", "bests",
                     "retests", "away_weeks", "weeks", "proof_measure", "proof_need", "patterns", "qualities", "exclude",
                     "windows", "of", "finish_before", "finish_from", "added_in", "paid_from", "repeats",   # stage99
-                    "kinds", "field", "habit"},   # stage130
+                    "kinds", "field", "habit", "each"},   # stage130 / stage132
     "title": {"name", "meaning", "from", "metal", "origin", "template", "proof_id", "retire_at", "superseded_by", "size"},
     "skin": {"name", "from", "origin", "proof_id"},
     "mission": {"name", "slot", "meaning", "asks", "counts", "habit", "measure", "target", "picked_when", "free",
@@ -1026,6 +1028,8 @@ def check_more_test(c, a, w, test):
         get_number(c, a, "at", ge=2 if test in ("weeks_running", "days_running", "weeks_checked_in", "cycles_running") else 1, integer=True)
     if test == "weeks_checked_in" and reads != "checkin_done":
         c.error('test "weeks_checked_in" reads the fact checkin_done (rule 18)')
+    if test == "week_parts" and "each" in a:
+        get_number(c, a, "each", gt=0, integer=True)   # Move minutes each part adds (plan; Court Log; walking or the Library)
     if test == "month_all" and reads != "move_week":
         c.error('test "month_all" reads the fact move_week (each plan week of the month, dated its first day) (rule 18)')
     if "field" in a and (test not in ("sum", "month_sum") or "habit" in a or not (is_text(a["field"]) and SNAKE_CASE.match(a["field"]))):

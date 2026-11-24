@@ -67,7 +67,11 @@
     "a full moving week": "یه هفتهٔ پرتحرک",
     "went over the line": "از خط رد شد",
     "Best week yet": "بهترین هفته‌تون",
-    "Long day": "روز طولانی"
+    "Long day": "روز طولانی",
+    "KINDS": "نوع",
+    "Whole Week": "هفتهٔ همه‌جانبه",
+    "One plan week where your plan, Court Log, and walking or the Library each add 30 Move minutes.": "یه هفتهٔ تمرینی که برنامه، فعالیت‌های ثبت‌شده، و پیاده‌روی یا کتابخانه هر کدوم ۳۰ دقیقهٔ تحرک اضافه کنن.",
+    "Gym, court and walking, all in one week.": "باشگاه، زمین و پیاده‌روی، همه توی یه هفته."
   },
   "patterns": [
     [

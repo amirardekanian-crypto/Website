@@ -2453,3 +2453,22 @@ free = false
 origin = "new"
 added_in = 16
 paid_from = "2026-11-25"
+
+# ── Version 17 (2026-11-24): #147 Whole Week, round 15 step 6 ─────────────────────────────────────────────────────────────────
+# Once: a plan week where three kinds of moving each add 30 Move minutes (move_week()'s own parts, stage132). paid_from the day after the seed (D21).
+
+[achievement.whole_week]
+name = "Whole Week"
+meaning = "commitment"
+reads = "activity_done"
+test = "week_parts"
+each = 30
+at = 1
+rule = "One plan week where your plan, Court Log, and walking or the Library each add 30 Move minutes."
+xp = 150
+size = "highlight"
+caption = "Gym, court and walking, all in one week."
+free = false
+origin = "new"
+added_in = 17
+paid_from = "2026-11-25"

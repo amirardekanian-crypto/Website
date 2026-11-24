@@ -320,6 +320,7 @@
   put('match_day', { sec: 'move', fam: 'roundel', text: 'MATCH', tier: 0, order: 501 });
   put('cross_court', { sec: 'move', fam: 'roundel', text: '3 KINDS', tier: 1, order: 502 });
   put('court_month', { sec: 'move', fam: 'roundel', text: 'MONTH', tier: 2, order: 503 });
+  put('whole_week', { sec: 'move', fam: 'ring', n: 3, w: 'KINDS', tier: 2, order: 160 });   // version 17 (#147): three kinds of moving in one week
   // Version 16 (#159 phases 2 and 3): the month shape on the habit coins (the banner says how many days), the steps totals as one-offs, HOUSE
   // RULES as its own ladder (the star: a rule of your own), Full Moving Month as The Line's ring in Night, and the training ones as trophies.
   [['steps', 'steps_month_100k', '100K', 1], ['steps', 'steps_month_200k', '200K', 2], ['steps', 'steps_month_300k', '300K', 4]].forEach(([g, id, text, tier], i) =>
