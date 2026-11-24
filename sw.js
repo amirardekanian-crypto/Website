@@ -651,7 +651,9 @@
 // cover is the article added last (each article carries an `added` stamp), not the first read of the first shelf.
 // v300: program.html changed (2026-11-24, Amir: "this shoule be notified once every day, untill they log in their first time"): the box
 // under Steps comes back once a day until the athlete logs their first activity.
-const CACHE = 'aap-v300';
+// v301: program.html and i18n-fa.js (?v=38) changed (2026-11-24, round 15 'Over the Line', Amir: "go with your picks"): The Count-Up, a
+// Court Log save says what it added to the week's Move minutes, with the bar, and "That's your line" on the save that reaches 300.
+const CACHE = 'aap-v301';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -692,7 +694,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=16',
-  '/assets/js/i18n-fa.js?v=37',
+  '/assets/js/i18n-fa.js?v=38',
   // The recovery rules (v295, round 14): Footprint's thresholds and The Last Word's lines, generated from recovery/*.toml. The finished card
   // reads them at Done, signal or not. By the exact URL the page asks for: a change is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/recovery.js?v=1',

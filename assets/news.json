@@ -72,6 +72,26 @@
       }
     },
     {
+      "id": "2026-11-24-count-up",
+      "at": "2026-11-24T16:20:00Z",
+      "en": {
+        "title": "See what your activity added",
+        "items": [
+          "Add tennis, padel or anything else and you see at once how many Move minutes it added to your week, and how close you are to 300.",
+          "The save that takes you to 300 tells you. That's your line, and the XP that comes with it."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "ببینید فعالیتتون چقدر اضافه کرد",
+        "items": [
+          "تنیس، پدل یا هر فعالیت دیگه‌ای رو که ثبت کنید، همون لحظه می‌بینید چند دقیقهٔ تحرک به هفته‌تون اضافه شد و چقدر تا ۳۰۰ مونده.",
+          "ثبتی که شما رو به ۳۰۰ برسونه بهتون می‌گه: رسیدید به خطتون، با امتیازی که براش می‌گیرید."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-24-playbook-latest",
       "at": "2026-11-24T15:50:00Z",
       "en": {
