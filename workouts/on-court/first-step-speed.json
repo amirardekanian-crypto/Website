@@ -3,6 +3,7 @@
   "title": "First-Step Speed",
   "category": "on-court",
   "countsAs": "strength",
+  "met": { "value": 6.0, "code": "02032", "entry": "Circuit training, body weight exercises", "source": "2024 Adult Compendium" },
   "duration": "25 min",
   "equipment": "Court",
   "focusTag": "Acceleration & First Step",
@@ -369,6 +370,7 @@
     ],
     "category": "on-court",
     "countsAs": "strength",
+    "met": { "value": 6.0, "code": "02032", "entry": "Circuit training, body weight exercises", "source": "2024 Adult Compendium" },
     "duration": "25 min",
     "focusTag": "شتاب و قدم اول",
     "equipment": "Court"

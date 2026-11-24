@@ -3,6 +3,7 @@
   "title": "Banded Lower Burner",
   "category": "strength",
   "countsAs": "strength",
+  "met": { "value": 3.8, "code": "02022", "entry": "Calisthenics (e.g., pushups, sit ups, pull-ups, lunges), moderate effort", "source": "2024 Adult Compendium" },
   "duration": "40 min",
   "equipment": "Bands",
   "focusTag": "Legs & Glutes, Minimal Kit",
@@ -365,6 +366,7 @@
     ],
     "category": "strength",
     "countsAs": "strength",
+    "met": { "value": 3.8, "code": "02022", "entry": "Calisthenics (e.g., pushups, sit ups, pull-ups, lunges), moderate effort", "source": "2024 Adult Compendium" },
     "duration": "40 min",
     "focusTag": "پا و باسن، حداقل وسیله",
     "equipment": "Bands"

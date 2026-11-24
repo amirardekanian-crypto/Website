@@ -3,6 +3,7 @@
   "title": "Green Light",
   "category": "mobility",
   "countsAs": "mobility",
+  "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
   "duration": "8 min",
   "equipment": "Bodyweight",
   "focusTag": "Daily Whole-Body Flow",
@@ -221,6 +222,7 @@
     ],
     "category": "mobility",
     "countsAs": "mobility",
+    "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
     "duration": "8 min",
     "focusTag": "فلو روزانه کل بدن",
     "equipment": "Bodyweight"

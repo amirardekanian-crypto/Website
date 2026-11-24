@@ -3,6 +3,7 @@
   "title": "Turnaround",
   "category": "recovery",
   "countsAs": "mobility",
+  "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
   "duration": "10 min",
   "equipment": "Bodyweight",
   "focusTag": "Between Matches, Same Day",
@@ -185,6 +186,7 @@
     ],
     "category": "recovery",
     "countsAs": "mobility",
+    "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
     "duration": "10 min",
     "focusTag": "بین مسابقه‌ها، همون روز",
     "equipment": "Bodyweight"

@@ -3,6 +3,7 @@
   "title": "Cut & Recover",
   "category": "on-court",
   "countsAs": "strength",
+  "met": { "value": 6.0, "code": "02032", "entry": "Circuit training, body weight exercises", "source": "2024 Adult Compendium" },
   "duration": "25 min",
   "equipment": "Court",
   "focusTag": "Deceleration & Change of Direction",
@@ -345,6 +346,7 @@
     ],
     "category": "on-court",
     "countsAs": "strength",
+    "met": { "value": 6.0, "code": "02032", "entry": "Circuit training, body weight exercises", "source": "2024 Adult Compendium" },
     "duration": "25 min",
     "focusTag": "ترمز و تغییر جهت",
     "equipment": "Court"

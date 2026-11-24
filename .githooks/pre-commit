@@ -296,6 +296,18 @@ if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(workouts/|scrip
   fi
 fi
 
+# ── 14b. every Library session carries its MET (added 2026-11-24) ────────
+# Why: Amir, "every session in the library needs to calculate this when uploading and add it". A session's Move minutes come from
+# its own `met` (stage129, move_lib_met()); without one the server falls back to the shelf's default, which may be wrong for it.
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(workouts/|scripts/check_library_met\.py$)'; then
+  echo "pre-commit: a Library session changed — checking every session carries its MET..."
+  if ! "$PY" scripts/check_library_met.py; then
+    echo ""
+    echo "pre-commit: BLOCKED — a Library session has no MET (details above). Add \"met\" from the 2024 Adult Compendium (docs/ref/move-credit.md)."
+    failed=1
+  fi
+fi
+
 # ── 15. logic that exists in both the dashboard and the athlete app (added 2026-10-10) ────────
 # Why: coach.html re-implements some of program.html's rules (program.html is the offline PWA and stays self-contained):
 # the exercise-name tiers, a renamed lift, the Spine lookup, today's RPE target on a lower day, what the Quality check counts,

@@ -3,6 +3,7 @@
   "title": "Tennis Warm-Up Routine",
   "category": "on-court",
   "countsAs": "none",
+  "met": { "value": 5.0, "code": "15695", "entry": "Tennis, hitting balls, non-game play, moderate effort", "source": "2024 Adult Compendium" },
   "duration": "15 min",
   "equipment": "Bodyweight",
   "focusTag": "Warm-Up & Prep",
@@ -329,6 +330,7 @@
     ],
     "category": "on-court",
     "countsAs": "none",
+    "met": { "value": 5.0, "code": "15695", "entry": "Tennis, hitting balls, non-game play, moderate effort", "source": "2024 Adult Compendium" },
     "duration": "15 min",
     "focusTag": "گرم کردن و آماده‌سازی",
     "equipment": "Bodyweight"

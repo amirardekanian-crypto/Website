@@ -3,6 +3,7 @@
   "title": "Brake Pads",
   "category": "mobility",
   "countsAs": "mobility",
+  "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
   "duration": "25 min",
   "equipment": "Bodyweight",
   "focusTag": "Ankles & Calves",
@@ -281,6 +282,7 @@
     ],
     "category": "mobility",
     "countsAs": "mobility",
+    "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
     "duration": "25 min",
     "focusTag": "مچ پا و ساق",
     "equipment": "Bodyweight"

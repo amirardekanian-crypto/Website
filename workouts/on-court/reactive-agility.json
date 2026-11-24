@@ -3,6 +3,7 @@
   "title": "Split Second",
   "category": "on-court",
   "countsAs": "strength",
+  "met": { "value": 6.0, "code": "02032", "entry": "Circuit training, body weight exercises", "source": "2024 Adult Compendium" },
   "duration": "20 min",
   "equipment": "Court",
   "focusTag": "Reaction & Quickness",
@@ -283,6 +284,7 @@
     ],
     "category": "on-court",
     "countsAs": "strength",
+    "met": { "value": 6.0, "code": "02032", "entry": "Circuit training, body weight exercises", "source": "2024 Adult Compendium" },
     "duration": "20 min",
     "focusTag": "واکنش و چابکی",
     "equipment": "Court"

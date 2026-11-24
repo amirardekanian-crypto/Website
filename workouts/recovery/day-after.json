@@ -3,6 +3,7 @@
   "title": "The Morning After",
   "category": "recovery",
   "countsAs": "mobility",
+  "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
   "duration": "17 min",
   "equipment": "Bodyweight",
   "focusTag": "Day After, Keep Moving",
@@ -203,6 +204,7 @@
     ],
     "category": "recovery",
     "countsAs": "mobility",
+    "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
     "duration": "17 min",
     "focusTag": "روز بعد، حرکت کن",
     "equipment": "Bodyweight"

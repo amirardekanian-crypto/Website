@@ -3,6 +3,7 @@
   "title": "Landing Gear",
   "category": "on-court",
   "countsAs": "strength",
+  "met": { "value": 6.0, "code": "02032", "entry": "Circuit training, body weight exercises", "source": "2024 Adult Compendium" },
   "duration": "30 min",
   "equipment": "Bodyweight",
   "focusTag": "Landing & Jump Base",
@@ -415,6 +416,7 @@
     ],
     "category": "on-court",
     "countsAs": "strength",
+    "met": { "value": 6.0, "code": "02032", "entry": "Circuit training, body weight exercises", "source": "2024 Adult Compendium" },
     "duration": "30 min",
     "focusTag": "فرود و پایه‌ی پرش",
     "equipment": "Bodyweight"

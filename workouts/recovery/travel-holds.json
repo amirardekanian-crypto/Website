@@ -3,6 +3,7 @@
   "title": "Hotel Floor",
   "category": "recovery",
   "countsAs": "mobility",
+  "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
   "duration": "12 min",
   "equipment": "Bodyweight",
   "focusTag": "On the Road, Hips & Shoulders",
@@ -169,6 +170,7 @@
     ],
     "category": "recovery",
     "countsAs": "mobility",
+    "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
     "duration": "12 min",
     "focusTag": "توی سفر، باسن و شونه",
     "equipment": "Bodyweight"

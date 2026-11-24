@@ -3,6 +3,7 @@
   "title": "Switch Off",
   "category": "breath",
   "countsAs": "breathe",
+  "met": { "value": 1.0, "code": "07075", "entry": "Meditating", "source": "2024 Adult Compendium" },
   "duration": "12 min",
   "equipment": "Bodyweight",
   "focusTag": "After a Hard Day",
@@ -193,6 +194,7 @@
     ],
     "category": "breath",
     "countsAs": "breathe",
+    "met": { "value": 1.0, "code": "07075", "entry": "Meditating", "source": "2024 Adult Compendium" },
     "duration": "12 min",
     "focusTag": "بعد از یه روز سخت",
     "equipment": "Bodyweight"

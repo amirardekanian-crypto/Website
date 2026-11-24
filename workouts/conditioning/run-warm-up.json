@@ -3,6 +3,7 @@
   "title": "Rolling Start",
   "category": "conditioning",
   "countsAs": "none",
+  "met": { "value": 4.8, "code": "12025", "entry": "Jogging, in place", "source": "2024 Adult Compendium" },
   "duration": "15 min",
   "equipment": "Bodyweight",
   "focusTag": "Zone 2 Run Warm-Up",
@@ -349,6 +350,7 @@
     ],
     "category": "conditioning",
     "countsAs": "none",
+    "met": { "value": 4.8, "code": "12025", "entry": "Jogging, in place", "source": "2024 Adult Compendium" },
     "duration": "15 min",
     "focusTag": "گرم کردن برای دویدن زون ۲",
     "equipment": "Bodyweight"

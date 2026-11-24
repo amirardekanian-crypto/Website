@@ -3,6 +3,7 @@
   "title": "Racket Arm",
   "category": "care",
   "countsAs": "mobility",
+  "met": { "value": 2.8, "code": "02024", "entry": "Calisthenics (e.g., curl ups, abdominal crunches, plank), light effort", "source": "2024 Adult Compendium" },
   "duration": "12 min",
   "equipment": "Foam Roller",
   "focusTag": "Forearm, Elbow & Shoulder",
@@ -217,6 +218,7 @@
     ],
     "category": "care",
     "countsAs": "mobility",
+    "met": { "value": 2.8, "code": "02024", "entry": "Calisthenics (e.g., curl ups, abdominal crunches, plank), light effort", "source": "2024 Adult Compendium" },
     "duration": "12 min",
     "focusTag": "ساعد، آرنج و شونه",
     "equipment": "Foam Roller"

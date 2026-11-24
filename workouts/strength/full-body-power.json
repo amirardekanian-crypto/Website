@@ -3,6 +3,7 @@
   "title": "Full-Body Power",
   "category": "strength",
   "countsAs": "strength",
+  "met": { "value": 5.0, "code": "02052", "entry": "Resistance (weight) training, squats, deadlift, slow or explosive effort", "source": "2024 Adult Compendium" },
   "duration": "50 min",
   "equipment": "Barbell",
   "focusTag": "Lower-Body Strength & Power",
@@ -407,6 +408,7 @@
     ],
     "category": "strength",
     "countsAs": "strength",
+    "met": { "value": 5.0, "code": "02052", "entry": "Resistance (weight) training, squats, deadlift, slow or explosive effort", "source": "2024 Adult Compendium" },
     "duration": "50 min",
     "focusTag": "قدرت و توان پایین‌تنه",
     "equipment": "Barbell"

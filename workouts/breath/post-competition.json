@@ -3,6 +3,7 @@
   "title": "Final Whistle",
   "category": "breath",
   "countsAs": "breathe",
+  "met": { "value": 1.0, "code": "07075", "entry": "Meditating", "source": "2024 Adult Compendium" },
   "duration": "18 min",
   "equipment": "Bodyweight",
   "focusTag": "After Competition",
@@ -253,6 +254,7 @@
     ],
     "category": "breath",
     "countsAs": "breathe",
+    "met": { "value": 1.0, "code": "07075", "entry": "Meditating", "source": "2024 Adult Compendium" },
     "duration": "18 min",
     "focusTag": "بعد از مسابقه",
     "equipment": "Bodyweight"

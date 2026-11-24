@@ -3,6 +3,7 @@
   "title": "Reset & Roll",
   "category": "recovery",
   "countsAs": "mobility",
+  "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
   "duration": "15 min",
   "equipment": "Foam Roller",
   "focusTag": "Release & Down-Regulate",
@@ -227,6 +228,7 @@
     ],
     "category": "recovery",
     "countsAs": "mobility",
+    "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
     "duration": "15 min",
     "focusTag": "رها کردن و آروم شدن",
     "equipment": "Foam Roller"

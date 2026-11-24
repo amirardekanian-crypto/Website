@@ -3,6 +3,7 @@
   "title": "Open Road",
   "category": "conditioning",
   "countsAs": "strength",
+  "met": { "value": 7.5, "code": "12020", "entry": "Jogging, general, self-selected pace", "source": "2024 Adult Compendium" },
   "duration": "45 min",
   "equipment": "Bodyweight",
   "focusTag": "Long Easy Run",
@@ -285,6 +286,7 @@
     ],
     "category": "conditioning",
     "countsAs": "strength",
+    "met": { "value": 7.5, "code": "12020", "entry": "Jogging, general, self-selected pace", "source": "2024 Adult Compendium" },
     "duration": "45 min",
     "focusTag": "دوی طولانی و آروم",
     "equipment": "Bodyweight"

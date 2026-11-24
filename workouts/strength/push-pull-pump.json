@@ -3,6 +3,7 @@
   "title": "Serve Armour",
   "category": "strength",
   "countsAs": "strength",
+  "met": { "value": 3.5, "code": "02054", "entry": "Resistance (weight) training, multiple exercises, 8-15 reps at varied resistance", "source": "2024 Adult Compendium" },
   "duration": "40 min",
   "equipment": "Dumbbells",
   "focusTag": "Upper Body for Racket Athletes",
@@ -391,6 +392,7 @@
     ],
     "category": "strength",
     "countsAs": "strength",
+    "met": { "value": 3.5, "code": "02054", "entry": "Resistance (weight) training, multiple exercises, 8-15 reps at varied resistance", "source": "2024 Adult Compendium" },
     "duration": "40 min",
     "focusTag": "بالاتنه برای ورزشکارای راکتی",
     "equipment": "Dumbbells"

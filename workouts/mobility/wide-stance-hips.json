@@ -3,6 +3,7 @@
   "title": "Wide Ball",
   "category": "mobility",
   "countsAs": "mobility",
+  "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
   "duration": "20 min",
   "equipment": "Bodyweight",
   "focusTag": "Hips & Groin, Loaded",
@@ -241,6 +242,7 @@
     ],
     "category": "mobility",
     "countsAs": "mobility",
+    "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
     "duration": "20 min",
     "focusTag": "لگن و کشاله، با بار",
     "equipment": "Bodyweight"

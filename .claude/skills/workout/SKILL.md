@@ -329,6 +329,29 @@ you are torn between `strength` and `mobility`, pick `mobility`.
 
 Full reasoning: `supabase/stage28_library_sessions.sql`.
 
+### ⚠️ `met` is required — look it up, don't guess it
+
+Amir, 2026-11-24: *"every session in the library needs to calculate this when uploading and add it"*. Every session carries its
+MET, because its Move minutes (Your weeks, the weekly 150 XP) are worked out from it: minutes x MET / 4, for minutes at 3 MET or
+more. Put it right after `countsAs`:
+
+```json
+"met": { "value": 6.0, "code": "02032", "entry": "Circuit training, body weight exercises", "source": "2024 Adult Compendium" },
+```
+
+1. Ask what the session **is**, start to finish with its rests: intervals, a steady run, drills with rest between reps, gym
+   strength, bodyweight strength, light rehab loading, stretching, breathing.
+2. Find the closest entry in the 2024 Adult Compendium (pacompendium.com → Adult Compendium → the category page, e.g.
+   Conditioning Exercise 02xxx, Running 12xxx, Sports 15xxx, Inactivity 07xxx). Copy its code, its words verbatim and its MET.
+   The entries already in use are in `docs/ref/move-credit.md` → *Library sessions*; reuse one when it fits.
+3. **Never pick it from the category.** `conditioning` holds a steady run (12020, 7.5) and a run warm-up (12025, 4.8);
+   `strength` holds a barbell squat day (02052, 5.0) and a floor core session (02056, 3.0).
+4. When torn between two entries, take the lower: a session average includes its rests.
+5. Copy the same `met` into the Farsi copy (`fa`): it has no words, and the Farsi check wants every key in both.
+
+Pre-commit guard 14b (`scripts/check_library_met.py`) blocks a session file without a valid `met`. Name it in the hand-off to Amir
+(*"MET 6.0, Compendium 02032 circuit training, body weight"*) so he sees what was chosen.
+
 ## Step 4 — ⚠️ The database is the library, not the files
 
 **`program.html` reads the library from Supabase — `get_library()` — and the JSON

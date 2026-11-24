@@ -3,6 +3,7 @@
   "title": "Long Holds",
   "category": "recovery",
   "countsAs": "mobility",
+  "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
   "duration": "15 min",
   "equipment": "Bodyweight",
   "focusTag": "Static Stretching, No Kit",
@@ -237,6 +238,7 @@
     ],
     "category": "recovery",
     "countsAs": "mobility",
+    "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
     "duration": "15 min",
     "focusTag": "کشش ثابت، بدون وسیله",
     "equipment": "Bodyweight"

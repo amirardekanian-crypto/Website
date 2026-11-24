@@ -3,6 +3,7 @@
   "title": "Torque",
   "category": "strength",
   "countsAs": "strength",
+  "met": { "value": 3.0, "code": "02056", "entry": "Body weight resistance exercises (e.g., squat, lunge, push-up, crunch), general", "source": "2024 Adult Compendium" },
   "duration": "20 min",
   "equipment": "Bodyweight",
   "focusTag": "Trunk Control & Rotation",
@@ -281,6 +282,7 @@
     ],
     "category": "strength",
     "countsAs": "strength",
+    "met": { "value": 3.0, "code": "02056", "entry": "Body weight resistance exercises (e.g., squat, lunge, push-up, crunch), general", "source": "2024 Adult Compendium" },
     "duration": "20 min",
     "focusTag": "کنترل تنه و چرخش",
     "equipment": "Bodyweight"

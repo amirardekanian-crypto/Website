@@ -67,7 +67,7 @@ const line = p => p.evaluate(() => {
         text: ov.textContent.replace(/\s+/g, ' '), rows: ov.querySelectorAll('.pl-row').length };
     });
     C.check('the bar opens the counting sheet, titled Move minutes', sheet.open && sheet.title === 'Move minutes', JSON.stringify(sheet).slice(0, 200));
-    C.check('the sheet explains walking over 5,000 and the 150 / 300', /over 5,000/.test(sheet.text) && /150 is the health minimum/.test(sheet.text) && /300 is your line/.test(sheet.text), sheet.text.slice(0, 300));
+    C.check('the sheet explains walking over 5,000, the 150 / 300 and that care counts 0', /over 5,000/.test(sheet.text) && /Care, mobility, recovery and breathing count 0/.test(sheet.text) && /150 is the health minimum/.test(sheet.text) && /300 is your line/.test(sheet.text), sheet.text.slice(0, 300));
     C.check('the sheet says a week at the line pays 150 XP from 24 November', /pays 150 XP/.test(sheet.text) && /24 November/.test(sheet.text), '');
     C.check('the sheet lists the three weeks, week 1 with +150 XP', sheet.rows === 3 && /310 \+150 XP/.test(sheet.text), sheet.rows);
     await ctx.close();

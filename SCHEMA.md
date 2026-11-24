@@ -1276,6 +1276,8 @@ simply draws fewer cells. All 42 sessions were converted from `chips[]` to `rx` 
   "category": "strength", "duration": "45 min", "equipment": "Barbell",
   // Which habit "Mark as done" ticks in AA Proof. REQUIRED — see below.
   "countsAs": "strength",
+  // Its MET, from a named 2024 Adult Compendium entry: what its Move minutes are worked out from. REQUIRED — see below.
+  "met": { "value": 5.0, "code": "02052", "entry": "Resistance (weight) training, squats, deadlift, slow or explosive effort", "source": "2024 Adult Compendium" },
   // 1-2 short paragraphs, about 100-150 words in all: why this session exists,
   // how it runs, what kit and timing it needs. Renders in the green header under
   // the duration line. REQUIRED — see "Where the coaching goes" below.
@@ -1377,10 +1379,20 @@ a warm-up, and `conditioning` holds both an engine session and a run warm-up.
 When torn between `strength` and `mobility`, pick `mobility`: WORKOUT is 28.6% of
 the day score. Full reasoning: `supabase/stage28_library_sessions.sql`, `HABITS.md`.
 
+#### `met` — the session's MET, for Move minutes (stage129, 2026-11-24)
+
+Amir: *"every session in the library needs to calculate this when uploading and add it"*. `{ value, code, entry, source }`: the
+MET of the 2024 Adult Compendium entry closest to what the session **is**, averaged over its rests, with the entry's 5-digit code
+and its words verbatim, and `source` = `"2024 Adult Compendium"`. The server reads `value` from the session's `public.library` row
+(`move_lib_met()`); Move minutes = minutes x MET / 4 for minutes at 3 MET or more, so a value under 3 counts nothing (care,
+mobility, recovery, breathing). **Required:** pre-commit guard 14b (`scripts/check_library_met.py`) blocks a file without it, and a
+row published without it falls back to its shelf's default. **Do not derive it from the shelf**: `conditioning` holds a steady run
+(12020, 7.5) and a run warm-up (12025, 4.8). The table of entries in use and how to choose: `docs/ref/move-credit.md`.
+
 ### Adding a workout
 
 1. Create the workout JSON in `workouts/<category>/<id>.json` (with `title`,
-   `duration`, `equipment`, `countsAs`, `focusTag`, `blocks`).
+   `duration`, `equipment`, `countsAs`, `met`, `focusTag`, `blocks`).
 2. Add an entry to that category's `workouts` array in `index.json` with the
    **same** `title` / `duration` / `equipment` and the `file` path.
 3. Commit + push. **That alone does not put it in the app.** The Library is served from Supabase

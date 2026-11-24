@@ -3,6 +3,7 @@
   "title": "Low and Wide",
   "category": "mobility",
   "countsAs": "mobility",
+  "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
   "duration": "15 min",
   "equipment": "Bodyweight",
   "focusTag": "Hips & Groin",
@@ -203,6 +204,7 @@
     ],
     "category": "mobility",
     "countsAs": "mobility",
+    "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
     "duration": "15 min",
     "focusTag": "لگن و کشاله",
     "equipment": "Bodyweight"

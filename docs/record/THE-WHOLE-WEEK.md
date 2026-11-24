@@ -24,4 +24,4 @@ The rules: `docs/rules/habits-in-app.md`, `docs/rules/career.md`. The numbers: `
 - **Closed the same day: the live catalogue and the repo now match.** The repo took `century`'s live `paid_from = "2026-10-18"` (it
   pays as it always has; `check_career.py` knows the key), and the live `amirs_pick` line took the repo's "{month}" wording, which coach.html
   already used. All 162 rows and the version 13 rulebook hash the same on both sides; `career_compare()` ok.
-- **The Library shelf METs are by analogy** with the 2024 Adult Compendium (`move_shelf_met()`); check them with `/sc-research`.
+- **Closed the same day: every Library session carries its own MET** from a named 2024 Adult Compendium entry (stage129, `docs/ref/move-credit.md` → *Library sessions*); `/workout` adds it to every new one and pre-commit guard 14b checks it.

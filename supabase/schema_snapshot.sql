@@ -8,7 +8,7 @@
 -- schemas is here: Supabase makes the first four itself, and `backup` held one-off rollback copies, not part of the product.
 -- The extensions the live project has: pg_cron (pg_catalog), pg_net (extensions), pg_stat_statements (extensions), pgcrypto (extensions), plpgsql (pg_catalog), supabase_vault (vault), uuid-ossp (extensions).
 -- A new Supabase project already has all of them (plpgsql, pgcrypto, uuid-ossp, pg_stat_statements, supabase_vault).
--- 81 tables, 371 functions, 12 sequences.
+-- 81 tables, 372 functions, 12 sequences.
 
 set check_function_bodies = off;
 set search_path = public;
@@ -10240,6 +10240,18 @@ CREATE OR REPLACE FUNCTION public.move_full_from()
  IMMUTABLE
 AS $function$ select date '2026-11-24' $function$;
 
+CREATE OR REPLACE FUNCTION public.move_lib_met(p_slug text, p_shelf text)
+ RETURNS numeric
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  select coalesce((select case when jsonb_typeof(l.data -> 'met' -> 'value') = 'number' and (l.data #>> '{met,value}')::numeric between 0.9 and 23
+                               then (l.data #>> '{met,value}')::numeric end
+                     from public.library l where l.slug = p_slug and l.kind = 'workout' limit 1),
+                  public.move_shelf_met(p_shelf))
+$function$;
+
 CREATE OR REPLACE FUNCTION public.move_meta(p_athlete text)
  RETURNS jsonb
  LANGUAGE sql
@@ -10280,7 +10292,7 @@ AS $function$
      where f.athlete_id = p_athlete and f.void_at is null and f.kind in ('session_finished', 'session_finished_early')
        and f.day between p_from and p_to),
   ls as (
-    select l.completed_on as day, coalesce(l.duration_min, 0)::numeric as mins, public.move_shelf_met(l.category_id) as met, l.slug
+    select l.completed_on as day, coalesce(l.duration_min, 0)::numeric as mins, public.move_lib_met(l.slug, l.category_id) as met, l.slug
       from public.library_sessions l
      where l.athlete_id = p_athlete and l.completed_on between p_from and p_to),
   al as (
@@ -10333,8 +10345,8 @@ CREATE OR REPLACE FUNCTION public.move_shelf_met(p_shelf text)
 AS $function$
   select case p_shelf
     -- MOVE_SHELF_BEGIN
-    when 'conditioning' then 8.0 when 'on-court' then 6.0 when 'strength' then 5.0 when 'care' then 3.5
-    when 'mobility' then 2.5 when 'recovery' then 2.3 when 'breath' then 1.3
+    when 'conditioning' then 7.0 when 'on-court' then 6.0 when 'strength' then 3.8 when 'care' then 2.8
+    when 'mobility' then 2.3 when 'recovery' then 2.3 when 'breath' then 1.0
     -- MOVE_SHELF_END
     else 3.5 end
 $function$;
@@ -13390,6 +13402,8 @@ revoke all on function public.move_credit_from() from public, anon, authenticate
 grant execute on function public.move_credit_from() to anon, authenticated, service_role, public;
 revoke all on function public.move_full_from() from public, anon, authenticated, service_role;
 grant execute on function public.move_full_from() to authenticated, service_role;
+revoke all on function public.move_lib_met(p_slug text, p_shelf text) from public, anon, authenticated, service_role;
+grant execute on function public.move_lib_met(p_slug text, p_shelf text) to authenticated, service_role;
 revoke all on function public.move_meta(p_athlete text) from public, anon, authenticated, service_role;
 grant execute on function public.move_meta(p_athlete text) to service_role;
 revoke all on function public.move_parts(p_athlete text, p_from date, p_to date) from public, anon, authenticated, service_role;

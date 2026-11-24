@@ -3,6 +3,7 @@
   "title": "Forearm Forge",
   "category": "care",
   "countsAs": "mobility",
+  "met": { "value": 2.8, "code": "02024", "entry": "Calisthenics (e.g., curl ups, abdominal crunches, plank), light effort", "source": "2024 Adult Compendium" },
   "duration": "25 min",
   "equipment": "Dumbbells",
   "focusTag": "Elbow & Wrist Pain",
@@ -293,6 +294,7 @@
     ],
     "category": "care",
     "countsAs": "mobility",
+    "met": { "value": 2.8, "code": "02024", "entry": "Calisthenics (e.g., curl ups, abdominal crunches, plank), light effort", "source": "2024 Adult Compendium" },
     "duration": "25 min",
     "focusTag": "درد آرنج و مچ",
     "equipment": "Dumbbells"

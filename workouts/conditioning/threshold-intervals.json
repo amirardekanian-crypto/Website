@@ -3,6 +3,7 @@
   "title": "Hold the Line",
   "category": "conditioning",
   "countsAs": "strength",
+  "met": { "value": 7.0, "code": "02210", "entry": "High intensity interval exercise, moderate effort", "source": "2024 Adult Compendium" },
   "duration": "42 min",
   "equipment": "Bike",
   "focusTag": "Threshold · No Impact",
@@ -233,6 +234,7 @@
     ],
     "category": "conditioning",
     "countsAs": "strength",
+    "met": { "value": 7.0, "code": "02210", "entry": "High intensity interval exercise, moderate effort", "source": "2024 Adult Compendium" },
     "duration": "42 min",
     "focusTag": "آستانه · بدون ضربه",
     "equipment": "Bike"

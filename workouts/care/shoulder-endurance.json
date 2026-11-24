@@ -3,6 +3,7 @@
   "title": "Shoulder Brake",
   "category": "care",
   "countsAs": "mobility",
+  "met": { "value": 2.8, "code": "02024", "entry": "Calisthenics (e.g., curl ups, abdominal crunches, plank), light effort", "source": "2024 Adult Compendium" },
   "duration": "30 min",
   "equipment": "Bands",
   "focusTag": "Shoulder Pain",
@@ -317,6 +318,7 @@
     ],
     "category": "care",
     "countsAs": "mobility",
+    "met": { "value": 2.8, "code": "02024", "entry": "Calisthenics (e.g., curl ups, abdominal crunches, plank), light effort", "source": "2024 Adult Compendium" },
     "duration": "30 min",
     "focusTag": "درد شونه",
     "equipment": "Bands"

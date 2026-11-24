@@ -3,6 +3,7 @@
   "title": "Hard Stop",
   "category": "on-court",
   "countsAs": "strength",
+  "met": { "value": 6.0, "code": "02032", "entry": "Circuit training, body weight exercises", "source": "2024 Adult Compendium" },
   "duration": "39 min",
   "equipment": "Court",
   "focusTag": "Braking & the Planted Turn",
@@ -397,6 +398,7 @@
     ],
     "category": "on-court",
     "countsAs": "strength",
+    "met": { "value": 6.0, "code": "02032", "entry": "Circuit training, body weight exercises", "source": "2024 Adult Compendium" },
     "duration": "39 min",
     "focusTag": "ترمز و چرخش با پای ثابت",
     "equipment": "Court"

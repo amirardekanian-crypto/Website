@@ -3,6 +3,7 @@
   "title": "Engine Builder",
   "category": "conditioning",
   "countsAs": "strength",
+  "met": { "value": 6.0, "code": "12010", "entry": "Jog/walk combination (jogging component of less than 10 minutes) (Taylor Code 180)", "source": "2024 Adult Compendium" },
   "duration": "35 min",
   "equipment": "Bike",
   "focusTag": "Aerobic Base",
@@ -223,6 +224,7 @@
     ],
     "category": "conditioning",
     "countsAs": "strength",
+    "met": { "value": 6.0, "code": "12010", "entry": "Jog/walk combination (jogging component of less than 10 minutes) (Taylor Code 180)", "source": "2024 Adult Compendium" },
     "duration": "35 min",
     "focusTag": "پایه‌ی هوازی",
     "equipment": "Bike"

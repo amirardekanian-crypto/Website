@@ -3,6 +3,7 @@
   "title": "Night Shift",
   "category": "recovery",
   "countsAs": "mobility",
+  "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
   "duration": "20 min",
   "equipment": "Foam Roller",
   "focusTag": "Hard Day, Roller Work",
@@ -277,6 +278,7 @@
     ],
     "category": "recovery",
     "countsAs": "mobility",
+    "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
     "duration": "20 min",
     "focusTag": "روز سخت، کار با رولر",
     "equipment": "Foam Roller"

@@ -3,6 +3,7 @@
   "title": "Daily Mobility Flow",
   "category": "mobility",
   "countsAs": "mobility",
+  "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
   "duration": "15 min",
   "equipment": "Bodyweight",
   "focusTag": "Ankles, Hips, Upper Back",
@@ -265,6 +266,7 @@
     ],
     "category": "mobility",
     "countsAs": "mobility",
+    "met": { "value": 2.3, "code": "02101", "entry": "Stretching, mild", "source": "2024 Adult Compendium" },
     "duration": "15 min",
     "focusTag": "مچ پا، لگن، کمر بالا",
     "equipment": "Bodyweight"

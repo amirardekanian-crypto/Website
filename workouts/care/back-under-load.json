@@ -3,6 +3,7 @@
   "title": "Iron Back",
   "category": "care",
   "countsAs": "strength",
+  "met": { "value": 2.8, "code": "02024", "entry": "Calisthenics (e.g., curl ups, abdominal crunches, plank), light effort", "source": "2024 Adult Compendium" },
   "duration": "32 min",
   "equipment": "Dumbbells",
   "focusTag": "Lower Back Under Load",
@@ -291,6 +292,7 @@
     ],
     "category": "care",
     "countsAs": "strength",
+    "met": { "value": 2.8, "code": "02024", "entry": "Calisthenics (e.g., curl ups, abdominal crunches, plank), light effort", "source": "2024 Adult Compendium" },
     "duration": "32 min",
     "focusTag": "کمر زیر بار",
     "equipment": "Dumbbells"

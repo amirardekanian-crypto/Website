@@ -14,7 +14,7 @@ was decided and why.
 | [`SET-LOGGING-DESIGN.md`](SET-LOGGING-DESIGN.md) | how set logging was designed. |
 | [`COACHING-PRINCIPLES-HISTORY.md`](COACHING-PRINCIPLES-HISTORY.md) | the dates, Amir's words and each rule's origin behind the rule index (2026-09-27). No stage reads it. |
 | [`PUSH-REST-AND-FINISH.md`](PUSH-REST-AND-FINISH.md) | the rest alert (stage107) and the "still open" reminder (stage108), 2026-11-02: how they work, the live proofs, the stage number clash. |
-| [`THE-WHOLE-WEEK.md`](THE-WHOLE-WEEK.md) | Move minutes, the 100% steps cap, a full moving week pays (rulebook v13) and Your Number sets itself, stage127, 2026-11-24. **Open:** the Library shelf METs are by analogy (check with `/sc-research`). |
+| [`THE-WHOLE-WEEK.md`](THE-WHOLE-WEEK.md) | Move minutes, the 100% steps cap, a full moving week pays (rulebook v13) and Your Number sets itself, stage127, 2026-11-24. Library sessions carry their own MET since stage129. |
 
 ## Records left where they are
 

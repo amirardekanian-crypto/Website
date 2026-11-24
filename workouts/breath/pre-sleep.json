@@ -3,6 +3,7 @@
   "title": "Lights Out",
   "category": "breath",
   "countsAs": "breathe",
+  "met": { "value": 1.0, "code": "07075", "entry": "Meditating", "source": "2024 Adult Compendium" },
   "duration": "10 min",
   "equipment": "Bodyweight",
   "focusTag": "Before Sleep",
@@ -133,6 +134,7 @@
     ],
     "category": "breath",
     "countsAs": "breathe",
+    "met": { "value": 1.0, "code": "07075", "entry": "Meditating", "source": "2024 Adult Compendium" },
     "duration": "10 min",
     "focusTag": "قبل از خواب",
     "equipment": "Bodyweight"
