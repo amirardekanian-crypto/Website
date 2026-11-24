@@ -1,6 +1,6 @@
 // Court Log counts toward Steps (stage121, 2026-11-22): node scripts/headless/move-credit.js
 //
-// An activity on Your weeks adds round(minutes x MET / 3.5) x 100 steps to that day's Steps, capped at 70% of the target. The typed
+// An activity on Your weeks adds round(minutes x MET / 3.5) x 100 steps to that day's Steps, capped at 70% of the target (the whole target from 2026-11-24, stage127). The typed
 // number is never changed: the engine reads HAB_VIEW (the log plus the credit), the − / + / typing box edit HAB_LOG, and only HAB_LOG is
 // saved. What this holds: THE BIG NUMBER ON THE ROW IS THE SCORED NUMBER (2026-11-23, direction A "Total first": Tara read 2,000 on the
 // button while the server scored 9,000 and said the tennis did not add); the line under it splits walked and activity; what is left and
@@ -51,23 +51,23 @@ const numbersMatch = p => p.evaluate(() => {
   {
     const { ctx, p } = await open(browser, { fw: weeks([{ day: T, k: 'court', kind: 'tennis', title: 'Tennis', mins: 60, effort: 'normal', id: 'a1' }]), log: { [T]: { steps: 2000 } } });
     const r = await row(p);
-    t.check('the big number is the day\'s total, and the line splits walked and tennis', r && r.now === '9,000' && r.mv === '2,000 walked + 7,000 from Tennis', JSON.stringify(r));
-    t.check('what is left and the scored number use the total (2,000 + 7,000)', r && r.val === 9000 && r.sub === "1,000 steps to go" && !r.done, JSON.stringify(r));
+    t.check('the big number is the day\'s total, and the line splits walked and tennis', r && r.now === '12,000' && r.mv === '2,000 walked + 10,000 from Tennis', JSON.stringify(r));
+    t.check('the scored number uses the total (2,000 + 10,000, the whole target since stage127), so Steps is done', r && r.val === 12000 && r.done, JSON.stringify(r));
     t.check('every counted row draws the number that is scored', (await numbersMatch(p)).length === 0, JSON.stringify(await numbersMatch(p)));
     await p.evaluate(() => habStepOnce('steps', 1));
     await p.waitForTimeout(200);
     const saved = await p.evaluate(k => JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_log'))[k], T);
     const r2 = await row(p);
-    t.check('a + saves the typed number plus one step, never the credit', saved && saved.steps === 2500 && r2.now === '9,500' && r2.val === 9500
-      && r2.mv === '2,500 walked + 7,000 from Tennis', JSON.stringify([saved, r2]));
+    t.check('a + saves the typed number plus one step, never the credit', saved && saved.steps === 2500 && r2.now === '12,500' && r2.val === 12500
+      && r2.mv === '2,500 walked + 10,000 from Tennis', JSON.stringify([saved, r2]));
     await p.evaluate(() => habTypeOpen('steps'));
     const typing = await p.evaluate(() => ({ box: (document.getElementById('hab-type-steps') || {}).value, mv: (document.querySelector('.hb-wrap[data-h="steps"] .hb-mv') || {}).textContent }));
-    t.check('typing opens on the walked steps and says what the tennis adds', typing.box === '2500' && typing.mv === 'Type the steps you walked. Tennis adds 7,000.', JSON.stringify(typing));
+    t.check('typing opens on the walked steps and says what the tennis adds', typing.box === '2500' && typing.mv === 'Type the steps you walked. Tennis adds 10,000.', JSON.stringify(typing));
     await p.evaluate(() => { document.getElementById('hab-type-steps').value = '3000'; habTypeSave('steps'); });
     await p.waitForTimeout(200);
     const r3 = await row(p);
     const saved3 = await p.evaluate(k => JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_log'))[k], T);
-    t.check('3,000 typed + 7,000 credit ticks Steps, and the typed 3,000 is what is saved', r3.done && r3.val === 10000 && r3.now === '10,000' && saved3.steps === 3000, JSON.stringify([r3, saved3]));
+    t.check('3,000 typed + 10,000 credit ticks Steps, and the typed 3,000 is what is saved', r3.done && r3.val === 13000 && r3.now === '13,000' && saved3.steps === 3000, JSON.stringify([r3, saved3]));
     t.check('no page errors', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }
@@ -94,7 +94,7 @@ const numbersMatch = p => p.evaluate(() => {
       acts: [{ day: T, kind: 'tennis', mins: 60, effort: 'normal', id: 'd1' }] });
     const { ctx, p } = await open(browser, { fw, log: { [T]: { steps: 2000 } }, natural: true });
     const r = await row(p);
-    t.check('an activity outside the weeks still counts, read from acts on a plain boot', r && r.val === 9000 && r.now === '9,000', JSON.stringify(r));
+    t.check('an activity outside the weeks still counts, read from acts on a plain boot', r && r.val === 12000 && r.now === '12,000', JSON.stringify(r));
     await ctx.close();
   }
 
@@ -106,7 +106,7 @@ const numbersMatch = p => p.evaluate(() => {
     await p.evaluate(() => { openActivitySheet(); actPick('kind', 'tennis'); actPick('mins', 60); actPick('effort', 'normal'); return saveActivity(); });
     await p.waitForTimeout(1200);   // the save, then loadFiveWeeks()'s answer replacing the phone's own copy
     const after = await row(p);
-    t.check('after saving an hour of tennis Home shows 9,000 with the split line, after the server answered', after && after.now === '9,000' && after.mv === '2,000 walked + 7,000 from Tennis',
+    t.check('after saving an hour of tennis Home shows 12,000 with the split line, after the server answered', after && after.now === '12,000' && after.mv === '2,000 walked + 10,000 from Tennis',
       JSON.stringify(after));
     t.check('no page errors', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();

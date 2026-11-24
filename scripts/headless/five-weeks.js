@@ -213,7 +213,7 @@ const calls = (p, n) => p.evaluate(n => (window.__STUB.calls || []).filter(c => 
     const c = await card(p);
     C.check('outside a cycle: five rows and no "Cycle N" in the head', c.shown && c.rows === 5 && !/Cycle/.test(c.head) && /5 weeks/.test(c.head), JSON.stringify(c));
     const mv = await p.evaluate(d => ({ credit: moveCreditOn(d), last: actLast() }), at(0));
-    C.check('outside a cycle: 60 min of tennis today counts toward Steps from acts (7,000, the 70% cap)', !!mv.credit && mv.credit.steps === 7000, JSON.stringify(mv));
+    C.check('outside a cycle: 60 min of tennis today counts toward Steps from acts (10,000: the whole target since stage127)', !!mv.credit && mv.credit.steps === 10000, JSON.stringify(mv));
     C.check('outside a cycle: Played today? finds the last activity in acts', !!mv.last && mv.last.id === 'a-today', JSON.stringify(mv.last));
     const old = await p.evaluate(d => { const keep = FW; FW = JSON.parse(JSON.stringify(keep)); delete FW.acts; const r = moveCreditOn(d); FW = keep; return r; }, at(0));
     C.check('a copy from before stage122 (no acts) still reads the weeks, and gives nothing for a day outside them', old === null, JSON.stringify(old));

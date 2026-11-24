@@ -146,7 +146,8 @@ EXTRA_KEYS = {"tier_name", "mult", "title", "template", "proof_id", "proof_code"
 # retire_at, starts_at and superseded_by are the switch gates (rule 15). A badge may also name the one habit it reads.
 KNOWN_KEYS = {
     "fact": {"meaning", "xp", "xp_from", "source", "pays_for", "when", "cap", "min_share", "limit", "limit_per",
-             "weeks_away", "window_days", "min_gain", "career_only"},
+             "weeks_away", "window_days", "min_gain", "career_only",
+             "line", "mark", "per", "met_floor", "walk_floor", "walk_steps_per_min", "walk_cap", "walk_met"},   # stage127: move_week
     "badge": {"name", "meaning", "kind", "counts", "habit", "proof_codes", "caption", "free", "origin", "tiers",
               "retire_at", "starts_at", "superseded_by", "run", "history_twin_counts", "patterns", "qualities", "exclude"},
     "tier": {"at", "metal", "xp", "size", "title", "mult", "tier_name"},

@@ -1241,8 +1241,9 @@ run('the week\'s plan days (planDayIds, planDaysC / career_weeks() since stage10
 // program.html MOVE_MET / moveCreditOf() shows the credit; the server's activity_met() / move_steps_credit() pays it. The table must be
 // the same cell for cell, and the arithmetic the same (minutes x MET / 3.5, each to the nearest 100, the day capped at 70% of the target,
 // from the same first day).
-const A_MOVE = sandbox(null, [constSrc(A_SRC, 'MOVE_MET', 'program.html'), lineSrc(A_SRC, 'const MOVE_FROM', 'program.html')]
-  .concat(fromA('moveMet', 'moveCreditOf')), ['MOVE_MET', 'MOVE_FROM', 'MOVE_CAP', 'moveCreditOf']);
+const A_MOVE = sandbox(null, [constSrc(A_SRC, 'MOVE_MET', 'program.html'), lineSrc(A_SRC, 'const MOVE_FROM', 'program.html'),
+  lineSrc(A_SRC, 'const MOVE_FULL_FROM', 'program.html')]
+  .concat(fromA('moveMet', 'moveCapOn', 'moveCreditOf')), ['MOVE_MET', 'MOVE_FROM', 'MOVE_CAP', 'MOVE_FULL_FROM', 'moveCapOn', 'moveCreditOf']);
 run('the Steps credit of an activity (MOVE_MET, moveCreditOf / activity_met(), move_steps_credit() in stage121)', () => {
   const sql = read('supabase/schema_snapshot.sql');   // the live functions (stage121 put them there)
   const body = sql.slice(sql.indexOf('-- MOVE_MET_BEGIN'), sql.indexOf('-- MOVE_MET_END'));
@@ -1254,12 +1255,17 @@ run('the Steps credit of an activity (MOVE_MET, moveCreditOf / activity_met(), m
   expect('activity_kinds() is the table\'s kinds', null, kinds.slice().sort(), Object.keys(S).sort());
   expect('the first day', null, A_MOVE.MOVE_FROM, (/date '(\d{4}-\d{2}-\d{2})'/.exec(sql.slice(sql.indexOf('FUNCTION public.move_credit_from()'))) || [])[1]);
   expect('the server rounds each activity to 100 steps per 3.5 MET-minutes', null, /round\(a\.minutes \* coalesce\(public\.activity_met\(a\.kind, a\.effort\), 0\) \/ 3\.5\) \* 100/.test(sql), true);
-  expect('the server caps the day at 70% of the target', null, /least\(per\.raw, round\(tgt\.t \* 0\.7\)::integer\)/.test(sql) && A_MOVE.MOVE_CAP === 0.7, true);
-  const sqlCredit = (acts, t) => { const raw = acts.reduce((n, a) => n + Math.round(a.mins * S[a.kind][['easy', 'normal', 'hard'].indexOf(a.effort)] / 3.5) * 100, 0); return { steps: Math.min(raw, Math.round(t * 0.7)), raw }; };
+  // stage127: the cap is the day's share, 70% before move_full_from() and all of it from then on (move_cap_on())
+  expect('the server caps the day at move_cap_on(day) of the target', null, /least\(per\.raw, round\(tgt\.t \* public\.move_cap_on\(per\.day\)\)::integer\)/.test(sql), true);
+  expect('move_cap_on(): 0.7 before move_full_from(), 1.0 from then on', null, /case when p_day >= public\.move_full_from\(\) then 1\.0 else 0\.7 end/.test(sql) && A_MOVE.MOVE_CAP === 0.7, true);
+  expect('move_full_from() is MOVE_FULL_FROM', null, A_MOVE.MOVE_FULL_FROM, (/date '(\d{4}-\d{2}-\d{2})'/.exec(sql.slice(sql.indexOf('FUNCTION public.move_full_from()'))) || [])[1]);
+  const capOn = day => day >= A_MOVE.MOVE_FULL_FROM ? 1.0 : 0.7;
+  const sqlCredit = (acts, t, day) => { const raw = acts.reduce((n, a) => n + Math.round(a.mins * S[a.kind][['easy', 'normal', 'hard'].indexOf(a.effort)] / 3.5) * 100, 0); return { steps: Math.min(raw, Math.round(t * capOn(day))), raw }; };
   [[], [{ kind: 'tennis', mins: 60, effort: 'normal' }], [{ kind: 'padel', mins: 30, effort: 'easy' }], [{ kind: 'cycling', mins: 45, effort: 'hard' }, { kind: 'gym', mins: 20, effort: 'easy' }],
    [{ kind: 'pickleball', mins: 5, effort: 'normal' }], [{ kind: 'beach_tennis', mins: 90, effort: 'hard' }]].forEach(acts =>
-    [10000, 8000].forEach(t => same('moveCreditOf vs the server\'s arithmetic', [acts, t], A_MOVE.moveCreditOf(acts, t), sqlCredit(acts, t))));
-  expect('an hour of normal tennis is 11,700 steps, capped at 7,000', null, A_MOVE.moveCreditOf([{ kind: 'tennis', mins: 60, effort: 'normal' }], 10000), { steps: 7000, raw: 11700 });
+    [10000, 8000].forEach(t => ['2026-11-23', '2026-11-24', '2026-12-30'].forEach(day => same('moveCreditOf vs the server\'s arithmetic', [acts, t, day], A_MOVE.moveCreditOf(acts, t, day), sqlCredit(acts, t, day)))));
+  expect('an hour of normal tennis before stage127 is 11,700 steps, capped at 7,000', null, A_MOVE.moveCreditOf([{ kind: 'tennis', mins: 60, effort: 'normal' }], 10000, '2026-11-23'), { steps: 7000, raw: 11700 });
+  expect('an hour of normal tennis from stage127 fills a 10,000 day', null, A_MOVE.moveCreditOf([{ kind: 'tennis', mins: 60, effort: 'normal' }], 10000, '2026-11-24'), { steps: 10000, raw: 11700 });
   // The third copy is the headless stub's get_five_weeks / log_activity (scripts/headless/stub.js). It answered without `acts` and with
   // three court kinds for a day after stage122 changed the server, so every Steps-credit check tested a server that no longer existed
   // (found 2026-11-23 over Tara's tennis). The court kinds and the first day of `acts` are held equal to the app's and the server's.
@@ -1276,19 +1282,21 @@ run('the Steps credit of an activity (MOVE_MET, moveCreditOf / activity_met(), m
 /* ── The coach's habit grid copies two things from the athlete app (2026-11-23) ───────────────────────────────── */
 // 1. The Steps credit: coach.html MOVE_MET_C / moveCreditOfC() is held to program.html's MOVE_MET / moveCreditOf() (and so, through the block
 //    below, to the server's activity_met() / move_steps_credit()). activity_log rows say `minutes`, the phone's copy `mins`: the vectors are mapped.
-const D_MOVE = sandbox(null, [constSrc(D_SRC, 'MOVE_MET_C', 'coach.html'), lineSrc(D_SRC, 'const MOVE_FROM_C', 'coach.html')]
-  .concat(fromD('moveMetC', 'moveCreditOfC')), ['MOVE_MET_C', 'MOVE_FROM_C', 'MOVE_CAP_C', 'moveCreditOfC']);
+const D_MOVE = sandbox(null, [constSrc(D_SRC, 'MOVE_MET_C', 'coach.html'), lineSrc(D_SRC, 'const MOVE_FROM_C', 'coach.html'),
+  lineSrc(D_SRC, 'const MOVE_FULL_FROM_C', 'coach.html')]
+  .concat(fromD('moveMetC', 'moveCapOnC', 'moveCreditOfC')), ['MOVE_MET_C', 'MOVE_FROM_C', 'MOVE_CAP_C', 'MOVE_FULL_FROM_C', 'moveCreditOfC']);
 run('the Steps credit, coach.html copy (MOVE_MET_C, MOVE_FROM_C, MOVE_CAP_C, moveCreditOfC / program.html moveCreditOf)', () => {
   same('the MET table', null, A_MOVE.MOVE_MET, D_MOVE.MOVE_MET_C);
   same('the first day', null, A_MOVE.MOVE_FROM, D_MOVE.MOVE_FROM_C);
   same('the cap', null, A_MOVE.MOVE_CAP, D_MOVE.MOVE_CAP_C);
+  same('the day the cap becomes the whole target (stage127)', null, A_MOVE.MOVE_FULL_FROM, D_MOVE.MOVE_FULL_FROM_C);
   const kinds = Object.keys(A_MOVE.MOVE_MET).concat(['nothing_known']);
   const efforts = ['easy', 'normal', 'hard', 'brutal'];
   const vecs = [[]];
   kinds.forEach(k => efforts.forEach(e => [0, 5, 20, 45, 60, 90, 150].forEach(m => vecs.push([{ kind: k, mins: m, effort: e }]))));
   vecs.push([{ kind: 'tennis', mins: 60, effort: 'hard' }, { kind: 'gym', mins: 20, effort: 'easy' }, { kind: 'run', mins: 30, effort: 'normal' }], [{ kind: 'padel', effort: 'easy' }]);
-  vecs.forEach(acts => [10000, 8000, 7500, 0, undefined].forEach(t =>
-    same('moveCreditOf vs moveCreditOfC', [acts, t], A_MOVE.moveCreditOf(acts, t), D_MOVE.moveCreditOfC(acts.map(a => ({ kind: a.kind, minutes: a.mins, effort: a.effort })), t))));
+  vecs.forEach(acts => [10000, 8000, 7500, 0, undefined].forEach(t => ['2026-11-23', '2026-11-24', undefined].forEach(day =>
+    same('moveCreditOf vs moveCreditOfC', [acts, t, day], A_MOVE.moveCreditOf(acts, t, day), D_MOVE.moveCreditOfC(acts.map(a => ({ kind: a.kind, minutes: a.mins, effort: a.effort })), t, day)))));
 });
 // 2. The habit config the engine is handed: program.html habLoad() merges the saved config over defaultCfg() with `on` per key; coach.html habCfgOfC()
 //    must do exactly that. habLoad() is run as it stands (localStorage stubbed) beside habCfgOfC(), both on the real engine (assets/js/habits-core.js).
@@ -1324,18 +1332,18 @@ run('the habit config merge (program.html habLoad / coach.html habCfgOfC)', () =
 /* ── Your Number: Steps scored against the athlete's own target (stage125, 2026-11-23) ─────────────────────── */
 // program.html stepsScored() (HAB_VIEW) and the server's hab_log_credited() must score a day the same way: the credit capped at 70% of
 // that day's target, then (typed + credit) x global target / the day's target, rounded; unchanged when there is no credit and no target.
-const A_NUM = sandbox('var MOVE_CAP = 0.7;', fromA('stepsScored'), ['stepsScored']);
+const A_NUM = sandbox('var MOVE_CAP = 0.7;', [lineSrc(A_SRC, 'const MOVE_FULL_FROM', 'program.html')].concat(fromA('moveCapOn', 'stepsScored')), ['stepsScored']);
 run('a day\'s Steps against the athlete\'s own target (stepsScored / hab_log_credited() since stage125)', () => {
   const snap = read('supabase/schema_snapshot.sql');
   const i = snap.indexOf('FUNCTION public.hab_log_credited(p_athlete text, p_log jsonb)');
   const fn = i < 0 ? '' : snap.slice(i, snap.indexOf('$function$;', i));
-  expect('the server caps the credit at 70% of the day\'s own target', null, fn.includes('least(coalesce(r.raw, 0), round(v_t * 0.7))'), true);
+  expect('the server caps the credit at move_cap_on(day) of the day\'s own target', null, fn.includes('least(coalesce(r.raw, 0), round(v_t * public.move_cap_on(r.day)))'), true);
   expect('the server scales (typed + credit) to the global target', null, fn.includes('round((v_typed + v_cr) * v_g / v_t)'), true);
   expect('the server leaves a day with no credit and the global target as it was', null, fn.includes('if v_cr = 0 and v_t = v_g then continue; end if;'), true);
-  const sql = (typed, raw, t, g) => { const cr = Math.min(raw, Math.round(t * 0.7)); if (cr === 0 && t === g) return null; return Math.round((typed + cr) * g / t); };
+  const sql = (typed, raw, t, g, day) => { const cr = Math.min(raw, Math.round(t * (day >= '2026-11-24' ? 1.0 : 0.7))); if (cr === 0 && t === g) return null; return Math.round((typed + cr) * g / t); };
   [[5000, 3000, 7000, 10000], [8500, 0, 8500, 10000], [2000, 11700, 10000, 10000], [0, 0, 10000, 10000], [6000, 0, 6000, 10000], [3000, 9000, 6500, 10000], [12000, 0, 12000, 10000]]
-    .forEach(v => same('stepsScored vs hab_log_credited()', v, A_NUM.stepsScored(...v), sql(...v)));
-  expect('8,500 of an 8,500 target scores as a full 10,000', null, A_NUM.stepsScored(8500, 0, 8500, 10000), 10000);
+    .forEach(v => ['2026-11-23', '2026-11-24'].forEach(day => same('stepsScored vs hab_log_credited()', v.concat(day), A_NUM.stepsScored(...v, day), sql(...v, day))));
+  expect('8,500 of an 8,500 target scores as a full 10,000', null, A_NUM.stepsScored(8500, 0, 8500, 10000, '2026-11-24'), 10000);
 });
 
 /* ── report ───────────────────────────────────────────────────────────────── */

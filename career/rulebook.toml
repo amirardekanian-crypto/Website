@@ -16,8 +16,8 @@
 # a tier or what earns an achievement raises `version` and sets `starts_on = "YYYY-MM-DD"`, the day it is seeded: facts before that day
 # keep their prices, awards keep the XP they were minted with. The seed refuses a change to [habits], [level], [season], [week], [share] or
 # to how a fact is worked out (career/README.md; PROCEDURES.md → Stage 76).
-version = 12
-starts_on = "2026-10-26"   # Version 12 (2026-10-26, seeded live that day, brought to the repo 2026-11-03): the spare, a plan day done twice in a training week pays twice (limit 2 on session_finished and session_finished_early); its server half is supabase/stage106_spare_session.sql. On a new version, set it to the day the seed runs, and every new `paid_from` in achievements.toml with it (D21). Version 11 (2026-10-25), the Emblem Cabinet: 33 achievements that pay only for wins from that day on. Version 10 (2026-10-20): AA Proof's habit ladders, as achievements: 20 of them, and the ten of version 9 renamed into their families (version 10). Version 9, the same day: ten plain habit achievements. Version 8, the same day: the day pays: a day that counts 40, a perfect day 60 in all (version 7, the same day, had 50 and 150) (Amir: "50 for a day that counts, 100 more for a perfect day"). Version 6 (the same day) gave the seven achievements that paid nothing their XP; version 5 (2026-10-19) the new achievements, stage79; version 4 (2026-10-19) the cut, stage78. D20: forward only, every time.
+version = 13
+starts_on = "2026-11-24"   # Version 13 (2026-11-24, stage127; Amir on round 13 The Whole Week: "movement should give people xp, because those who walk get more xp compared to those who play tennis"): a full moving week, [fact.move_week], 300 Move minutes in a plan week pays 150 once a week; a week that started before this day pays nothing. Version 12 (2026-10-26, seeded live that day, brought to the repo 2026-11-03): the spare, a plan day done twice in a training week pays twice (limit 2 on session_finished and session_finished_early); its server half is supabase/stage106_spare_session.sql. On a new version, set it to the day the seed runs, and every new `paid_from` in achievements.toml with it (D21). Version 11 (2026-10-25), the Emblem Cabinet: 33 achievements that pay only for wins from that day on. Version 10 (2026-10-20): AA Proof's habit ladders, as achievements: 20 of them, and the ten of version 9 renamed into their families (version 10). Version 9, the same day: ten plain habit achievements. Version 8, the same day: the day pays: a day that counts 40, a perfect day 60 in all (version 7, the same day, had 50 and 150) (Amir: "50 for a day that counts, 100 more for a perfect day"). Version 6 (the same day) gave the seven achievements that paid nothing their XP; version 5 (2026-10-19) the new achievements, stage79; version 4 (2026-10-19) the cut, stage78. D20: forward only, every time.
 meanings = ["consistency", "commitment", "progress", "resilience"]
 
 [switch]
@@ -177,6 +177,24 @@ cap = "Two a week. It never counts toward a held week."
 limit = 2                 # paid Library sessions per week (Monday to Sunday)
 limit_per = "week"
 
+
+[fact.move_week]
+meaning = "commitment"
+xp = 150
+source = "server"
+pays_for = "act"
+when = "A plan week (the weeks on Your weeks) reaches the line in Move minutes: every minute at met_floor MET or more, minutes x MET / per, from plan sessions (the Gym row by session RPE), Library sessions (their shelf), Court Log (the steps credit's table) and walking (typed steps over walk_floor, minus 100 a minute of any run, at walk_steps_per_min, at most walk_cap a day, at walk_met). Dated the week's first day (supabase/stage127_whole_week.sql)."
+cap = "One per week."
+limit = 1
+limit_per = "week"
+line = 300                # Move minutes for the week to pay (the WHO upper line, 300 moderate minutes)
+mark = 150                # drawn on the line, never paid (the WHO minimum)
+per = 4                   # Move minutes = minutes x MET / per: an easy minute about 1, a hard one about 2
+met_floor = 3             # minutes under this MET count nothing (mobility, recovery, breathing)
+walk_floor = 5000         # typed steps under this are the day's ordinary moving
+walk_steps_per_min = 100  # brisk walking
+walk_cap = 60             # walking minutes a day at most (bounds a watch that counted court steps)
+walk_met = 4              # brisk walking, about 100 steps a minute
 
 # ── Facts from AA Proof ───────────────────────────────────────────────────────────────────────────────────────────
 

@@ -2,6 +2,30 @@
   "_about": "What's new in the app, shown in every athlete's Inbox for 14 days (program.html, newsRows/openNews). Newest first. Each entry: id (unique), at (ISO time), en and fa: { title, items: [one short line each], sign }. Written in Amir's voice (COM-3) in both languages (COM-1). THE RULE (docs/rules/working-with-amir.md): a change to program.html that an athlete would notice ships with its entry here in the same commit; .githooks/commit-msg blocks a program.html commit without this file unless the message says [no news].",
   "items": [
     {
+      "id": "2026-11-24-whole-week",
+      "at": "2026-11-24T18:00:00Z",
+      "en": {
+        "title": "Everything you do now counts",
+        "items": [
+          "An hour of tennis or padel can now fill your whole Steps day, the same as 10,000 steps walked.",
+          "Your weeks on Progress has a new line, Move this week. Your plan, the Library, your sport and your walking, in one number.",
+          "Reach 300 in a week and you get 150 XP. It starts with your next new week.",
+          "Your steps number now sets itself every Monday, from what you usually walk. I can still change it for you."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "حالا همهٔ فعالیت‌هاتون حساب می‌شه",
+        "items": [
+          "یه ساعت تنیس یا پدل حالا می‌تونه کل قدم‌های روزتون رو پر کنه، درست مثل ۱۰٬۰۰۰ قدم پیاده‌روی.",
+          "«هفته‌هاتون» در صفحهٔ پیشرفت یه خط جدید داره: تحرک این هفته. برنامه، کتابخانه، ورزشتون و پیاده‌روی، همه در یک عدد.",
+          "اگه توی یه هفته به ۳۰۰ برسید، ۱۵۰ امتیاز می‌گیرید. از هفتهٔ جدید بعدی‌تون شروع می‌شه.",
+          "عدد قدم‌تون حالا هر دوشنبه خودش تنظیم می‌شه، از روی چیزی که معمولاً راه می‌رید. من هم هنوز می‌تونم براتون عوضش کنم."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-23-your-number",
       "at": "2026-11-23T22:45:00Z",
       "en": {

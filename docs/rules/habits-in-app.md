@@ -74,7 +74,9 @@ reference is [`../../HABITS.md`](../../HABITS.md). These are the rules for the h
 
 - **Court Log counts toward Steps** (stage121, 2026-11-22, Amir: *"lets do option 1"*). Each logged activity is worth
   `round(minutes × MET ÷ 3.5) × 100` steps, a day's credit is capped at 70% of the target, and Steps for the day is the typed
-  number plus the credit. ⚠️ **The typed number is never changed**: the server adds the credit as it reads the log
+  number plus the credit. **From 2026-11-24 the cap is 100% of the day's target** (stage127, #136, Amir: *"movement should give
+  people xp, because those who walk get more xp compared to those who play tennis"*): `move_cap_on(day)`, so days before keep 70%
+  (D20), in both copies (`move_steps_credit()` / `hab_log_credited()` and `moveCreditOf()` / `stepsScored()`, check_twins). ⚠️ **The typed number is never changed**: the server adds the credit as it reads the log
   (`hab_log_credited()`, inside `career_observe_proof()`), and the phone reads the log through `HAB_VIEW`, never saving it; the −,
   + and typing box edit the typed number. ⚠️ **The number on the row is the number that counts** (2026-11-23, Amir picked
   *"A Total first"* after Tara read her typed 2,000 while 9,000 was scored): the big number is the total and the line under it
@@ -100,10 +102,23 @@ reference is [`../../HABITS.md`](../../HABITS.md). These are the rules for the h
 - **Each athlete can have their own Steps number, and Amir sets it** (#130, 2026-11-23, Amir: *"App suggests, you approve"*, *"Full
   XP at their number"*). coach.html → an athlete → the Proof tab → **Steps target**: their 14-day usual and a suggestion (+10%, to
   the nearest 500, 6,000 to 12,000); `coach_set_steps_target()` (stage125) writes a row from today. ⚠️ **Scoring is one formula in two
-  copies**: Steps = (typed + credit capped at 70% of the day's target) x global / the day's target, in `hab_log_credited()` and the
+  copies**: Steps = (typed + credit capped at 70% of the day's target, 100% from 2026-11-24) x global / the day's target, in `hab_log_credited()` and the
   phone's `stepsScored()` (HAB_VIEW), held equal by `scripts/check_twins.js`. Hitting their own number is a full Steps day for the ring,
   the day gate and the XP. Forward only (D20): a number starts the day it is set. ⚠️ Step totals (the 250,000 / 1,000,000 achievements,
   the crew's million-steps mission) count a met day at the scaled value, so a lower number counts a little more toward them.
+- **Your Number sets itself; Amir's number is an override** (stage127, #137, 2026-11-24, Amir: *"do i need to pick? can the app
+  choose automatically?"*, then *"Yes, build it"*). `steps_targets.source` is `'coach'` or `'auto'`. Once a week (the first save from
+  Monday on), for an athlete with a programme whose latest number is not Amir's, `steps_auto()` sets it from that day: the first number
+  is their usual (the median typed steps of the last 14 days, 7 days or more needed) +10% to the nearest 500, 6,000 to 12,000 (the
+  coach.html suggestion's rule); after that it goes up by at least 500 when it was met on 5 of the last 7 days, and **never goes down
+  by itself**. A number Amir sets is left alone until he hands it back: `coach_set_steps_target(id, null)`. Forward only, like every number.
+- **Move minutes are worked out once, on the server, and the phone never copies the arithmetic** (stage127, #134 and #135,
+  2026-11-24, Amir: *"go with your picks but movement should give people xp"*). One weekly number from plan sessions, Library,
+  Court Log and walking (minutes × MET ÷ 4, minutes at 3 MET or more; the numbers are `career/rulebook.toml` → `[fact.move_week]`),
+  by `move_parts()` / `move_week()`, returned per week by `get_five_weeks()` (`weeks[].move`, and `move` for the line and the number).
+  program.html's Your weeks draws it as **The Week Line**; coach.html's Five weeks adds **The Mix** (plan against life). ⚠️ It is
+  information, plus one price: 300 in a plan week pays 150 XP once a week (rulebook version 13, `move_week`, dated the week's first day, D20; [`../ref/career-procedures/40-stage-127-the-whole-week.md`](../ref/career-procedures/40-stage-127-the-whole-week.md)). It never
+  moves load, days or `readinessPlan()` (REC-7). The table and its sources: [`../ref/move-credit.md`](../ref/move-credit.md).
 
 ---
 

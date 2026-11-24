@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=33"></script>
+<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=34"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -5113,6 +5113,28 @@
   .cr-actcard span span { font: 500 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
   .fw-usual { display: grid; gap: 2px; margin: 8px 0 0; font: 400 var(--fs-small)/1.4 'Barlow', sans-serif; color: var(--grey); }
   .fw-usual b { color: var(--ink); font-weight: 600; }
+  /* #134 The Week Line (stage127): the week's Move minutes in the grid's colours, walking in a quiet grey; the two marks are hairlines in ink */
+  .fw-mv { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--hair); }
+  .fw-mv-h { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  .fw-mv-t { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
+  .fw-mv-n { margin-left: auto; }
+  .fw-mv-n b, .fw-mv-wk b { font: 700 var(--fs-field)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .fw-mv-xp { font: 600 var(--fs-small)/1 'Barlow', sans-serif; color: var(--green-ink); }
+  .fw-mv-ok { color: var(--green-ink); font-weight: 700; }
+  .fw-mv-bar { position: relative; display: flex; width: 100%; height: 12px; margin: 8px 0 0; padding: 0; border: 0; border-radius: 6px; background: var(--tint); overflow: visible; cursor: pointer; }
+  .fw-mv-bar:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 3px; }
+  .fw-ms { display: block; height: 100%; }
+  .fw-ms:first-child { border-radius: 6px 0 0 6px; }
+  .fw-ms.is-p { background: var(--fill); } .fw-ms.is-l { background: var(--mint); } .fw-ms.is-c { background: var(--ink); } .fw-ms.is-o { background: var(--ring); }
+  .fw-ms.is-w, #screen-plan .fw-k.is-w { background: var(--grey); opacity: .45; }
+  .fw-mm { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--ink); opacity: .35; }
+  .fw-mm.is-line { opacity: .8; }
+  .fw-mv-k { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  .fw-mv-k b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .fw-mv-s { margin: 6px 0 0; font: 400 var(--fs-small)/1.4 'Barlow', sans-serif; color: var(--grey); }
+  .fw-mv-s b { color: var(--ink); font-weight: 600; }
+  .fw-mv-help p { margin: 0 0 8px; font: 400 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); }
+  .fw-mv-wk { flex: none; display: flex; align-items: baseline; gap: 6px; }
   .readiness-yday { margin: -4px 0 14px; padding: 8px 12px; border-radius: 10px; background: var(--tint); font: 500 var(--fs-small)/1.45 'Barlow', sans-serif; color: var(--ink); }   /* #127 */
   .act-from { margin: 6px 0 0; font: 400 var(--fs-small)/1.35 'Barlow', sans-serif; color: var(--grey); }   /* #126 */
   .act-sec { margin: 14px 0 6px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
@@ -12820,7 +12842,7 @@ function habViewOf(log) {
     const c = moveCreditOn(k), tg = stepsTargetOn(k), g = stepsGlobal();
     const d = (v && typeof v === 'object') ? v : {};
     if (!c && (tg === g || typeof d.steps !== 'number')) return v;   // nothing to add and nothing to scale
-    const sc = stepsScored(typeof d.steps === 'number' ? d.steps : 0, c ? c.raw : 0, tg, g);
+    const sc = stepsScored(typeof d.steps === 'number' ? d.steps : 0, c ? c.raw : 0, tg, g, k);
     return sc == null ? v : Object.assign({}, d, { steps: sc });
   };
   return new Proxy(log, {
@@ -13452,9 +13474,11 @@ function renderSystemGuide() {
     sysPrices([['A session finished', pr.session_finished], ['A session finished early', pr.session_finished_early],
                ['Every set logged, on top', pr.full_log], ['The readiness check, on top', pr.checkin_done],
                ['A retest', pr.retest_done], ['A session from the Library', pr.library_session],
-               ['A week held', pr.week_held], ['Holding a week after a broken one', pr.bounce_back]])
+               ['A week held', pr.week_held], ['Holding a week after a broken one', pr.bounce_back],
+               ['A full moving week (300 Move minutes)', pr.move_week]])
     + `<p>A week is <strong>held</strong> when you finish every session in it. Stopping a session early still counts. Library sessions do not.</p>`
-    + `<p>The weeks between cycles never count against you.</p>`);
+    + `<p>The weeks between cycles never count against you.</p>`
+    + (pr.move_week ? `<p>A full moving week is 300 Move minutes from everything you do: your plan, the Library, your sport and your walking. It is on Your weeks, on Progress.</p>` : ''));
 
   // 5. the level
   h += sysCard('Your level', 'progress',
@@ -19198,8 +19222,8 @@ function stepsTargetOn(day) {
   return t || stepsGlobal();
 }
 // The day's Steps as every scorer reads it, or null when it is the typed number unchanged (no credit, everyone's target).
-function stepsScored(typed, raw, t, g) {
-  const cr = Math.min(Math.max(0, Number(raw) || 0), Math.round(t * MOVE_CAP));
+function stepsScored(typed, raw, t, g, day) {
+  const cr = Math.min(Math.max(0, Number(raw) || 0), Math.round(t * moveCapOn(day)));
   if (cr === 0 && t === g) return null;
   return Math.round(((Number(typed) || 0) + cr) * g / t);
 }
@@ -19244,11 +19268,16 @@ const MOVE_MET = {
   football: [5.0, 7.0, 9.5], gym: [3.5, 5.0, 6.0], other: [3.5, 5.0, 7.5]
 };
 const MOVE_FROM = '2026-11-22', MOVE_CAP = 0.7;
+// stage127 (2026-11-24; Amir: "those who walk get more xp compared to those who play tennis"): from MOVE_FULL_FROM the credit may fill the
+// whole day's target (an hour of normal tennis is a full Steps day, like 10,000 walked). Days before keep MOVE_CAP (D20). The server's
+// copy is public.move_cap_on() / move_full_from(); scripts/check_twins.js holds them equal.
+const MOVE_FULL_FROM = '2026-11-24';
+function moveCapOn(day) { return String(day || '') >= MOVE_FULL_FROM ? 1 : MOVE_CAP; }
 function moveMet(kind, effort) { const r = MOVE_MET[kind], i = ['easy', 'normal', 'hard'].indexOf(effort); return r && i >= 0 ? r[i] : 0; }
-// A day's activities ({ kind, mins, effort }) and the Steps target → { steps (capped), raw }.
-function moveCreditOf(acts, target) {
+// A day's activities ({ kind, mins, effort }), the Steps target and the day → { steps (capped), raw }.
+function moveCreditOf(acts, target, day) {
   const raw = (acts || []).reduce((n, a) => n + Math.round((Number(a.mins) || 0) * moveMet(a.kind, a.effort) / 3.5) * 100, 0);
-  return { steps: Math.min(raw, Math.round((Number(target) || 10000) * MOVE_CAP)), raw: raw };
+  return { steps: Math.min(raw, Math.round((Number(target) || 10000) * moveCapOn(day))), raw: raw };
 }
 // Day → { steps, kinds } from Your weeks' copy (FW, which the phone keeps offline). Worked out again only when FW changes.
 // stage122 (2026-11-22; Amir: "yes and even after / because people may not renew program, but want to use the tracker"): from
@@ -19272,7 +19301,7 @@ function moveCreditMap() {
     if (d && d.day && String(d.day) >= MOVE_FROM) (by[d.day] = by[d.day] || []).push(d);
   });
   Object.keys(by).forEach(day => {
-    const c = moveCreditOf(by[day], stepsTargetOn(day) || target);   // #130: capped at 70% of that day's own target
+    const c = moveCreditOf(by[day], stepsTargetOn(day) || target, day);   // #130: capped at that day's own target (70% before stage127)
     if (c.steps > 0) _mvMap[day] = { steps: c.steps, raw: c.raw, kinds: [...new Set(by[day].map(a => a.kind))] };
   });
   return _mvMap;
@@ -19457,11 +19486,66 @@ function fiveWeeksHTML() {
     <div class="fw-h"><span>${c.n ? 'Cycle ' + esc(String(c.n)) : ''}</span><span>${weeks.length} ${weeks.length === 1 ? 'week' : 'weeks'}</span></div>
     <div class="fw-g">${head}${rows}</div>
     ${foot ? `<div class="fw-f">${foot}</div>` : ''}
+    ${fwMoveHtml(weeks, c.move)}
     ${fwUsualHtml(weeks)}
     <p class="fw-tip">${any ? 'Tap a day to see what you did.' : 'Your sessions show here as you train. Add your tennis, padel or anything else you do.'}</p>
     <button type="button" class="fw-add" onclick="openActivitySheet()">+ Add activity</button>
   </div>`;
 }
+// ── THE WEEK LINE — #134 + #135 (round 13 'The Whole Week', 2026-11-24; Amir: "go with your picks but movement should give people xp") ──
+// This week's Move minutes from everything the athlete did, against the line (300) with the health minimum (150) marked: plan sessions,
+// Library, court, other and walking, in the grid's own colours. A week at the line pays 150 XP (rulebook version 13, move_week), from
+// the first week that starts on or after 24 November. ⚠️ THE SERVER WORKS IT OUT (move_week() in supabase/stage127_whole_week.sql) and
+// get_five_weeks() hands it over per week as `move`; the phone only draws it. There is no phone copy of the arithmetic. A server
+// without stage127 sends no `move`: nothing is drawn.
+const MV_PARTS = [['plan', 'p', 'Plan'], ['lib', 'l', 'Library'], ['court', 'c', 'Court'], ['other', 'o', 'Other'], ['walk', 'w', 'Walking']];
+function fwNum(n) { return Math.round(Number(n) || 0).toLocaleString('en-US'); }
+function fwMoveHtml(weeks, meta) {
+  try {
+    const cur = (weeks || []).find(w => w && w.now);
+    const mv = cur && cur.move;
+    if (!mv || !meta || typeof mv.total !== 'number') return '';
+    const line = Number(meta.line) || 300, mark = Number(meta.mark) || 150, total = Math.round(mv.total);
+    const top = Math.max(line * 1.15, total);
+    const segs = MV_PARTS.filter(([k]) => Number(mv[k]) > 0)
+      .map(([k, c]) => `<i class="fw-ms is-${c}" style="width:${(Number(mv[k]) / top * 100).toFixed(2)}%"></i>`).join('');
+    const keys = MV_PARTS.filter(([k]) => Number(mv[k]) > 0)
+      .map(([k, c, label]) => `<span><i class="fw-k is-${c}"></i><span>${label}</span> <b>${fwNum(mv[k])}</b></span>`).join('');
+    const xp = Number(mv.xp) > 0 ? `<span class="fw-mv-xp">+${fwNum(mv.xp)} XP</span>` : total >= line ? '<span class="fw-mv-ok" role="img" aria-label="At the line">✓</span>' : '';
+    const num = Number(meta.number) || 0;
+    const steps = Number(mv.steps) > 0
+      ? `<p class="fw-mv-s"><span>Steps a day:</span> <b>${fwNum(mv.steps)}</b>${num ? ` · <span>your number</span> <b>${fwNum(num)}</b>` : ''}</p>` : '';
+    return `<div class="fw-mv">
+      <div class="fw-mv-h"><span class="fw-mv-t">Move this week</span><span class="fw-mv-n"><b>${fwNum(total)}</b> <span>of ${fwNum(line)}</span></span>${xp}</div>
+      <button type="button" class="fw-mv-bar" onclick="openMoveSheet()" aria-label="How your Move minutes are counted">${segs}<span class="fw-mm" style="left:${(mark / top * 100).toFixed(2)}%"></span><span class="fw-mm is-line" style="left:${(line / top * 100).toFixed(2)}%"></span></button>
+      ${keys ? `<div class="fw-mv-k">${keys}</div>` : ''}
+      ${steps}
+    </div>`;
+  } catch (e) { return ''; }
+}
+// The counting sheet: what counts and how, and every week on the card with its number.
+function openMoveSheet() {
+  const ov = document.getElementById('hist-overlay');
+  if (!ov || !fwOk(FW)) return;
+  const meta = FW.move || {}, line = Number(meta.line) || 300, mark = Number(meta.mark) || 150, xp = Number(meta.xp) || 0;
+  const weeks = FW.weeks.filter(w => w && w.move && typeof w.move.total === 'number');
+  const rows = weeks.map((w, i) => `<div class="pl-row"><div><span class="t">Week ${Number(w.w) || i + 1}</span><span class="q">${esc(plDay(w.from))}</span></div><span class="fw-mv-wk"><b>${fwNum(w.move.total)}</b>${Number(w.move.xp) > 0 ? ` <span class="fw-mv-xp">+${fwNum(w.move.xp)} XP</span>` : ''}</span></div>`).join('');
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">Your weeks</div>
+    <h2 class="readiness-title">Move minutes</h2>
+    <div class="fw-mv-help">
+      <p>Everything you do in a week, in one number. An easy minute counts about 1. A hard minute counts about 2.</p>
+      <p><b>Your plan</b> counts its minutes, by how hard the session felt.</p>
+      <p><b>Library</b> sessions count by their shelf. Mobility, recovery and breathing count 0 here, but they still show on your weeks.</p>
+      <p><b>Court and other</b> count what you add with + Add activity.</p>
+      <p><b>Walking</b> counts the steps you type over 5,000. 100 steps is a minute, up to 60 a day.</p>
+      <p>${fwNum(mark)} is the health minimum. ${fwNum(line)} is your line.</p>
+      ${xp ? `<p>A week at your line pays ${fwNum(xp)} XP, once a week. It starts with your first week that begins on or after 24 November.</p>` : ''}
+    </div>
+    ${rows ? `<div class="pl-list">${rows}</div>` : ''}`;
+  ov.classList.add('visible');
+}
+window.openMoveSheet = openMoveSheet;
 // ── YOUR USUAL — #133 (round 12, 2026-11-22; Amir: "build 133") ──────────────────────────────────────────────────────────────────
 // This week's court and other minutes against the athlete's own usual: the average of the four 7-day blocks before this week, from
 // every Court Log row the phone has (moveActs(), 70 days). Silent until there are three weeks of logs before this week, and for a group

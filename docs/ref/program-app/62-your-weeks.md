@@ -120,3 +120,23 @@ name of the Cycles should be only in english like exercise names"*) `fwTitle()` 
 - **No XP.** The card shows what was done; it pays nothing. Court Log (#123) will not pay either at first (Amir's pick).
 - **Tests**: `scripts/headless/five-weeks.js` (38 checks; Court Log's sheet, save, split squares, the two refusals and Delete among them; the squares, the foot, the sheet, Extra, the copy, never synced, no card with nothing
   done, without stage115, the demo, 320 px in dark mode). The stub answers `get_five_weeks` from `fiveWeeks`.
+
+### The Week Line (#134 + #135, round 13 'The Whole Week', stage127, 2026-11-24)
+
+Amir: *"go with your picks but movement should give people xp, because those who walk get more xp compared to those who play tennis"*,
+then *"Yes, build it"*. Under the grid's foot, **Move this week**: the week's Move minutes (`fwMoveHtml()`) against the line (300), with
+the health minimum (150) marked, one bar segment per source in the grid's colours (plan, Library, court, other; walking in a quiet
+grey), a legend with each source's minutes, *+150 XP* once the week has paid (a ✓ at the line before that), and *Steps a day* against
+*your number*. The bar opens **Move minutes** (`openMoveSheet()`, `#hist-overlay`): how each source counts, the 150 and 300, the XP and
+when it starts, and every week on the card with its number.
+
+- **The server works it out, once.** `move_week()` (stage127) answers per week as `weeks[].move` `{plan, lib, court, other, walk, total,
+  steps, xp}` and the top-level `move` `{line, mark, xp, from, number, global}`. The phone has no copy of the arithmetic, so nothing for
+  check_twins to hold. A server without stage127 sends no `move`, and the line is not drawn.
+- **It pays through Career Mode, not here.** A week at the line is a `move_week` fact (rulebook version 13, 150 XP, one a week, dated the
+  week's first day, so a week that began before 2026-11-24 pays nothing; `docs/ref/career-procedures/40-stage-127-the-whole-week.md`).
+  How the XP works lists the price (`pr.move_week`, from `get_profile()`'s price list).
+- **The traps above stand** for the grid (the weeks are the server's, Library titles stay private). The rule that the card pays nothing
+  is superseded for the Week Line only.
+- **Tests**: `scripts/headless/week-line.js` (15 checks: the line, the segments, the marks, the legend, the XP, the steps line, the
+  sheet, no line without stage127, 320 px in dark mode).

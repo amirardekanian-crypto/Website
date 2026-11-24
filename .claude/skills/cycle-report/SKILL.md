@@ -100,6 +100,9 @@ because athletes often start a day or two before the date) and run them:
   not "no tennis": athletes log some sessions, not all, and the log only exists since 2026-11-21.
 - **Q6** the monthly goal (`career_goals`): one row per calendar month from the cycle's start to next month, with the line,
   the day it was ticked, and `can_write` (the server takes a write or a tick only for last, this or next month).
+- **Q7** Move minutes (stage127, from 2026-11-24): `select public.get_five_weeks('<id>')` → `weeks[].move` (`plan`, `lib`, `court`,
+  `other`, `walk`, `total`, `steps` a day) and the top-level `move.number` (their Steps number today). Run it in the closing week:
+  the five weeks are the ones Your weeks shows today. **Information only (REC-7)**, and the walking part is only as good as the typed steps.
 
 ## Step 2 · The read (for Amir first, then the athlete)
 
@@ -128,6 +131,7 @@ Work through this list. Each line is a finding only if the data says so.
 | **Words** | day notes, messages, calls | What the athlete said goes in "what you told me" |
 | **Monthly goal** | Q6: each goal the cycle touched, ticked or not, against the evidence (a "3 sessions every week" goal is checked against Q2) | Met and not ticked: Amir ticks it at Step 3. It feeds the next goal (Step 3) |
 | **Court time** | Q5: court hours per week, the hard ones, and any that fell the day before a session (match it with Q2's dates) | Recovery and the training days: it explains a low readiness or a flat week. Never a load change by itself (REC-7): what it suggests goes to Amir at Step 3 |
+| **Move minutes** | Q7: the five weeks' total and a week's average; plan (`plan` + `lib`) against life (`court` + `other` + `walk`); steps a day against `move.number` | One line for the athlete, the split for the Debrief. Never a load or a day change (REC-7) |
 
 Then look forward: `next_cycle.focuses` and `teaser` (the locked roadmap), the ledger's deferred
 exercises ("enters C2"), and anything Amir already promised the athlete.
@@ -195,6 +199,8 @@ what's next, and what I need from you.>
 • *<fact with number>.* <why it matters, one line>      ← 3 to 5 bullets, strongest first:
                                                           adherence · load trend · technique cleared ·
                                                           tolerance · anything he logged well
+                                                          ← when Q7 has weeks: one line, e.g. "*1,420 Move minutes in
+                                                            five weeks, 284 a week.* Steps 6,200 a day against your 7,500."
 
 *<What you told me, and what we do about it>*          ← only if he said something (calls, notes, messages)
 • *<his point, in his words>.* <what we do> <when>
@@ -256,7 +262,8 @@ If not, leave it out.
 · the Ceiling for a flagged lift: e1RM, grade, date (TST-6) · a data fault only as the decision it
 forces ("take no starting load from his RPE", PRG-11; "whole bar or per side unknown") · each
 promise or gate: met / partly / not yet, with its number · court time from Q5, when any was logged: hours a week
-and the hard ones, as a fact (REC-7: information, never a decision) · at most one short quote, only when it
+and the hard ones, as a fact (REC-7: information, never a decision) · Move minutes from Q7: a week's average and
+plan against life ("284 a week, 40% plan / 60% life"), information only (REC-7) · at most one short quote, only when it
 moves the dose.
 
 **Profile changes** — only what changed: an injury new or resolved, kit, gym, schedule, goal, a

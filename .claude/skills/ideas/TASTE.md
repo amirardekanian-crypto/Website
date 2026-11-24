@@ -14,6 +14,14 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
   would rather grow the Library to fit a suggestion than bend the suggestion to the Library, so a missing session is a build, not a reason
   to cut; (4) cheaper agents for the easy work stays a standing ask, and a big build goes to a fresh chat.
 
+- **2026-11-24 · Round 13 'The Whole Week': "go with your picks but movement should give people xp, because those who walk get more
+  xp compared to those who play tennis".** Then: *"i dont know how to pick a number for each client? do i need to pick? can the app
+  choose automatically? can the program writer does that? what does it affect?"*. What it teaches: (1) he checks a reward for fairness
+  between kinds of athlete, and an unequal pay (the 70% cap: an hour of tennis 42 XP, 10,000 steps 72) is a bug to him, not a detail, so
+  show what each kind of athlete earns before pitching "no XP"; (2) "no XP, it is just a read" lost to his aim that moving more is
+  rewarded; (3) a control that needs him per athlete, with no clear way to choose (Your Number, #130), is a cost he did not want: pitch
+  the automatic version first, with his box as an override, and say plainly what the setting changes.
+
 - **2026-11-21 · 118 Pass It On, and a standing rule: athletes are told every change.** *"lets build 118 i like it"*, then *"yes i want it to
   be delivered in their inbox, if we add a function to the app, changed the function of the app. this should be a rule, that after any change
   to program.html people should know what have changed"*, and the same day *"have a read of what have changed in the app in last 3-4 days, send a

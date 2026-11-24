@@ -588,6 +588,31 @@ closed 30 June 2026), an athlete-facing strain or load score (round 5), calories
 badges or tiers for activity (Career Mode cuts), a BE FIT team stake with lifelines (= #61 Doubles, cut; revisit past 20 in the crew), and
 readiness moving the steps target (Oura; against REC-7).
 
+## Round 13 · 2026-11-24 · "The Whole Week" (one model of total activity: plan, Library, Court Log, steps)
+
+Page: https://claude.ai/artifact/U3KBuQcFvqBR4ra7q6ZLKc
+
+Brief: Amir wanted every kind of activity in one picture for two health goals: fewer sedentary hours (steps) and more energy spent.
+Live numbers (28 days): middle typed steps day 3,000 (97 days, 9 athletes; 60 under 5,000, 9 at 10,000); 9 of 22 who trained typed any
+steps; 0 personal Steps numbers set; plan sessions alone give the middle athlete-week 646 MET-min (162 Move minutes), 38 of 68 weeks
+past 600; 0 Library sessions, 4 Court Log rows ever. Model: two numbers from one MET engine (steps daily, Move minutes weekly =
+MET-min ÷ 4 for minutes at 3+ MET; plan by session RPE on the Gym row, Library by shelf, Court Log's table, walking above 5,000 typed
+steps at 100 a minute, max 60 a day; credit never becomes minutes, runs come off typed steps, the plan wins a tie). Amir: "go with
+your picks but movement should give people xp, because those who walk get more xp compared to those who play tennis", and asked
+whether he must pick each Your Number.
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 134 | The Week Line | Move minutes per plan week on Your weeks (grid colours by source, 150 mark, 300 line, a counting sheet), the steps average under it; server `move_week()` in `get_five_weeks()` (one copy, no phone arithmetic), Gym row by RPE and `move_shelf_met()`; same row in coach.html, a line in /cycle-report (direction B of three; supersedes #129's "double at RPE 7+") | 122, 123 | **built** 2026-11-24 (Amir: "Yes, build it"; stage127 + rulebook v13, applied live; cache aap-v295) |
+| 135 | Full Moving Week | 300 Move minutes in a plan week pays 150 XP once a week, all four sources (new rulebook version, D20) | 134 | **built** 2026-11-24 (Amir: "Yes, build it"; stage127 + rulebook v13, applied live; cache aap-v295) |
+| 136 | Sport Fills the Day | The Court Log credit cap 70% → 100% of the athlete's number, so one normal hour of tennis is a full Steps day (72 XP, like 10,000 walked); forward only, two copies (`hab_log_credited()`, `stepsScored()`) | 121 | **built** 2026-11-24 (Amir: "Yes, build it"; stage127 + rulebook v13, applied live; cache aap-v295) |
+| 137 | The Number Sets Itself | Your Number set by the app each Monday (14-day usual +10%, to 500, 6,000-12,000, after 7 typed days; up when met 5 of 7, never down by itself); coach.html's box becomes an override; not /program-design (runs every 5 weeks) | 130 | **built** 2026-11-24 (Amir: "Yes, build it"; stage127 + rulebook v13, applied live; cache aap-v295) |
+| 138 | The Mix | coach.html: each athlete's Move minutes split "from your plan" vs "from their life" over five weeks; /program-design reads it as a question for Amir (REC-7) | 134 | **built** 2026-11-24 (grown out of this round; decision 9) (Amir: "Yes, build it"; stage127 + rulebook v13, applied live; cache aap-v295) |
+
+Cut on the page (so they are not re-pitched): one blended activity score (hides the sitting), calories on any athlete screen (a
+coach-only kcal line stays optional), steps credit for plan or Library sessions, XP per Move minute (pays sessions and walking twice),
+a "save your week" push (= Break Point, cut), a minutes leaderboard.
+
 ## Round 14 · 2026-11-24 · "The Changeover" (recovery suggestions after a session, with an evidence brief)
 
 Page: https://claude.ai/artifact/DR5ZxXpXH1vqr21yAzsnpy

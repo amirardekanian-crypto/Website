@@ -9,6 +9,9 @@ options like beach tennis"*). The rule is in [`docs/rules/habits-in-app.md`](../
   walking is 4.8; level walking at ~5 km/h is ~3.5), so one MET-minute is ~28.6 steps.
 - A day's credit is the sum, capped at 70% of the Steps target (7,000 of 10,000). Steps also count the hours not spent sitting,
   and a watch worn on court has already counted some of those steps.
+- **From 2026-11-24 the cap is 100% of the day's target** (stage127, #136): `move_cap_on(day)` answers 0.7 before
+  `move_full_from()` and 1.0 from it. Under 70%, an hour of tennis paid 42 Steps XP while 10,000 steps walked paid 72 (Amir:
+  *"those who walk get more xp compared to those who play tennis"*). Days before keep 70% (D20).
 - Steps for the day = typed + credit. Paid through the Steps habit only, so it is paid once.
 - Forward only (D20): from 2026-11-22.
 - Bodyweight is not needed: walking and the activity both scale with body mass, so it cancels out of the conversion.
@@ -34,7 +37,30 @@ program.html (what the phone shows). `scripts/check_twins.js` holds them equal.
 | Gym | 3.5 | 5.0 | 6.0 | 02054, 02052, 02050 (C) |
 | Other | 3.5 | 5.0 | 7.5 | circuit training light / moderate / vigorous as a scale (A) |
 
-An hour of normal tennis is 11,700 steps of work, so it reaches the cap.
+An hour of normal tennis is 11,700 steps of work, so it reaches the cap (70% before 2026-11-24, the whole target from then).
+
+## Move minutes: one weekly number (stage127, 2026-11-24)
+
+Ideas #134 and #135 (round 13 'The Whole Week'). The rule is in [`docs/rules/habits-in-app.md`](../rules/habits-in-app.md); the
+XP is [`docs/rules/career.md`](../rules/career.md). **Move minutes = minutes × MET ÷ 4, for every minute at 3 MET or more**, so an easy
+minute is about 1 and a hard one about 2. Worked out once, on the server (`move_parts()` / `move_week()`), and read by both apps
+from `get_five_weeks()`: there is no phone copy of this arithmetic.
+
+| Source | Minutes | MET |
+|---|---|---|
+| Plan session | the finished-session fact's minutes (the athlete's median of the last 120 days if missing, else 60) | the Gym row by session RPE: 1–4 easy 3.5, 5–7 normal 5.0, 8–10 hard 6.0 (no RPE: normal) |
+| Library session | its duration | its shelf, `move_shelf_met()`: conditioning 8.0 (circuit / interval training, A), on-court 6.0 (agility drills, A), strength 5.0 (resistance training, A), care 3.5 (light resistance, A), mobility 2.5 (hatha yoga, A), recovery 2.3 (stretching, A), breath 1.3 (seated breathing, A); any other shelf 3.5 |
+| Court Log | its minutes | the table above (`activity_met()`); a `gym` row on a day with a plan session counts once (the plan's) |
+| Walking | typed steps over 5,000, minus 100 a minute of any run that day (Court Log runs and the two Library runs), at 100 steps a minute, at most 60 a day | 4.0 (brisk walking) |
+
+The Library shelf METs are **by analogy** with the 2024 Adult Compendium, not measured: check them with `/sc-research` before
+anything else leans on them. Mobility, recovery and breath fall under the 3 MET floor, so they count no Move minutes (the session
+still shows on Your weeks). The steps credit is never turned back into minutes, so court time is counted once.
+
+**Where each number lives.** The line (300, the WHO upper line), the mark drawn on it (150, the WHO minimum), `per`, `met_floor`,
+`walk_floor`, `walk_steps_per_min`, `walk_cap`, `walk_met` and the XP: `career/rulebook.toml` → `[fact.move_week]` (read by
+`move_rule()`). The shelf METs: `move_shelf_met()` in `supabase/stage127_whole_week.sql`, between `MOVE_SHELF_BEGIN` and
+`MOVE_SHELF_END`. The Gym row: `activity_met('gym', …)`, the table above.
 
 ## Where the evidence is thin
 

@@ -60,6 +60,7 @@
     --clay-ink: #B04A27; --clay-fill: #B04A27;
     --stick: 54px;   /* what stays on screen at the top: the top bar under 900 px, the one bar from 900 px up (56 px, set below). Everything that offsets itself under it reads this. */
     --track: rgba(26,26,26,0.10);
+    --walk: rgba(26,26,26,0.28);   /* walking on Five weeks' Move bar (#134): a neutral grey, lighter than Other */
     /* The ONE shadow, for layers that float above the page (the Tools panel, the More sheet, the Undo bar, the failure and notice bar, the toast, the sign-in card).
        A panel on the page has none: a 1px --line border is its edge. */
     --float: 0 12px 30px -12px rgba(0,0,0,.35);
@@ -1466,6 +1467,30 @@
   .fwc-sw:first-child { margin-left: 0; }
   .fwc-sw.is-p { background: var(--court); }
   .fwc-sw.is-l { background: var(--mint); }
+  /* Move minutes per week (#134, stage127): one cell at the end of each week's row. A bar against the line (300; the small mark is 150), split by
+     source in the grid's own colours plus walking in a light grey, the minutes, +150 XP when the week paid, and steps a day (green at their number).
+     Below 600 px the cell takes its own line under the week's squares. fiveWeeksPanelC(). */
+  .fwc-g.has-mv { grid-template-columns: 32px repeat(7, minmax(0, 28px)) minmax(0, 1fr); }
+  .fwc-mvh { text-align: left; padding-left: 6px; }
+  .fwc-mv { display: flex; align-items: center; gap: 8px; min-width: 0; padding-left: 6px; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; }
+  .fwc-bar { position: relative; display: flex; flex: 0 1 120px; min-width: 48px; height: 8px; border-radius: 999px; background: var(--track); overflow: hidden; }
+  .fwc-seg { height: 100%; }
+  .fwc-seg.is-p { background: var(--court); } .fwc-seg.is-l { background: var(--mint); } .fwc-seg.is-c { background: var(--ink); }
+  .fwc-seg.is-o { background: var(--muted-soft); } .fwc-seg.is-w { background: var(--walk); }
+  .fwc-mk { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--card); }
+  .fwc-mn { color: var(--ink); font-variant-numeric: tabular-nums; }
+  .fwc-mn.is-met { color: var(--court); font-weight: 600; }
+  .fwc-of { color: var(--muted); font-weight: 400; }
+  .fwc-xp { color: var(--court); font-weight: 600; }
+  .fwc-st { font-variant-numeric: tabular-nums; }
+  .fwc-st.is-met { color: var(--court); font-weight: 600; }
+  .fwc-sw.is-w { background: var(--walk); }
+  .fwc-mix { margin-top: 6px; }
+  @media (max-width: 600px) {
+    .fwc-g.has-mv { grid-template-columns: 32px repeat(7, minmax(0, 28px)); }
+    .fwc-mvh { display: none; }
+    .fwc-mv { grid-column: 2 / -1; padding-left: 0; }
+  }
   /* Habits and court on The work, and Athletes -> Habits (2026-11-23, Amir picked "The Grid"). habGridPanelC(), renderHabitsView(). One engine (assets/js/habits-core.js)
      says what a habit is and when it is met; these classes only draw it. met = green, under = pale green, none = grey, a day the habit did not exist = no box. */
   #habGrid, .hv-box { --hg-mid: rgba(14,74,54,0.28); }
@@ -5119,18 +5144,21 @@ function habCfgOfC(H, raw) {
   return cfg;
 }
 // A COPY of program.html's Steps credit (stage121, "Move credit"): Steps for a day is what the athlete typed PLUS this, so it is the number that counts.
-// One activity = round(minutes x MET / 3.5) x 100 steps, a day's credit capped at 70% of the Steps target, only from MOVE_FROM_C. The server's copy is
-// public.activity_met() / move_steps_credit(); scripts/check_twins.js holds all three equal. (activity_log rows say `minutes`, the phone's copy `mins`.)
+// One activity = round(minutes x MET / 3.5) x 100 steps, a day's credit capped at 70% of the Steps target (all of it from MOVE_FULL_FROM_C, stage127:
+// moveCapOnC(day), days before keep 70%, D20), only from MOVE_FROM_C. The server's copy is
+// public.activity_met() / move_steps_credit() / move_cap_on(); scripts/check_twins.js holds all three equal. (activity_log rows say `minutes`, the phone's copy `mins`.)
 const MOVE_MET_C = {
   tennis: [5.0, 6.8, 8.0], match: [6.8, 8.0, 8.5], padel: [5.0, 6.0, 7.0], beach_tennis: [5.0, 6.0, 7.5], pickleball: [4.0, 4.5, 6.0],
   squash: [6.0, 7.3, 10.0], badminton: [5.5, 7.0, 9.0], run: [7.5, 9.3, 11.0], cycling: [4.0, 6.8, 10.0], swim: [5.8, 8.0, 9.8],
   football: [5.0, 7.0, 9.5], gym: [3.5, 5.0, 6.0], other: [3.5, 5.0, 7.5]
 };
 const MOVE_FROM_C = '2026-11-22', MOVE_CAP_C = 0.7;
+const MOVE_FULL_FROM_C = '2026-11-24';
+function moveCapOnC(day) { return String(day || '') >= MOVE_FULL_FROM_C ? 1 : MOVE_CAP_C; }
 function moveMetC(kind, effort) { const r = MOVE_MET_C[kind], i = ['easy', 'normal', 'hard'].indexOf(effort); return r && i >= 0 ? r[i] : 0; }
-function moveCreditOfC(acts, target) {
+function moveCreditOfC(acts, target, day) {
   const raw = (acts || []).reduce((n, a) => n + Math.round((Number(a.minutes) || 0) * moveMetC(a.kind, a.effort) / 3.5) * 100, 0);
-  return { steps: Math.min(raw, Math.round((Number(target) || 10000) * MOVE_CAP_C)), raw: raw };
+  return { steps: Math.min(raw, Math.round((Number(target) || 10000) * moveCapOnC(day))), raw: raw };
 }
 // Your Number (stage125): an athlete's own Steps target, one row per change (athlete_id, from_day, steps), read once with the lists. A day's target is the
 // last row from that day or before, else everyone's (the engine's). Steps on that day is met at THEIR number, and the activity credit is capped at 70% of
@@ -5158,13 +5186,13 @@ const habTgtC = (h, d) => h.id === 'steps' && _habWho ? stepsTargetOnC(_habWho, 
 // null when the court time did not load, then the typed number stands and the banner says why).
 function habValC(H, h, d, by) {
   const v = H.valOf(d, h.id);
-  return h.id === 'steps' && by && by[d] && d >= MOVE_FROM_C ? v + moveCreditOfC(by[d], habTgtC(h, d)).steps : v;
+  return h.id === 'steps' && by && by[d] && d >= MOVE_FROM_C ? v + moveCreditOfC(by[d], habTgtC(h, d), d).steps : v;
 }
 const habDoneC = (H, h, d, by) => h.id === 'steps' ? habValC(H, h, d, by) >= habTgtC(h, d) : H.isDone(h, d);
 // "2,000 walked + 7,000 from Tennis" (program.html's own line); '' on a day with no credit.
 function habStepsTitleC(H, h, d, by) {
   if (h.id !== 'steps' || !by || !by[d] || d < MOVE_FROM_C) return '';
-  const c = moveCreditOfC(by[d], habTgtC(h, d)).steps;
+  const c = moveCreditOfC(by[d], habTgtC(h, d), d).steps;
   if (c <= 0) return '';
   const kinds = [...new Set(by[d].map(r => r.kind))];
   const from = kinds.length === 1 ? (ACT_WORD_C[kinds[0]] || 'Activity') : 'your activity';
@@ -6606,6 +6634,9 @@ const _fwC = {};
 // Each athlete's Steps target, set here and nowhere else (coach_set_steps_target(), stage125). The panel shows their usual (the median
 // of the last 14 days they typed a steps number, today left out) and a suggestion: the usual plus 10%, to the nearest 500, between 6,000
 // and 12,000. A new number starts today and never rewrites an earlier day (D20). Read once per athlete per store, like Five weeks.
+// stage127 (#137, "can the app choose automatically?"): each row says who set it (`by`: 'auto' | 'coach'). The app sets the number itself
+// every Monday from this same rule (the server's copy of stepsUsualC / stepsSuggestC); a number set here is an override the app leaves alone,
+// and "Let the app set it" (coach_set_steps_target(id, null)) hands it back. A server before stage127 sends no `by`: no who, no hand-back.
 const _stC = {};
 async function stepsTargetsC(id) {
   if (DEMO) return null;
@@ -6642,22 +6673,28 @@ function stepsTargetPanelC(D) {
   const sug = u.n >= 5 ? stepsSuggestC(u.usual) : null;
   const n = v => Number(v).toLocaleString('en-US');
   const btn = (v, label) => `<button class="btn sm" onclick="setStepsTargetC(${jsq(D.athleteId)}, ${v}, this)">${esc(label)}</button>`;
+  const hasBy = rows.some(r => r && r.by), mine = !!(cur && cur.by === 'coach');
+  const who = cur && cur.by ? `set by ${cur.by === 'coach' ? 'you' : 'the app'} on ${esc(dayMonth(cur.from))}` : '';
   return `<section class="panel">
-    <div class="phead"><span class="t hd">Steps target</span><span class="r">${cur ? n(now) + ' since ' + esc(prettyDate(cur.from)) : n(g) + ' (everyone\'s)'}</span></div>
+    <div class="phead"><span class="t hd">Steps target</span><span class="r">${cur ? n(now) + (who ? ', ' + who : ' since ' + esc(prettyDate(cur.from))) : n(g) + ' (everyone\'s)'}</span></div>
+    ${hasBy ? `<p class="meta">${mine ? 'Your number stays until you hand it back. ' : ''}The app sets their number every Monday from what they log, unless you set one.</p>` : ''}
     <p class="meta">${u.n ? `Their usual: <b>${n(u.usual)}</b> a day (the middle of ${u.n} logged day${u.n === 1 ? '' : 's'} in the last 14).` : 'No steps logged in the last 14 days.'}
       ${sug ? ` Suggested: <b>${n(sug)}</b> (their usual plus 10%).` : u.n ? ' A suggestion needs 5 logged days.' : ''}</p>
-    <p class="meta">Hitting their number ticks Steps, counts for the day and pays full Steps XP. A new number starts today; earlier days keep theirs.</p>
+    <p class="meta">Hitting their number ticks Steps, counts for the day and pays full Steps XP. Court time counts toward it. A new number starts today; earlier days keep theirs.</p>
     <div class="note-actions" style="margin-top:10px">
       ${sug && sug !== now ? btn(sug, 'Set ' + n(sug)) : ''}
       <input type="number" id="st-in-${esc(D.athleteId)}" min="3000" max="20000" step="500" value="${sug || now}" aria-label="Steps target" style="width:110px">
       <button class="btn sm" onclick="setStepsTargetC(${jsq(D.athleteId)}, Number(document.getElementById('st-in-' + ${jsq(D.athleteId)}).value), this)">Set</button>
       ${cur && now !== g ? btn(g, 'Back to ' + n(g)) : ''}
+      ${mine ? `<button class="btn sm" onclick="setStepsTargetC(${jsq(D.athleteId)}, null, this)">Let the app set it</button>` : ''}
     </div>
   </section>`;
 }
+// steps = null hands the number back to the app (stage127): the server writes the app's pick from today, or 10,000 without enough days.
 async function setStepsTargetC(id, steps, el) {
-  steps = Math.round(Number(steps));
-  if (!(steps >= 3000 && steps <= 20000)) { toast('A steps target is a number from 3,000 to 20,000.'); return; }
+  const back = steps === null;
+  if (!back) steps = Math.round(Number(steps));
+  if (!back && !(steps >= 3000 && steps <= 20000)) { toast('A steps target is a number from 3,000 to 20,000.'); return; }
   if (el) el.disabled = true;
   try {
     const r = await sb.rpc('coach_set_steps_target', { p_athlete_id: id, p_steps: steps });
@@ -6665,7 +6702,9 @@ async function setStepsTargetC(id, steps, el) {
     _stC[id] = { stamp: S.stamp, data: r.data, err: '' };
     await loadStepsTgtC();   // the habit grid and Athletes -> Habits read their number from here
     if (_D && _D.athleteId === id) { _D.st = _stC[id]; renderDetailBody(); }
-    toast('Steps target set: ' + steps.toLocaleString('en-US') + ' from today.');
+    const last = r.data && Array.isArray(r.data.rows) && r.data.rows.length ? r.data.rows[r.data.rows.length - 1] : null;
+    toast(back ? 'The app sets their number now' + (last ? ': ' + Number(last.steps).toLocaleString('en-US') + ' from today.' : '.')
+      : 'Steps target set: ' + steps.toLocaleString('en-US') + ' from today.');
   } catch (e) {
     if (el) el.disabled = false;
     toast('That did not save: ' + String((e && e.message) || e));
@@ -6715,6 +6754,39 @@ function fiveWeeksPanelC(D) {
   const head = '<span></span>' + Array.from({ length: 7 }, (_, i) => `<span class="fwc-dw">${FW_DOW_C[pDate(addDays(weeks[0].from, i)).getDay()]}</span>`).join('');
   // A held week (Amir, 2026-11-21: "A, the tick"): the label is a green circle with a tick, from the server's week_held fact.
   const held = weeks.filter(w => w.held).length;
+  // Move minutes (#134, stage127): per week, the server's minutes by source against the line (300, a mark at 150), the XP the week paid
+  // and its steps a day against their number. Worked out once on the server; an older server sends no `move` and nothing here is drawn.
+  const mv = c.move && typeof c.move === 'object' && weeks.some(w => w.move && typeof w.move === 'object') ? c.move : null;
+  const mvLine = mv ? Number(mv.line) || 300 : 0, mvMark = mv ? Number(mv.mark) || 150 : 0, mvNum = mv ? Number(mv.number) || Number(mv.global) || 0 : 0;
+  const nf = v => Math.round(Number(v) || 0).toLocaleString('en-US');
+  const MV_SRC = [['plan', 'p', 'plan'], ['lib', 'l', 'Library'], ['court', 'c', 'court'], ['other', 'o', 'other'], ['walk', 'w', 'walking']];
+  const moveCell = (w, wi) => {
+    if (!mv) return '';
+    const x = w.move && typeof w.move === 'object' ? w.move : null;
+    if (!x || String(w.from) > today) return '<span class="fwc-mv" aria-hidden="true"></span>';
+    const tot = Math.round(Number(x.total) || 0), xp = Number(x.xp) || 0, steps = x.steps == null ? null : Number(x.steps);
+    const scale = Math.max(mvLine, tot) || 1, pc = v => Math.max(0, Math.min(100, v / scale * 100)).toFixed(1);
+    const segs = MV_SRC.map(([k, cls]) => Number(x[k]) > 0 ? `<span class="fwc-seg is-${cls}" style="width:${pc(Number(x[k]))}%"></span>` : '').join('');
+    const ticks = `<i class="fwc-mk" style="left:${pc(mvMark)}%"></i>${tot > mvLine ? `<i class="fwc-mk" style="left:${pc(mvLine)}%"></i>` : ''}`;
+    const met = tot >= mvLine;
+    const badge = xp > 0 ? `<b class="fwc-xp">+${nf(xp)} XP</b>` : met ? '<b class="fwc-xp">✓</b>' : '';
+    const stepOk = steps != null && mvNum > 0 && steps >= mvNum;
+    const split = MV_SRC.filter(([k]) => Number(x[k]) > 0).map(([k, , word]) => `${word} ${nf(x[k])}`).join(', ');
+    const said = `Week ${Number(w.w) || wi + 1}: ${nf(tot)} Move minutes of ${nf(mvLine)}${split ? ' (' + split + ')' : ''}.`
+      + (steps != null ? ` ${nf(steps)} steps a day${mvNum ? ', their number is ' + nf(mvNum) : ''}.` : ' No steps logged.')
+      + (xp > 0 ? ` Paid ${nf(xp)} XP.` : met ? ' Reached the line.' : '');
+    return `<span class="fwc-mv" title="${esc(said)}" aria-label="${esc(said)}" role="img">`
+      + `<span class="fwc-bar">${segs}${ticks}</span>`
+      + `<span class="fwc-mn${met ? ' is-met' : ''}">${nf(tot)}<span class="fwc-of">/${nf(mvLine)}</span></span>${badge}`
+      + (steps != null ? `<span class="fwc-st${stepOk ? ' is-met' : ''}">${nf(steps)} steps</span>` : '')
+      + '</span>';
+  };
+  // The Mix (#138): over the weeks shown, the share of Move minutes from the plan (plan + Library) and from the rest of their life. Coach only.
+  const mixTot = { plan: 0, life: 0 };
+  if (mv) weeks.forEach(w => { const x = w.move; if (!x || typeof x !== 'object') return;
+    mixTot.plan += (Number(x.plan) || 0) + (Number(x.lib) || 0); mixTot.life += (Number(x.court) || 0) + (Number(x.other) || 0) + (Number(x.walk) || 0); });
+  const mixAll = mixTot.plan + mixTot.life, mixPlan = mixAll > 0 ? Math.round(mixTot.plan / mixAll * 100) : 0;
+  const mixLine = mixAll > 0 ? `<p class="fwc-k fwc-mix">The mix over these weeks: <b>${mixPlan}% from your plan</b>, ${100 - mixPlan}% from their life.</p>` : '';
   const rows = weeks.map((w, wi) => (w.held ? `<span class="fwc-wl is-held" title="Week ${Number(w.w) || wi + 1}, held" role="img" aria-label="Week ${Number(w.w) || wi + 1}, held">✓</span>`
     : `<span class="fwc-wl${w.now ? ' is-now' : ''}">W${Number(w.w) || wi + 1}</span>`) + Array.from({ length: 7 }, (_, i) => {
     const day = addDays(w.from, i);
@@ -6728,12 +6800,14 @@ function fiveWeeksPanelC(D) {
       + (Number(x.mins) > 0 ? `, ${Math.round(Number(x.mins))} min` : ''); };
     const said = items.length ? `${dayMonth(day)}: ` + items.map(what).join(' · ') : '';
     return items.length ? `<span class="${cls}" title="${esc(said)}" aria-label="${esc(said)}" role="img">${items.length > 1 ? items.length : ''}</span>` : `<span class="${cls}" aria-hidden="true"></span>`;
-  }).join('')).join('');
+  }).join('') + moveCell(w, wi)).join('');
   const sum = [held ? `${held} held` : '', `${n.plan} plan`, `${n.library} Library`, n.court ? `${hm(m.court)} court` : '', n.other ? `${hm(m.other)} other` : '', mins ? hm(mins) + ' in all' : ''].filter(Boolean).join(' · ');
   return `<section class="panel fwc">
     <div class="phead"><span class="t hd">Five weeks</span><span class="r">${c.n ? 'Cycle ' + esc(String(c.n)) + ' · ' : ''}${sum}</span></div>
-    <div class="fwc-g">${head}${rows}</div>
-    <p class="fwc-k"><span class="fwc-sw is-p"></span>Plan session <span class="fwc-sw is-l"></span>Library session <span class="fwc-sw is-c"></span>Court <span class="fwc-sw is-o"></span>Other · <b class="fwc-tk">✓</b> week held · hover a day for what was in it</p>
+    <div class="fwc-g${mv ? ' has-mv' : ''}">${head}${mv ? '<span class="fwc-dw fwc-mvh">Move</span>' : ''}${rows}</div>
+    <p class="fwc-k"><span class="fwc-sw is-p"></span>Plan session <span class="fwc-sw is-l"></span>Library session <span class="fwc-sw is-c"></span>Court <span class="fwc-sw is-o"></span>Other${mv ? ' <span class="fwc-sw is-w"></span>Walking' : ''} · <b class="fwc-tk">✓</b> week held · hover a day for what was in it</p>
+    ${mv ? `<p class="fwc-k">Move: minutes of training, sport and brisk walking, harder minutes count for more. ${nf(mvLine)} in a week ${Number(mv.xp) > 0 ? 'pays ' + nf(mv.xp) + ' XP' : 'is the line'}; the small mark is ${nf(mvMark)}. Steps: their average a day${mvNum ? ', green at their number (' + nf(mvNum) + ')' : ''}.</p>` : ''}
+    ${mixLine}
   </section>`;
 }
 // Sessions from before this cycle began, newest first, each with its log exactly as sent. Folded: the cycle on

@@ -1,0 +1,27 @@
+{
+  "area": "Progress: Your weeks, The Week Line (#134 + #135, round 13 'The Whole Week', stage127, 2026-11-24): the Move line under the grid, its legend, the steps line, the counting sheet, and How the XP works' new price. Formal (شما), as every new Farsi text since 2026-11-21 (docs/rules/farsi-app.md). Drafts until Amir has read them. 'Move minutes' is دقیقهٔ تحرک.",
+  "exact": {
+    "Move this week": "تحرک این هفته",
+    "Plan": "برنامه",
+    "Walking": "پیاده‌روی",
+    "Steps a day:": "قدم در روز:",
+    "your number": "عدد شما",
+    "Move minutes": "دقیقهٔ تحرک",
+    "How your Move minutes are counted": "دقیقه‌های تحرک شما چطور حساب می‌شه",
+    "At the line": "رسیده به خط",
+    "Everything you do in a week, in one number. An easy minute counts about 1. A hard minute counts about 2.": "هر کاری که توی یه هفته می‌کنید، در یک عدد. هر دقیقهٔ سبک حدود ۱ حساب می‌شه و هر دقیقهٔ سخت حدود ۲.",
+    "counts its minutes, by how hard the session felt.": "دقیقه‌هاش رو حساب می‌کنه، به اندازهٔ سختی‌ای که جلسه براتون داشت.",
+    "sessions count by their shelf. Mobility, recovery and breathing count 0 here, but they still show on your weeks.": "جلسه‌ها بر اساس قفسه‌شون حساب می‌شن. تحرک‌پذیری، ریکاوری و تنفس اینجا صفر حساب می‌شن، ولی توی هفته‌هاتون دیده می‌شن.",
+    "Court and other": "زمین و سایر",
+    "count what you add with + Add activity.": "چیزهایی رو حساب می‌کنن که با «+ اضافه کردن فعالیت» ثبت می‌کنید.",
+    "counts the steps you type over 5,000. 100 steps is a minute, up to 60 a day.": "قدم‌هایی که بالای ۵٬۰۰۰ ثبت می‌کنید رو حساب می‌کنه. هر ۱۰۰ قدم یک دقیقه‌ست، تا ۶۰ دقیقه در روز.",
+    "A full moving week (300 Move minutes)": "یه هفتهٔ پرتحرک (۳۰۰ دقیقهٔ تحرک)"
+  },
+  "patterns": [
+    ["of (\\d[\\d,]*)", "از {n1}"],
+    ["\\+(\\d[\\d,]*) XP", "+{n1} امتیاز"],
+    ["(\\d[\\d,]*) is the health minimum\\. (\\d[\\d,]*) is your line\\.", "{n1} حداقلِ لازم برای سلامتیه. {n2} خطِ شماست."],
+    ["A week at your line pays (\\d[\\d,]*) XP, once a week\\. It starts with your first week that begins on or after 24 November\\.", "هفته‌ای که به خطتون برسه {n1} امتیاز می‌گیره، هفته‌ای یک بار. از اولین هفته‌ای شروع می‌شه که از ۳ آذر یا بعدش شروع بشه."],
+    ["A full moving week is 300 Move minutes from everything you do: your plan, the Library, your sport and your walking\\. It is on Your weeks, on Progress\\.", "یه هفتهٔ پرتحرک یعنی ۳۰۰ دقیقهٔ تحرک از همهٔ کارهایی که می‌کنید: برنامه، کتابخانه، ورزشتون و پیاده‌روی. توی «هفته‌هاتون» در صفحهٔ پیشرفت هست."]
+  ]
+}

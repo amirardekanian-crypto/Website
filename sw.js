@@ -639,7 +639,9 @@
 // to the crew as it is saved (stage126), Add a photo puts words and a photo on it, icons for running, cycling and swimming, Gym off the list.
 // v294: program.html and i18n-fa.js (?v=33) changed (2026-11-23, Amir: "build 130", "App suggests, you approve", "Full XP at their number"):
 // Your Number, the personal Steps target Amir sets in coach.html (stage125), read and scored on the phone the server's way.
-const CACHE = 'aap-v294';
+// v295: program.html and i18n-fa.js (?v=34) changed (2026-11-24, Amir: "movement should give people xp", "Yes, build it"): the Week Line
+// on Your weeks (Move minutes, stage127), the Court Log credit filling the whole Steps day from today, a full moving week in How the XP works.
+const CACHE = 'aap-v295';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -680,7 +682,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=16',
-  '/assets/js/i18n-fa.js?v=33',
+  '/assets/js/i18n-fa.js?v=34',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).
