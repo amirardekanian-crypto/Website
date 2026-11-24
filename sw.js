@@ -651,7 +651,9 @@
 // cover is the article added last (each article carries an `added` stamp), not the first read of the first shelf.
 // v300: program.html changed (2026-11-24, Amir: "this shoule be notified once every day, untill they log in their first time"): the box
 // under Steps comes back once a day until the athlete logs their first activity.
-const CACHE = 'aap-v300';
+// v301: program.html changed (2026-11-24, Amir: "everytime i open the app i see it. doesnt it have to go away"): the Cycle complete moment's
+// seen list (<id>_hl_seen) merges as a union, so a server copy without this cycle's mark can no longer take the phone's mark away at the next pull.
+const CACHE = 'aap-v301';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
