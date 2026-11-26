@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RUSTBLOOD RALLY</title>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- three.js (the 3D library) is loaded from a CDN; everything else is generated in code -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <canvas id="game-canvas"></canvas>
+  <div id="vignette"></div>
+
+  <!-- ================================================================ HUD -->
+  <div id="hud" class="hidden">
+    <div id="hud-race" class="panel">
+      <div class="pos"><span id="hud-pos">4</span><span id="hud-pos-suf">TH</span><span class="of">/4</span></div>
+      <div class="row"><span class="lbl">LAP</span><span id="hud-lap">1/3</span></div>
+      <div class="row"><span class="lbl">TIME</span><span id="hud-time">00:00.00</span></div>
+      <div class="row small"><span class="lbl">BEST</span><span id="hud-best">--:--.--</span></div>
+    </div>
+
+    <div id="hud-map" class="panel"><canvas id="hud-minimap"></canvas></div>
+    <div id="hud-opponents" class="panel"></div>
+
+    <div id="hud-vitals" class="panel">
+      <div class="vital">
+        <div class="vlbl">ARMOR <span id="hud-hp-num">120</span></div>
+        <div class="bar"><div id="hud-hp" class="fill hp"></div></div>
+      </div>
+      <div class="vital">
+        <div class="vlbl">NITRO <span class="key">SHIFT</span></div>
+        <div class="bar"><div id="hud-nitro" class="fill nitro"></div></div>
+      </div>
+    </div>
+
+    <div id="hud-dash" class="panel">
+      <div id="hud-speed"><span id="hud-speed-num">0</span><span class="unit">KM/H</span></div>
+      <div id="hud-speedbar"><div id="hud-speedfill"></div></div>
+      <div id="hud-weapons">
+        <div class="weapon" id="w-mg"><span class="key">L-CLICK</span><span class="wname">GUNS</span><span class="ammo" id="hud-mg">0</span></div>
+        <div class="weapon" id="w-rocket"><span class="key">R-CLICK</span><span class="wname">ROCKETS</span><span class="ammo" id="hud-rocket">0</span></div>
+        <div class="weapon" id="w-mine"><span class="key">E</span><span class="wname">MINES</span><span class="ammo" id="hud-mine">0</span></div>
+      </div>
+    </div>
+
+    <div id="hud-feed"></div>
+    <div id="hud-center"></div>
+    <div id="hud-toasts"></div>
+    <div id="hud-tags"></div>
+    <div id="hud-arrows"></div>
+    <div id="hud-wrongway" class="hidden">WRONG WAY<small>turn around</small></div>
+    <div id="hud-hint">
+      <span><b>W A S D</b> drive</span><span><b>SPACE</b> handbrake / drift</span><span><b>SHIFT</b> nitro</span>
+      <span><b>L-CLICK</b> guns</span><span><b>R-CLICK</b> rockets</span><span><b>E</b> mines</span>
+    </div>
+  </div>
+
+  <!-- ============================================================ screens -->
+  <div id="screen-loading" class="screen">
+    <div class="logo">RUSTBLOOD<span>RALLY</span></div>
+    <div class="loadbar"><div id="load-fill"></div></div>
+    <div id="load-text">Starting engines…</div>
+  </div>
+
+  <div id="screen-title" class="screen hidden">
+    <div class="title-wrap">
+      <div class="logo big">RUSTBLOOD<span>RALLY</span></div>
+      <div class="tagline">3 LAPS &bull; 4 WAR MACHINES &bull; NO RULES</div>
+      <button id="btn-start" class="btn primary">START RACE</button>
+      <div class="press">or press ENTER</div>
+      <div class="controls">
+        <div class="ctl-col">
+          <h3>DRIVING</h3>
+          <div><kbd>W</kbd><kbd>&uarr;</kbd> accelerate</div>
+          <div><kbd>S</kbd><kbd>&darr;</kbd> brake / reverse</div>
+          <div><kbd>A</kbd><kbd>D</kbd><kbd>&larr;</kbd><kbd>&rarr;</kbd> steer</div>
+          <div><kbd>SPACE</kbd> handbrake &mdash; drift!</div>
+          <div><kbd>SHIFT</kbd> nitro boost</div>
+        </div>
+        <div class="ctl-col">
+          <h3>WEAPONS</h3>
+          <div><kbd>LEFT CLICK</kbd> machine guns (hold)</div>
+          <div><kbd>RIGHT CLICK</kbd> homing rockets</div>
+          <div><kbd>E</kbd> drop a mine behind you</div>
+          <div><kbd>R</kbd> put car back on track</div>
+          <div><kbd>ESC</kbd> pause &nbsp; <kbd>M</kbd> mute &nbsp; <kbd>Q</kbd> graphics</div>
+        </div>
+      </div>
+      <div class="tips">
+        <div>&#9654; Guns aim themselves a little &mdash; just point your car at a rival.</div>
+        <div>&#9654; Drifting with the handbrake refills your nitro faster.</div>
+        <div>&#9654; Shoot the <b class="red">red barrels</b> when rivals drive past. Grab <b class="green">green</b> crates to repair.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-pause" class="screen hidden">
+    <div class="box">
+      <h2>PAUSED</h2>
+      <button id="btn-resume" class="btn primary">RESUME</button>
+      <button id="btn-restart" class="btn">RESTART RACE</button>
+      <button id="btn-menu" class="btn">MAIN MENU</button>
+      <div class="small-controls">WASD drive &bull; SPACE drift &bull; SHIFT nitro &bull; L-CLICK guns &bull; R-CLICK rockets &bull; E mines &bull; R reset car &bull; M mute</div>
+      <div class="small-controls">GRAPHICS: <b id="quality-label">MEDIUM</b> &mdash; press <kbd>Q</kbd> to change</div>
+    </div>
+  </div>
+
+  <div id="screen-results" class="screen hidden">
+    <div class="box wide">
+      <h1 id="res-title">VICTORY</h1>
+      <div id="res-sub"></div>
+      <table id="res-table"></table>
+      <div id="res-stats"></div>
+      <div class="btn-row">
+        <button id="btn-again" class="btn primary">RACE AGAIN</button>
+        <button id="btn-results-menu" class="btn">MAIN MENU</button>
+      </div>
+      <div class="press">ENTER race again &bull; ESC main menu</div>
+    </div>
+  </div>
+
+  <div id="screen-error" class="screen hidden">
+    <div class="box">
+      <h2>ENGINE FAILURE</h2>
+      <p id="error-text"></p>
+      <p class="press">This game needs a modern browser (Chrome, Edge or Firefox) with WebGL and an internet connection the first time it loads.</p>
+    </div>
+  </div>
+
+  <!-- ========================================================== bootstrap -->
+  <script type="module">
+    const SCRIPTS = ['core', 'textures', 'geometry', 'track', 'effects', 'audio', 'world', 'props',
+      'vehicle-models', 'vehicle', 'weapons', 'pickups', 'hazards', 'ai', 'hud', 'game'].map((n) => `js/${n}.js`);
+    const fill = document.getElementById('load-fill');
+    const text = document.getElementById('load-text');
+    const status = (msg, p) => { text.textContent = msg; fill.style.width = Math.round(p * 100) + '%'; };
+    const loadScript = (src) => new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = () => reject(new Error('Could not load ' + src));
+      document.head.appendChild(s);
+    });
+    function fail(err) {
+      console.error(err);
+      document.getElementById('screen-loading').classList.add('hidden');
+      document.getElementById('error-text').textContent = String((err && err.message) || err);
+      document.getElementById('screen-error').classList.remove('hidden');
+    }
+    (async () => {
+      try {
+        status('Loading 3D engine…', 0.03);
+        let THREE;
+        try {
+          THREE = await import('three');
+        } catch (e) {
+          throw new Error('Could not download the 3D engine (three.js). Check your internet connection and reload.');
+        }
+        window.THREE = THREE;
+        try {
+          const [a, b, c, d] = await Promise.all([
+            import('three/addons/postprocessing/EffectComposer.js'),
+            import('three/addons/postprocessing/RenderPass.js'),
+            import('three/addons/postprocessing/UnrealBloomPass.js'),
+            import('three/addons/postprocessing/OutputPass.js'),
+          ]);
+          window.THREE_ADDONS = { EffectComposer: a.EffectComposer, RenderPass: b.RenderPass, UnrealBloomPass: c.UnrealBloomPass, OutputPass: d.OutputPass };
+        } catch (e) {
+          console.warn('Bloom post-processing unavailable; continuing without it.');
+        }
+        for (let i = 0; i < SCRIPTS.length; i++) {
+          status('Loading game code…', 0.05 + 0.04 * (i / SCRIPTS.length));
+          await loadScript(SCRIPTS[i]);
+        }
+        await window.RR.Game.init(status);
+        document.getElementById('screen-loading').classList.add('hidden');
+      } catch (err) {
+        fail(err);
+      }
+    })();
+  </script>
+</body>
+</html>

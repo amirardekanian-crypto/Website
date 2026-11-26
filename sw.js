@@ -792,7 +792,8 @@ self.addEventListener('fetch', e => {
   // which must be the registration that holds the test subscription; answering it from this cache would
   // also serve a stale page, the same trap as /reach/.
   // /darkhold/ is Amir's browser game (2026-11-26): it is not part of either app, so its 1.6MB of files stay out of athletes' caches.
-  if (/^\/(reach|tennis|tennis-testing|pushtest|darkhold)(\/|$)/.test(url.pathname)) return;
+  // /rustblood/ is Amir's browser game RUSTBLOOD RALLY (2026-11-26): not part of either app, so its files stay out of athletes' caches.
+  if (/^\/(reach|tennis|tennis-testing|pushtest|darkhold|rustblood)(\/|$)/.test(url.pathname)) return;
   // The coach's dashboard always comes from the network (Amir's pick of two, 2026-10-20). Served from this cache it was one
   // deploy behind on its first open after every push, and it is opened on a PC, where no signal is rare.
   if (url.pathname === '/coach.html') return;
