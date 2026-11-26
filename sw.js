@@ -671,7 +671,9 @@
 // Long Day on a crew activity of two hours or more (#155).
 // v309: program.html, emblems.js (?v=6) and i18n-fa.js (?v=45) changed (2026-11-24, round 15 step 6, stage132, rulebook version 17): Whole Week
 // in the cabinet (#147), The Line's ring with 3 KINDS.
-const CACHE = 'aap-v309';
+// v310: program.html and i18n-fa.js (?v=46) changed: Home counts a spare. A plan day a spare from last week covers is in the week's count and
+// Hold Serve's, is not Next up, reads Counts from last week on its row, and the week-done extra comes when it completes the week.
+const CACHE = 'aap-v310';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -712,7 +714,7 @@ const SHELL = [
   // The app in Farsi (v245): the engine, loaded in program.html's <head> for everyone (in English it only returns), and the words,
   // loaded only in Farsi. By the exact URLs the page asks for: a change to either is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/i18n.js?v=16',
-  '/assets/js/i18n-fa.js?v=45',
+  '/assets/js/i18n-fa.js?v=46',
   // The recovery rules (v295, round 14): Footprint's thresholds and The Last Word's lines, generated from recovery/*.toml. The finished card
   // reads them at Done, signal or not. By the exact URL the page asks for: a change is a ?v= bump there, here, and a CACHE bump.
   '/assets/js/recovery.js?v=1',

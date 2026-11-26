@@ -41,6 +41,7 @@
     "sets fewer": "ست کمتر",
     "set fewer": "ست کمتر",
     "Done this week": "این هفته انجام شد",
+    "Counts from last week": "از هفتهٔ پیش حساب می‌شه",
     "In progress": "در حال انجام",
     "Saved for you": "برات ذخیره شد",
     "How hard was that session?": "اون جلسه چقدر سخت بود؟",
@@ -190,7 +191,11 @@
       "روز {n1}، $2، این هفته انجام شد"
     ],
     [
-      "Day (\\d+), (?!.*(?:, optional|, done this week)$)(.+)",
+      "Day (\\d+), (.+), counts from last week",
+      "روز {n1}، $2، از هفتهٔ پیش حساب می‌شه"
+    ],
+    [
+      "Day (\\d+), (?!.*(?:, optional|, done this week|, counts from last week)$)(.+)",
       "روز {n1}، $2"
     ],
     [

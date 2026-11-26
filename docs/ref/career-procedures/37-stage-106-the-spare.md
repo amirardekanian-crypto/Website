@@ -36,4 +36,6 @@ the session counts for every session, and `careerRecPaid()` / `careerPaidAtDone(
 `career/rulebook.toml` and `career_derive()`; `reward_cases.json`'s six repeat moves were worked out again from `movesRef()` in `rehearse_catalogue.mjs`, which says the same.
 The phone reads an earlier session of the plan day as a full finish (the history it has does not say early), so after an early finish the card can say less than the server
 pays; the server's answer puts it right. `scripts/headless/career.js` checks the second, the third and the spare on the finish card.
+**Home, brought in step 2026-11-26** (sw `aap-v310`): Home's count, Next up, day rows, Hold Serve and the week-done extra count a spare too
+(`weekSpareDays()`, `weekCoveredDays()`; *This Week is built from the session history* in the program-app reference; `scripts/headless/spare-home.js`).
 **The way back:** `scripts/career/rollback_stage106.sql`, on Amir's word only. It does not undo version 12's limit 2; that would be a new rulebook version (D20).

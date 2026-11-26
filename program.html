@@ -189,7 +189,7 @@
 <!-- The app in Farsi (2026-11-20): parser-blocking on purpose, before anything is drawn. In English it sets nothing and
      returns; in Farsi it turns the page right to left and loads the words (data-fa) before the app's scripts run. Settings →
      Language is for every athlete since 2026-11-20, and it starts in the programme's athlete.lang. See the file's header. -->
-<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=45"></script>
+<script src="/assets/js/i18n.js?v=16" data-fa="/assets/js/i18n-fa.js?v=46"></script>
 <!-- Reminders on the phone (stage84). One copy, shared with habits.html: the two apps are one
      website, with one service worker and one notification permission between them. -->
 <script defer src="/assets/js/push.js?v=1"></script>
@@ -10256,10 +10256,10 @@ function dayCardHTML(day, dayNum, total, opts) {
   // done this week. Home never names a rest day: athletes move their days, so the app cannot know one. It is data-dl,
   // never data-dc: only the Next up card carries data-dc (markSuggestedDay() and the tests look for it there).
   if (!opts.static && !opts.hero) {
-    const done = weekDoneDays().has(String(id));
-    return `<div class="dc-row${done ? ' is-done' : ''}${opt ? ' is-optional' : ''}" data-dl="${idStr}" role="button" tabindex="0" onclick="openDayView('${idStr}')" aria-label="Day ${dayNum}, ${attr(name)}${opt ? ', optional' : ''}${done ? ', done this week' : ''}">`
+    const own = weekDoneDays().has(String(id)), spare = !own && weekSpareDays().has(String(id)), done = own || spare;
+    return `<div class="dc-row${done ? ' is-done' : ''}${opt ? ' is-optional' : ''}" data-dl="${idStr}" role="button" tabindex="0" onclick="openDayView('${idStr}')" aria-label="Day ${dayNum}, ${attr(name)}${opt ? ', optional' : ''}${own ? ', done this week' : spare ? ', counts from last week' : ''}">`
       + `<span class="dc-num" aria-hidden="true">${dayNum}</span>`
-      + `<span class="dc-nm">${esc(name)}<small>${done ? 'Done this week' : (opt ? 'Optional · ' : '') + esc(sub)}</small></span>`
+      + `<span class="dc-nm">${esc(name)}<small>${own ? 'Done this week' : spare ? 'Counts from last week' : (opt ? 'Optional · ' : '') + esc(sub)}</small></span>`
       + (done ? `<span class="dc-st">Done</span>` : `<span class="dc-ar" aria-hidden="true">›</span>`) + `</div>`;
   }
 
@@ -10317,7 +10317,7 @@ function suggestedDayId() {
   if (active >= 0) return String(all[active].id != null ? all[active].id : active + 1);   // a session under way, an optional one too
   // Only the plan days rotate: an optional day is never Next up, and once the plan days are done the week is done (stage109).
   const ids = all.map((d, i) => dayIsOptional(d) ? null : String(d.id != null ? d.id : i + 1)).filter(x => x !== null);
-  const done = weekDoneDays();
+  const done = weekCoveredDays();   // a day a spare covers is not suggested again
   let i = -1;
   if (!cycleOver()) {
     const last = ids.indexOf(lastTrainedDayId(ids));
@@ -10431,6 +10431,18 @@ function weekDoneDays() {
   // A finish stamp counts on the date it was stamped, as sessionDateFor() files it, never on today's (Love All B8).
   ids.forEach(id => { if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) { const on = sessionDateFor(id); if (on >= win.from && on <= win.to) done.add(id); } });
   return done;
+}
+// The plan days a spare from last week covers and this week has not done itself (stage106), and the days the week counts as done: those
+// and the ones finished in it. The rule is careerWeekOf()'s, the finish card's. Home's count, Next up, the day rows, Hold Serve and the
+// week-done extra read these; weekDoneDays() stays what was trained this week.
+function weekSpareDays() {
+  const done = weekDoneDays(), spare = careerWeekOf('').spare;
+  return new Set(planDayIds().filter(id => spare.has(id) && !done.has(id)));
+}
+function weekCoveredDays() {
+  const out = weekDoneDays();
+  weekSpareDays().forEach(id => out.add(id));
+  return out;
 }
 // ── AN UNFINISHED DAY IS FILED BY ITSELF (DATA-02; Amir, 2026-10-12: "i dont want any info or log to be lost") ──
 // Sets ticked on a day that was never finished used to carry into next week and never reach
@@ -10912,7 +10924,7 @@ function paintWeek() {
   if (!el) return;
   const ids = planDayIds();   // the plan days only: an optional day done is a bonus, one not done is no miss
   if (!ids.length) { el.textContent = ''; return; }
-  const n = ids.filter(id => weekDoneDays().has(id)).length;
+  const cov = weekCoveredDays(), n = ids.filter(id => cov.has(id)).length;   // a spare counts: the week is held with it
   // In a week with a note the count sits in the note's kicker (weekNoteHTML), in its short form.
   el.textContent = el.classList.contains('wn-count')
     ? (n >= ids.length ? `All ${ids.length} done` : `${n} of ${ids.length} done`)
@@ -13895,7 +13907,7 @@ function holdState() {
   }
   const ids = planDayIds();   // the plan days: an optional day never holds or breaks a week (stage109)
   if (!ids.length) return null;
-  const doneSet = weekDoneDays();
+  const doneSet = weekCoveredDays();
   const done = ids.filter(id => doneSet.has(id)).length;
   const held = !!(last && last.kind === 'week_held' && Number(lv.cycle) === holdCycleNum(cur, cci) && Number(lv.week) === w.wk);
   return { now, best, held, done, total: ids.length };
@@ -21343,6 +21355,7 @@ function weekDoneOn() {
   });
   const today = ymdLocal(new Date());
   ids.forEach(id => { if (!first[id] && completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) first[id] = today; });
+  weekSpareDays().forEach(id => { if (!first[id]) first[id] = win.from; });   // covered from the week's first day, as the server dates it
   return ids.every(id => first[id]) ? ids.map(id => first[id]).sort().pop() : null;
 }
 // Home's row once the week is done, until the pick has been opened since; it goes when the week turns.

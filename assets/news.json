@@ -2,6 +2,28 @@
   "_about": "What's new in the app, shown in every athlete's Inbox for 14 days (program.html, newsRows/openNews). Newest first. Each entry: id (unique), at (ISO time), en and fa: { title, items: [one short line each], sign }. Written in Amir's voice (COM-3) in both languages (COM-1). THE RULE (docs/rules/working-with-amir.md): a change to program.html that an athlete would notice ships with its entry here in the same commit; .githooks/commit-msg blocks a program.html commit without this file unless the message says [no news].",
   "items": [
     {
+      "id": "2026-11-26-spare-on-home",
+      "at": "2026-11-26T23:00:00Z",
+      "en": {
+        "title": "Your spare now shows on Home",
+        "items": [
+          "Did a session twice last week? If it covers that day this week, Home now counts it.",
+          "That day says Counts from last week, and Next up moves to a day you still need.",
+          "You can still open it and train it."
+        ],
+        "sign": "Amir"
+      },
+      "fa": {
+        "title": "جلسهٔ اضافه حالا توی صفحهٔ اصلی دیده می‌شه",
+        "items": [
+          "هفتهٔ پیش یه جلسه رو دو بار انجام دادی؟ اگه این هفته جای اون روز حساب بشه، صفحهٔ اصلی حالا نشونش می‌ده.",
+          "کنار اون روز نوشته «از هفتهٔ پیش حساب می‌شه» و جلسهٔ بعدی می‌ره سراغ روزی که هنوز مونده.",
+          "هنوز هم می‌تونی بازش کنی و تمرینش کنی."
+        ],
+        "sign": "امیر"
+      }
+    },
+    {
       "id": "2026-11-24-court-day-one-card",
       "at": "2026-11-24T23:30:00Z",
       "en": {

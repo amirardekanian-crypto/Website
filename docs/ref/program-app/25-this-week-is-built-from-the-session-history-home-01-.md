@@ -14,5 +14,11 @@ done this week"; it runs at boot, when the history arrives, and whenever the day
 finished session shows on Home without a reload. `completed_on` is the local day the session was
 finished since DATA-02 (rows before it carry a UTC date).
 
+**A spare counts on Home (2026-11-26).** From 2026-11-03 the finish card read the spare (stage106; `careerWeekOf()`) and Home did not: it said
+"1 of 2" for a week the server held and offered the covered day as Next up. Now the count, the suggested day, Hold Serve's count and the week-done
+extra read `weekCoveredDays()`: `weekDoneDays()` and `weekSpareDays()`, the plan days a spare covers that this week has not done itself. A covered
+day's row is done and reads **Counts from last week**; it still opens and trains. An optional day is never covered. `weekDoneDays()` keeps meaning
+what was trained this week. `node scripts/headless/spare-home.js`.
+
 ---
 *One section of the reference. The index is [`PROGRAM-APP.md`](../../../PROGRAM-APP.md); the rules are in [`docs/rules/`](../../../docs/README.md).*
