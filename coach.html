@@ -1622,7 +1622,7 @@
      Every number on The work is a duel on one split bar (hers against her usual, her plan or her first estimate), with its verdict in words and
      its chart in the same card. Scoped to #content.afa, which renderNow() sets on an athlete's file only. It keeps THE LOOK's five sizes and three
      radii; it has its own palette and face (Archivo, expanded for figures and titles). Still no yellow, gold, ochre or amber, anywhere.
-     The shared parts are here; parts 1-4 below belong to the header and score cards, the cycle calendar, habits and strength, the sessions. ── */
+     The shared parts are here; parts 1-5 below belong to the header and the read, the score cards, the cycle calendar, habits and strength, the sessions. ── */
   #content.afa { --a-ground: #EEF1F6; --a-card: #FFFFFF; --a-ink: #14213D; --a-muted: #56627C; --a-line: #D9DFEA; --a-soft: #F4F6FA;
     --a-her: #2B59C3; --a-her-100: rgba(43,89,195,0.10); --a-usual: #C3CCDB; --a-usual-ink: #6E7A93;
     --a-good: #17855B; --a-good-100: rgba(23,133,91,0.12); --a-watch: #7A4FB3; --a-watch-100: rgba(122,79,179,0.12);
@@ -1697,27 +1697,33 @@
   #content.afa .a-sech { margin: 8px 0 -8px; }
   #content.afa .a-days { display: grid; gap: 12px; }
 
-  /* ── Look A, part 1: the header (the player card), the read, the three score cards ── */
+  /* ── Look A, part 1: the header (the player card), the read, the sub-tabs ── */
   /* part 1 goes here */
   /* ── end of part 1 ── */
   /*
-     (a gap, so the four parts of the build merge without touching each other)
+     (a gap, so the five parts of the build merge without touching each other)
   */
-  /* ── Look A, part 2: her cycle, day by day ── */
+  /* ── Look A, part 2: the three score cards ── */
   /* part 2 goes here */
   /* ── end of part 2 ── */
   /*
-     (a gap, so the four parts of the build merge without touching each other)
+     (a gap, so the five parts of the build merge without touching each other)
   */
-  /* ── Look A, part 3: habits against her targets, getting stronger ── */
+  /* ── Look A, part 3: the cycle, day by day ── */
   /* part 3 goes here */
   /* ── end of part 3 ── */
   /*
-     (a gap, so the four parts of the build merge without touching each other)
+     (a gap, so the five parts of the build merge without touching each other)
   */
-  /* ── Look A, part 4: the sessions, earlier cycles, her phone ── */
+  /* ── Look A, part 4: habits against their targets, getting stronger ── */
   /* part 4 goes here */
   /* ── end of part 4 ── */
+  /*
+     (a gap, so the five parts of the build merge without touching each other)
+  */
+  /* ── Look A, part 5: the sessions, earlier cycles, their phone ── */
+  /* part 5 goes here */
+  /* ── end of part 5 ── */
 </style>
 </head>
 <body>
@@ -4809,8 +4815,7 @@ function renderCharts(m) {
   </div>`;
   return `<div class="charts">${loadCard}${readyCard}${adhCard}</div>`;
 }
-// ── Look A, part 1 (2026-11-28): the read and the three score cards on The work. PLACEHOLDERS until part 1 lands: the old strip. ──
-function readLineC(D) { return ''; }
+// ── Look A, part 2 (2026-11-28): the three score cards on The work. PLACEHOLDER until part 2 lands: the old strip. ──
 function scoreCardsC(D) { return metricStripHtml(D.metrics); }
 
 // --- ATHLETES (roster) -------------------------------------------------------
@@ -5411,7 +5416,7 @@ function stackedPanelC(D) {
     <p class="stk-l">${esc(stackedLineC(st))}</p>
   </section>`;
 }
-// ── Look A, part 2 (2026-11-28): her cycle, day by day. PLACEHOLDER until part 2 lands: the old Five weeks and Stacked. ──
+// ── Look A, part 3 (2026-11-28): the cycle, day by day. PLACEHOLDER until part 3 lands: the old Five weeks and Stacked. ──
 function cycleCardC(D) { return fiveWeeksPanelC(D) + stackedPanelC(D); }
 // ── Habits and court time, in the coach's file and across everyone (2026-11-23; Amir picked direction A, "The Grid") ─────────────────────────────
 // What a habit IS and when it is MET is the engine's, assets/js/habits-core.js, the file the athlete's app loads: nothing here retypes it (a second copy is how the
@@ -5638,7 +5643,7 @@ function habGridPanelC(D) {
     <p class="hg-k"><span class="hg-sw met"></span>met <span class="hg-sw under"></span>logged, under <span class="hg-sw"></span>not logged <span class="hg-sw court"></span>court minutes (dark = hard)</p>
   </section>`;
 }
-// ── Look A, part 3 (2026-11-28): habits against her targets. PLACEHOLDER until part 3 lands: the old grid. ──
+// ── Look A, part 4 (2026-11-28): habits against their targets. PLACEHOLDER until part 4 lands: the old grid. ──
 function habitsCardC(D) { return habGridPanelC(D); }
 // ── Across everyone: Athletes -> Habits ──
 function setRosterView(v) { location.hash = v === 'habits' ? 'athletes/habits' : 'athletes'; }
@@ -6930,6 +6935,9 @@ function aIco(name, cls) {
   return p ? `<svg class="a-ico${cls ? ' ' + cls : ''}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${p}</svg>` : '';
 }
 function aChip(text, tone, icon) { return `<span class="a-chip${tone ? ' ' + tone : ''}">${icon ? aIco(icon) : ''}${esc(text)}</span>`; }
+// Look A's colours as hex for SVG attributes (var() is unreliable there, as C above is for the old charts). The same values as the CSS tokens.
+const A_C = { her: '#2B59C3', usual: '#C3CCDB', usualInk: '#6E7A93', good: '#17855B', watch: '#7A4FB3', miss: '#D14B33', missInk: '#B23C28',
+  ink: '#14213D', muted: '#56627C', line: '#D9DFEA', soft: '#F4F6FA', court: '#1E7FA6', courtHard: '#135E7A', card: '#FFFFFF' };
 function aSplit(o) {
   const a = Math.max(0, Number(o.a) || 0), b = Math.max(0, Number(o.b) || 0);
   // Her share of the two; for a lift, the first estimate as a share of now (the rest of the bar is the gain).
@@ -7331,7 +7339,7 @@ function liveSnapshotHtml(D) {
     </table></div>` : ''}
   </details>`;
 }
-// ── Look A, part 4 (2026-11-28): her phone. PLACEHOLDER until part 4 lands: the old snapshot. ──
+// ── Look A, part 5 (2026-11-28): their phone. PLACEHOLDER until part 5 lands: the old snapshot. ──
 function phoneCardC(D) { return liveSnapshotHtml(D); }
 
 // --- athlete file ------------------------------------------------------------
@@ -7353,6 +7361,8 @@ function invalidateDetail() { if (_D) _D.stamp = -1; }
 // Try again after their logs failed to load: rebuild the file, which reads them again.
 function retryLogs() { invalidateDetail(); render(); }
 window.retryLogs = retryLogs;
+// ── Look A, part 1 (2026-11-28): the read, one sentence at the top of The work. PLACEHOLDER until part 1 lands: nothing. ──
+function readLineC(D) { return ''; }
 // The number you reach them on, with a button, or a nudge to add it (stage62, audit FLOW-8; Amir: "shown in the header with a WhatsApp button").
 // It sits on the right of the header (below the name on a phone), beside View their app.
 function waHeaderHtml(a) {
@@ -7594,7 +7604,7 @@ function weightPanel(a) {
       : `<p class="empty">One reading so far — a line needs a few more.</p>`}
   </details></section>`;
 }
-// ── Look A, part 3 (2026-11-28): getting stronger. PLACEHOLDER until part 3 lands: the old records and body weight. ──
+// ── Look A, part 4 (2026-11-28): getting stronger. PLACEHOLDER until part 4 lands: the old records and body weight. ──
 function strengthCardC(D) { return maxesPanel(D) + weightPanel(D.a); }
 // ── The File tab's building blocks (2026-10-12: four groups, one white panel each; label / value / action rows between hairlines) ──
 // A row: its label, then the value, its actions (right-aligned, wrapping under on a phone), one short muted hint, and `full` (a form, the
