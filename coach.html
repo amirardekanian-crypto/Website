@@ -1698,31 +1698,378 @@
   #content.afa .a-days { display: grid; gap: 12px; }
 
   /* ── Look A, part 1: the header (the player card), the read, the sub-tabs ── */
-  /* part 1 goes here */
+  /* The player card: one white card, identity and actions on top, a facts row, then the cycle box beside the Needs you box. */
+  #content.afa .dethead { display: grid; gap: 20px; background: var(--a-card); border: 1px solid var(--a-line); border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+  @media (max-width: 480px) { #content.afa .dethead { padding: 16px; gap: 16px; } }
+  #content.afa .dh-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; min-width: 0; }
+  #content.afa .det-id { flex: 1 1 320px; gap: 16px; align-items: center; }
+  #content.afa .det-ava { width: 56px; height: 56px; background: var(--a-her); font-family: var(--a-face); font-stretch: 125%; font-weight: 800; font-size: 22px; }
+  #content.afa .dethead h2.hd { font-family: var(--a-face); font-stretch: 125%; font-weight: 800; font-size: 30px; line-height: 1.1; letter-spacing: 0; text-transform: none; color: var(--a-ink); }
+  @media (max-width: 640px) { #content.afa .dethead h2.hd { font-size: 22px; } }
+  #content.afa .dethead .sub { margin-top: 8px; gap: 8px; }
+  #content.afa .dethead .chip { border-color: var(--a-line); color: var(--a-ink); font-weight: 600; }
+  #content.afa .dethead .chip.court { background: var(--a-navy); border-color: var(--a-navy); color: #fff; }
+  #content.afa .dethead .lvchip { background: var(--a-her-100); border-color: transparent; color: var(--a-her); }
+  #content.afa .det-game { margin-top: 8px; color: var(--a-muted); }
+  #content.afa .det-acts { gap: 8px; }
+  #content.afa .det-wa { gap: 8px; }
+  #content.afa .det-wa .abtn, #content.afa .det-acts .btn { background: var(--a-card); border: 1px solid var(--a-line); color: var(--a-ink); font-weight: 600; }
+  #content.afa .det-wa .abtn:hover, #content.afa .det-acts .btn:hover { border-color: var(--a-her); color: var(--a-her); background: var(--a-card); }
+  #content.afa .det-wa .abtn .a-ico { width: 14px; height: 14px; }
+  #content.afa .dethead .det-num { color: var(--a-muted); }
+  #content.afa .dethead .det-wa a:not(.abtn) { color: var(--a-her); border-bottom-color: var(--a-her-100); }
+  /* The facts: a big figure over a 12 px label, a rule between the cells. */
+  #content.afa .dh-facts { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); border-top: 1px solid var(--a-line); border-bottom: 1px solid var(--a-line); }
+  #content.afa .dh-cell { display: flex; flex-direction: column; gap: 2px; padding: 14px 20px; min-width: 0; }
+  #content.afa .dh-cell:first-child { padding-left: 0; }
+  #content.afa .dh-cell + .dh-cell { border-left: 1px solid var(--a-line); }
+  #content.afa .dh-cell b { font-stretch: 125%; font-weight: 800; font-size: 22px; line-height: 1.2; color: var(--a-ink); font-variant-numeric: tabular-nums; }
+  #content.afa .dh-cell span { font-size: 12px; color: var(--a-muted); }
+  @media (max-width: 640px) {
+    #content.afa .dh-facts { grid-auto-flow: row; }
+    #content.afa .dh-cell { flex-direction: row; align-items: baseline; gap: 12px; padding: 10px 0; }
+    #content.afa .dh-cell + .dh-cell { border-left: 0; border-top: 1px solid var(--a-line); }
+    #content.afa .dh-cell b { min-width: 76px; }
+  }
+  #content.afa .dh-main { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+  #content.afa .dh-main.one { grid-template-columns: minmax(0, 1fr); }
+  @media (max-width: 899px) { #content.afa .dh-main { grid-template-columns: minmax(0, 1fr); gap: 20px; } }
+  /* The cycle box. */
+  #content.afa .det-cycle { margin: 0; display: block; font-size: 14px; min-width: 0; }
+  #content.afa .dc-top { display: flex; align-items: center; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; }
+  #content.afa .dc-h { display: flex; align-items: baseline; gap: 4px 12px; flex-wrap: wrap; min-width: 0; }
+  #content.afa .dc-n { font-stretch: 125%; font-weight: 800; font-size: 17px; color: var(--a-ink); }
+  #content.afa .dc-name { font-weight: 700; font-size: 17px; color: var(--a-her); overflow-wrap: anywhere; }
+  #content.afa .dc-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  #content.afa .dc-bar { height: 12px; margin-top: 12px; border-radius: 999px; background: var(--a-usual); overflow: hidden; }
+  #content.afa .dc-bar i { display: block; height: 100%; border-radius: 999px; background: var(--a-her); }
+  #content.afa .dc-dates { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; font-size: 12px; font-weight: 600; color: var(--a-muted); }
+  #content.afa .dc-fo { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 8px; }
+  #content.afa .dc-fo li { position: relative; padding-left: 20px; font-size: 14px; line-height: 1.45; }
+  #content.afa .dc-fo li::before { content: ''; position: absolute; left: 4px; top: 7px; width: 8px; height: 8px; border-radius: 999px; background: var(--a-her); }
+  /* The Needs you box: a title, one row per reason (the first warning is the blue one), the goal line and the missing number as rows too. */
+  #content.afa .det-need { margin: 0; padding: 16px; border-radius: 12px; background: var(--a-ground); display: grid; gap: 8px; font-size: 14px; min-width: 0; }
+  #content.afa .dn-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  #content.afa .dn-h h3 { margin: 0; font-stretch: 125%; font-weight: 750; font-size: 17px; line-height: 1.25; color: var(--a-ink); }
+  #content.afa .dn-row { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 8px 16px; border-radius: 12px; background: var(--a-card);
+    border: 1px solid var(--a-line); color: var(--a-ink); font-weight: 600; text-decoration: none; min-width: 0; }
+  #content.afa .dn-row:hover { border-color: var(--a-her); color: var(--a-her); }
+  #content.afa .dn-row .a-ico { width: 20px; height: 20px; color: var(--a-her); }
+  #content.afa .dn-row.warn .a-ico { color: var(--a-miss-ink); }
+  #content.afa .dn-t { min-width: 0; overflow-wrap: anywhere; }
+  #content.afa .dn-t small { display: block; font-size: 12px; font-weight: 400; color: var(--a-muted); }
+  #content.afa .dn-row.primary, #content.afa .dn-row.primary:hover { background: var(--a-her); border-color: var(--a-her); color: #fff; }
+  #content.afa .dn-row.primary .a-ico { color: #fff; }
+  #content.afa .dn-goal { background: var(--a-card); border: 1px solid var(--a-line); border-radius: 12px; padding: 8px 16px; min-height: 44px; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+  #content.afa .dn-goal .from-box { min-width: 0; }
+  #content.afa .dn-goal .from-box .t-sm { overflow-wrap: anywhere; }
+  #content.afa .dn-goal .open-in, #content.afa .dn-goal input, #content.afa .dn-goal textarea { max-width: 100%; min-width: 0; box-sizing: border-box; }
+  #content.afa .dn-goal .det-goal { margin: 0; }
+  #content.afa .dn-goal .det-goal .gk, #content.afa .dn-goal .det-goal .gdone { color: var(--a-her); }
+  /* The sub-tabs: pills; the one you are on is navy. */
+  #content.afa .subrail { gap: 8px; border-bottom: 0; margin-bottom: 16px; padding-bottom: 0; }
+  #content.afa .stab { padding: 0 16px; min-height: 40px; margin-bottom: 0; border: 1px solid var(--a-line); border-radius: 999px; background: var(--a-card); color: var(--a-ink); font-weight: 600; }
+  #content.afa .stab:hover { border-color: var(--a-her); color: var(--a-her); }
+  #content.afa .stab.active { background: var(--a-navy); border-color: var(--a-navy); color: #fff; }
+  #content.afa .stab .n { background: var(--a-miss-100); color: var(--a-miss-ink); }
+  #content.afa .stab.active .n { background: var(--a-miss); color: #fff; }
+  /* The read: a navy band with a blue edge. */
+  #content.afa .a-read { display: flex; align-items: center; gap: 20px; padding: 16px 24px 16px 20px; border-radius: 12px; background: var(--a-navy); color: #fff; border-left: 4px solid var(--a-her); }
+  #content.afa .a-read .a-chip.her { flex: none; background: var(--a-her); border-color: var(--a-her); color: #fff; }
+  #content.afa .a-read p { margin: 0; font-size: 17px; line-height: 1.5; max-width: 70ch; }
+  #content.afa .a-read b { font-weight: 800; }
+  @media (max-width: 640px) { #content.afa .a-read { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px; } }
   /* ── end of part 1 ── */
   /*
      (a gap, so the five parts of the build merge without touching each other)
   */
   /* ── Look A, part 2: the three score cards ── */
-  /* part 2 goes here */
+  #content.afa .a-score { display: flex; flex-direction: column; }
+  #content.afa .a-score .a-h .a-ico { width: 18px; height: 18px; }
+  #content.afa .a-score-end { margin-top: auto; padding-top: 4px; }
+  #content.afa .a-tech { margin: 12px 0 0; font-size: 12px; line-height: 1.45; color: var(--a-muted); }
+  #content.afa .a-tech + .a-tech { margin-top: 4px; }
+  #content.afa .a-tech b { color: var(--a-ink); font-weight: 700; }
+  #content.afa .a-tech .a-chip { vertical-align: middle; }
+  #content.afa .a-cap { margin: 16px 0 0; font-size: 12px; line-height: 1.45; color: var(--a-muted); }
+  #content.afa .a-score .chart-plot { margin-top: 24px; }
+  #content.afa .a-score .chart-plot .cp-y span, #content.afa .a-score .chart-plot .cp-x { color: var(--a-muted); }
+  #content.afa .a-ov { position: relative; }
+  #content.afa .a-ovl { position: absolute; font-size: 12px; line-height: 1.2; white-space: nowrap; color: var(--a-muted); background: var(--a-card); padding: 0 3px; }
+  #content.afa .a-ovl.strong { color: var(--a-ink); font-weight: 700; }
+  #content.afa .a-ovl.her { color: var(--a-her); font-weight: 700; }
+  /* The load zones: a 0 to 2.0 scale, a marker for the ratio, the ticks and the zone names under it. */
+  #content.afa .a-zones { position: relative; margin-top: 12px; padding-top: 24px; }
+  #content.afa .a-zbar { display: flex; height: 12px; border-radius: 999px; overflow: hidden; }
+  #content.afa .a-zbar i { display: block; height: 100%; }
+  #content.afa .a-zbar .z1 { background: var(--a-usual); }
+  #content.afa .a-zbar .z2 { background: #8CCFB1; }
+  #content.afa .a-zbar .z3 { background: #C4B1E4; }
+  #content.afa .a-zbar .z4 { background: #F2A798; }
+  #content.afa .a-zmark-l { position: absolute; top: 0; transform: translateX(-50%); font-size: 12px; line-height: 16px; font-weight: 700; color: var(--a-ink); font-variant-numeric: tabular-nums; }
+  #content.afa .a-zmark-d { position: absolute; top: 24px; width: 12px; height: 12px; margin-left: -6px; box-sizing: border-box; border-radius: 50%; background: var(--a-ink); border: 2px solid var(--a-card); }
+  #content.afa .a-zrow { position: relative; height: 16px; margin-top: 4px; font-size: 12px; line-height: 16px; color: var(--a-muted); }
+  #content.afa .a-zrow span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+  #content.afa .a-zrow span.l { transform: none; }
+  #content.afa .a-zrow span.r { transform: translateX(-100%); }
+  #content.afa .a-zrow.names { margin-top: 0; color: var(--a-ink); font-weight: 600; }
+  #content.afa .a-zrow.names.on span.on { color: var(--a-ink); }
+  /* Readiness and sessions. */
+  #content.afa .a-lgs { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 8px; font-size: 12px; color: var(--a-muted); }
+  #content.afa .a-lg { display: inline-flex; align-items: center; gap: 6px; }
+  #content.afa .a-lg-dot { display: block; width: 12px; height: 12px; box-sizing: border-box; border-radius: 8px; background: var(--a-her); }
+  #content.afa .a-lg-dot.line { height: 2px; border-radius: 999px; width: 16px; }
+  #content.afa .a-lg-dot.dash { height: 0; width: 16px; border-radius: 0; background: none; border-top: 2px dashed var(--a-usual-ink); }
+  #content.afa .a-lg-dot.half { border: 1.5px solid var(--a-her); background: linear-gradient(to top, var(--a-her) 50%, var(--a-her-100) 50%); }
+  #content.afa .a-lg-dot.miss { border: 1.5px dashed var(--a-miss); background: var(--a-miss-100); }
+  #content.afa .a-wk { margin-top: 12px; display: grid; gap: 8px; }
+  #content.afa .a-wkrow { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; column-gap: 8px; align-items: center; }
+  #content.afa .a-wkrow .d { font-size: 12px; font-weight: 600; color: var(--a-ink); }
+  #content.afa .a-wkrow .n { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  #content.afa .a-wkrow .h { grid-column: 2 / 4; font-size: 12px; color: var(--a-muted); }
+  #content.afa .a-wkboxes { display: flex; flex-wrap: wrap; gap: 4px; }
+  #content.afa .a-sl { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; box-sizing: border-box; border-radius: 8px; border: 1.5px solid var(--a-her); }
+  #content.afa .a-sl .a-ico { width: 14px; height: 14px; stroke-width: 2.5; }
+  #content.afa .a-sl.done { background: var(--a-her); color: #FFFFFF; }
+  #content.afa .a-sl.half { background: linear-gradient(to top, var(--a-her) 50%, var(--a-her-100) 50%); }
+  #content.afa .a-sl.miss { border: 1.5px dashed var(--a-miss); background: var(--a-miss-100); color: var(--a-miss-ink); }
+  #content.afa .a-split.solo .a-split-n { justify-content: flex-start; }
+  #content.afa .a-split.solo .a-split-n > div:last-child { text-align: left; }
+  #content.afa .a-split.solo .a-split-n > div:last-child b { color: var(--a-her); }
+  #content.afa .a-none { margin: 16px 0 0; font-size: 14px; color: var(--a-muted); }
   /* ── end of part 2 ── */
   /*
      (a gap, so the five parts of the build merge without touching each other)
   */
   /* ── Look A, part 3: the cycle, day by day ── */
-  /* part 3 goes here */
+  #content.afa .cy-key { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 12px; font-size: 12px; color: var(--a-muted); }
+  #content.afa .cy-key > span { display: inline-flex; align-items: center; gap: 6px; }
+  #content.afa .cy-sw { display: inline-block; width: 16px; height: 16px; border-radius: 8px; background: var(--a-her); }
+  #content.afa .cy-sw.half { background: linear-gradient(to bottom, #E3EAF8 50%, var(--a-her) 50%); border: 1px solid var(--a-her); }
+  #content.afa .cy-sw.court { background: var(--a-court); }
+  #content.afa .cy-sw.hard { background: var(--a-court-hard); }
+  #content.afa .cy-sw.today { background: var(--a-card); border: 2px solid var(--a-ink); }
+  #content.afa .cy-scroll { margin-top: 16px; overflow-x: auto; padding-bottom: 4px; }
+  #content.afa .cy-grid { min-width: 640px; display: grid; gap: 8px; }
+  #content.afa .cy-r { display: grid; grid-template-columns: 64px repeat(7, minmax(0, 1fr)) 88px; gap: 8px; align-items: stretch; }
+  #content.afa .cy-dw { text-align: center; font-size: 12px; font-weight: 600; color: var(--a-muted); }
+  #content.afa .cy-wkh { text-align: left; }
+  #content.afa .cy-wl { align-self: center; font-size: 14px; font-weight: 750; color: var(--a-ink); }
+  #content.afa .cy-c { min-height: 52px; border-radius: 8px; border: 1px dashed var(--a-line); display: flex; gap: 2px; min-width: 0; overflow: hidden; }
+  #content.afa .cy-c.has { border: 0; }
+  #content.afa .cy-c.is-fut { border-style: dotted; opacity: .7; }
+  #content.afa .cy-c.is-today { border: 2px solid var(--a-ink); border-style: solid; }
+  #content.afa .cy-td { margin: auto; font-size: 12px; font-weight: 700; color: var(--a-ink); }
+  #content.afa .cy-p { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; background: var(--a-her); color: #FFFFFF; font-size: 12px; font-weight: 700; }
+  #content.afa .cy-p .cy-t, #content.afa .cy-p .cy-m { flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; min-width: 0; font-variant-numeric: tabular-nums; }
+  #content.afa .cy-p .a-ico { width: 12px; height: 12px; stroke-width: 2.25; }
+  #content.afa .cy-p.is-half { outline: 1px solid var(--a-her); outline-offset: -1px; border-radius: 8px; }
+  #content.afa .cy-p.is-half .cy-t { background: #E3EAF8; color: var(--a-ink); }
+  #content.afa .cy-p.is-court { background: var(--a-court); }
+  #content.afa .cy-p.is-court.is-hard { background: var(--a-court-hard); }
+  #content.afa .cy-wt { align-self: center; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--a-muted); white-space: nowrap; }
+  #content.afa .cy-wt.is-held { color: var(--a-ink); }
+  #content.afa .cy-wt.is-fut { font-weight: 400; }
+  #content.afa .cy-ok { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 999px; background: var(--a-good); color: #FFFFFF; }
+  #content.afa .cy-ok .a-ico { width: 12px; height: 12px; stroke-width: 2.5; }
+  #content.afa .cy-brr { margin-top: -6px; }
+  #content.afa .cy-br { display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 22px; border: 2px solid var(--a-miss); border-top: 0; border-radius: 0 0 8px 8px; color: var(--a-miss-ink); font-size: 12px; font-weight: 700; white-space: nowrap; }
+  #content.afa .cy-br.cont { border-left: 0; border-radius: 0 0 8px 0; }
+  #content.afa .cy-br.goes { border-right: 0; border-radius: 0 0 0 8px; }
+  #content.afa .cy-br .a-ico { width: 12px; height: 12px; }
+  #content.afa .cy-end { align-self: center; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--a-muted); font-weight: 600; }
+  #content.afa .cy-end .a-ico { color: var(--a-good); }
+  #content.afa .cy-say { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--a-line); }
+  #content.afa .cy-sayh { font-family: var(--a-face); font-stretch: 125%; font-weight: 750; font-size: 17px; }
+  #content.afa .cy-lines { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+  @media (max-width: 899px) { #content.afa .cy-lines { grid-template-columns: minmax(0, 1fr); } }
+  #content.afa .cy-line { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; border-radius: 8px; background: var(--a-soft); font-size: 14px; line-height: 1.45; }
+  #content.afa .cy-line .a-ico { margin-top: 2px; color: var(--a-her); width: 18px; height: 18px; }
+  #content.afa .cy-line.miss { background: var(--a-miss-100); }
+  #content.afa .cy-line.miss .a-ico { color: var(--a-miss-ink); }
+  #content.afa .cy-line.good { background: var(--a-good-100); }
+  #content.afa .cy-line.good .a-ico { color: var(--a-good); }
+  #content.afa .cy-line.watch { background: var(--a-watch-100); }
+  #content.afa .cy-line.watch .a-ico { color: var(--a-watch); }
+  #content.afa .cy-foot { margin: 12px 0 0; font-size: 12px; color: var(--a-muted); }
   /* ── end of part 3 ── */
   /*
      (a gap, so the five parts of the build merge without touching each other)
   */
   /* ── Look A, part 4: habits against their targets, getting stronger ── */
-  /* part 4 goes here */
+  #content.afa .a-hab .a-verdict, #content.afa .a-str .a-verdict { align-items: flex-start; }
+  #content.afa .a-hab .a-verdict .a-ico, #content.afa .a-str .a-verdict .a-ico { margin-top: 3px; }
+  #content.afa .a-hsub4 { margin: 16px 0 0; font-size: 14px; color: var(--a-muted); }
+  #content.afa .a-keys { display: grid; gap: 12px; margin-top: 8px; }
+  #content.afa .a-key { background: var(--a-soft); border-radius: 12px; padding: 16px 20px; }
+  #content.afa .a-key-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+  #content.afa .a-key-h b { font-stretch: 125%; font-weight: 750; font-size: 17px; }
+  #content.afa .a-key .a-split { margin-top: 8px; }
+  #content.afa .a-key-one { margin: 12px 0 0; font-size: 14px; color: var(--a-muted); }
+  /* The rest: a row a habit, a dot a day (met filled in the tone, logged-under paler, not logged empty, not yet switched on dashed). */
+  #content.afa .a-hrs { display: grid; margin-top: 4px; }
+  #content.afa .a-hr { display: grid; grid-template-columns: minmax(96px, 1.1fr) minmax(0, 1.3fr) auto 64px; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--a-line); font-size: 14px; }
+  #content.afa .a-hr:first-child { border-top: 0; }
+  #content.afa .a-hr.good { color: var(--a-good); }
+  #content.afa .a-hr.watch { color: var(--a-watch); }
+  #content.afa .a-hr.miss { color: var(--a-miss-ink); }
+  #content.afa .a-hr-n { display: flex; align-items: center; gap: 8px; font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+  #content.afa .a-hr-v { color: var(--a-muted); min-width: 0; overflow-wrap: anywhere; }
+  #content.afa .a-hr-d { display: flex; gap: 4px; }
+  #content.afa .a-hr-d .sq { display: block; width: 14px; height: 14px; border-radius: 999px; background: var(--a-line); }
+  #content.afa .a-hr-d .sq.met { background: currentColor; }
+  #content.afa .a-hr-d .sq.under { background: currentColor; opacity: .4; }
+  #content.afa .a-hr-d .sq.off { background: none; border: 1px dashed var(--a-usual); }
+  #content.afa .a-hr-c { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+  #content.afa .a-chips4 { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  #content.afa .a-body .a-chips4 { margin-top: 8px; }
+  @media (max-width: 480px) {
+    #content.afa .a-hr { grid-template-columns: minmax(0, 1fr) auto; row-gap: 8px; }
+    #content.afa .a-hr-v { grid-column: 1; grid-row: 2; }
+    #content.afa .a-hr-d { grid-column: 2; grid-row: 2; }
+    #content.afa .a-hr-c { grid-column: 2; grid-row: 1; }
+  }
+  /* The steps target and its controls. */
+  #content.afa .a-stc { margin-top: 16px; background: var(--a-soft); border-radius: 12px; padding: 12px 16px; }
+  #content.afa .a-stc > summary { display: flex; align-items: center; gap: 8px; }
+  #content.afa .a-stc-t { flex: 1; min-width: 0; font-size: 14px; }
+  #content.afa .a-stc-t b { font-stretch: 125%; font-weight: 800; font-size: 17px; margin: 0 4px; }
+  #content.afa .a-stc-c { flex: none; display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--a-line); background: var(--a-card); font-size: 14px; font-weight: 600; }
+  #content.afa .a-stc-b { margin-top: 12px; }
+  #content.afa .a-stc-b .a-how { background: var(--a-card); }
+  #content.afa .a-stc-a { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+  #content.afa .a-stc-a input { width: 110px; }
+  /* The 14-day grid, folded; its own panel loses its border so it is not a card in a card. */
+  #content.afa .a-hg14 { margin-top: 12px; }
+  #content.afa .a-hg14 > summary { border: 1px solid var(--a-line); border-radius: 8px; padding: 8px 12px; min-height: 32px; display: flex; align-items: center; }
+  #content.afa .a-card #habGrid { border: 0; border-radius: 0; padding: 12px 0 0; background: none; animation: none; margin: 0; --hg-mid: rgba(30,127,166,0.30); }
+  #content.afa .a-card #habGrid .hg-c.met, #content.afa .a-card #habGrid .hg-c.court.hard { background: var(--a-court-hard); }
+  #content.afa .a-card #habGrid .hg-c.under { background: var(--a-her-100); color: var(--a-her); }
+  #content.afa .a-card #habGrid .hg-c.court { color: var(--a-court-hard); }
+  #content.afa .a-card #habGrid .hg-c.court.hard { color: #fff; }
+  #content.afa .a-card #habGrid .hg-c { background-color: var(--a-soft); }
+  #content.afa .a-card #habGrid .hg-c.x, #content.afa .a-card #habGrid .hg-c.court.x { background: none; }
+  #content.afa .a-card #habGrid .hg-l { background: var(--a-card); }
+  /* Wall lines. */
+  #content.afa .a-wall { margin-top: 8px; }
+  #content.afa .a-wl { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--a-line); }
+  #content.afa .a-wl.hid { opacity: .55; }
+  #content.afa .a-wl-b { flex: 1; min-width: 0; }
+  #content.afa .a-wl-t { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; }
+  #content.afa .a-wl-x { margin-top: 4px; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+  /* Getting stronger. */
+  #content.afa .a-lifts { margin-top: 4px; }
+  #content.afa .a-lift { padding: 16px 0; border-top: 1px solid var(--a-line); }
+  #content.afa .a-lift:first-child { border-top: 0; padding-top: 8px; }
+  #content.afa .a-lift-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+  #content.afa .a-lift-c { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+  #content.afa .a-lift-n { font-weight: 700; font-size: 14px; overflow-wrap: anywhere; }
+  #content.afa .pr-tag { background: var(--a-soft); color: var(--a-muted); }
+  #content.afa .a-lift-a { margin: 8px 0 0; font-size: 12px; color: var(--a-muted); }
+  #content.afa .a-first { margin-top: 16px; border: 1px dashed var(--a-usual); border-radius: 12px; padding: 4px 16px 16px; }
+  #content.afa .a-first-g { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 24px; margin-top: 8px; }
+  #content.afa .a-lift.q { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 8px 0; border-top: 0; align-items: baseline; font-size: 14px; }
+  #content.afa .a-lift.q:first-child { padding-top: 8px; }
+  #content.afa .a-lift-n2 { min-width: 0; }
+  #content.afa .a-lift-n2 .a-lift-n { font-weight: 400; }
+  #content.afa .a-lift-v { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  #content.afa .a-lift-s { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--a-muted); }
+  @media (max-width: 480px) { #content.afa .a-first-g { grid-template-columns: minmax(0, 1fr); } }
+  /* Body weight. */
+  #content.afa .a-body { margin-top: 16px; background: var(--a-soft); border-radius: 12px; padding: 16px 20px; }
+  #content.afa .a-body-h { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  #content.afa .a-body-h > .a-ico { width: 24px; height: 24px; color: var(--a-her); }
+  #content.afa .a-body-h small { display: block; font-size: 12px; color: var(--a-muted); }
+  #content.afa .a-body-h b { display: block; font-stretch: 125%; font-weight: 800; font-size: 22px; line-height: 1.2; }
+  #content.afa .a-body-w { margin-left: auto; text-align: right; }
+  #content.afa .a-body-w b { font-size: 14px; font-stretch: 100%; font-weight: 700; }
+  #content.afa .a-spark { flex: 1 1 120px; min-width: 100px; max-width: 220px; height: 40px; }
+  #content.afa .a-body .wtdet { margin-top: 12px; }
+  #content.afa .a-body .wtdet > summary { font-weight: 600; }
+  #content.afa .a-foot { margin: 16px 0 0; font-size: 12px; color: var(--a-muted); }
+  #content.afa .a-str .how { border-top: 0; padding-bottom: 0; }
+  #content.afa .a-str .how > summary { color: var(--a-muted); }
   /* ── end of part 4 ── */
   /*
      (a gap, so the five parts of the build merge without touching each other)
   */
   /* ── Look A, part 5: the sessions, earlier cycles, their phone ── */
-  /* part 5 goes here */
+  /* The day card: a blue line on top, the day as a tile, the facts as chips, the score on the right, the comparison inside. */
+  #content.afa .wday { margin: 0; background: var(--a-card); border: 1px solid var(--a-line); border-top: 3px solid var(--a-her); border-radius: 12px; overflow: clip;
+    animation: riseIn .4s cubic-bezier(.16,1,.3,1) both; }
+  #content.afa.no-anim .wday, #tabbody.a-still .wday { animation: none; }
+  #content.afa .wday.warn { border-left: 1px solid var(--a-line); }
+  #content.afa .wday.idle { background: var(--a-card); border-top-color: var(--a-usual); }
+  #content.afa .wday-top { align-items: flex-start; gap: 12px; padding: 16px 20px; }
+  #content.afa .wday-top:hover { background: var(--a-soft); }
+  #content.afa .wday-n { width: auto; height: auto; padding: 2px 10px; border-radius: 8px; background: var(--a-her-100); color: var(--a-her); font-family: var(--a-face);
+    font-stretch: 125%; font-weight: 800; font-size: 14px; line-height: 1.5; white-space: nowrap; margin-top: 2px; }
+  #content.afa .wday.idle .wday-n { background: var(--a-soft); color: var(--a-muted); }
+  #content.afa .wday-title { font-stretch: 125%; font-weight: 750; font-size: 17px; line-height: 1.3; color: var(--a-ink); }
+  #content.afa .wday-title .zpill { font-stretch: 100%; }
+  #content.afa .wday-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; font-size: 12px; color: var(--a-muted); }
+  #content.afa .wday-meta .a-chip { white-space: normal; max-width: 100%; }
+  #content.afa .wday-none { font-size: 12px; color: var(--a-muted); }
+  #content.afa .wday-right { align-items: flex-start; }
+  #content.afa .dv { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; font-size: 14px; font-weight: 400; color: var(--a-muted); }
+  #content.afa .dv-score { font-size: 14px; color: var(--a-muted); white-space: nowrap; }
+  #content.afa .dv-score b { font-family: var(--a-face); font-stretch: 125%; font-weight: 800; font-size: 22px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+  #content.afa .dv.ok .dv-score b { color: var(--a-good); }
+  #content.afa .dv.warn .dv-score b, #content.afa .dv.miss .dv-score b { color: var(--a-miss-ink); }
+  #content.afa .wday .day-c-chev { margin-top: 8px; }
+  #content.afa .wday-body { padding: 0 20px 20px; }
+  /* The big-day pill is a dark chip with a bolt (the element and its title are the footprint's own). */
+  #content.afa .zpill.fp-big { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border: 1px solid var(--a-navy); background: var(--a-navy); color: #FFFFFF; font-size: 12px; font-weight: 600; line-height: 1.5; }
+  #content.afa .zpill.fp-big::before { content: ''; width: 12px; height: 12px; background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linejoin='round'%3E%3Cpath d='M13 2.5 4.5 13.5H11l-1 8 8.5-11H12l1-8Z'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linejoin='round'%3E%3Cpath d='M13 2.5 4.5 13.5H11l-1 8 8.5-11H12l1-8Z'/%3E%3C/svg%3E") center / contain no-repeat; }
+  /* Inside the day: the picker, the warnings, the day note. */
+  #content.afa .sesspick { border-top-color: var(--a-line); }
+  #content.afa .sp.on { background: var(--a-her); border-color: var(--a-her); color: #FFFFFF; }
+  #content.afa .sp:hover { border-color: var(--a-her); color: var(--a-her); }
+  #content.afa .sp.on:hover { color: #FFFFFF; }
+  #content.afa .stalewarn { background: var(--a-watch-100); border-left: 3px solid var(--a-watch); color: var(--a-ink); }
+  #content.afa .daynote { background: var(--a-soft); border-left: 3px solid var(--a-her); }
+  #content.afa .rawlog { border-top-color: var(--a-line); }
+  /* The comparison: Exercise, Asked, Did, Verdict. */
+  #content.afa .cmp-grp-t { color: var(--a-muted); }
+  #content.afa .cmp-head { text-transform: none; letter-spacing: 0; font-size: 12px; font-weight: 600; color: var(--a-muted); border-bottom-color: var(--a-line); }
+  #content.afa .cmp-row { border-bottom-color: var(--a-line); }
+  #content.afa .cmp-row.warn::before { background: var(--a-watch); }
+  #content.afa .cmp-row.miss::before { background: var(--a-miss); }
+  #content.afa .cmp-nm { color: var(--a-ink); }
+  #content.afa .cmp-vid { color: var(--a-her); }
+  #content.afa .rx-rpe { color: var(--a-her); }
+  #content.afa .cmp-flags { gap: 6px; }
+  #content.afa .did-sets.ok { color: var(--a-good); }
+  #content.afa .did-sets.warn { color: var(--a-watch); }
+  #content.afa .did-sets.miss, #content.afa .did-rpe.warn { color: var(--a-miss-ink); }
+  /* Your note folds; their note is a soft speech bubble. */
+  #content.afa .cmp-cnote { margin-top: 8px; padding: 4px 8px; border: 0; border-radius: 8px; background: var(--a-soft); font-size: 12px; }
+  #content.afa .cmp-cnote > summary { font-size: 12px; color: var(--a-muted); }
+  #content.afa .cmp-cnote .cn-txt { padding: 4px 0 4px 20px; line-height: 1.45; color: var(--a-ink); }
+  #content.afa .cmp-anote { display: flex; gap: 8px; align-items: flex-start; margin-top: 8px; padding: 8px 12px; border: 0; border-radius: 12px; background: var(--a-her-100); font-size: 12px; line-height: 1.45; color: var(--a-ink); }
+  #content.afa .cmp-anote .a-ico { margin-top: 1px; color: var(--a-her); }
+  /* Earlier cycles: a fold card; each session a row of chips. */
+  #content.afa details.rawlog.earlier { margin: 0; padding: 16px 20px; border: 1px solid var(--a-line); border-radius: 12px; background: var(--a-card); }
+  #content.afa details.rawlog.earlier > summary { font-stretch: 125%; font-weight: 750; font-size: 17px; }
+  #content.afa details.rawlog.earlier > details.rawlog { margin: 8px 0 0; padding-top: 8px; border-top: 1px solid var(--a-line); }
+  #content.afa details.rawlog.earlier > details.rawlog > summary { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-weight: 400; }
+  #content.afa details.rawlog.earlier > details.rawlog > summary::before { margin-right: 6px; }
+  #content.afa .ec-day { font-size: 14px; font-weight: 600; margin-right: 6px; }
+  /* Their phone: red only when something is stuck on it, else one quiet line. */
+  #content.afa .a-phone.stuck { border-color: var(--a-miss); background: var(--a-miss-100); }
+  #content.afa .a-phone.stuck .a-h .a-ico, #content.afa .a-phone.stuck .a-ctx .a-ico { color: var(--a-miss-ink); }
+  #content.afa .a-phone-fold { margin-top: 12px; }
+  #content.afa .a-phone-fold > summary { font-size: 14px; font-weight: 600; }
+  #content.afa .a-phone-body { padding-top: 8px; }
+  #content.afa .a-phone.quiet { padding: 0 4px; }
+  #content.afa .a-phone-l { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--a-muted); }
+  #content.afa .a-phone-l .a-ico { color: var(--a-muted); }
+  #content.afa .a-phone-s { margin: 2px 0 0 24px; font-size: 12px; color: var(--a-muted); }
+  #content.afa .a-phone.quiet .a-phone-fold { margin: 8px 0 0 24px; }
+  @media (max-width: 900px) { #content.afa .wday-right { justify-content: flex-start; } #content.afa .dv { justify-content: flex-start; } }
+  @media (max-width: 480px) { #content.afa .wday-top { padding: 16px; } #content.afa .wday-body { padding: 0 16px 16px; } }
   /* ── end of part 5 ── */
 </style>
 </head>
@@ -4768,55 +5115,181 @@ function lineSVG(series, opts) {
   if (loAt - hiAt < 0.18) { const mid = (hiAt + loAt) / 2; hiAt = mid - 0.09; loAt = mid + 0.09; }
   return plotAxes(svg, [{ at: hiAt, text: ax.hi.text }, { at: loAt, text: ax.lo.text }], ax.x);
 }
-function renderCharts(m) {
-  const az = acwrZone(m.acwr.enough ? m.acwr.ratio : null);
-  const azColor = az.cls === 'red' ? 'tone-clay' : az.cls === 'amber' ? 'tone-plum' : az.cls === 'green' ? 'tone-green' : 'tone-ink';
-  const hasLoad = Object.keys(m.daily).length > 0;
-  const head = (title, big) => `<div class="chart-head"><h4>${title}</h4> ${big || ''}</div>`;
-  const loadBig = m.acwr.enough && m.acwr.ratio != null
-    ? `<div class="chart-big ${azColor}">${round1(m.acwr.ratio)}<span class="cb-unit">ACWR · ${az.label}</span></div>`
-    : m.acwr.partial ? `<div class="chart-big chart-big-quiet">Not enough data</div>`
-    : `<div class="chart-big chart-big-quiet">Building baseline</div>`;
-  const loadSub = m.acwr.enough && m.acwr.ratio != null
-    ? `<div class="chart-sub">${Math.round(m.acwr.acute)} AU this week vs ${Math.round(m.acwr.chronicWeekly)} AU weekly average${m.acwr.spanDays < 27 ? ` (over ${Math.min(m.acwr.spanDays + 1, 28)} days of history)` : ''}</div>`
-    : m.acwr.partial
-      ? `<div class="chart-sub">${m.cover.total - m.cover.withLoad} of ${m.cover.total} session${m.cover.total === 1 ? '' : 's'} in the last 4 weeks ${m.cover.total - m.cover.withLoad === 1 ? 'has' : 'have'} no duration or RPE, so a ratio would be a wrong number. ${m.cover.total - m.cover.withLoad === 1 ? 'It is' : 'They are'} left out. The ratio comes back when ${m.cover.total - m.cover.withLoad === 1 ? 'it is' : 'those are'} filled in, or once ${m.cover.total - m.cover.withLoad === 1 ? 'it is' : 'they are'} more than 4 weeks old.</div>`
-      : `<div class="chart-sub">Needs ~2 weeks of sessions with a duration logged.</div>`;
-  const loadCard = `<div class="chart-card">
-    ${head('Training load', loadBig)}
-    ${loadSub}
-    ${hasLoad
-      ? barsSVG(weeklyLoad(m.daily, 8), C.green) + `<div class="chart-legend">Weekly load (AU = session RPE × minutes), last 8 weeks${
-          m.cover && m.cover.total > m.cover.withLoad ? ` · <b>${m.cover.total - m.cover.withLoad} of ${m.cover.total} sessions in the last 4 weeks have no duration or RPE and are left out</b>` : ''}</div>`
-      : `<p class="empty">No load data yet — needs sessions with a logged duration.</p>`}
-  </div>`;
-  const r = m.readiness;
-  const rColor = !r || r.delta == null ? 'tone-muted' : r.delta <= -1 ? 'tone-clay' : r.delta <= -0.5 ? 'tone-plum' : 'tone-green';
-  const readyCard = `<div class="chart-card">
-    ${r
-      ? `${head('Readiness', `<div class="chart-big ${rColor}">${round1(r.latest)}<span class="cb-unit">/5${r.baseline != null ? ' · usual ' + round1(r.baseline) : ' · no usual yet'}</span></div>`)}
-         <div class="chart-sub">${r.delta == null ? 'Their usual starts once they have five check-ins to go on.' : (r.delta >= 0 ? '+' : '') + round1(r.delta) + ' vs their usual (the mean of their last ten check-ins before this one)'}</div>
-         ${lineSVG(m.rser, { color: C.green, baseline: r.baseline, yMin: 1, yMax: 5,
-           axis: { hi: { v: 5, text: '5' }, lo: { v: 1, text: '1' }, x: axisDays(m.rser[0].iso, m.rser[m.rser.length - 1].iso) } })}
-         <div class="chart-legend">The check-in score per session (1–5: sleep, energy, stress and how ready they feel; higher = fresher), as the athlete's app scores it · dashed = their usual now</div>`
-      : `${head('Readiness')}<p class="empty">No readiness check-ins yet.</p>`}
-  </div>`;
-  const adh = m.adherence;
-  const adhColor = !adh || adh.pct == null ? 'tone-muted' : adh.pct >= 85 ? 'tone-green' : adh.pct >= 60 ? 'tone-plum' : 'tone-clay';
-  const adhDone = adh ? (adh.done % 1 ? adh.done.toFixed(1) : adh.done) : 0;
-  const adhFrom = adh && adh.pct != null ? axisDays(addDays(todayKey(), -(adh.days - 1)), todayKey()) : [];
-  const adhCard = `<div class="chart-card">
-    ${adh && adh.pct != null
-      ? `${head('Adherence', `<div class="chart-big ${adhColor}">${adh.pct}%<span class="cb-unit">last ${adh.days < 28 ? adh.days + ' days' : '4 wks'}</span></div>`)}
-         <div class="chart-sub">${adhDone} of ${adh.expected} planned sessions completed${adh.extra ? ` (${adh.extra % 1 ? adh.extra.toFixed(1) : adh.extra} more than planned)` : ''}${adh.bonus ? ` · <span class="tone-green">+${adh.bonus % 1 ? adh.bonus.toFixed(1) : adh.bonus} optional, a bonus</span>` : ''}</div>
-         <div class="chart-bar"><div class="bar"><div class="bar-fill ${adhColor}" style="width:${Math.min(adh.pct, 100)}%"></div></div><div class="cp-x"><span>0%</span><span>100%</span></div></div>
-         <div class="chart-legend">Planned = ${adh.perWeek}/week (their program${adh.optional ? `, plus ${adh.optional} optional day${adh.optional === 1 ? ' that never counts' : 's that never count'} as a miss` : ''}), over the last ${adh.days} day${adh.days === 1 ? '' : 's'}${adhFrom.length === 2 ? ` (${adhFrom[0]} to ${adhFrom[1]})` : ''}</div>`
-      : `${head('Adherence')}<p class="empty">Needs a program file and at least one finished session.</p>`}
-  </div>`;
-  return `<div class="charts">${loadCard}${readyCard}${adhCard}</div>`;
+// ── Look A, part 2 (2026-11-28): the three score cards on The work. Each is a verdict in words, a split bar (their number against their usual, their
+// plan or their first estimate), the technical line, a chart and one plain sentence. Every fact the old strip and charts (metricStripHtml, renderCharts)
+// showed is still here; those two stay as they were, undrawn. ──
+const SC_NUM = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+const scNum = n => (n >= 0 && n <= 10 && n % 1 === 0) ? SC_NUM[n] : String(n);
+const scFmt = n => (n % 1 ? n.toFixed(1) : String(n));
+function scoreVerdictC(word, tone, icon) { return `<div class="a-verdict ${tone}">${aIco(icon)}<span>${esc(word)}</span></div>`; }
+function scoreCardC(cls, icon, title, verdict, body, ctx, how) {
+  return `<section class="a-card a-score ${cls}"><h3 class="a-h">${aIco(icon)}${esc(title)}</h3>${verdict}${body}
+    <div class="a-score-end">${ctx ? `<div class="a-ctx">${aIco('info')}<span>${esc(ctx)}</span></div>` : ''}<div class="a-how"><b>How to read it.</b> ${esc(how)}</div></div></section>`;
 }
-// ── Look A, part 2 (2026-11-28): the three score cards on The work. PLACEHOLDER until part 2 lands: the old strip. ──
-function scoreCardsC(D) { return metricStripHtml(D.metrics); }
+function scoreCardsC(D) {
+  const m = D.metrics;
+  return `<div class="a-row3 a-scores">${scoreLoadC(m, D)}${scoreReadyC(m)}${scoreSessionsC(m, D)}</div>`;
+}
+// Training load: this week against their usual week, the zone, and the eight weekly bars.
+function scoreLoadChartC(m, shown) {
+  const b = weeklyLoad(m.daily, 8), w = 320, h = 120, top = 8, base = 118, n = b.length, slot = w / n;
+  const usual = shown ? m.acwr.chronicWeekly : 0;
+  const max = Math.max(1, ...b.map(x => x.load), usual);
+  const Y = v => base - (v / max) * (base - top);
+  const bars = b.map((x, i) => {
+    const bh = (x.load / max) * (base - top), last = i === n - 1;
+    return `<rect x="${(i * slot + slot * 0.18).toFixed(1)}" y="${(base - bh).toFixed(1)}" width="${(slot * 0.64).toFixed(1)}" height="${Math.max(0, bh).toFixed(1)}" rx="3" fill="${last ? A_C.her : A_C.usual}"></rect>`;
+  }).join('');
+  const rules = [top, base].map(y => `<line x1="0" y1="${y}" x2="${w}" y2="${y}" stroke="${A_C.line}" stroke-width="1"/>`).join('');
+  const dash = usual > 0 ? `<line x1="0" y1="${Y(usual).toFixed(1)}" x2="${w}" y2="${Y(usual).toFixed(1)}" stroke="${A_C.ink}" stroke-width="1.5" stroke-dasharray="5 4"/>` : '';
+  const xp = i => ((i + 0.5) / n * 100).toFixed(1);
+  const lbl = [];
+  if (usual > 0) lbl.push(`<span class="a-ovl" style="left:0;top:${(Y(usual) / h * 100).toFixed(1)}%;transform:translateY(-100%)">usual week ${Math.round(usual).toLocaleString('en-GB')}</span>`);
+  b.forEach((x, i) => { if (!x.load) lbl.push(`<span class="a-ovl" style="left:${xp(i)}%;top:${(base / h * 100).toFixed(1)}%;transform:translate(-50%,-100%)">none</span>`); });
+  if (b[n - 1].load) lbl.push(`<span class="a-ovl her" style="left:${xp(n - 1)}%;top:${(Y(b[n - 1].load) / h * 100).toFixed(1)}%;transform:translate(-50%,-100%)">${Math.round(b[n - 1].load).toLocaleString('en-GB')}</span>`);
+  const aria = `Weekly load, the last 8 weeks from ${axisDays(dkey(b[0].start), dkey(b[0].start))[0]}: ${b.map(x => x.load ? Math.round(x.load) : 'none').join(', ')}. The last bar is this week.${usual > 0 ? ' Their usual week is ' + Math.round(usual) + '.' : ''}`;
+  const svg = `<div class="a-ov"><svg class="chart-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(aria)}">${rules}${bars}${dash}</svg>${lbl.join('')}</div>`;
+  return plotAxes(svg, [{ at: top / h, text: Math.round(max).toLocaleString('en-GB') }, { at: base / h, text: '0' }],
+    axisDays(dkey(b[0].start), dkey(b[n - 1].start)));
+}
+function scoreZonesC(ratio) {
+  const at = v => (v / 2 * 100).toFixed(1) + '%', x = Math.min(2, ratio);
+  const t = (v, txt, c) => `<span${c ? ` class="${c}"` : ''} style="left:${at(v)}">${txt}</span>`;
+  return `<div class="a-zones"><span class="a-zmark-l" style="left:${at(x)}">${ratio.toFixed(2)}</span><span class="a-zmark-d" style="left:${at(x)}"></span>
+    <div class="a-zbar" role="img" aria-label="Load zones: light under 0.8, sweet spot 0.8 to 1.3, climbing 1.3 to 1.5, spike over 1.5. The ratio is ${ratio.toFixed(2)}."><i class="z1" style="flex:0.8"></i><i class="z2" style="flex:0.5"></i><i class="z3" style="flex:0.2"></i><i class="z4" style="flex:0.5"></i></div>
+    <div class="a-zrow" aria-hidden="true">${t(0, '0', 'l')}${t(0.8, '0.8')}${t(1.3, '1.3')}${t(1.5, '1.5')}${t(2, '2.0', 'r')}</div>
+    <div class="a-zrow names" aria-hidden="true">${t(0.4, 'Light')}${t(1.05, 'Sweet spot')}${t(1.75, 'Spike')}</div>
+    <div class="a-zrow names" aria-hidden="true">${t(1.4, 'Climbing')}</div></div>`;
+}
+function scoreLoadC(m, D) {
+  const ac = m.acwr, cv = m.cover, shown = ac.enough && ac.ratio != null, lack = cv.total - cv.withLoad;
+  const sing = lack === 1, hasLoad = Object.keys(m.daily).length > 0;
+  let verdict, split = '', tech = '', zones = '';
+  if (shown) {
+    const r = ac.ratio;
+    verdict = r > 1.5 ? scoreVerdictC('Spike', 'a-miss', 'up') : r > 1.3 ? scoreVerdictC('Climbing', 'a-watch', 'up')
+      : r >= 0.8 ? scoreVerdictC('Sweet spot', 'a-good', 'check') : scoreVerdictC('Light week', 'a-watch', 'down');
+    split = aSplit({ a: ac.acute, b: ac.chronicWeekly, fa: Math.round(ac.acute).toLocaleString('en-GB'), fb: Math.round(ac.chronicWeekly).toLocaleString('en-GB'), la: 'this week', lb: 'usual week',
+      aria: `Load this week ${Math.round(ac.acute)}, usual week ${Math.round(ac.chronicWeekly)}` });
+    tech = `<p class="a-tech">load ratio ${r.toFixed(2)} (this week ÷ usual week)</p>${ac.spanDays < 27 ? `<p class="a-tech">Worked out over ${Math.min(ac.spanDays + 1, 28)} days of history.</p>` : ''}`;
+    zones = scoreZonesC(r);
+  } else if (ac.partial) {
+    verdict = scoreVerdictC('Not enough data', 'a-mut', 'info');
+    tech = `<p class="a-tech">${lack} of ${cv.total} session${cv.total === 1 ? '' : 's'} in the last 4 weeks ${sing ? 'has' : 'have'} no duration or RPE, so a ratio would be a wrong number. ${sing ? 'It is' : 'They are'} left out. The ratio comes back when ${sing ? 'it is' : 'those are'} filled in, or once ${sing ? 'it is' : 'they are'} more than 4 weeks old.</p>`;
+  } else {
+    verdict = scoreVerdictC('Building a baseline', 'a-mut', 'clock');
+    tech = '<p class="a-tech">Needs about 2 weeks of sessions with a duration logged.</p>';
+  }
+  const wl = hasLoad ? weeklyLoad(m.daily, 8) : null;
+  const chart = hasLoad
+    ? `<p class="a-cap">Weekly load in AU (session effort × minutes), the last 8 weeks, weeks starting ${axisDays(dkey(wl[0].start), dkey(wl[7].start)).join(' to ')}</p>${scoreLoadChartC(m, shown)}${
+      lack > 0 ? `<p class="a-tech"><b>${lack} of ${cv.total} sessions in the last 4 weeks ${sing ? 'has' : 'have'} no duration or RPE and ${sing ? 'is' : 'are'} left out</b></p>` : ''}`
+    : `<p class="a-none">No load data yet. It needs sessions with a logged duration.</p>`;
+  // The sessions since Monday, against how many a week their plan has.
+  const monday = new Date(); monday.setHours(0, 0, 0, 0); monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+  const wk = (D.history || []).filter(s => s.completed_on && pDate(s.completed_on) >= monday).length;
+  const planned = m.adherence ? m.adherence.perWeek : 0;
+  const r = ac.ratio;
+  const ctx = planned && wk < planned ? (wk === 0 ? 'No sessions yet this week.' : `Only ${wk} session${wk === 1 ? '' : 's'} so far this week.`)
+    : shown ? (r > 1.5 ? 'Their load jumped well above their usual week.' : r > 1.3 ? 'Their load is climbing above their usual week.' : r >= 0.8 ? 'Their load matches their usual week.' : 'Their load is under their usual week.')
+    : 'Sessions without a duration or effort score add no load.';
+  return scoreCardC('a-score-load', 'load', 'Training load', verdict, split + tech + zones + chart, ctx,
+    'Load = how hard (session effort 1-10) × how long (minutes). This week compared with their usual week. 0.8 to 1.3 is the sweet spot.');
+}
+// Readiness: today against their usual, and their last 16 check-ins on a date scale.
+function scoreReadyChartC(m) {
+  const pts = m.rser.slice(-16), n = pts.length, w = 320, h = 120, top = 10, bot = 112, left = 4, right = 316;
+  const wide = pts.some(p => p.v < 3 || (p.base != null && p.base < 3)), lo = wide ? 1 : 3, hi = 5;
+  const day = p => Math.round(pDate(p.iso).getTime() / 86400000), t0 = day(pts[0]), span = Math.max(1, day(pts[n - 1]) - t0);
+  const X = p => n > 1 ? left + (day(p) - t0) / span * (right - left) : (left + right) / 2;
+  const Y = v => bot - (Math.min(hi, Math.max(lo, v)) - lo) / (hi - lo) * (bot - top);
+  const line = pts.map((p, i) => (i ? 'L' : 'M') + X(p).toFixed(1) + ' ' + Y(p.v).toFixed(1)).join(' ');
+  let dash = '', pen = false;
+  pts.forEach(p => { if (p.base == null) { pen = false; return; } dash += (pen ? 'L' : 'M') + X(p).toFixed(1) + ' ' + Y(p.base).toFixed(1) + ' '; pen = true; });
+  const last = pts[n - 1], ex = X(last);
+  const dots = pts.map((p, i) => i === n - 1 ? '' : `<circle cx="${X(p).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="2.6" fill="${A_C.her}"></circle>`).join('');
+  const rules = [hi, lo].map(v => `<line x1="${left}" y1="${Y(v).toFixed(1)}" x2="${right}" y2="${Y(v).toFixed(1)}" stroke="${A_C.line}" stroke-width="1"/>`).join('');
+  const lbl = [], tx = n > 1 ? 'translateX(-100%)' : 'translateX(-50%)';
+  const pos = (v, off) => `left:${(ex / w * 100).toFixed(1)}%;top:${(Y(v) / h * 100).toFixed(1)}%;transform:${tx} translateY(${off})`;
+  const above = last.base == null || last.v >= last.base;
+  lbl.push(`<span class="a-ovl her" style="${pos(last.v, above ? 'calc(-100% - 8px)' : '8px')}">${round1(last.v)} today</span>`);
+  if (last.base != null) lbl.push(`<span class="a-ovl" style="${pos(last.base, above ? '6px' : 'calc(-100% - 6px)')}">usual ${round1(last.base)}</span>`);
+  const aria = `Their last ${n} check-in${n === 1 ? '' : 's'}, scale ${lo} to ${hi}: ${pts.map(p => round1(p.v)).join(', ')}. The latest is ${round1(last.v)}${last.base != null ? ', their usual ' + round1(last.base) : ', no usual yet'}.`;
+  const svg = `<div class="a-ov"><svg class="chart-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(aria)}">${rules}${dash ? `<path d="${dash.trim()}" fill="none" stroke="${A_C.usualInk}" stroke-width="1.5" stroke-dasharray="5 4"/>` : ''}<path d="${line}" fill="none" stroke="${A_C.her}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${dots}<circle cx="${ex.toFixed(1)}" cy="${Y(last.v).toFixed(1)}" r="5" fill="${A_C.her}" stroke="${A_C.card}" stroke-width="2"></circle></svg>${lbl.join('')}</div>`;
+  const ad = axisDays(pts[0].iso, last.iso);
+  return `<p class="a-cap">${n === 1 ? 'Their one check-in' : 'Their last ' + n + ' check-ins'}, ${ad.join(' to ')} (scale ${lo} to ${hi})</p>${
+    plotAxes(svg, [{ at: Y(hi) / h, text: String(hi) }, { at: Y(lo) / h, text: String(lo) }], ad)}
+    <div class="a-lgs"><span class="a-lg"><i class="a-lg-dot line"></i>their check-in</span>${pts.some(p => p.base != null) ? '<span class="a-lg"><i class="a-lg-dot dash"></i>their usual</span>' : ''}</div>`;
+}
+function scoreReadyC(m) {
+  const r = m.readiness, lp = m.latestPlan;
+  const how = 'Their check-in before each session: sleep, energy, stress and how ready they feel, each 1 to 5. Higher is fresher, as the athlete\'s app scores it. Usual = the average of their last 10.';
+  if (!r) return scoreCardC('a-score-ready', 'pulse', 'Readiness', scoreVerdictC('No check-ins yet', 'a-mut', 'minus'),
+    '<p class="a-none">No readiness check-ins yet.</p>', 'Their check-ins show here once they answer the one before a session.', how);
+  const LV = { green: ['Normal', 'a-good', 'check'], amber: ['Lower day', 'a-watch', 'down'], red: ['Short day', 'a-miss', 'down'] };
+  const d = r.delta;
+  let v;
+  if (lp && LV[lp.level]) v = LV[lp.level];
+  else if (d != null) v = d <= -1 ? LV.red : d <= -0.5 ? LV.amber : LV.green;
+  const verdict = v ? scoreVerdictC(v[0], v[1], v[2]) : scoreVerdictC('No usual yet', 'a-mut', 'info');
+  const split = r.baseline != null
+    ? aSplit({ a: r.latest, b: r.baseline, fa: String(round1(r.latest)), fb: String(round1(r.baseline)), la: 'today', lb: 'usual', aria: `Readiness today ${round1(r.latest)}, their usual ${round1(r.baseline)}, out of 5` })
+    : `<div class="a-split solo"><div class="a-split-n"><div><b>${round1(r.latest)}</b><small>today, no usual yet</small></div></div></div>`;
+  const tech = `<p class="a-tech">out of 5 (higher is fresher)</p>${d != null ? `<p class="a-tech">${d >= 0 ? '+' : ''}${round1(d)} vs their usual (the mean of their last ten check-ins before this one)</p>` : ''}`;
+  const ctx = d == null ? 'Their usual starts once they have five check-ins.'
+    : d <= -0.5 ? `Below their usual by ${round1(-d)}.` : d >= 0.5 ? `Fresh. Above their usual by ${round1(d)}.`
+    : d > 0.05 ? 'Fresh. Their latest check-in is a touch above their usual.' : d < -0.05 ? 'Their latest check-in is a touch below their usual.' : 'Their latest check-in is the same as their usual.';
+  return scoreCardC('a-score-ready', 'pulse', 'Readiness', verdict, split + tech + scoreReadyChartC(m), ctx, how);
+}
+// Sessions done: the slots of each week over the window adherence() counts, done / half / missed.
+function scoreSlotsC(D, adh) {
+  const start = addDays(todayKey(), -(adh.days - 1)), today = todayKey(), nrows = Math.ceil(adh.days / 7);
+  const opt = new Set(optionalDayIdsC(D.program).map(String));
+  const rows = [];
+  for (let i = 0; i < nrows; i++) rows.push({ from: addDays(start, i * 7), len: Math.min(7, adh.days - i * 7), full: 0, halves: [], sum: 0,
+    slots: Math.round(adh.perWeek * Math.min(7, adh.days - i * 7) / 7) });
+  (D.history || []).forEach(s => {
+    if (!s.completed_on || s.completed_on < start || s.completed_on > today || opt.has(String(s.day))) return;
+    const i = Math.min(nrows - 1, Math.floor(Math.round((pDate(s.completed_on) - pDate(start)) / 86400000) / 7));
+    if (isPartialStatus(s.status)) { rows[i].halves.push(s); rows[i].sum += 0.5; } else { rows[i].full++; rows[i].sum += 1; }
+  });
+  rows.forEach(r => { if (r.len < 7) r.slots = Math.max(r.slots, Math.ceil(r.sum)); });
+  return rows;
+}
+function scoreSessionsC(m, D) {
+  const adh = m.adherence;
+  const how = 'Planned = their programme\'s days a week, over the last 4 weeks. A half-done session counts as half. On target is 85% or more.';
+  if (!adh || adh.pct == null) return scoreCardC('a-score-done', 'target', 'Sessions done', scoreVerdictC('Needs a programme and a session', 'a-mut', 'info'),
+    '<p class="a-none">Needs a program file and at least one finished session.</p>', '', how);
+  const p = adh.pct, v = p >= 85 ? ['On target', 'a-good', 'check'] : p >= 60 ? ['A bit under', 'a-watch', 'down'] : ['Below target', 'a-miss', 'alert'];
+  const done = scFmt(adh.done), extra = adh.extra ? scFmt(adh.extra) : '', bonus = adh.bonus ? scFmt(adh.bonus) : '';
+  const split = aSplit({ a: adh.done, b: adh.expected, fa: done, fb: String(adh.expected), la: 'done', lb: 'planned', aria: `${done} of ${adh.expected} planned sessions done` });
+  const from = axisDays(addDays(todayKey(), -(adh.days - 1)), todayKey());
+  const tech = `<p class="a-tech">${p}% done (target: 85% or more)</p>
+    <p class="a-tech">${done} of ${adh.expected} planned sessions completed${extra ? ` (${extra} more than planned)` : ''}</p>${bonus ? `<p class="a-tech">${aChip('+' + bonus + ' optional, a bonus', 'good', 'plus')}</p>` : ''}`;
+  const rows = scoreSlotsC(D, adh);
+  const html = rows.map(r => {
+    const boxes = [];
+    for (let i = 0; i < r.full; i++) boxes.push('done');
+    r.halves.forEach(() => boxes.push('half'));
+    while (boxes.length < r.slots) boxes.push('miss');
+    const box = k => `<span class="a-sl ${k}">${k === 'done' ? aIco('check') : k === 'miss' ? aIco('x') : ''}</span>`;
+    const notes = r.halves.map(s => {
+      const mm = String(s.status || '').match(/\((\d+)\s+of\s+(\d+)/);
+      return `<div class="h">half: ${[s.duration_min != null ? s.duration_min + ' min' : '', mm ? mm[1] + ' of ' + mm[2] + ' sets' : ''].filter(Boolean).join(', ') || 'a partial session'}</div>`;
+    }).join('');
+    return `<div class="a-wkrow"><span class="d">${esc(axisDays(r.from, r.from)[0])}</span><div class="a-wkboxes">${boxes.map(box).join('')}</div><span class="n">${scFmt(r.sum)} of ${r.slots}</span>${notes}</div>`;
+  }).join('');
+  const aria = 'Sessions by week: ' + rows.map(r => `week of ${axisDays(r.from, r.from)[0]} ${scFmt(r.sum)} of ${r.slots}`).join(', ');
+  const chart = `<p class="a-cap">Planned = ${adh.perWeek}/week (their program${adh.optional ? `, plus ${adh.optional} optional day${adh.optional === 1 ? ' that never counts' : 's that never count'} as a miss` : ''}), over the last ${adh.days} day${adh.days === 1 ? '' : 's'}${from.length === 2 ? ` (${from[0]} to ${from[1]})` : ''}</p>
+    <div class="a-wk" role="img" aria-label="${esc(aria)}">${html}</div>
+    <div class="a-lgs"><span class="a-lg"><i class="a-lg-dot"></i>done</span><span class="a-lg"><i class="a-lg-dot half"></i>half done</span><span class="a-lg"><i class="a-lg-dot miss"></i>missed</span></div>`;
+  const missed = Math.max(0, adh.expected - adh.done), lastRow = rows[rows.length - 1];
+  const lastMissed = Math.max(0, lastRow.slots - lastRow.sum);
+  const ctx = missed <= 0 ? 'Every planned session is done.'
+    : `Missed ${scFmt(missed)} of ${adh.expected}${rows.length > 1 && lastRow.len === 7 && lastMissed % 1 === 0 && lastMissed > 0 ? `, ${scNum(lastMissed)} of them in the last week` : ''}.`;
+  return scoreCardC('a-score-done', 'target', 'Sessions done', scoreVerdictC(v[0], v[1], v[2]), split + tech + chart, ctx, how);
+}
 
 // --- ATHLETES (roster) -------------------------------------------------------
 function tierChip(a) {
@@ -5416,8 +5889,157 @@ function stackedPanelC(D) {
     <p class="stk-l">${esc(stackedLineC(st))}</p>
   </section>`;
 }
-// ── Look A, part 3 (2026-11-28): the cycle, day by day. PLACEHOLDER until part 3 lands: the old Five weeks and Stacked. ──
-function cycleCardC(D) { return fiveWeeksPanelC(D) + stackedPanelC(D); }
+// ── Look A, part 3 (2026-11-28): the cycle, day by day. One card: a calendar of the cycle's weeks, then what it says in plain lines. ──
+// Information only (REC-7): nothing here is a Needs-you reason and nothing moves the plan. The counts in the lines are stackedOfC()'s, called as
+// stackedPanelC() calls it, so this card and /cycle-report always agree. An undated cycle keeps the old Five weeks and Stacked panels.
+// The days that count as hard, for the bracket. This MIRRORS stackedOfC()'s "two hard days in a row": a big session (Footprint level 'big') or a
+// Court Log activity with effort 'hard' and at least the rules' court.hard_min minutes, inside the window. Change one, change the other.
+function cyHardC(items, from, to) {
+  const f0 = dayNumC(from), t0 = dayNumC(to), set = new Set();
+  items.forEach(it => { const n = dayNumC(it.day); if (n >= f0 && n <= t0 && it.hard) set.add(n); });
+  return set;
+}
+function cyWhenC(iso) { return `${FW_DOW_C[pDate(iso).getDay()]} ${dayMonth(iso)}`; }
+const CY_DOWN_C = { Sun: 'Sunday', Mon: 'Monday', Tue: 'Tuesday', Wed: 'Wednesday', Thu: 'Thursday', Fri: 'Friday', Sat: 'Saturday' };
+function cycleCardC(D) {
+  const cd = D && D.a && D.a.cycle;
+  if (!cd || !cd.start) return fiveWeeksPanelC(D) + stackedPanelC(D);
+  const today = todayKey(), start = String(cd.start);
+  const end = cd.end ? String(cd.end) : addDays(start, 34);
+  const to = end < today ? end : today;
+  const R = window.AAREC && window.AAREC.fp;
+  const nf1 = v => (Math.round(v * 10) / 10).toString();
+  // Their sessions in the cycle, each with its read.
+  const sess = (D.history || []).filter(s => s && s.completed_on && String(s.completed_on) >= start && String(s.completed_on) <= end)
+    .map(s => { const fp = footprintOfSessionC(D, s); return { s, day: String(s.completed_on).slice(0, 10), part: isPartialStatus(s.status), big: !!fp && fp.level === 'big' }; });
+  const acts = fileActsC(D).filter(a => a && a.day && String(a.day).slice(0, 10) >= start && String(a.day).slice(0, 10) <= end)
+    .map(a => ({ a, day: String(a.day).slice(0, 10), hard: !!(R && a.effort === 'hard' && Number(a.mins) >= R.court.hard_min) }));
+  if (!sess.length && !acts.length) return '';
+  const bySess = {}, byAct = {};
+  sess.forEach(x => (bySess[x.day] = bySess[x.day] || []).push(x));
+  acts.forEach(x => (byAct[x.day] = byAct[x.day] || []).push(x));
+  const hardSet = cyHardC(sess.filter(x => x.big).map(x => ({ day: x.day, hard: true })).concat(acts), start, to);
+  const planned = planDaysC(D.program).length;
+  // The rows: one per week from the start date, then (a cycle that has just ended) one more that holds today.
+  const rows = [];
+  for (let r = start; r <= end; r = addDays(r, 7)) rows.push(r);
+  let tail = null;
+  if (cd.end && end < today && dayNumC(today) - dayNumC(end) <= 7) {
+    const rs = addDays(rows[rows.length - 1], 7), col = dayNumC(today) - dayNumC(rs);
+    if (col >= 0 && col <= 6) tail = { rs, col };
+  }
+  const head = '<span></span>' + Array.from({ length: 7 }, (_, i) => `<span class="cy-dw">${FW_DOW_C[pDate(addDays(start, i)).getDay()]}</span>`).join('') + '<span class="cy-dw cy-wkh">Week</span>';
+  const partHtml = x => {
+    if (x.s) {
+      const mins = Math.round(Number(x.s.duration_min) || 0);
+      return `<span class="cy-p${x.part ? ' is-half' : ''}"><span class="cy-t">D${esc(x.s.day)}${x.big ? aIco('bolt') : ''}</span><span class="cy-m">${mins > 0 ? mins + '′' : ''}</span></span>`;
+    }
+    const mins = Math.round(Number(x.a.mins) || 0);
+    return `<span class="cy-p is-court${x.hard ? ' is-hard' : ''}"><span class="cy-t">${aIco('ball')}${x.hard ? 'hard' : ''}</span><span class="cy-m">${mins > 0 ? mins + '′' : ''}</span></span>`;
+  };
+  const sayOf = (day, ss, as) => {
+    const bits = ss.map(x => `Day ${x.s.day}${Number(x.s.duration_min) > 0 ? ', ' + Math.round(Number(x.s.duration_min)) + ' min' : ''}${x.part ? ', half done' : ''}${x.big ? ', big day' : ''}`)
+      .concat(as.map(x => `${ACT_WORD_C[x.a.kind] || 'Court activity'}${Number(x.a.mins) > 0 ? ', ' + Math.round(Number(x.a.mins)) + ' min' : ''}${x.a.effort ? ', ' + x.a.effort : ''}`));
+    return `${cyWhenC(day)}${bits.length ? ': ' + bits.join('; ') : ''}`;
+  };
+  const rowHtml = rs => {
+    let cells = '', done = 0;
+    const hardCols = [];
+    for (let i = 0; i < 7; i++) {
+      const day = addDays(rs, i);
+      if (day > end) { cells += '<span></span>'; continue; }
+      const ss = (bySess[day] || []), as = (byAct[day] || []);
+      ss.forEach(x => { done += x.part ? 0.5 : 1; });
+      if (hardSet.has(dayNumC(day))) hardCols.push(i);
+      const isToday = day === today, items = ss.concat(as);
+      const said = items.length ? sayOf(day, ss, as) + (isToday ? ' (today)' : '') : `${cyWhenC(day)}: nothing logged${isToday ? ' (today)' : ''}`;
+      cells += `<span class="cy-c${items.length ? ' has' : ''}${items.length > 1 ? ' two' : ''}${isToday ? ' is-today' : ''}${!items.length && day > today ? ' is-fut' : ''}" title="${esc(said)}" aria-label="${esc(said)}" role="img">`
+        + (items.length ? items.map(partHtml).join('') : (isToday ? '<span class="cy-td">today</span>' : '')) + '</span>';
+    }
+    // Brackets: a run of hard days in a row, one bracket under each row's stretch of it, the label on the run's first.
+    let brs = '';
+    const runs = [];
+    hardCols.forEach(i => { const last = runs[runs.length - 1]; if (last && last[last.length - 1] === i - 1) last.push(i); else runs.push([i]); });
+    runs.forEach(run => {
+      const dFirst = dayNumC(addDays(rs, run[0])), dLast = dayNumC(addDays(rs, run[run.length - 1]));
+      const prevHard = run[0] === 0 && hardSet.has(dFirst - 1), nextHard = run[run.length - 1] === 6 && hardSet.has(dLast + 1);
+      if (run.length < 2 && !prevHard && !nextHard) return;
+      brs += `<span class="cy-br${prevHard ? ' cont' : ''}${nextHard ? ' goes' : ''}" style="grid-column:${run[0] + 2} / span ${run.length}">${prevHard ? '' : aIco('link') + 'back to back'}</span>`;
+    });
+    const wl = planned ? `${nf1(done)} of ${planned}` : `${nf1(done)}`;
+    const held = planned > 0 && done >= planned;
+    const wk = `<span class="cy-wt${held ? ' is-held' : ''}${rs > today ? ' is-fut' : ''}" title="${esc(`Week of ${dayMonth(rs)}: ${wl} planned sessions${held ? ', held' : ''}`)}">${held ? `<span class="cy-ok">${aIco('check')}</span>` : ''}${esc(wl)}</span>`;
+    return `<div class="cy-r" data-week="${esc(rs)}"><span class="cy-wl">${esc(dayMonth(rs))}</span>${cells}${wk}</div>`
+      + (brs ? `<div class="cy-r cy-brr"><span></span>${brs}<span></span></div>` : '');
+  };
+  let grid = rows.map(rowHtml).join('');
+  if (tail) {
+    let cells = '';
+    for (let i = 0; i < tail.col; i++) cells += '<span></span>';
+    cells += `<span class="cy-c is-today" title="${esc(cyWhenC(today) + ' (today)')}" aria-label="${esc(cyWhenC(today) + ' (today)')}" role="img"><span class="cy-td">today</span></span>`;
+    cells += `<span class="cy-end" style="grid-column:${tail.col + 3} / -1">${aIco('check')}cycle ended</span>`;
+    grid += `<div class="cy-r" data-week="${esc(tail.rs)}"><span class="cy-wl">${esc(dayMonth(today))}</span>${cells}</div>`;
+  }
+  // What the calendar says: only the lines that apply.
+  const lines = [];
+  const line = (tone, icon, lead, text) => lines.push(`<div class="cy-line${tone ? ' ' + tone : ''}">${aIco(icon)}<div><b>${esc(lead)}</b>: ${esc(text)}</div></div>`);
+  const sd = [...new Set(sess.filter(x => x.day <= to).map(x => dayNumC(x.day)))].sort((a, b) => a - b);
+  let gap = null;
+  for (let i = 1; i < sd.length; i++) { const off = sd[i] - sd[i - 1] - 1; if (off >= 10 && (!gap || off > gap.n)) gap = { n: off, a: sd[i - 1] + 1, b: sd[i] - 1 }; }
+  const keyOf = n => addDays('1970-01-01', n);
+  if (gap) {
+    const A = keyOf(gap.a), B = keyOf(gap.b), sameMonth = pDate(A).getMonth() === pDate(B).getMonth();
+    line('', 'calx', `${gap.n} days off mid-cycle`, `no sessions from ${sameMonth ? pDate(A).getDate() : dayMonth(A)} to ${dayMonth(B)}.`);
+  }
+  let st = null;
+  if (R && !D.logsErr) {
+    const rws = (D.history || []).map(s => ({ date: String(s.completed_on || ''), fp: footprintOfSessionC(D, s), ready: jparse(s.readiness) }));
+    st = stackedOfC(rws, fileActsC(D), window.AAREC, start, to);
+  }
+  if (st && st.sessions) {
+    const B = R.big, nm = (k, one, many) => `${k} ${k === 1 ? one : many}`;
+    const what = n => {
+      const iso = keyOf(n), parts = [];
+      if ((bySess[iso] || []).some(x => x.big)) parts.push('big gym session');
+      (byAct[iso] || []).filter(x => x.hard).forEach(x => parts.push('hard ' + (ACT_WORD_C[x.a.kind] || 'court activity').toLowerCase()));
+      return `${parts.join(' and ')} ${cyWhenC(iso)}`;
+    };
+    const hs = [...hardSet].sort((a, b) => a - b), firstPair = hs.find(n => hardSet.has(n + 1));
+    if (st.inRow > 0 && firstPair != null) {
+      line('miss', 'link', st.inRow === 1 ? 'Back to back once' : `Back to back ${st.inRow} times`,
+        `${st.inRow === 1 ? '' : 'the first was '}${what(firstPair)}, then ${what(firstPair + 1)}.${st.inRow === 1 ? ' Every other hard day had a rest day after it.' : ''}${st.nearCourt > st.inRow ? ' ' + nm(st.nearCourt, 'big gym day', 'big gym days') + ' came within a day of hard court.' : ''}`);
+    } else if (st.big > 0) {
+      line('good', 'check', 'Hard days well spaced', 'no two hard days in a row.');
+      if (st.nearCourt > 0) line('watch', 'link', 'Big gym day beside hard court', `${nm(st.nearCourt, 'big gym day was', 'big gym days were')} on the same day as hard court or the day next to it.`);
+    }
+    if (st.failThen > 0) line('', 'dumbbell', 'Hard leg days close together',
+      `${nm(st.failThen, 'time', 'times')} a leg day with ${B.hard_sets}+ sets at RPE ${B.hard_set_rpe}-10 had another leg day within 2 days.`);
+    if (st.sessions > 0 && st.big * 2 >= st.sessions) line('', 'bolt', 'Their sessions run hard',
+      `${st.big} of their ${st.sessions} sessions were big days (session effort ${B.session_rpe} or more, or ${B.hard_sets}+ sets at RPE ${B.hard_set_rpe}-10).`);
+    else if (st.big > 0) line('', 'bolt', 'Big days', `${st.big} of ${st.sessions} sessions.`);
+    if (st.diff != null) {
+      const ab = Math.abs(st.diff);
+      if (st.diff >= 0.3) line('watch', 'heart', 'Big days cost them', `their check-ins after big days were ${ab.toFixed(1)} lower.`);
+      else line('good', 'heart', "Big days don't knock them down", `their check-ins after them were ${st.diff <= -0.3 ? ab.toFixed(1) + ' higher than' : 'about the same as'} the rest (${st.diff <= 0 ? '+' : '-'}${ab.toFixed(1)}).`);
+    }
+  }
+  const fwOk = !!(D.fw && D.fw.data), actMins = acts.reduce((n, x) => n + (Number(x.a.mins) || 0), 0);
+  const hm = x => x >= 60 ? `${Math.floor(x / 60)} h${Math.round(x % 60) ? ' ' + Math.round(x % 60) + ' min' : ''}` : `${Math.round(x)} min`;
+  const foot = fwOk && (acts.length || start <= '2026-11-21')
+    ? `<p class="cy-foot">${acts.length ? 'Court time: ' + hm(actMins) + ' logged' : 'Court time: none logged'}${start < '2026-11-21' ? " (the court log started 21 Nov, so earlier sport isn't here)." : '.'}</p>` : '';
+  const say = lines.length || foot ? `<div class="cy-say"><div class="cy-sayh">What the calendar says</div>${lines.length ? `<div class="cy-lines">${lines.join('')}</div>` : ''}${foot}</div>` : '';
+  const dow = FW_DOW_C[pDate(start).getDay()];
+  const legend = `<div class="cy-key" role="list">
+      <span role="listitem"><i class="cy-sw"></i>Plan session</span><span role="listitem"><i class="cy-sw half"></i>Half done</span>
+      <span role="listitem">${aIco('bolt')}Big day</span><span role="listitem"><i class="cy-sw court"></i>Court</span>
+      <span role="listitem"><i class="cy-sw hard"></i>Hard court</span><span role="listitem"><i class="cy-sw today"></i>Today</span></div>`;
+  return `<section class="a-card cy-card" id="cyCard">
+    <div class="a-h">${aIco('calendar')}The cycle, day by day <span class="a-hsub">One row for each week of the cycle. Weeks start on ${esc(CY_DOWN_C[dow])}.</span></div>
+    ${legend}
+    <div class="cy-scroll" tabindex="0" role="region" aria-label="The cycle calendar, one row for each week"><div class="cy-grid"><div class="cy-r cy-hd">${head}</div>${grid}</div></div>
+    ${say}
+  </section>`;
+}
 // ── Habits and court time, in the coach's file and across everyone (2026-11-23; Amir picked direction A, "The Grid") ─────────────────────────────
 // What a habit IS and when it is MET is the engine's, assets/js/habits-core.js, the file the athlete's app loads: nothing here retypes it (a second copy is how the
 // coach and the athlete end up disagreeing). The engine holds one athlete at a time, so every draw binds it to one athlete, asks, and binds the next. Court time is
@@ -5643,8 +6265,154 @@ function habGridPanelC(D) {
     <p class="hg-k"><span class="hg-sw met"></span>met <span class="hg-sw under"></span>logged, under <span class="hg-sw"></span>not logged <span class="hg-sw court"></span>court minutes (dark = hard)</p>
   </section>`;
 }
-// ── Look A, part 4 (2026-11-28): habits against their targets. PLACEHOLDER until part 4 lands: the old grid. ──
-function habitsCardC(D) { return habGridPanelC(D); }
+// ── Look A, part 4 (2026-11-28): habits against their targets ─────────────────────────────────────────────────────────────────
+// One card: a verdict in words from the last 7 days, the two habits the cycle leans on as duels (the 7-day average against the target), the rest as
+// compact rows with a dot a day, the court and session chips, the steps target (it lived only on the Proof tab), the 14-day grid folded, the wall lines.
+// Nothing here decides what a habit is or when it is met: that is the engine's (habStat, habValC, habDoneC), as in the grid.
+const HAB_KEYWORDS_C = [['steps', /\bsteps?\b|walk/], ['fuel', /protein|fuel|nutrition|\bmeals?\b/], ['sleep', /sleep/], ['water', /water|hydrat/],
+  ['mobility', /mobil|stretch/], ['breathe', /breath/], ['supps', /suppl/]];
+// The habits (by id) the current cycle names, in the order its name and focuses name them; at most two.
+function habCycleIdsC(D, ids) {
+  const p = D.program;
+  const cyc = (p && p.cycles || [])[(p && Number.isInteger(p.currentCycleIndex)) ? p.currentCycleIndex : 0];
+  if (!cyc) return [];
+  const txt = [cyc.name].concat(Array.isArray(cyc.focuses) ? cyc.focuses : []).map(x => String(x || '')).join(' ').toLowerCase();
+  const found = [];
+  HAB_KEYWORDS_C.forEach(([id, re]) => { const at = txt.search(re); if (at >= 0 && ids.indexOf(id) >= 0) found.push([at, id]); });
+  return found.sort((x, y) => x[0] - y[0]).slice(0, 2).map(x => x[1]);
+}
+// How a habit's last 7 days read: miss (met on fewer than 3), good (met on 6 or 7, or on every day it had), else watch.
+const habToneC = s => habLow(s) ? 'miss' : s.met >= Math.min(6, s.n) ? 'good' : 'watch';
+const HAB_TONE_ICO_C = { miss: 'x', watch: 'alert', good: 'check' };
+// "Sleep", "Sleep and steps": up to two names; a core habit's second name goes lower case, a custom habit keeps what the athlete typed.
+function habNamesC(xs, nm) {
+  return xs.slice(0, 2).map((x, i) => i && x.h.core ? nm(x.h).toLowerCase() : nm(x.h)).join(' and ');
+}
+function habVerdictC(stats, nm) {
+  const good = stats.filter(x => habToneC(x.st) === 'good' && x.st.n >= 3).sort((x, y) => y.st.met - x.st.met);
+  const weak = stats.filter(x => habToneC(x.st) === 'miss').sort((x, y) => x.st.met - y.st.met);
+  if (!stats.length) return '';
+  const bits = [];
+  if (!weak.length) bits.push('On track: every habit was met on 3 or more days.');
+  else {
+    if (good.length) bits.push(`${habNamesC(good, nm)} ${good.length === 1 ? 'is' : 'are'} great.`);
+    bits.push(`${habNamesC(weak, nm)} ${weak.length === 1 ? 'is' : 'are'} far under.`);
+  }
+  const tone = weak.length ? (good.length ? 'a-watch' : 'a-miss') : 'a-good';
+  return `<p class="a-verdict ${tone}">${aIco(weak.length ? 'alert' : 'check')}<span>${esc(bits.join(' '))}</span></p>`;
+}
+// One of the two big habits: its name, "target met k of 7 days", the 7-day average against the target.
+function habKeyBoxC(H, x, today, d7, onSet, by, nm) {
+  const { h, st } = x, tone = habToneC(st);
+  const name = nm(h);
+  let split, extra = '';
+  if (h.kind === 'check') {
+    split = aSplit({ a: st.met, b: Math.max(0, st.n - st.met), fa: String(st.met), fb: String(st.n), la: 'days it was done', lb: 'days it existed',
+      aria: `${name}: done on ${st.met} of ${st.n} days` });
+  } else {
+    const tgt = habTgtC(h, today), steps = h.unit === 'steps';
+    const fmt = v => steps ? Math.round(v).toLocaleString('en-US') : String(round1(v));
+    split = aSplit({ a: st.avg || 0, b: tgt, fa: st.avg == null ? '—' : fmt(st.avg), fb: steps ? Number(tgt).toLocaleString('en-US') : H.fmtVal(h, tgt),
+      la: st.avg == null ? 'nothing logged' : steps ? 'a day, on average' : `${h.unit} a day, on average`, lb: 'target',
+      aria: `${name}: ${st.avg == null ? 'nothing logged' : 'on average ' + fmt(st.avg)}, against a target of ${steps ? Number(tgt).toLocaleString('en-US') : H.fmtVal(h, tgt)}` });
+    if (st.met === 1) {
+      const d = d7[st.st.indexOf('met')];
+      if (d) extra = `<p class="a-key-one">The one day it was met: ${esc(habShort(h, habValC(H, h, d, by)))}.</p>`;
+    }
+  }
+  return `<div class="a-key"><div class="a-key-h"><b${h.core ? '' : ' dir="auto"'}>${esc(name)}</b>${aChip(`target met ${st.met} of ${st.n} days`, tone, HAB_TONE_ICO_C[tone])}</div>${split}${extra}</div>`;
+}
+// A habit in the list: tone + icon + name, its value, a dot a day, "5 of 7".
+function habRestRowC(H, x, d7, nm) {
+  const { h, st } = x, tone = habToneC(st), name = nm(h);
+  let val;
+  if (h.kind === 'check') val = h.unit === 'dose' ? 'taken' : h.unit === 'session' ? 'done' : h.unit;
+  else if (st.avg == null) val = '—';
+  else if (h.unit === 'steps') val = habAvgText(h, st.avg);
+  else if (h.unit === 'hours') val = habAvgText(h, st.avg);
+  else val = `${round1(st.avg)} of ${H.fmtVal(h, h.target)} ${h.unit}`;
+  const dots = st.st.map((s, i) => `<i class="sq ${s === 'met' ? 'met' : s === 'under' ? 'under' : s === 'x' ? 'off' : ''}" title="${esc(dayMonth(d7[i]))}"></i>`).join('');
+  return `<div class="a-hr ${tone}" role="group" aria-label="${esc(`${name}: ${val}, met on ${st.met} of ${st.n} days`)}">
+      <span class="a-hr-n">${aIco(HAB_TONE_ICO_C[tone])}<span${h.core ? '' : ' dir="auto"'}>${esc(name)}</span></span>
+      <span class="a-hr-v">${esc(val)}</span><span class="a-hr-d" aria-hidden="true">${dots}</span>
+      <span class="a-hr-c">${esc(`${st.met} of ${st.n}`)}</span></div>`;
+}
+// The steps target: one row and a quiet "Change" that opens the controls stepsTargetPanelC has, calling the same setStepsTargetC().
+function stepsTargetRowC(D) {
+  const st = D.st && D.st.data;
+  if (!st) return D.st && D.st.err ? `<p class="a-ctx a-miss">${aIco('alert')}<span>The steps target did not load (${esc(D.st.err)}).</span></p>` : '';
+  const g = Number(st.global) || 10000, rows = Array.isArray(st.rows) ? st.rows : [];
+  const cur = rows.length ? rows[rows.length - 1] : null, now = cur ? Number(cur.steps) : g;
+  const u = stepsUsualC(D.a.blob, D.athleteId, todayKey());
+  const sug = u.n >= 5 ? stepsSuggestC(u.usual) : null;
+  const n = v => Number(v).toLocaleString('en-US');
+  const id = D.athleteId;
+  const btn = (v, label) => `<button class="btn sm" onclick="setStepsTargetC(${jsq(id)}, ${v}, this)">${esc(label)}</button>`;
+  const hasBy = rows.some(r => r && r.by), mine = !!(cur && cur.by === 'coach');
+  const who = cur ? (cur.by ? `set by ${cur.by === 'coach' ? 'you' : 'the app'} on ${dayMonth(cur.from)}` : `since ${prettyDate(cur.from)}`) : 'everyone\'s number';
+  return `<details class="a-stc" id="stc-${esc(id)}"><summary><span class="a-stc-t">Steps target <b>${esc(n(now))}</b> <span class="a-mut">${esc(who)}</span></span><span class="a-stc-c">Change</span></summary>
+    <div class="a-stc-b">
+      ${hasBy ? `<p class="a-how">${mine ? 'Your number stays until you hand it back. ' : ''}The app sets their number every Monday from what they log, unless you set one.</p>` : ''}
+      <p class="a-how">${u.n ? `Their usual: <b>${n(u.usual)}</b> a day (the middle of ${u.n} logged day${u.n === 1 ? '' : 's'} in the last 14).` : 'No steps logged in the last 14 days.'}
+        ${sug ? ` Suggested: <b>${n(sug)}</b> (their usual plus 10%).` : u.n ? ' A suggestion needs 5 logged days.' : ''}
+        Hitting their number ticks Steps, counts for the day and pays full Steps XP. Court time counts toward it. A new number starts today; earlier days keep theirs.</p>
+      <div class="a-stc-a">
+        ${sug && sug !== now ? btn(sug, 'Set ' + n(sug)) : ''}
+        <input type="number" id="st-in-${esc(id)}" min="3000" max="20000" step="500" value="${sug || now}" aria-label="Steps target">
+        <button class="btn sm" onclick="setStepsTargetC(${jsq(id)}, Number(document.getElementById('st-in-' + ${jsq(id)}).value), this)">Set</button>
+        ${cur && now !== g ? btn(g, 'Back to ' + n(g)) : ''}
+        ${mine ? `<button class="btn sm" onclick="setStepsTargetC(${jsq(id)}, null, this)">Let the app set it</button>` : ''}
+      </div></div></details>`;
+}
+// Their lines on the crew wall this week (the Proof tab's list), with the same Hide / Show buttons.
+function wallLinesC(D) {
+  const id = D.athleteId;
+  const mine = S.notes.filter(n => n.athlete_id === id).sort((x, y) => y.day.localeCompare(x.day));
+  if (!mine.length) return '';
+  return `<div class="a-wall"><p class="a-hsub4">Wall lines this week</p>${mine.map(n => `<div class="a-wl${n.hidden ? ' hid' : ''}">
+      <div class="a-wl-b"><div class="a-wl-t"><b>${esc(wallDayLabel(n.day))}</b>${n.pct != null ? aChip(n.pct + '%', 'her') : ''}${n.hidden ? aChip('hidden', '', 'eye') : ''}</div>
+      <div class="a-wl-x" dir="auto">${esc(n.body)}</div></div>
+      <button class="btn sm" onclick="toggleHide(${jsq(id)},${jsq(n.day)},${n.hidden ? 'false' : 'true'})">${n.hidden ? 'Show' : 'Hide'}</button></div>`).join('')}</div>`;
+}
+function habitsCardC(D) {
+  const H = habEngine();
+  if (!H || !D.a) return '';
+  const grid = habGridPanelC(D);   // '' when nothing is logged and there is no court time: then there is no card either
+  if (!grid) return '';
+  const id = D.athleteId, t = todayKey();
+  const days = Array.from({ length: HAB_SPAN }, (_, i) => addDays(t, i - (HAB_SPAN - 1)));
+  const d7 = days.slice(-7);
+  habBind(H, D.a);
+  const acts = Array.isArray(D.act) ? D.act : null;   // null: the court read failed, no court chip is drawn
+  const byDay = {};
+  (acts || []).forEach(r => { const d = actDay(r); if (d >= days[0] && d <= t) (byDay[d] = byDay[d] || []).push(r); });
+  const by = acts && byDay;
+  const onSet = habOnSets(H, days);
+  const nm = h => H.splitEmoji(H.shortName(h))[1];
+  const all = H.all().filter(h => d7.some(d => onSet[d].has(h.id))).map(h => ({ h, st: habStat(H, h, d7, onSet, by) })).filter(x => x.st.n > 0);
+  const sess = all.find(x => x.h.id === 'strength');
+  const hab = all.filter(x => x.h.id !== 'strength');   // Session is its own chip below, not a habit against a target
+  // The two big ones: the habits the cycle names, else the weakest (met share, lowest first).
+  const named = habCycleIdsC(D, hab.map(x => x.h.id)).map(i => hab.find(x => x.h.id === i));
+  const weakest = hab.filter(x => named.indexOf(x) < 0).sort((x, y) => x.st.met / x.st.n - y.st.met / y.st.n);
+  const keys = named.concat(weakest).slice(0, Math.min(2, hab.length));
+  const lead = named.length >= 2 ? 'The two habits this cycle leans on' : named.length === 1 ? 'The habit this cycle leans on, and the one furthest from its target'
+    : keys.length === 1 ? 'The habit furthest from its target' : 'The two habits furthest from their targets';
+  const rest = hab.filter(x => keys.indexOf(x) < 0);
+  let wk = 0;
+  if (acts) d7.forEach(d => (byDay[d] || []).forEach(r => { wk += Number(r.minutes) || 0; }));
+  const chips = (acts ? aChip(`Court ${wk ? habMins(wk) : 'none'} this week`, '', 'ball') : '') + (sess ? aChip(`Sessions ${sess.st.met} this week`, '', 'dumbbell') : '');
+  return `<section class="a-card a-hab">
+    <h3 class="a-h">${aIco('list')}Habits against their targets</h3>
+    ${habVerdictC(hab, nm)}
+    ${keys.length ? `<p class="a-hsub4">${lead}</p><div class="a-keys">${keys.map(x => habKeyBoxC(H, x, t, d7, onSet, by, nm)).join('')}</div>` : ''}
+    ${rest.length ? `<p class="a-hsub4">The rest, last 7 days</p><div class="a-hrs">${rest.map(x => habRestRowC(H, x, d7, nm)).join('')}</div>` : ''}
+    ${chips ? `<div class="a-chips4">${chips}</div>` : ''}
+    ${stepsTargetRowC(D)}
+    <details class="a-hg14" id="hg14-${esc(id)}"><summary>Show 14 days</summary>${grid}</details>
+    ${wallLinesC(D)}
+  </section>`;
+}
 // ── Across everyone: Athletes -> Habits ──
 function setRosterView(v) { location.hash = v === 'habits' ? 'athletes/habits' : 'athletes'; }
 window.setRosterView = setRosterView;
@@ -6215,6 +6983,23 @@ function cmpCell(c) {
   if (c.logged.gear) detail.push(esc(c.logged.gear));
   return bits.join('') + (detail.length ? `<div class="did-detail">${detail.join(' · ')}</div>` : '');
 }
+// Look A, part 5: a row's flags as chips with icons, in the same words as before; a row with none is "On plan".
+function verdictChipsC(c) {
+  if (!c.logged) return aChip('not logged', 'miss', 'x');
+  if (!c.flags.length) return aChip('On plan', 'good', 'check');
+  return c.flags.map(f => {
+    const t = f.text;
+    if (t === 'not done') return aChip(t, 'miss', 'x');
+    if (/ sets? short$/.test(t)) return aChip(t, 'miss', 'minus');
+    if (/ over target RPE$/.test(t)) return aChip(t, 'miss', 'up');
+    if (/ under target RPE$/.test(t)) return aChip(t, 'her', 'down');
+    if (/ extra sets?$/.test(t)) return aChip(t, 'her', 'plus');
+    if (t === 'not in the plan') return aChip(t, 'watch', 'plus');
+    if (/^0 of \d+ sets ticked$/.test(t)) return aChip(t, 'miss', 'alert');
+    if (/ sets? under \d+ reps$/.test(t)) return aChip(t, 'watch', 'minus');
+    return aChip(t, f.tone === 'miss' ? 'miss' : f.tone === 'warn' ? 'watch' : '');
+  }).join('');
+}
 function cmpRowHtml(c, lib, athleteId) {
   const rx = c.rx;
   const dose = rxLine(rx);
@@ -6242,12 +7027,13 @@ function cmpRowHtml(c, lib, athleteId) {
     ? c.pex.items.map(it => esc(it.name) + (it.detail ? ' (' + esc(it.detail) + ')' : '')).join(' · ')
     : (c.logged && c.logged.items.length ? c.logged.items.map(esc).join(' · ') : '');
   const tone = !c.logged ? 'miss' : c.state === 'skip' ? 'miss' : c.flags.some(f => f.tone === 'miss' || f.tone === 'warn') ? 'warn' : 'ok';
+  const cnId = 'cn-' + (athleteId + '_' + (c.path ? c.path.day + '_' + c.path.block + '_' + c.path.ex : c.name)).replace(/[^a-z0-9]/gi, '_');
   return `<div class="cmp-row ${tone}">
     <div class="cmp-ex">
       <div class="cmp-nm">${esc(c.name)}${v ? ` <a class="cmp-vid" href="${esc(v)}" target="_blank" rel="noopener" title="Video">▶</a>` : ''}</div>
       ${items ? `<div class="cmp-items">${items}</div>` : ''}
-      ${c.pex && c.pex.note ? `<div class="cmp-cnote"><b>Your note:</b> ${esc(c.pex.note)}</div>` : ''}
-      ${c.logged && c.logged.note ? `<div class="cmp-anote" dir="auto"><b>They wrote:</b> ${esc(c.logged.note)}</div>` : ''}
+      ${c.pex && c.pex.note ? `<details class="cmp-cnote" id="${cnId}"><summary>Your note</summary><div class="cn-txt">${esc(c.pex.note)}</div></details>` : ''}
+      ${c.logged && c.logged.note ? `<div class="cmp-anote" dir="auto">${aIco('msg')}<span><b>They wrote:</b> ${esc(c.logged.note)}</span></div>` : ''}
     </div>
     <div class="cmp-rx">${rxBits.join('') || '<span class="did-none">—</span>'}
       ${rxSub.length ? `<div class="rx-sub">${rxSub.join(' · ')}</div>` : ''}
@@ -6256,7 +7042,7 @@ function cmpRowHtml(c, lib, athleteId) {
       ${warn.length ? `<div class="rx-warn" title="${esc(warn.map(w => w.msg).join('\n'))}">⚠ ${esc(warn.length)} chip issue${warn.length > 1 ? 's' : ''}</div>` : ''}
     </div>
     <div class="cmp-did">${cmpCell(c)}</div>
-    <div class="cmp-flags">${c.flags.map(f => `<span class="fl ${f.tone === 'note' ? 'quiet' : f.tone}">${esc(f.text)}</span>`).join('')}</div>
+    <div class="cmp-flags">${verdictChipsC(c)}</div>
     ${editable ? `<div class="rx-editor" id="exed-${eid}" style="display:none"></div>` : ''}
   </div>`;
 }
@@ -6815,34 +7601,39 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
   if (!s) { status = optional && !sessions.length ? 'optional, not done' : sessions.length ? 'never finished' : 'not logged yet'; statusTone = 'idle'; }
   else if (isPartialStatus(s.status)) { status = partialLabel(s.status); statusTone = 'warn'; }
   else { status = 'Complete'; statusTone = 'ok'; }
+  // Look A: each fact is its own chip (never a " · " string); the big-day pill follows the effort chip.
   const thisCycle = !!(_D && _D.a && _D.a.cycle && _D.a.cycle.start);   // a dated cycle: the cards hold only its sessions (workTabHtml)
-  const meta = [];
+  const statusChip = statusTone === 'ok' ? aChip(status, 'good', 'check') : statusTone === 'warn' ? aChip(status, 'watch', 'alert')
+    : status === 'never finished' ? aChip(status, 'miss', 'x') : aChip(status);
+  const metaBits = [];
   if (s) {
-    meta.push(prettyDate(s.completed_on));
-    if (s.session_rpe != null) meta.push('sRPE ' + s.session_rpe + '/10');
-    if (s.duration_min != null) meta.push(s.duration_min + ' min');
-    if (s.session_rpe != null && s.duration_min != null) meta.push((s.session_rpe * s.duration_min) + ' AU');
+    metaBits.push(aChip(prettyDate(s.completed_on), '', 'calendar'));
+    metaBits.push(statusChip);
+    if (s.duration_min != null) metaBits.push(aChip(s.duration_min + ' min', '', 'clock'));
+    // #139 Footprint: a big session wears a "big day" pill beside its effort (bigDayMarkC(); none while the log did not load).
+    const bigMark = !noLog ? bigDayMarkC(_D, s) : '';
+    if (s.session_rpe != null) metaBits.push(aChip('effort ' + s.session_rpe + '/10', '', 'pulse') + bigMark);
+    else if (bigMark) metaBits.push(bigMark.trim());
+    if (s.session_rpe != null && s.duration_min != null) metaBits.push(aChip('load ' + (s.session_rpe * s.duration_min), '', 'load'));
     const rd = jparse(s.readiness);
     // The score the athlete's app judged the day on (sleep, energy, stress and overall) when it stored one, so the number beside "lower
     // day" is the one that made it lower; a check-in from before 2026-09-26 or an imported email has only the composite.
     const rdNum = rd && !rd.skipped ? (typeof rd.score === 'number' ? round1(rd.score) : rd.composite) : null;
-    if (rdNum != null) meta.push('readiness ' + rdNum + '/5');
-    else if (rd && rd.skipped) meta.push('readiness skipped');
+    if (rdNum != null) metaBits.push(aChip('readiness ' + rdNum + '/5', '', 'heart'));
+    else if (rd && rd.skipped) metaBits.push(aChip('readiness skipped'));
     const plan = planLabelC(rd);
-    if (plan) meta.push(plan);
+    if (plan) plan.split(' · ').forEach(p => metaBits.push(aChip(p, 'watch')));
     // #127 Yesterday on Court (2026-11-22): what the athlete had logged the day before, carried on the check-in (readiness.yday).
-    if (rd && Array.isArray(rd.yday) && rd.yday.length) meta.push('the day before: ' + rd.yday.map(ydayWordC).join(' + '));
+    if (rd && Array.isArray(rd.yday) && rd.yday.length) metaBits.push(aChip('the day before: ' + rd.yday.map(ydayWordC).join(' + '), '', 'ball'));
+  } else {
+    metaBits.push(statusChip);
+    metaBits.push(`<span class="wday-none">${thisCycle ? 'nothing logged on this day this cycle yet' : 'nothing logged against this day yet'}</span>`);
   }
-  // #139 Footprint: a big session wears a "big day" pill beside its RPE (bigDayMarkC(); none while the log did not load).
-  const rpeAt = meta.findIndex(m => /^sRPE /.test(m)), bigMark = s && !noLog ? bigDayMarkC(_D, s) : '';
   // Say both when both are true — a day can have work skipped AND work done at
   // the wrong dose, and only naming the worse of the two hides half the story.
-  const verdictBits = [];
-  if (v.missing) verdictBits.push(v.missing + ' not done');
-  if (v.off) verdictBits.push(v.off + ' off plan');
   const scoreline = !s ? '' : v.total
-    ? `<span class="dv ${v.missing ? 'miss' : v.off ? 'warn' : 'ok'}">${esc(verdictBits.join(' · ')) || 'all on plan'}</span>
-       <span class="dv-sub">${v.clean}/${v.total} exactly as prescribed</span>`
+    ? `<span class="dv ${v.missing ? 'miss' : v.off ? 'warn' : 'ok'}"><span class="dv-score"><b>${v.clean}</b> of ${v.total} on plan</span>
+       ${v.missing ? aChip(v.missing + ' not done', 'miss', 'x') : ''}${v.off ? aChip(v.off + ' off plan', 'miss', 'alert') : ''}${!v.missing && !v.off ? aChip('all on plan', 'good', 'check') : ''}</span>`
     : '';
 
   const picker = sessions.length > 1 ? `<div class="sesspick">${sessions.map(x =>
@@ -6862,7 +7653,7 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
   // The column header belongs to the day, not to every block inside it —
   // repeating "PRESCRIBED / DONE" above each block just adds noise to scan past.
   const body = groups.length
-    ? `<div class="cmp-head"><span></span><span>Prescribed</span><span>Done</span><span></span></div>`
+    ? `<div class="cmp-head"><span>Exercise</span><span>Asked</span><span>Did</span><span>Verdict</span></div>`
       + groups.map(g => `
       <div class="cmp-grp">
         <div class="cmp-grp-t">${g.icon ? esc(g.icon) + ' ' : ''}${esc(g.title)}</div>
@@ -6873,12 +7664,12 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
 
   return `<div class="wday ${open ? 'open' : ''} ${statusTone}" id="wday-${esc(dayNum)}">
     <button class="wday-top" aria-expanded="${open}" onclick="toggleWorkDay(${dayNum})">
-      <span class="wday-n">${esc(dayNum)}</span>
+      <span class="wday-n">Day ${esc(dayNum)}</span>
       <span class="wday-main">
         <span class="wday-title">${esc(focus || 'Day ' + dayNum)}${optional ? ` <span class="zpill${s ? ' green' : ''}">${s ? 'optional · a bonus' : 'optional'}</span>` : ''}${needsReply ? ' <span class="zpill reply">note to read</span>' : ''}</span>
-        <span class="wday-meta">${meta.length ? meta.map((m, i) => esc(m) + (i === rpeAt ? bigMark : '')).join(' · ') : (thisCycle ? 'nothing logged on this day this cycle yet' : 'nothing logged against this day yet')}</span>
+        <span class="wday-meta">${metaBits.join(' ')}</span>
       </span>
-      <span class="wday-right">${scoreline}<span class="tag ${statusTone === 'ok' ? 'done' : statusTone === 'warn' ? 'partial' : ''}">${esc(status)}</span></span>
+      <span class="wday-right">${scoreline}</span>
       <span class="day-c-chev">▾</span>
     </button>
     <div class="wday-body">
@@ -7183,11 +7974,12 @@ function earlierCyclesHtml(D, earlier) {
   if (!earlier.length) return '';
   const rows = earlier.slice(0, 80).map(s => {
     const uid = ('eh_' + D.athleteId + '_' + s.day + '_' + s.completed_on).replace(/[^a-z0-9]/gi, '_');
-    const bits = [prettyDate(s.completed_on), 'Day ' + s.day + (s.focus ? ' — ' + s.focus : ''), isPartialStatus(s.status) ? partialLabel(s.status) : 'Complete'];
-    if (s.session_rpe != null) bits.push('sRPE ' + s.session_rpe + '/10');
-    if (s.duration_min != null) bits.push(s.duration_min + ' min');
-    const rpeAt = bits.findIndex(m => /^sRPE /.test(m)), mark = D.logsErr ? '' : bigDayMarkC(D, s);   // #139
-    return `<details class="rawlog" id="${uid}"><summary>${bits.map((m, i) => esc(m) + (i === rpeAt ? mark : '')).join(' · ')}</summary>
+    const part = isPartialStatus(s.status), mark = D.logsErr ? '' : bigDayMarkC(D, s);   // #139
+    const bits = [`<span class="ec-day">Day ${esc(s.day)}${s.focus ? ' — ' + esc(s.focus) : ''}</span>`, aChip(prettyDate(s.completed_on), '', 'calendar'),
+      part ? aChip(partialLabel(s.status), 'watch', 'alert') : aChip('Complete', 'good', 'check')];
+    if (s.session_rpe != null) bits.push(aChip('effort ' + s.session_rpe + '/10', '', 'pulse') + mark);
+    if (s.duration_min != null) bits.push(aChip(s.duration_min + ' min', '', 'clock'));
+    return `<details class="rawlog" id="${uid}"><summary>${bits.join(' ')}</summary>
       <div class="elog-body">${D.logsErr ? 'The log did not load.' : esc(exerciseLogPart(s.summary))}</div>
       <div class="note-actions"><button class="btn sm" onclick="hideSession(${jsq(D.athleteId)}, ${Number(s.day)}, ${jsq(s.completed_on)})">Hide this log</button></div>
     </details>`;
@@ -7207,88 +7999,7 @@ function earlierCyclesHtml(D, earlier) {
 // Amir is the one deciding when to ask, so he needs it early.
 const RETEST_MIN_DAYS_C = 28;
 // (The retest flag itself, exTestSpecC(), sits in the comparison block above: compareDay() reads it too.)
-function maxesPanel(D) {
-  const a = D.a || {};
-  const entries = a.oneRm || [];
-  const days = (D.programDays || []);
-  const names = [], flagged = {};
-  days.forEach(d => (d.blocks || []).forEach(b => (b.exercises || []).forEach(ex => {
-    const n = String((ex && ex.name) || '').trim();
-    if (!n) return;
-    if (names.indexOf(n) === -1) names.push(n);
-    const spec = exTestSpecC(ex);
-    if (spec) flagged[n] = spec.label;
-  })));
-  const lifts = oneRmLifts(entries, names);
-  // A flagged lift with nothing on the record at all never reaches oneRmLifts,
-  // and it is the one most worth chasing — so it is added here as a row of its own.
-  const untested = Object.keys(flagged).filter(n => !lifts.some(l => l.lift === n));
-  if (!lifts.length && !untested.length) return '';
 
-  const row = (name, kg, sub, tone, u) => `<div class="pr-row">
-      <div class="pr-n">${esc(name)}${flagged[name] ? `<span class="pr-tag">${esc(flagged[name])}</span>` : ''}</div>
-      <div class="pr-s ${tone || ''}">${sub}</div>
-      <div class="pr-v">${kg == null ? '—' : round1(kg) + '<small>' + recUnitC(u, kg) + '</small>'}</div>
-    </div>`;
-
-  const rows = lifts.map(l => {
-    const due = flagged[l.lift] && l.age >= RETEST_MIN_DAYS_C;
-    const move = l.entries.length < 2 ? 'first estimate'
-      : (l.delta === 0 ? 'no change' : fmtDeltaKg(l.delta) + ' ' + recUnitC(l.u, Math.abs(l.delta)) + ' since the first');
-    const ago = l.age === 0 ? 'today' : l.age === 1 ? 'yesterday' : l.age + ' days ago';
-    return row(l.lift, l.latest.kg,
-      `${move} · ${l.latest.test ? 'tested' : 'from a set'} ${ago}${due ? ' · <b>due a retest</b>' : ''}`,
-      due ? 'amber' : '', l.u);
-  }).concat(untested.map(n => row(n, null, 'nothing on the record yet · <b>due a retest</b>', 'amber')));
-
-  return `<div class="sec"><span>Personal records</span></div>
-    <section class="panel"><div class="prlist">${rows.join('')}</div>
-      <p class="empty" data-hint="prs" style="padding:12px 0 0">Estimated one-rep maxes. Read-only: they own the record.</p>
-      ${howFold('how-prs', ['Estimated one-rep maxes, worked out from their logged sets or entered after a test. They own the record — this is read-only.'])}
-    </section>`;
-}
-
-// The three numbers, always visible; the charts behind one tap. They used to be
-// three full-width cards above everything, which pushed the actual work below
-// the fold on every single athlete.
-function metricStripHtml(m) {
-  const az = acwrZone(m.acwr.enough ? m.acwr.ratio : null);
-  const r = m.readiness, adh = m.adherence;
-  // The latest check-in's own verdict when it has one: since 2026-09-26 the athlete's app works out
-  // the day (REC-2: score S of sleep, energy, stress and overall, against their usual B) and stores
-  // { level, score, base } with it. Re-judging it here from the composite (which includes soreness)
-  // against an all-time mean could call green a day the app made lower, or the reverse. The twin is
-  // readinessPlan() in program.html; this only READS what it stored.
-  const lp = m.latestPlan;
-  const LV = { red: ['red', 'short day'], amber: ['amber', 'lower day'], green: ['green', 'normal day'] };
-  if (lp && LV[lp.level] && lp.score != null) {
-    const [tone, said] = LV[lp.level];
-    // `base: null` is the app saying "fewer than 5 check-ins so far"; no `base` key at all is an imported email,
-    // which cannot know their usual, so it says nothing about it rather than "no usual yet".
-    m._readyPill = { val: round1(lp.score) + '<small>/5</small>', sub: said + (lp.base != null ? ' · usual ' + round1(lp.base) : 'base' in lp ? ' · no usual yet' : ''), tone };
-  }
-  const rTone = !r || r.delta == null ? '' : r.delta <= -1 ? 'red' : r.delta <= -0.5 ? 'amber' : 'green';
-  const aTone = !adh || adh.pct == null ? '' : adh.pct >= 85 ? 'green' : adh.pct >= 60 ? 'amber' : 'red';
-  const pill = (label, val, sub, tone) =>
-    `<div class="mp ${tone || ''}"><div class="mp-l">${label}</div><div class="mp-v">${val}</div><div class="mp-s">${sub}</div></div>`;
-  return `<div class="mstrip">
-    ${pill('Training load', m.acwr.enough && m.acwr.ratio != null ? round1(m.acwr.ratio) : '—',
-           m.acwr.enough && m.acwr.ratio != null ? 'ACWR · ' + az.label : m.acwr.partial ? 'not enough data' : 'building baseline', az.cls)}
-    ${m._readyPill ? pill('Readiness', m._readyPill.val, m._readyPill.sub, m._readyPill.tone)
-      : pill('Readiness', r ? round1(r.latest) + '<small>/5</small>' : '—',
-           r ? (r.delta == null ? 'no usual yet' : (r.delta >= 0 ? '+' : '') + round1(r.delta) + ' vs their usual') : 'no check-ins yet', rTone)}
-    ${pill('Adherence', adh && adh.pct != null ? adh.pct + '<small>%</small>' : '—',
-           adh && adh.pct != null ? 'last ' + (adh.days < 28 ? adh.days + ' days' : '4 wks') : 'needs a program + a session', aTone)}
-    <button class="mp mp-more" id="chartsBtn" aria-expanded="false" aria-controls="chartbox" onclick="toggleCharts()">Charts<span>▾</span></button>
-  </div>
-  <div id="chartbox" class="chartbox" style="display:none">${renderCharts(m)}</div>`;
-}
-function toggleCharts() {
-  const b = $('chartbox');
-  if (b) b.style.display = b.style.display === 'none' ? 'block' : 'none';
-  const t = $('chartsBtn'); if (t && b) t.setAttribute('aria-expanded', String(b.style.display === 'block'));
-}
-window.toggleCharts = toggleCharts;
 
 // Is a started session over? program.html's sessionIsStale() (DATA-02: midnight is not the end of a session): its stamp is on another
 // calendar day AND more than six hours old. The snapshot used its own 30-hour window until 2026-10-11 (TWIN-6); scripts/check_twins.js
@@ -7339,8 +8050,45 @@ function liveSnapshotHtml(D) {
     </table></div>` : ''}
   </details>`;
 }
-// ── Look A, part 5 (2026-11-28): their phone. PLACEHOLDER until part 5 lands: the old snapshot. ──
-function phoneCardC(D) { return liveSnapshotHtml(D); }
+// ── Look A, part 5 (2026-11-28): their phone. A red card only when something is stuck on it; otherwise one quiet line. ──
+// Stuck = a day in progress now, or a touched day (started or finished on the phone) whose work has no finished session in D.history on or after
+// that date. The old snapshot (liveSnapshotHtml) stays, as the body of the #livesnap fold, so nothing is lost.
+function phoneStuckC(D) {
+  const progRow = S.prog.find(r => r.athlete_id === D.athleteId) || null;
+  const days = progRow ? decode(D.athleteId, progRow.data).days : {};
+  const out = [];
+  (D.programDays || []).forEach(pd => {
+    const d = days[pd.id] || {};
+    if (!(d.completed || d.srpe || d.note || d.readiness)) return;
+    const ts = (d.readiness && d.readiness.timestamp) || (d.completedOn && String(d.completedOn).slice(0, 10)) || null;
+    const when = ts && !isNaN(new Date(ts)) ? dkey(new Date(ts)) : '';
+    const reached = (D.history || []).some(h => Number(h.day) === Number(pd.id) && (!when || String(h.completed_on) >= when));
+    const recent = !!ts && !sessionIsStaleC(ts);
+    const at = when ? prettyDate(when) : 'earlier';
+    if (d.completed) { if (!reached) out.push(`Day ${pd.id}: finished ${at} on their phone, nothing reached you`); }
+    else if (recent) {
+      const t = ts && String(ts).indexOf('T') > 0 ? new Date(ts) : null;
+      out.push(`Day ${pd.id}: in progress` + (t ? ', started ' + String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0') : ''));
+    } else if (!reached) out.push(`Day ${pd.id}: started ${at}, not finished, nothing reached you`);
+  });
+  return out;
+}
+function phoneCardC(D) {
+  const snap = liveSnapshotHtml(D);
+  if (!snap) return '';
+  // The snapshot's own outer <details> becomes the fold below; its body is kept as it was.
+  const body = snap.replace(/^<details[^>]*>\s*<summary>[\s\S]*?<\/summary>/, '').replace(/<\/details>\s*$/, '');
+  const fold = `<details class="a-phone-fold" id="livesnap"><summary>Show what their phone holds</summary><div class="a-phone-body">${body}</div></details>`;
+  const stuck = phoneStuckC(D);
+  if (stuck.length) return `<section class="a-card a-phone stuck" aria-label="On their phone right now">
+      <h3 class="a-h">${aIco('phone')}On their phone right now</h3>
+      ${stuck.map(t => `<div class="a-ctx a-miss">${aIco('alert')}<span>${esc(t)}</span></div>`).join('')}
+      ${fold}</section>`;
+  return `<section class="a-phone quiet" aria-label="Their phone">
+      <div class="a-phone-l">${aIco('phone')}<span>Their phone matches what reached you.</span></div>
+      <div class="a-phone-s">This turns red when a session is stuck on their phone or they are training right now.</div>
+      ${fold}</section>`;
+}
 
 // --- athlete file ------------------------------------------------------------
 // One person, three screens. It used to be eight sections on a single scroll —
@@ -7361,42 +8109,132 @@ function invalidateDetail() { if (_D) _D.stamp = -1; }
 // Try again after their logs failed to load: rebuild the file, which reads them again.
 function retryLogs() { invalidateDetail(); render(); }
 window.retryLogs = retryLogs;
-// ── Look A, part 1 (2026-11-28): the read, one sentence at the top of The work. PLACEHOLDER until part 1 lands: nothing. ──
-function readLineC(D) { return ''; }
-// The number you reach them on, with a button, or a nudge to add it (stage62, audit FLOW-8; Amir: "shown in the header with a WhatsApp button").
-// It sits on the right of the header (below the name on a phone), beside View their app.
+// ── Look A, part 1 (2026-11-28): the read, one or two sentences at the top of The work: the cycle, sessions done of planned, the biggest lift gains, the habits under target, notes to read. ──
+function readLineC(D) {
+  const a = D.a || {}, first = firstWord(a.name) || 'They';
+  const t = todayKey();
+  // 1. The cycle.
+  const p = D.program, cyc = p && p.cycles && p.cycles[Number.isInteger(p.currentCycleIndex) ? p.currentCycleIndex : 0];
+  const cd = a.cycle;
+  let head = '';
+  if (cyc && cd && (cd.start || cd.end)) {
+    const nm = cyc.name || 'This cycle', left = cd.end ? daysBetween(t, cd.end) : null, wk = cycleWeekOnC(cyc, t);
+    if (left != null && left < 0) head = `${nm} is over.`;
+    else if (left === 0) head = `${nm} ends today.`;
+    else if (wk && !wk.before && !wk.after) head = `Week ${wk.wk} of ${wk.total} of ${nm}.`;
+  }
+  // 2. Sessions.  3. Strength (the same records maxesPanel reads, in kg only).
+  const adh = D.metrics && D.metrics.adherence;
+  const sess = adh && adh.expected ? `did ${adh.done} of the last ${adh.expected} planned sessions` : '';
+  const names = [];
+  (D.programDays || []).forEach(d => (d.blocks || []).forEach(b => (b.exercises || []).forEach(ex => {
+    const n = String((ex && ex.name) || '').trim();
+    if (n && names.indexOf(n) === -1) names.push(n);
+  })));
+  const up = oneRmLifts(a.oneRm || [], names).filter(l => l.entries.length > 1 && !REC_UNIT_C[l.u] && round1(l.delta) > 0)
+    .sort((x, y) => y.delta - x.delta);
+  let str = '';
+  if (up.length === 1) str = `${up[0].lift} is up ${round1(up[0].delta)} kg`;
+  else if (up.length >= 2) {
+    const x = up[0], y = up[1];
+    str = round1(x.delta) === round1(y.delta) ? `${x.lift} and ${y.lift} are both up ${round1(x.delta)} kg`
+      : `${x.lift} is up ${round1(x.delta)} kg and ${y.lift} ${round1(y.delta)} kg`;
+  }
+  // 4. Habits met on fewer than 3 of the last 7 days (the grid's own helpers and rule).
+  let weak = [];
+  const H = habEngine();
+  if (H) {
+    const days = Array.from({ length: HAB_SPAN }, (_, i) => addDays(t, i - (HAB_SPAN - 1)));
+    const { log } = habBind(H, a);
+    const acts = Array.isArray(D.act) ? D.act : null;
+    const byDay = {};
+    (acts || []).forEach(r => { const d = actDay(r); if (d >= days[0] && d <= t) (byDay[d] = byDay[d] || []).push(r); });
+    const d7 = days.slice(-7);
+    if (d7.some(d => { const e = log[d]; return !!e && typeof e === 'object' && Object.keys(e).length > 0; })) {
+      const onSet = habOnSets(H, days);
+      weak = H.all().filter(h => h.id !== 'strength' && d7.some(d => onSet[d].has(h.id)))
+        .filter(h => habLow(habStat(H, h, d7, onSet, acts && byDay)))
+        .slice(0, 2).map(h => String(H.splitEmoji(H.shortName(h))[1] || '').trim().toLowerCase()).filter(Boolean);
+    }
+  }
+  // 5. Notes.
+  const notes = (a.needReplySessions || []).length;
+  let html = '';
+  if (head) html += `<b>${esc(head)}</b>`;
+  if (sess || str) {
+    const lead = sess ? `${first} ${sess}` : `${first} got stronger: ${str}`;
+    const tail = sess && str ? ` and got stronger: ${str}` : '';
+    html += (html ? ' ' : '') + (head ? esc(lead + tail) : `<b>${esc(sess ? lead : `${first} got stronger`)}</b>${esc(sess ? tail : ': ' + str)}`) + '.';
+  }
+  if (weak.length) {
+    const txt = `${weak.join(' and ')} ${weak.length === 1 ? 'was' : 'were'} met on fewer than 3 days in 7.`;
+    html += html ? ' But ' + esc(txt) : esc(txt.charAt(0).toUpperCase() + txt.slice(1));
+  }
+  if (notes) html += (html ? ' ' : '') + `${notes} note${notes === 1 ? '' : 's'} to read.`;
+  if (!html) return '';
+  return `<section class="a-read" aria-label="The read"><span class="a-chip her">The read</span><p>${html}</p></section>`;
+}
+// The number you reach them on, with a button (stage62, audit FLOW-8; Amir: "shown in the header with a WhatsApp button").
+// It sits at the top right of the player card, beside View their app. A coached athlete with no number is not drawn here any more: the
+// Needs you box has the row "Add their WhatsApp" (look A, part 1). The other two cases stay.
 function waHeaderHtml(a) {
   const num = a.contact ? String(a.contact.whatsapp || '').trim() : '', link = num && waLink(num), file = '#a/' + encodeURIComponent(a.id) + '/file';
-  if (link) return `<span class="det-wa"><a class="abtn" target="_blank" rel="noopener" href="${esc(link)}">WhatsApp ↗</a><bdi class="det-num">${esc(num)}</bdi></span>`;
+  if (link) return `<span class="det-wa"><a class="abtn" target="_blank" rel="noopener" href="${esc(link)}">${aIco('msg')}WhatsApp</a><bdi class="det-num">${esc(num)}</bdi></span>`;
   if (num) return `<span class="det-wa"><bdi class="det-num">${esc(num)}</bdi><span class="muted">is not a number WhatsApp can open</span><a href="${file}">fix it</a></span>`;
-  return a.tier === 'coached' ? `<span class="det-wa"><a href="${file}">add a WhatsApp number</a></span>` : '';
+  return '';
 }
-// The cycle the athlete is in, as one line under their name on every sub-tab (it was a dark green block on The work only):
-// the name, "week 2 of 4" when the cycle has dates (cycleWeekOnC(), the app's own week), the dates and the days left, then the focuses.
-// A cycle with no dates has no week text; its roadmap label ("Weeks 1-5") stands in, as the block showed it.
+// The cycle the athlete is in, as a box in the player card on every sub-tab (look A, part 1): "Cycle 4 of 5" and its name, a bar from the
+// start date to the end date (today's share; full once it ended), the two dates under it, a status chip ("Week 2 of 4", "Ended yesterday")
+// and a second one ("20 days left"), then the focuses as bullets. A cycle with no dates has no bar and no week: its roadmap label
+// ("Weeks 1-5") is the chip. The week is cycleWeekOnC(), the app's own.
 function cycleLineHtml(D) {
   const p = D.program;
   const cyc = (p && p.cycles || [])[(p && Number.isInteger(p.currentCycleIndex)) ? p.currentCycleIndex : 0];
   if (!cyc) return '';
   const cd = D.a && D.a.cycle, dated = !!(cd && (cd.start || cd.end));
-  const wk = dated ? cycleWeekOnC(cyc, todayKey()) : null;
-  const left = cd && cd.end ? daysBetween(todayKey(), cd.end) : null;
-  const bits = [];
-  if (wk && !wk.before && !wk.after) bits.push(`week ${wk.wk} of ${wk.total}`);
-  else if (!dated && cyc.weeks) bits.push(esc(cyc.weeks));
-  if (dated) bits.push(`${cd.start ? esc(dayMonth(cd.start)) : '?'} – ${cd.end ? esc(dayMonth(cd.end)) : '?'}`);
-  if (left != null) bits.push(left > 0 ? `${left} day${left === 1 ? '' : 's'} left` : left === 0 ? 'ends today' : `ended ${-left} day${left === -1 ? '' : 's'} ago`);
-  const fo = cyc.focuses && cyc.focuses.length ? `<span class="det-fo">· ${cyc.focuses.map(esc).join(', ')}</span>` : '';
-  return `<div class="det-cycle"><b>${esc(cyc.name || 'This cycle')}</b>${bits.length ? `<span>· ${bits.join(' · ')}</span>` : ''}${fo}</div>`;
+  const t = todayKey();
+  const wk = dated ? cycleWeekOnC(cyc, t) : null;
+  const left = cd && cd.end ? daysBetween(t, cd.end) : null;
+  const n = p && p.cycles ? p.cycles.length : 0;
+  const idx = (p && Number.isInteger(p.currentCycleIndex) ? p.currentCycleIndex : 0) + 1;
+  const name = cyc.name || (n > 1 ? '' : 'This cycle');
+  const chips = [];
+  if (left != null && left < 0) chips.push(aChip(left === -1 ? 'Ended yesterday' : `Ended ${-left} days ago`, 'good', 'check'));
+  else if (left === 0) chips.push(aChip('Ends today', 'watch', 'clock'));
+  else if (wk && wk.before) chips.push(aChip('Starts ' + dayMonth(cd.start), 'her', 'calendar'));
+  else if (wk) chips.push(aChip(`Week ${wk.wk} of ${wk.total}`, 'her', 'calendar'));
+  else if (!dated && cyc.weeks) chips.push(aChip(String(cyc.weeks), 'her', 'calendar'));
+  if (left != null && left > 0) chips.push(aChip(`${left} day${left === 1 ? '' : 's'} left`, '', 'clock'));
+  let bar = '';
+  if (cd && cd.start && cd.end) {
+    const span = Math.max(1, daysBetween(cd.start, cd.end)), done = Math.min(1, Math.max(0, daysBetween(cd.start, t) / span));
+    const pct = Math.round(done * 100);
+    bar = `<div class="dc-bar" role="img" aria-label="${esc(`Cycle from ${dayMonth(cd.start)} to ${dayMonth(cd.end)}: ${pct} percent of it has passed`)}"><i style="width:${pct}%"></i></div>
+      <div class="dc-dates"><span>${esc(dayMonth(cd.start))}</span><span>${esc(dayMonth(cd.end))}</span></div>`;
+  } else if (dated) {
+    bar = `<div class="dc-dates"><span>${cd.start ? esc(dayMonth(cd.start)) : '?'}</span><span>${cd.end ? esc(dayMonth(cd.end)) : '?'}</span></div>`;
+  }
+  const fo = (cyc.focuses || []).filter(x => x);
+  return `<div class="det-cycle"><div class="dc-top"><span class="dc-h">${n > 1 ? `<b class="dc-n">Cycle ${idx} of ${n}</b>` : ''}${name ? `<span class="dc-name">${esc(name)}</span>` : ''}</span>${chips.length ? `<span class="dc-chips">${chips.join('')}</span>` : ''}</div>
+    ${bar}${fo.length ? `<ul class="dc-fo">${fo.map(f => `<li>${esc(f)}</li>`).join('')}</ul>` : ''}</div>`;
 }
 // Why this person needs the coach, from the one rule (reasonsOf(): a.reasons, plus the quiet flag a gone-quiet athlete keeps), each a link to
-// the screen that has it. A quiet flag names no screen: the one it can carry (no login) is fixed on the File.
+// the screen that has it. A quiet flag names no screen: the one it can carry (no login) is fixed on the File. Look A: a box, one row per
+// reason with an icon (a note: msg; a cycle that ended or ends: pen; a sync problem: alert; a login: info; the rest: flag), the first warning
+// the blue row; the goal line is a row, and "Add their WhatsApp" is one for a coached athlete with no number. Nothing to say: no box.
 function needsLineHtml(a) {
   const need = (a.reasons || []).concat(a.quietFlags || []);
-  if (!need.length) return '';
+  const noNum = a.tier === 'coached' && !(a.contact && String(a.contact.whatsapp || '').trim());
+  const goal = goalLineHtml(a);
+  if (!need.length && !noNum && !goal) return '';
   // Mark all read: every note of theirs still new, the recent and the older (a.needReplySessions), in one tap.
   const unread = (a.needReplySessions || []).length;
-  return `<div class="det-need"><b>Needs you:</b> ${need.map(r => `<a${r.tone === 'warn' ? ' class="warn"' : ''} href="#a/${encodeURIComponent(a.id)}/${encodeURIComponent(r.sub || 'file')}">${esc(r.text)}</a>`).join(' · ')}${unread ? ` <button class="btn sm quiet" onclick="markAllRead(${jsq(a.id)})" title="Clear all ${unread} new note${unread === 1 ? '' : 's'} of ${esc(a.name)} without opening each day">Mark all read</button>` : ''}</div>`;
+  const icoOf = r => ({ note: 'msg', cycle: 'pen', renew: 'pen', sync: 'alert', login: 'info' }[r.key] || (/login/.test(r.text) ? 'info' : 'flag'));
+  const first = need.findIndex(r => r.tone === 'warn');
+  const rows = need.map((r, i) => `<a class="dn-row${r.tone === 'warn' ? ' warn' : ''}${i === first ? ' primary' : ''}" href="#a/${encodeURIComponent(a.id)}/${encodeURIComponent(r.sub || 'file')}">${aIco(icoOf(r))}<span class="dn-t">${esc(String(r.text).charAt(0).toUpperCase() + String(r.text).slice(1))}</span></a>`).join('');
+  const wa = noNum ? `<a class="dn-row" href="#a/${encodeURIComponent(a.id)}/file">${aIco('msg')}<span class="dn-t">Add their WhatsApp<small>No number saved</small></span></a>` : '';
+  return `<div class="det-need"><div class="dn-h"><h3>Needs you</h3>${unread ? `<button class="btn sm quiet" onclick="markAllRead(${jsq(a.id)})" title="Clear all ${unread} new note${unread === 1 ? '' : 's'} of ${esc(a.name)} without opening each day">Mark all read</button>` : ''}</div>
+    ${rows}${goal ? `<div class="dn-goal">${goal}</div>` : ''}${wa}</div>`;
 }
 async function renderDetail(athleteId, sub) {
   let a = S.ath[athleteId];
@@ -7446,40 +8284,47 @@ async function renderDetail(athleteId, sub) {
     // open and the session they were comparing; only a different athlete starts fresh.
     if (!sameAthlete) { _workSel = {}; _workOpen = {}; Object.keys(_exDrafts).forEach(k => delete _exDrafts[k]); }
   }
-  const has = { proof: !!(a.isHab || isSignup(a.contact)), work: true, file: true };
-  // With no screen named in the address, a habit-only athlete (free or Proof, no training days)
-  // opens on Proof, where their facts are; everyone else on The work.
+  // The Proof tab is drawn only for someone with no training (no programme days, no history): a training athlete's habits, steps target and wall
+  // lines are on The work. The address #a/<id>/proof still draws the Proof body for anyone. With no screen named in the address, someone
+  // with no training and habits opens on Proof, where their facts are; everyone else on The work.
   const noTraining = !_D.programDays.length && !_D.history.length;
-  _D.sub = SUBTABS.some(t => t.id === sub) ? sub : ((has.proof && (a.tier !== 'coached' || noTraining)) ? 'proof' : 'work');
+  const has = { proof: !!(a.isHab || isSignup(a.contact)) && noTraining, work: true, file: true };
+  _D.sub = SUBTABS.some(t => t.id === sub) ? sub : (has.proof ? 'proof' : 'work');
   if (_pendingFocus && _pendingFocus.id === athleteId) {
     _workOpen[_pendingFocus.day] = true;
     if (_pendingFocus.on) _workSel[_pendingFocus.day] = _pendingFocus.on;
   }
-  const sub2 = [];
-  if (_D.history.length) sub2.push(_D.history.length + ' session' + (_D.history.length === 1 ? '' : 's'));
-  if (a.isHab) sub2.push('Proof ' + a.hab7 + '/7');
-  sub2.push('last active ' + timeAgo(a.lastActive));
+  // The facts row of the player card: a big figure over a label, each its own cell.
+  const cell = (fig, label) => `<div class="dh-cell"><b>${esc(fig)}</b><span>${esc(label)}</span></div>`;
+  const la = timeAgo(a.lastActive);
+  const facts = [
+    _D.history.length ? cell(String(_D.history.length), _D.history.length === 1 ? 'session in all' : 'sessions in all') : '',
+    a.isHab ? cell(`${a.hab7} of 7`, 'habits logged in the last 7 days') : '',
+    cell(la.charAt(0).toUpperCase() + la.slice(1), 'last active'),
+  ].filter(Boolean);
 
   // View their app when they have a programme to show; their Proof when habits are all they have.
   const viewBtn = _D.programDays.length ? `<button class="btn sm" onclick="viewAsAthlete(${jsq(athleteId)})">View their app</button>`
     : a.isHab ? `<button class="btn sm" onclick="viewAsAthlete(${jsq(athleteId)}, 'habits')">View their Proof</button>` : '';
   const acts = waHeaderHtml(a) + viewBtn;
+  const cycleBox = cycleLineHtml(_D), needBox = needsLineHtml(a);
 
   const keep = snapTabBody();     // what is typed or open in the tab on screen, before the page is replaced
   $('content').innerHTML = `<a class="back" href="#athletes">← Roster</a>
     <div class="dethead">
-      <div class="det-id">
-        ${avaHtml('det-ava', athleteId, a.name)}
-        <div>
-          <h2 class="hd">${esc(a.name)}</h2>
-          <div class="sub">${tierChip(a)}${statusChip(a)}${lvSlot('hchip', athleteId)} <span>${esc(sub2.join(' · '))}</span></div>
-          <div class="det-game" id="detGame" data-id="${esc(athleteId)}">${gameLine(S.game[athleteId])}</div>
-          ${cycleLineHtml(_D)}
-          ${needsLineHtml(a)}
-          ${goalLineHtml(a)}
+      <div class="dh-top">
+        <div class="det-id">
+          ${avaHtml('det-ava', athleteId, a.name)}
+          <div>
+            <h2 class="hd">${esc(a.name)}</h2>
+            <div class="sub">${tierChip(a)}${statusChip(a)}${lvSlot('hchip', athleteId)}</div>
+            <div class="det-game" id="detGame" data-id="${esc(athleteId)}">${gameLine(S.game[athleteId])}</div>
+          </div>
         </div>
+        ${acts ? `<div class="det-acts">${acts}</div>` : ''}
       </div>
-      ${acts ? `<div class="det-acts">${acts}</div>` : ''}
+      <div class="dh-facts">${facts.join('')}</div>
+      ${cycleBox || needBox ? `<div class="dh-main${cycleBox && needBox ? '' : ' one'}">${cycleBox}${needBox}</div>` : ''}
     </div>
     <div class="subrail">${SUBTABS.filter(t => has[t.id]).map(t => {
         const n = t.id === 'work' ? a.needReplyRecent.length : 0;
@@ -7577,35 +8422,106 @@ function proofTabHtml(D) {
       <button class="modbtn" onclick="toggleHide(${jsq(athleteId)},${jsq(n.day)},${n.hidden ? 'false' : 'true'})">${n.hidden ? 'Show' : 'Hide'}</button>
     </div>`).join('')}</section>` : '<p class="empty">Nothing on the wall this week.</p>'}`;
 }
-// Weight is opt-in in the app and most athletes will never switch it on, so
-// this panel is absent rather than empty when there is nothing to show — an
-// empty chart on every athlete's page trains you to scroll past the one that
-// has something in it. It sits on The work (round 2, 2026-10-12: the weight comes from the training app, not from Proof, and a coached
-// athlete who never ticks a habit has no Proof tab): ONE compact panel, the figures on its header line and the chart folded under them in
-// #wtdet, shut until it is opened (snapTabBody() keeps it open through a redraw).
-function weightPanel(a) {
-  const wt = a.wt || {};
-  const keys = wtDaysOf(wt);
-  if (!keys.length) return '';
-  const last = keys[keys.length - 1], kg = wt[last];
-  const gap = daysSince(last + 'T12:00:00');
-  const c30 = wtChangeOf(wt, 30), c90 = wtChangeOf(wt, 90);
-  const ser = wtAvgSeriesOf(wt, 90);
-  const vals = ser.map(p => p.v);
-  const lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
-  const pad = Math.max(0.5, (hi - lo) * 0.18);
-  return `<section class="panel wtpanel"><details class="wtdet" id="wtdet">
-    <summary><span class="wt-t">Body weight</span> · <b>${round1(kg).toFixed(1)} kg</b> · ${gap === 0 ? 'today' : gap === 1 ? 'yesterday' : gap + ' days ago'} · ${c30 ? fmtDeltaKg(c30.delta) + ' kg over 30 days' : 'not enough readings for a 30-day change'}${c90 ? ' · ' + fmtDeltaKg(c90.delta) + ' over 90' : ''}</summary>
-    ${ser.length > 1
-      ? lineSVG(ser, { color: C.green, yMin: lo - pad, yMax: hi + pad, dots: false, w: 520, h: 120,
-          // the lowest and highest point of the line, in kg, and its first and last day: the same scale the line is drawn on
-          axis: { hi: { v: hi, text: round1(hi).toFixed(1) + ' kg' }, lo: { v: lo, text: round1(lo).toFixed(1) + ' kg' }, x: axisDays(ser[0].day, ser[ser.length - 1].day) } })
-        + `<div class="chart-legend">${WT_AVG_WINDOW}-day rolling average, last 90 days · ${keys.length} reading${keys.length === 1 ? '' : 's'} all time</div>`
-      : `<p class="empty">One reading so far — a line needs a few more.</p>`}
-  </details></section>`;
+// ── Look A, part 4 (2026-11-28): getting stronger ────────────────────────────────────────────────────────────────────────────
+// The same records maxesPanel() reads (oneRmLifts: the newest series of each lift, in its own measure, never converted) and the same body weight
+// weightPanel() reads, as one card: the lifts that went up as duels (first estimate against now), the ones still on their first estimate, the body.
+function strengthDataC(D) {
+  const a = D.a || {};
+  const names = [], flagged = {};
+  (D.programDays || []).forEach(d => (d.blocks || []).forEach(b => (b.exercises || []).forEach(ex => {
+    const n = String((ex && ex.name) || '').trim();
+    if (!n) return;
+    if (names.indexOf(n) === -1) names.push(n);
+    const spec = exTestSpecC(ex);
+    if (spec) flagged[n] = spec.label;
+  })));
+  const lifts = oneRmLifts(a.oneRm || [], names);
+  const untested = Object.keys(flagged).filter(n => !lifts.some(l => l.lift === n));
+  return { lifts, untested, flagged };
 }
-// ── Look A, part 4 (2026-11-28): getting stronger. PLACEHOLDER until part 4 lands: the old records and body weight. ──
-function strengthCardC(D) { return maxesPanel(D) + weightPanel(D.a); }
+const agoWordC = n => n === 0 ? 'today' : n === 1 ? 'yesterday' : n + ' days ago';
+// A number in its own measure: "32.5 kg", "225 lb", "9.5 plates".
+const liftNumC = (v, u) => `${round1(v)} ${recUnitC(u, v)}`;
+function liftNameC(name, tag) { return `<b class="a-lift-n">${esc(name)}</b>${tag ? ` <span class="pr-tag">${esc(tag)}</span>` : ''}`; }
+function liftGainC(l, tag, due) {
+  const first = l.entries[0].kg, now = l.latest.kg;
+  const split = l.u === 'plates'
+    ? `<div class="a-split gain" role="img" aria-label="${esc(`${l.lift}: first estimate ${liftNumC(first, l.u)}, now ${liftNumC(now, l.u)}`)}"><div class="a-split-n"><div><b>${esc(liftNumC(first, l.u))}</b><small>first estimate</small></div><div><b>${esc(liftNumC(now, l.u))}</b><small>now</small></div></div></div>`
+    : aSplit({ gain: true, a: first, b: now, fa: liftNumC(first, l.u), fb: liftNumC(now, l.u), la: 'first estimate', lb: 'now',
+      aria: `${l.lift}: first estimate ${liftNumC(first, l.u)}, now ${liftNumC(now, l.u)}` });
+  return `<div class="a-lift"><div class="a-lift-h"><span>${liftNameC(l.lift, tag)}</span><span class="a-lift-c">${due ? aChip('due a retest', 'watch', 'clock') : ''}${aChip(`${fmtDeltaKg(l.delta)} ${recUnitC(l.u, Math.abs(l.delta))}`, 'good', 'up')}</span></div>
+    ${split}<p class="a-lift-a">${l.latest.test ? 'tested' : 'from a set'} ${agoWordC(l.age)}</p></div>`;
+}
+function liftQuietC(l, tag, due) {
+  const sub = l.entries.length < 2 ? '' : l.delta === 0 ? 'no change' : `${fmtDeltaKg(l.delta)} ${recUnitC(l.u, Math.abs(l.delta))} since the first`;
+  return `<div class="a-lift q"><span class="a-lift-n2">${liftNameC(l.lift, tag)}</span><span class="a-lift-v">${esc(liftNumC(l.latest.kg, l.u))}</span>
+    ${sub || due ? `<span class="a-lift-s">${sub ? esc(sub) : ''}${due ? aChip('due a retest', 'watch', 'clock') : ''}</span>` : ''}</div>`;
+}
+// The body weight chart the old fold held (the same line, the same scale).
+function wtChartC(wt) {
+  const keys = wtDaysOf(wt), ser = wtAvgSeriesOf(wt, 90);
+  if (ser.length < 2) return `<p class="empty">One reading so far — a line needs a few more.</p>`;
+  const vals = ser.map(p => p.v), lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), pad = Math.max(0.5, (hi - lo) * 0.18);
+  return lineSVG(ser, { color: C.green, yMin: lo - pad, yMax: hi + pad, dots: false, w: 520, h: 120,
+      axis: { hi: { v: hi, text: round1(hi).toFixed(1) + ' kg' }, lo: { v: lo, text: round1(lo).toFixed(1) + ' kg' }, x: axisDays(ser[0].day, ser[ser.length - 1].day) } })
+    + `<div class="chart-legend">${WT_AVG_WINDOW}-day rolling average, last 90 days · ${keys.length} reading${keys.length === 1 ? '' : 's'} all time</div>`;
+}
+// A flat-or-sloping line of the 90-day average, drawn to scale (the same pad as the chart, so a flat body draws flat). No text in it.
+function wtSparkC(ser) {
+  const W = 200, H = 40, px = 6, py = 8;
+  const vals = ser.map(p => p.v), lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), pad = Math.max(0.5, (hi - lo) * 0.18);
+  const y0 = lo - pad, y1 = hi + pad;
+  const t0 = pDate(ser[0].day).getTime(), t1 = pDate(ser[ser.length - 1].day).getTime();
+  const X = d => px + (t1 > t0 ? (pDate(d).getTime() - t0) / (t1 - t0) : 1) * (W - 2 * px);
+  const Y = v => py + (1 - (v - y0) / (y1 - y0)) * (H - 2 * py);
+  const pts = ser.map(p => `${X(p.day).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' ');
+  const last = ser[ser.length - 1];
+  return `<svg class="a-spark" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(`Body weight, ${WT_AVG_WINDOW}-day average, from ${round1(ser[0].v).toFixed(1)} kg to ${round1(last.v).toFixed(1)} kg over ${ser.length} days with a reading`)}">
+    <polyline points="${pts}" fill="none" stroke="${A_C.her}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${X(last.day).toFixed(1)}" cy="${Y(last.v).toFixed(1)}" r="4.5" fill="${A_C.her}"/></svg>`;
+}
+function bodyWeightBoxC(a) {
+  const wt = a.wt || {}, keys = wtDaysOf(wt);
+  if (!keys.length) return '';
+  const last = keys[keys.length - 1], kg = wt[last], gap = daysSince(last + 'T12:00:00');
+  const c30 = wtChangeOf(wt, 30), c90 = wtChangeOf(wt, 90), ser = wtAvgSeriesOf(wt, 90);
+  const trend = d => Math.abs(d) <= 0.5 ? 'flat' : '';
+  const chips = (c30 ? aChip(`${fmtDeltaKg(c30.delta)} kg over 30 days`, '', c30.delta > 0.5 ? 'up' : c30.delta < -0.5 ? 'down' : 'minus') : aChip('not enough readings for a 30-day change', '', 'minus'))
+    + (c90 ? aChip(trend(c90.delta) ? 'flat over 90 days' : `${fmtDeltaKg(c90.delta)} kg over 90 days`, '', 'minus') : '');
+  return `<div class="a-body"><div class="a-body-h">${aIco('scale')}<span><small>Body weight</small><b>${esc(round1(kg).toFixed(1))} kg</b></span>${ser.length > 1 ? wtSparkC(ser) : ''}
+      <span class="a-body-w"><small>last weighed</small><b>${esc(agoWordC(gap))}</b></span></div>
+    <div class="a-chips4">${chips}</div>
+    <details class="wtdet" id="wtdet"><summary>Show the chart</summary>${wtChartC(wt)}</details></div>`;
+}
+function strengthCardC(D) {
+  const a = D.a || {};
+  const { lifts, untested, flagged } = strengthDataC(D);
+  const body = bodyWeightBoxC(a);
+  if (!lifts.length && !untested.length && !body) return '';
+  const due = l => !!flagged[l.lift] && l.age >= RETEST_MIN_DAYS_C;
+  const gains = lifts.filter(l => l.entries.length >= 2 && l.delta > 0);
+  const quiet = lifts.filter(l => gains.indexOf(l) < 0);
+  const c30 = a.wt ? wtChangeOf(a.wt, 30) : null;
+  let verdict, tone, ico;
+  if (gains.length) { verdict = c30 && Math.abs(c30.delta) <= 0.5 ? 'Stronger, body weight steady.' : 'Stronger.'; tone = 'a-good'; ico = 'up'; }
+  else if (lifts.length) { verdict = 'Holding steady.'; tone = 'a-her'; ico = 'minus'; }
+  else if (body && !untested.length) { verdict = 'Body weight only.'; tone = 'a-her'; ico = 'scale'; }
+  else { verdict = 'Nothing on the record yet.'; tone = 'a-her'; ico = 'clock'; }
+  const allSingle = quiet.every(l => l.entries.length < 2);
+  const quietRows = quiet.map(l => liftQuietC(l, flagged[l.lift], due(l)))
+    .concat(untested.map(n => `<div class="a-lift q"><span class="a-lift-n2">${liftNameC(n, flagged[n])}</span><span class="a-lift-v">—</span><span class="a-lift-s">nothing on the record yet${aChip('due a retest', 'watch', 'clock')}</span></div>`));
+  return `<section class="a-card a-str">
+    <h3 class="a-h">${aIco('dumbbell')}Getting stronger</h3>
+    <p class="a-verdict ${tone}">${aIco(ico)}<span>${esc(verdict)}</span></p>
+    <div class="prlist">
+    ${gains.length ? `<p class="a-hsub4">Lifts that went up</p><div class="a-lifts">${gains.map(l => liftGainC(l, flagged[l.lift], due(l))).join('')}</div>` : ''}
+    ${quietRows.length ? `<div class="a-first"><p class="a-hsub4">${allSingle ? 'First estimates, not retested yet' : 'Not gone up yet'}</p><div class="a-first-g">${quietRows.join('')}</div></div>` : ''}
+    </div>
+    ${body}
+    <p class="a-foot" data-hint="prs">Estimated one-rep maxes from their sets. Read-only: they own the record.</p>
+    ${howFold('how-prs', ['Estimated one-rep maxes, worked out from their logged sets or entered after a test. They own the record — this is read-only.'])}
+  </section>`;
+}
 // ── The File tab's building blocks (2026-10-12: four groups, one white panel each; label / value / action rows between hairlines) ──
 // A row: its label, then the value, its actions (right-aligned, wrapping under on a phone), one short muted hint, and `full` (a form, the
 // unsent password, the Erase panel: anything that wants the whole width). Every part but the label is optional.

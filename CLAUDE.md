@@ -40,7 +40,8 @@ Each line is the short form. The file beside it holds the full wording, which is
   index in [`.claude/COACHING-PRINCIPLES.md`](.claude/COACHING-PRINCIPLES.md) wins, and new
   text cites the ID instead of restating it. → [`docs/rules/coaching.md`](docs/rules/coaching.md)
 - **Clay `#C7552F` is the only accent. No yellow, gold, ochre or amber, ever**, in either app
-  or any design. → [`docs/rules/design.md`](docs/rules/design.md) ·
+  or any design (the coach dashboard may have its own palette since 2026-11-28, still with no
+  yellow). → [`docs/rules/design.md`](docs/rules/design.md) ·
   [`docs/rules/program-app-look.md`](docs/rules/program-app-look.md)
 - **Everything an athlete reads sounds like Amir typed it** (COM-3): plain words, short
   sentences. → [`docs/rules/coaching.md`](docs/rules/coaching.md)

@@ -1688,37 +1688,36 @@ S['load-partial'] = async (b) => {
   const day = n => page.evaluate(n => new Date(Date.now() - n * 86400e3).toISOString().slice(0, 10), n);
   const mk = async (n, extra) => Object.assign({ athlete_id: 'ava_test', athlete_name: 'Ava Example', day: 1, completed_on: await day(n), status: 'Complete', session_rpe: 7, duration_min: 50,
     readiness: null, day_note: '', focus: '', summary: '', updated_at: new Date().toISOString(), coach_status: 'read', log: null }, extra || {});
-  const strip = async () => (await page.locator('.mstrip').first().innerText()).replace(/\s+/g, ' ');
+  const strip = async () => (await page.locator('.a-score-load').first().innerText()).replace(/\s+/g, ' ');
   const reload = async () => { await page.evaluate(() => hardRefresh()); await L.settle(page, 900); };
   // 1. a month of full data: the ratio shows
   await addSessions([await mk(15), await mk(20), await mk(26), await mk(12), await mk(9)]);
   await reload();
   let t = await strip();
-  check(r, 'every session has a duration and RPE: the ratio and its zone are shown', /ACWR · (Optimal|Climbing|High load|Low load)/.test(t) && !/not enough data/.test(t), t);
+  check(r, 'every session has a duration and RPE: the ratio and its zone are shown', /load ratio \d\.\d\d/.test(t) && /(Sweet spot|Climbing|Spike|Light week)/.test(t) && !/Not enough data/.test(t), t);
   // 2. one session with no duration: the ratio goes, with the reason
   await addSessions([await mk(5, { duration_min: null })]);
   await reload();
   t = await strip();
-  check(r, 'one session in the window has no duration: the pill says "not enough data" and shows no number or zone', /not enough data/.test(t) && !/ACWR ·/.test(t) && /training load\s*—/i.test(t), t);
-  const card = (await page.locator('.chart-card', { hasText: 'Training load' }).first().innerText().catch(() => '')).replace(/\s+/g, ' ');
-  const cardText = card || (await page.evaluate(() => { const d = document.querySelector('.chart-card'); return d ? d.textContent : ''; })).replace(/\s+/g, ' ');
+  check(r, 'one session in the window has no duration: the card says "Not enough data" and shows no ratio, no zone marker and no split', /Not enough data/.test(t) && !/load ratio/.test(t) && !/(Sweet spot|Climbing|Spike|Light week)/.test(t) && (await page.locator('.a-score-load .a-zmark-d, .a-score-load .a-split').count()) === 0, t);
+  const cardText = t;
   check(r, 'the load card says why, with the count, in the singular', /Not enough data/.test(cardText) && /1 of 9 sessions in the last 4 weeks has no duration or RPE/.test(cardText) && /It is left out/.test(cardText), cardText);
   check(r, 'the bars still show the sessions that do have a load, and say one was left out', /and (is|are) left out/.test(cardText) && !/count as zero/.test(cardText), cardText);
   // 3. two sessions
   await addSessions([await mk(3, { session_rpe: null })]);
   await reload();
-  const card2 = await page.evaluate(() => (document.querySelector('.chart-card') || {}).textContent || '');
+  const card2 = await page.evaluate(() => (document.querySelector('.a-score-load') || {}).textContent || '');
   check(r, 'two missing: the plural wording', /2 of 10 sessions in the last 4 weeks have no duration or RPE/.test(card2.replace(/\s+/g, ' ')) && /They are left out/.test(card2.replace(/\s+/g, ' ')), card2.replace(/\s+/g, ' ').slice(0, 400));
   // 4. once they are filled in the ratio comes back
   await page.evaluate(() => { window.__DB.session_history.filter(x => x.athlete_id === 'ava_test').forEach(x => { if (x.duration_min == null) x.duration_min = 45; if (x.session_rpe == null) x.session_rpe = 6; }); });
   await reload();
   t = await strip();
-  check(r, 'once the duration and RPE are filled in, the ratio is back', /ACWR · /.test(t) && !/not enough data/.test(t), t);
+  check(r, 'once the duration and RPE are filled in, the ratio is back', /load ratio/.test(t) && !/Not enough data/.test(t), t);
   // 5. a session older than four weeks without a duration does not matter
   await addSessions([await mk(40, { duration_min: null })]);
   await reload();
   t = await strip();
-  check(r, 'a session older than 4 weeks with no duration is outside the window and changes nothing', /ACWR · /.test(t), t);
+  check(r, 'a session older than 4 weeks with no duration is outside the window and changes nothing', /load ratio/.test(t), t);
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;
@@ -2445,10 +2444,10 @@ S['hist-heavy-fails'] = async (b) => {
   const open = (await page.locator('.wday.open').first().innerText()).replace(/\s+/g, ' ');
   check(r, 'the work tab says the logs did not load, and why', /did not load/i.test(txt) && /fixture: logs unavailable/.test(txt), txt.slice(0, 260));
   check(r, 'the open day shows no verdict or "not logged" built from a log that never arrived', !/not logged|exactly as prescribed|not done|off plan/.test(open), open.slice(0, 260));
-  check(r, 'the numbers that did load are still shown (date, sRPE, minutes)', /sRPE 7\/10/.test(open) && /50 min/.test(open), open.slice(0, 200));
+  check(r, 'the numbers that did load are still shown (date, effort, minutes)', /effort 7\/10/.test(open) && /50 min/.test(open), open.slice(0, 200));
   await page.locator('#tabbody button', { hasText: 'Try again' }).click(); await L.settle(page, 900);
   const txt2 = (await page.locator('#tabbody').innerText()).replace(/\s+/g, ' ');
-  check(r, 'Try again reads them: the notice is gone and the comparison appears', !/did not load/i.test(txt2) && /4\/4 sets/.test(txt2), txt2.slice(0, 200));
+  check(r, 'Try again reads them: the notice is gone and the comparison appears', !/Their session logs did not load/i.test(txt2) && /4\/4 sets/.test(txt2), txt2.slice(0, 200));
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;
@@ -2502,7 +2501,7 @@ S['retest-flag'] = async (b) => {
   });
   await page.evaluate(() => reloadPrograms().then(render)); await L.settle(page, 700);
   await L.go(page, 'athletes'); await L.go(page, 'a/ava_test/work');
-  const rows = (await page.locator('.prlist .pr-row').allInnerTexts()).map(x => x.replace(/\s+/g, ' ').trim());
+  const rows = (await page.locator('.prlist .a-lift').allInnerTexts()).map(x => x.replace(/\s+/g, ' ').trim());
   const has = name => rows.some(x => x.toLowerCase().startsWith(name.toLowerCase()));
   check(r, 'a "3RM" lift is listed with its tag', rows.some(x => /^goblet squat\s*3rm/i.test(x)), rows);
   check(r, '`test: true` is the 5RM default', rows.some(x => /^dumbbell bench press\s*5rm/i.test(x)), rows);
@@ -2537,25 +2536,27 @@ S['readiness-chart'] = async (b) => {
   });
   await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
   await L.go(page, 'a/ava_test/work');
-  const strip = T(await page.locator('.mstrip').first().innerText());
+  const strip = T(await page.locator('.a-score-ready').first().innerText());
   const chart = await page.evaluate(() => {
-    const c = [...document.querySelectorAll('#chartbox .chart-card')].find(x => /Readiness/.test(x.textContent));
-    return c ? { text: c.textContent.replace(/\s+/g, ' ').trim(), dots: c.querySelectorAll('svg circle').length, dashed: c.querySelectorAll('svg line[stroke-dasharray]').length } : null;
+    const c = document.querySelector('.a-score-ready');
+    return c ? { text: c.innerText.replace(/\s+/g, ' ').trim(), dots: c.querySelectorAll('.a-ov circle').length, dashed: c.querySelectorAll('svg [stroke-dasharray]').length,
+      y: [...c.querySelectorAll('.cp-y span')].map(s => s.textContent) } : null;
   });
-  check(r, 'the chart card is there', !!chart, strip);
+  check(r, 'the readiness card is there', !!chart, strip);
   if (chart) {
-    check(r, 'the big number is the latest check-in\'s score (2.5, not the composite 2.75), against their usual 3.6', /^Readiness 2\.5\/5 · usual 3\.6/.test(chart.text), chart.text);
+    check(r, 'a score under 3 widens the scale to 1 to 5, and the card says so', JSON.stringify(chart.y) === JSON.stringify(['5', '1']) && /scale 1 to 5/.test(chart.text), { y: chart.y, text: chart.text });
+    check(r, 'the big number is the latest check-in\'s score (2.5, not the composite 2.75), against their usual 3.6', /^Readiness Lower day 2\.5 today 3\.6 usual/.test(chart.text), chart.text);
     check(r, 'it says how far under their usual, in the app\'s measure', /-1\.1 vs their usual \(the mean of their last ten check-ins before this one\)/.test(chart.text), chart.text);
     check(r, 'one dot per answered check-in (11) and a dashed line at their usual', chart.dots === 11 && chart.dashed === 1, { dots: chart.dots, dashed: chart.dashed });
     check(r, 'the legend names the measure the app uses, and the old "Composite per session" wording is gone', /sleep, energy, stress and how ready they feel/.test(chart.text) && /as the athlete's app scores it/.test(chart.text) && !/omposite/.test(chart.text), chart.text);
   }
-  check(r, 'the pill and the chart name the same check-in: 2.5 against their usual 3.6, a lower day', /Readiness\s*2\.5\/5\s*lower day · usual 3\.6/i.test(strip), strip);
+  check(r, 'the verdict and the chart name the same check-in: 2.5 against their usual 3.6, a lower day', /Readiness Lower day 2\.5 today 3\.6 usual/.test(strip), strip);
   // The day cards: the number beside the verdict is the one that made it.
   const meta = async n => T(await page.locator('#wday-' + n + ' .wday-meta').innerText());
   const m2 = await meta(2), m1 = await meta(1), m3 = await meta(3);
-  check(r, 'Day 2 (the later check-in of the shared day) reads 2.5/5 with its lower day, not the composite 2.75', /readiness 2\.5\/5 · lower day/.test(m2) && !/2\.75/.test(m2), m2);
+  check(r, 'Day 2 (the later check-in of the shared day) reads 2.5/5 with its lower day, not the composite 2.75', /readiness 2\.5\/5 lower day/.test(m2) && !/2\.75/.test(m2), m2);
   check(r, 'Day 1 reads its stored score (4/5), not the composite (3.75)', /readiness 4\/5/.test(m1) && !/3\.75/.test(m1), m1);
-  check(r, 'Day 3 reads the score 4/5 although its soreness answer was 1 (the composite would say 3.25), and says the jumps were skipped', /readiness 4\/5 · sore: no jumps/.test(m3) && !/3\.25/.test(m3), m3);
+  check(r, 'Day 3 reads the score 4/5 although its soreness answer was 1 (the composite would say 3.25), and says the jumps were skipped', /readiness 4\/5 sore: no jumps/.test(m3) && !/3\.25/.test(m3), m3);
 
   // Eli: too few check-ins for a usual. Two from before the verdict and one stored with `base: null` (the app's own "fewer than five").
   await page.evaluate(() => {
@@ -2567,13 +2568,87 @@ S['readiness-chart'] = async (b) => {
   });
   await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
   await L.go(page, 'athletes'); await L.go(page, 'a/eli_new/work');
-  const strip2 = T(await page.locator('.mstrip').first().innerText());
+  const strip2 = T(await page.locator('.a-score-ready').first().innerText());
   const chart2 = await page.evaluate(() => {
-    const c = [...document.querySelectorAll('#chartbox .chart-card')].find(x => /Readiness/.test(x.textContent));
-    return c ? { text: c.textContent.replace(/\s+/g, ' ').trim(), dots: c.querySelectorAll('svg circle').length, dashed: c.querySelectorAll('svg line[stroke-dasharray]').length } : null;
+    const c = document.querySelector('.a-score-ready');
+    return c ? { text: c.innerText.replace(/\s+/g, ' ').trim(), dots: c.querySelectorAll('.a-ov circle').length, dashed: c.querySelectorAll('svg [stroke-dasharray]').length, split: c.querySelectorAll('.a-split-bar').length } : null;
   });
-  check(r, 'three check-ins: the pill says "no usual yet" beside the app\'s verdict, with no invented difference', /Readiness\s*3\.5\/5\s*normal day · no usual yet/i.test(strip2) && !/vs their usual/.test(strip2), strip2);
-  check(r, 'the chart says the same, plots three dots and draws no dashed line', !!chart2 && /^Readiness 3\.5\/5 · no usual yet/.test(chart2.text) && /Their usual starts once they have five check-ins to go on/.test(chart2.text) && chart2.dots === 3 && chart2.dashed === 0, chart2);
+  check(r, 'three check-ins: the card says "no usual yet" beside the app\'s verdict, with no split bar and no invented difference', /^Readiness Normal 3\.5 today, no usual yet/.test(strip2) && !/vs their usual/.test(strip2) && chart2.split === 0, strip2);
+  check(r, 'the chart says the same, plots three dots and draws no dashed line', !!chart2 && /Their usual starts once they have five check-ins\./.test(chart2.text) && chart2.dots === 3 && chart2.dashed === 0, chart2);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── Look A, part 2: the three score cards (Training load, Readiness, Sessions done) ───────────────────────────────────────────────────────
+S['look-a-score-cards'] = async (b) => {
+  const r = { id: 'look-a-score-cards', title: 'Look A: the three score cards read the same numbers as before, as a verdict, a split bar and a chart', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const T = s => s.replace(/\s+/g, ' ').trim();
+  // Ava, 3 plan days a week. Nine sessions 27 to 9 days ago (420 AU each, one check-in each, the one 9 days ago half done), then this week's.
+  const seed = (extra, noRd) => page.evaluate(([extra, noRd]) => {
+    const arr = window.__DB.session_history;
+    for (let i = arr.length - 1; i >= 0; i--) if (arr[i].athlete_id === 'ava_test') arr.splice(i, 1);
+    const day = n => new Date(Date.now() - n * 86400e3).toISOString().slice(0, 10);
+    const ago = [27, 24, 21, 18, 15, 12, 9].concat(extra.map(e => e[0]));
+    ago.forEach((n, i) => {
+      const e = extra.find(x => x[0] === n) || [];
+      arr.push({ athlete_id: 'ava_test', athlete_name: 'Ava Example', day: 1 + (i % 3), completed_on: day(n), status: n === 9 ? 'Partial (16 of 19 sets/units done)' : 'Complete', session_rpe: 7, duration_min: n === 9 ? 32 : 60,
+        readiness: noRd ? null : { sleep: 4, energy: 4, stress: 4, overall: 4, soreness: 3, skipped: false }, day_note: '', focus: '', summary: 'Day fixture', coach_status: 'read', log: null, updated_at: new Date().toISOString() });
+    });
+    return hardRefresh();
+  }, [extra, noRd]);
+  const reload = async () => { await L.settle(page, 900); await L.go(page, 'athletes'); await L.go(page, 'a/ava_test/work'); await L.settle(page, 300); };
+  const card = sel => page.evaluate(sel => {
+    const c = document.querySelector(sel);
+    if (!c) return null;
+    const mk = c.querySelector('.a-zmark-d');
+    return { text: c.innerText.replace(/\s+/g, ' ').trim(), verdict: (c.querySelector('.a-verdict') || {}).textContent, nums: [...c.querySelectorAll('.a-split-n b')].map(e => e.textContent),
+      mark: mk ? parseFloat(mk.style.left) : null, markLabel: (c.querySelector('.a-zmark-l') || {}).textContent, rects: c.querySelectorAll('svg rect').length, dashed: c.querySelectorAll('svg [stroke-dasharray]').length,
+      circles: c.querySelectorAll('.a-ov circle').length, done: c.querySelectorAll('.a-sl.done').length, half: c.querySelectorAll('.a-sl.half').length, miss: c.querySelectorAll('.a-sl.miss').length,
+      rows: [...c.querySelectorAll('.a-wkrow .n')].map(e => e.textContent.trim()) };
+  }, sel);
+  // 1. a sweet-spot week: two sessions this week
+  await seed([[5], [3]]); await reload();
+  const titles = await page.evaluate(() => [...document.querySelectorAll('.a-scores .a-card .a-h')].map(h => h.textContent.trim()));
+  check(r, 'the three cards, in order: Training load, Readiness, Sessions done; the old strip and its Charts button are gone', JSON.stringify(titles) === JSON.stringify(['Training load', 'Readiness', 'Sessions done']) && !(await page.locator('#chartsBtn, .mstrip').count()), titles);
+  let ld = await card('.a-score-load');
+  check(r, 'sweet spot: verdict, this week 840 against usual week 896 (a 7-day sum over a 4-week average), ratio 0.94', !!ld && /Sweet spot/.test(ld.verdict) && ld.nums.join() === '840,896' && /load ratio 0.94 \(this week ÷ usual week\)/.test(ld.text), ld);
+  check(r, 'the zone marker sits at 0.94 of the 0 to 2.0 scale (46.9 %) and says 0.94', !!ld && Math.abs(ld.mark - 46.9) < 0.2 && ld.markLabel === '0.94', ld && [ld.mark, ld.markLabel]);
+  check(r, 'the chart has 8 weekly bars and one dashed usual-week line, labelled', !!ld && ld.rects === 8 && ld.dashed === 1 && /usual week 896/.test(ld.text), ld && [ld.rects, ld.dashed]);
+  const rd = await card('.a-score-ready');
+  check(r, 'readiness: Normal, today 4 against usual 4, one dot per check-in (9: eight small and the latest one) and one dashed usual line', !!rd && /Normal/.test(rd.verdict) && rd.nums.join() === '4,4' && rd.circles === 9 && rd.dashed === 1 && /4 today/.test(rd.text) && /usual 4/.test(rd.text), rd);
+  let sd = await card('.a-score-done');
+  check(r, 'sessions done: 8.5 of 12 planned, 71 %, A bit under', !!sd && /A bit under/.test(sd.verdict) && sd.nums.join() === '8.5,12' && /71% done \(target: 85% or more\)/.test(sd.text) && /8\.5 of 12 planned sessions completed/.test(sd.text), sd);
+  check(r, 'the slots by week: 8 done, 1 half, 3 missed; each week\'s count on its right and the half\'s minutes and sets', !!sd && sd.done === 8 && sd.half === 1 && sd.miss === 3 && sd.rows.join() === '3 of 3,2 of 3,1.5 of 3,2 of 3' && /half: 32 min, 16 of 19 sets/.test(sd.text), sd);
+  check(r, 'the sentence says what was missed', !!sd && /Missed 3\.5 of 12/.test(sd.text), sd && sd.text);
+  // 2. a light week
+  await seed([[2]]); await reload();
+  ld = await card('.a-score-load');
+  check(r, 'light week: ratio 0.53, the marker at 26.6 %, verdict Light week', !!ld && /Light week/.test(ld.verdict) && Math.abs(ld.mark - 26.6) < 0.2 && /load ratio 0.53/.test(ld.text), ld);
+  // 3. a spike
+  await seed([[6], [5], [4], [3], [2], [1]]); await reload();
+  ld = await card('.a-score-load');
+  check(r, 'spike: ratio 1.91, the marker past 1.5 (95.7 %), verdict Spike', !!ld && /Spike/.test(ld.verdict) && Math.abs(ld.mark - 95.7) < 0.3 && /load ratio 1.91/.test(ld.text), ld);
+  // 4. a session with no duration: not enough data
+  await seed([[5], [3]]);
+  await page.evaluate(() => { const a = window.__DB.session_history.filter(x => x.athlete_id === 'ava_test'); a[a.length - 1].duration_min = null; return hardRefresh(); });
+  await reload();
+  ld = await card('.a-score-load');
+  check(r, 'a session with no duration: Not enough data, no ratio, no zone marker, no split', !!ld && /Not enough data/.test(ld.verdict) && ld.mark === null && !ld.nums.length && /1 of 9 sessions in the last 4 weeks has no duration or RPE/.test(ld.text), ld);
+  // 5. no check-ins at all
+  await seed([[5], [3]], true); await reload();
+  const none = await card('.a-score-ready');
+  check(r, 'no check-ins: "No check-ins yet", no chart', !!none && /No check-ins yet/.test(none.verdict) && none.circles === 0, none);
+  // 6. layout: one row at 1440, stacked and no sideways scroll at 390
+  const lay = () => page.evaluate(() => { const c = [...document.querySelectorAll('.a-scores .a-card')].map(e => e.getBoundingClientRect()); return { tops: c.map(x => Math.round(x.top)), lefts: c.map(x => Math.round(x.left)), over: document.documentElement.scrollWidth - innerWidth }; });
+  let l = await lay();
+  check(r, 'at 1440 the three cards share one row', l.tops[0] === l.tops[1] && l.tops[1] === l.tops[2] && l.lefts[0] < l.lefts[1] && l.lefts[1] < l.lefts[2], l);
+  await seed([[5], [3]]); await reload();
+  await page.setViewportSize({ width: 390, height: 844 }); await L.settle(page, 300);
+  l = await lay();
+  check(r, 'at 390 the three cards stack and nothing scrolls sideways', l.tops[0] < l.tops[1] && l.tops[1] < l.tops[2] && new Set(l.lefts).size === 1 && l.over <= 0, l);
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;
@@ -2761,8 +2836,8 @@ S['hints-once'] = async (b) => {
   await page.evaluate(() => reloadPrograms().then(render)); await L.settle(page, 700);
   await L.go(page, 'athletes'); await L.go(page, 'a/ava_test/work'); await L.settle(page, 700);
   await panel('work tab, Personal records', '[data-hint=prs]', 'how-prs', ['Estimated one-rep maxes, worked out from their logged sets or entered after a test.', 'They own the record — this is read-only.']);
-  const stripSubs = await page.evaluate(() => [...document.querySelectorAll('.mstrip .mp-s')].map(e => e.textContent.trim()));
-  check(r, 'work tab: the metric strip\'s sub-lines were already short and are unchanged (each under 8 words)', stripSubs.length === 3 && stripSubs.every(s => s.split(' ').length < 8), stripSubs);
+  const stripSubs = await page.evaluate(() => [...document.querySelectorAll('.a-scores .a-card')].map(c => ({ v: c.querySelector('.a-verdict').textContent.trim(), ctx: c.querySelectorAll('.a-ctx').length, w: ((c.querySelector('.a-ctx') || {}).textContent || '').trim().split(/\s+/).length })));
+  check(r, 'work tab: each score card has a verdict of at most 3 words and one short context sentence (under 14 words)', stripSubs.length === 3 && stripSubs.every(s => s.v.split(/\s+/).length <= 3 && s.ctx === 1 && s.w < 14), stripSubs);
   check(r, 'work tab: Earlier cycles and the Live app snapshot are folded rows, not paragraphs of intro', await page.evaluate(() => [...document.querySelectorAll('#earlier-cycles > summary, #livesnap > summary')].every(s => s.textContent.trim().split(/\s+/).length <= 10)), '');
 
   // 2. The ⚙ Tools panel: the Coach tools note and the Logins to send paragraph.
@@ -2859,8 +2934,7 @@ S['design-rules'] = async (b) => {
   const COND_OK = '.brand, .gate h1, .gate .mark, .dethead h2';
   const SCREENS = [
     ['today', 'today'], ['today with Tools open', 'today', async p => { await p.click('#toolsBtn'); await p.waitForTimeout(300); }],
-    ['athletes', 'athletes'], ['athletes, habits', 'athletes/habits'], ['an athlete (the work)', 'a/demo_ana'], ['an athlete, charts open', 'a/demo_ana', async p => { await p.click('#chartsBtn'); await p.waitForTimeout(300); }],
-    ['an athlete (the file)', 'a/demo_ana/file'], ['a free athlete', 'a/demo_kian'],
+    ['athletes', 'athletes'], ['athletes, habits', 'athletes/habits'], ['an athlete (the work)', 'a/demo_ana'], ['an athlete, score cards in view', 'a/demo_ana', async p => { await p.locator('.a-scores').scrollIntoViewIfNeeded(); await p.waitForTimeout(300); }],    ['an athlete (the file)', 'a/demo_ana/file'], ['a free athlete', 'a/demo_kian'],
     ['exercises', 'exercises'], ['exercises, an entry open', 'exercises', async p => { const row = await p.$('.spine-row'); if (row) { await row.click(); await p.waitForTimeout(500); } }],
     ['qualities', 'exercises/qualities'], ['coverage', 'exercises/coverage'],
     ['proof', 'proof'], ['leads', 'leads'], ['free signups', 'leads/signups'], ['referral codes', 'leads/codes'], ['library', 'links'], ['buyers', 'buyers'], ['testing app', 'buyers/testing'],
@@ -3161,11 +3235,11 @@ S['proof-home'] = async (b) => {
   const wt = await page.evaluate(() => {
     const d = document.getElementById('wtdet'), box = document.getElementById('tabbody');
     const pos = (a, c) => !!(a && c && (a.compareDocumentPosition(c) & Node.DOCUMENT_POSITION_FOLLOWING));
-    return d ? { n: document.querySelectorAll('#wtdet').length, inWork: box.contains(d), open: d.open, head: d.querySelector('summary').textContent.replace(/\s+/g, ' ').trim(),
+    return d ? { n: document.querySelectorAll('#wtdet').length, inWork: box.contains(d), open: d.open, head: d.querySelector('summary').textContent.replace(/\s+/g, ' ').trim(), inStrength: !!d.closest('.a-str .a-body'), box: d.closest('.a-body').innerText.replace(/\s+/g, ' ').trim(),
       afterPr: pos(document.querySelector('.prlist'), d), beforeCards: pos(d, document.querySelector('.wday')), svgShown: !!d.querySelector('.chart-svg') && d.querySelector('.chart-svg').checkVisibility() } : null;
   });
-  check(r, 'The work: ONE #wtdet panel, shut, after the Personal records panel and before the day cards', !!wt && wt.n === 1 && wt.inWork && !wt.open && wt.afterPr && wt.beforeCards, wt);
-  check(r, 'its header line reads "Body weight · 64.7 kg · today · −x.x kg over 30 days · −x.x over 90" (the app\'s own numbers)', !!wt && /^Body weight · 64\.7 kg · today · −\d\.\d kg over 30 days · −\d\.\d over 90$/.test(wt.head), wt && wt.head);
+  check(r, 'The work: ONE #wtdet fold, shut, inside the Getting stronger card\'s body-weight box, after the lifts and before the day cards', !!wt && wt.n === 1 && wt.inWork && wt.inStrength && !wt.open && wt.afterPr && wt.beforeCards, wt);
+  check(r, 'the body-weight box reads "Body weight 64.7 kg", "last weighed today" and the 30- and 90-day changes as chips (the app\'s own numbers)', !!wt && /^Body weight 64\.7 kg/.test(wt.box) && /last weighed today/.test(wt.box) && /−\d\.\d kg over 30 days/.test(wt.box) && /−\d\.\d kg over 90 days/.test(wt.box), wt && wt.box);
   check(r, 'the chart is not on screen until it is opened', !!wt && wt.svgShown === false, wt);
   await page.locator('#wtdet summary').click(); await L.settle(page, 200);
   const opened = () => page.evaluate(() => { const d = document.getElementById('wtdet'); return { open: !!d && d.open, svg: !!d && !!d.querySelector('.chart-svg') && d.querySelector('.chart-svg').checkVisibility(), w: d ? Math.round(d.querySelector('.chart-svg').getBoundingClientRect().width) : 0 }; });
@@ -4440,7 +4514,7 @@ S['r3-library-charts-editor'] = async (b) => {
   }, [sess, checkIns]);
   await L.settle(page, 900);
   await L.go(page, 'athletes'); await L.go(page, 'a/ava_test/work');
-  await page.locator('#chartsBtn').click(); await page.locator('#wtdet summary').click(); await L.settle(page, 250);
+  await page.locator('#wtdet summary').click(); await L.settle(page, 250);
   // what the load chart should say, worked out here from the same sessions: the Monday of each of the last 8 weeks and each week's load
   const monday = s => new Date(new Date(s + 'T00:00:00Z').getTime() - ((new Date(s + 'T00:00:00Z').getUTCDay() + 6) % 7) * 86400e3);
   const m0 = monday(DAY(0)), buckets = [];
@@ -4448,25 +4522,26 @@ S['r3-library-charts-editor'] = async (b) => {
   sess.forEach(([ago, rpe, min]) => { const d = DAY(ago); for (let i = buckets.length - 1; i >= 0; i--) if (d >= buckets[i].start) { buckets[i].load += rpe * min; break; } });
   const maxLoad = Math.max.apply(null, buckets.map(x => x.load));
   const cardInfo = name => page.evaluate(n => {
-    const c = [...document.querySelectorAll('#chartbox .chart-card')].find(x => x.querySelector('h4').textContent === n);
+    const c = document.querySelector({ 'Training load': '.a-score-load', Readiness: '.a-score-ready', Adherence: '.a-score-done' }[n]);
     if (!c) return null;
-    const svg = c.querySelector('svg');
+    const svg = c.querySelector('.a-ov svg');
     return { y: [...c.querySelectorAll('.cp-y span')].map(s => s.textContent), x: [...c.querySelectorAll('.cp-x span')].map(s => s.textContent), h: Math.round(c.getBoundingClientRect().height),
       px: [...c.querySelectorAll('.cp-y span, .cp-x span')].map(s => parseFloat(getComputedStyle(s).fontSize)),
-      circles: c.querySelectorAll('svg circle').length, dashed: c.querySelectorAll('svg line[stroke-dasharray]').length, rects: c.querySelectorAll('svg rect').length,
-      fill: c.querySelector('.bar-fill') ? c.querySelector('.bar-fill').style.width : null, big: (c.querySelector('.chart-big') || {}).textContent || '',
+      circles: c.querySelectorAll('.a-ov circle').length, dashed: c.querySelectorAll('svg [stroke-dasharray]').length, rects: c.querySelectorAll('svg rect').length,
+      fill: c.querySelector('.a-split-bar i') ? c.querySelector('.a-split-bar i').style.flexGrow : null, nums: [...c.querySelectorAll('.a-split-n b')].map(e => e.textContent), text: c.innerText.replace(/\s+/g, ' '),
       rules: svg ? [...svg.querySelectorAll('line:not([stroke-dasharray])')].map(l => Number(l.getAttribute('y1'))) : [], vb: svg ? svg.viewBox.baseVal.height : 0, svgTop: svg ? svg.getBoundingClientRect().top : 0, svgH: svg ? svg.getBoundingClientRect().height : 0,
       yMid: [...c.querySelectorAll('.cp-y span')].map(s => { const q = s.getBoundingClientRect(); return q.top + q.height / 2; }) };
   }, name);
   const ld = await cardInfo('Training load'), rd = await cardInfo('Readiness'), ad = await cardInfo('Adherence');
-  check(r, 'the three chart cards are there and each is shorter than the old 280 px (260 or less at 1440)', !!ld && !!rd && !!ad && [ld.h, rd.h, ad.h].every(h => h <= 260), [ld && ld.h, rd && rd.h, ad && ad.h]);
-  check(r, 'Training load: the y axis is 0 and the tallest week, the x axis the Monday of the first and of the last week', !!ld && JSON.stringify(ld.y) === JSON.stringify([maxLoad.toLocaleString('en-GB'), '0']) && JSON.stringify(ld.x) === JSON.stringify(axisFmt(buckets[0].start, buckets[7].start).map(t => 'w/c ' + t)), { got: ld && [ld.y, ld.x], want: [maxLoad.toLocaleString('en-GB'), buckets[0].start, buckets[7].start] });
+  check(r, 'the three score cards are there, side by side, and none is taller than 800 px at 1440', !!ld && !!rd && !!ad && [ld.h, rd.h, ad.h].every(h => h <= 800), [ld && ld.h, rd && rd.h, ad && ad.h]);
+  check(r, 'Training load: the y axis is 0 and the tallest week, the x axis the Monday of the first and of the last week', !!ld && JSON.stringify(ld.y) === JSON.stringify([maxLoad.toLocaleString('en-GB'), '0']) && JSON.stringify(ld.x) === JSON.stringify(axisFmt(buckets[0].start, buckets[7].start)), { got: ld && [ld.y, ld.x], want: [maxLoad.toLocaleString('en-GB'), buckets[0].start, buckets[7].start] });
   check(r, 'Training load keeps its eight weekly bars', !!ld && ld.rects === 8, ld && ld.rects);
-  check(r, 'Readiness: the y axis is the 1 to 5 scale, the x axis the first and the last check-in', !!rd && JSON.stringify(rd.y) === JSON.stringify(['5', '1']) && JSON.stringify(rd.x) === JSON.stringify(axisFmt(DAY(30), DAY(3))), { got: rd && [rd.y, rd.x], want: axisFmt(DAY(30), DAY(3)) });
+  check(r, 'Readiness: the y axis is the 3 to 5 scale (no score is under 3), the x axis the first and the last check-in', !!rd && JSON.stringify(rd.y) === JSON.stringify(['5', '3']) && /scale 3 to 5/.test(rd.text) && JSON.stringify(rd.x) === JSON.stringify(axisFmt(DAY(30), DAY(3))), { got: rd && [rd.y, rd.x], want: axisFmt(DAY(30), DAY(3)) });
   check(r, 'Readiness keeps one point per check-in (10) and its dashed "usual" line', !!rd && rd.circles === 10 && rd.dashed === 1, rd && [rd.circles, rd.dashed]);
-  check(r, 'a y label sits at the height of the value it names: 5 and 1 at the chart\'s two rules, within 2 px', !!rd && rd.rules.length === 2 && rd.yMid.every((m, i) => Math.abs(m - (rd.svgTop + rd.rules[i] / rd.vb * rd.svgH)) <= 2), rd && { rules: rd.rules, mids: rd.yMid, svgTop: rd.svgTop, svgH: rd.svgH, vb: rd.vb });
-  check(r, 'Adherence keeps its bar, with the 0 % and 100 % ends under it, and the bar is as long as the number says', !!ad && JSON.stringify(ad.x) === JSON.stringify(['0%', '100%']) && ad.fill === parseInt(ad.big, 10) + '%', ad && [ad.x, ad.fill, ad.big]);
-  check(r, 'every axis label is 12 px or more', [ld, rd, ad].every(c => c && c.px.length && c.px.every(p => p >= 12)), [ld && ld.px, rd && rd.px, ad && ad.px]);
+  check(r, 'a y label sits at the height of the value it names: 5 and 3 at the chart\'s two rules, within 2 px', !!rd && rd.rules.length === 2 && rd.yMid.every((m, i) => Math.abs(m - (rd.svgTop + rd.rules[i] / rd.vb * rd.svgH)) <= 2), rd && { rules: rd.rules, mids: rd.yMid, svgTop: rd.svgTop, svgH: rd.svgH, vb: rd.vb });
+  { const dn = ad && Number(ad.nums[0]), pl = ad && Number(ad.nums[1]), pctSaid = ad && (ad.text.match(/(\d+)% done \(target: 85% or more\)/) || [])[1];
+    check(r, 'Sessions done keeps its split bar: done over planned, the bar split at their share, and the percentage said in words', !!ad && ad.nums.length === 2 && Math.abs(Number(ad.fill) - dn / (dn + pl) * 100) < 0.2 && Number(pctSaid) === Math.round(dn / pl * 100), ad && [ad.nums, ad.fill, pctSaid]); }
+  check(r, 'every axis label is 12 px or more', [ld, rd].every(c => c && c.px.length && c.px.every(p => p >= 12)), [ld && ld.px, rd && rd.px]);
   // body weight: the lowest and highest point of the line it draws, and its first and last day
   const wtAvg = []; { const kg = []; for (let i = 0; i < 40; i++) kg.push(Math.round((64.7 + i * 0.08) * 10) / 10);
     for (let i = 0; i < 40; i++) { const w = kg.slice(i, Math.min(i + 7, 40)); wtAvg.push(w.reduce((a, v) => a + v, 0) / w.length); } }
@@ -4527,7 +4602,7 @@ S['r3-library-charts-editor'] = async (b) => {
   for (const w of [390, 320]) {
     await page.setViewportSize({ width: w, height: 844 });
     await L.go(page, 'athletes'); await L.go(page, 'a/ava_test/work');
-    await page.evaluate(() => { document.getElementById('chartbox').style.display = 'block'; document.getElementById('wtdet').open = true; const d = document.getElementById('wday-1'); if (d && !d.classList.contains('open')) d.querySelector('.wday-top').click(); });
+    await page.evaluate(() => { document.getElementById('wtdet').open = true; const d = document.getElementById('wday-1'); if (d && !d.classList.contains('open')) d.querySelector('.wday-top').click(); });
     await L.settle(page, 250);
     // an editor left open by the last round comes back with the page (its typed work and its open groups survive a redraw): that is the one to look at
     const e2 = (await page.locator('.rx-editor[style*="block"]').count()) ? page.locator('.rx-editor[style*="block"]').first() : await openEditor(page, 'Goblet Squat');
@@ -4904,7 +4979,7 @@ S['whatsapp-number'] = async (b) => {
   const r = { id: 'whatsapp-number', title: "A WhatsApp number on the File: saved by the coach, shown in the header with a button, never mistaken for a signup", checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'a/ben_test/file' });
   const head = async () => (await page.locator('.dethead').innerText()).replace(/\s+/g, ' ');
-  check(r, 'a coached athlete with no number gets "add a WhatsApp number" under their name', /add a WhatsApp number/i.test(await head()) && (await page.locator('.dethead a[href$="/file"]').count()) === 1, await head());
+  check(r, 'a coached athlete with no number gets an "Add their WhatsApp" row in the Needs you box', /Add their WhatsApp/.test(await head()) && (await page.locator('.dethead a[href$="/file"]').count()) === 1, await head());
   check(r, 'the File has the number box, empty, with no Remove button', (await page.locator('#waNum').inputValue()) === '' && !(await page.getByRole('button', { name: 'Remove', exact: true }).count()), '');
   // 1. nonsense is refused on the page
   let n0 = await L.nCalls(page);
@@ -4934,7 +5009,7 @@ S['whatsapp-number'] = async (b) => {
   await page.getByRole('button', { name: 'Remove', exact: true }).click(); await L.settle(page, 900);
   const c2 = lastOf(await L.callsSince(page, n0), c => c.name === 'coach_set_whatsapp');
   check(r, 'Remove sends an empty number', !!c2 && c2.payload.p_whatsapp === null, c2 && c2.payload);
-  check(r, 'the header goes back to "add a WhatsApp number" and the box is empty', /add a WhatsApp number/i.test(await head()) && (await page.locator('#waNum').inputValue()) === '', await head());
+  check(r, 'the header goes back to the "Add their WhatsApp" row and the box is empty', /Add their WhatsApp/.test(await head()) && (await page.locator('#waNum').inputValue()) === '', await head());
   // 6. an Iranian number, and a server without stage62
   await page.locator('#waNum').fill('۰۹۱۲ ۱۲۳ ۴۵۶۷');
   await page.evaluate(() => { window.__STUB.missingRpc = ['coach_set_whatsapp']; });
@@ -5196,9 +5271,9 @@ S['file-groups'] = async (b) => {
   await L.settle(page, 900);
   await L.go(page, 'a/ava_test/file'); await L.settle(page, 500);
   const h1 = await head();
-  check(r, 'a dated cycle: "week 2 of 4", the dates and "20 days left" sit under the name', /Cycle 2 — Made-Up Block · week 2 of 4 · \d{1,2} [A-Z][a-z]{2} – \d{1,2} [A-Z][a-z]{2} · 20 days left/.test(h1) && /Strength base/.test(h1), h1);
+  check(r, 'a dated cycle: the cycle box says "Week 2 of 4" and "20 days left" with both dates under its bar', /Cycle 2 — Made-Up Block/.test(h1) && /Week 2 of 4/.test(h1) && /\d{1,2} [A-Z][a-z]{2}\s+\d{1,2} [A-Z][a-z]{2}/.test(h1) && /20 days left/.test(h1) && /Strength base/.test(h1), h1);
   const needs = await page.locator('.dethead .det-need a').evaluateAll(as => as.map(a => [a.textContent.trim(), a.getAttribute('href'), a.className]));
-  check(r, 'Needs you lists each reason as a link to its own sub-tab (the unread note goes to The work, in clay)', /^Needs you:/.test((await page.locator('.det-need').innerText()).trim()) && needs.some(n => /note/.test(n[0]) && n[1] === '#a/ava_test/work' && /warn/.test(n[2])), needs);
+  check(r, 'Needs you lists each reason as a link to its own sub-tab (the unread note goes to The work, in clay)', /^Needs you/.test((await page.locator('.det-need').innerText()).trim()) && needs.some(n => /note/.test(n[0]) && n[1] === '#a/ava_test/work' && /warn/.test(n[2])), needs);
   const cycbarFile = await page.locator('.cycbar').count();
   await L.go(page, 'a/ava_test/work'); await L.settle(page, 400);
   check(r, 'the same header (cycle line) is on The work, and the green cycle block is gone from it and from the File', (await page.locator('.dethead .det-cycle').count()) === 1 && (await page.locator('.cycbar').count()) === 0 && cycbarFile === 0, await head());
@@ -5207,7 +5282,7 @@ S['file-groups'] = async (b) => {
   await L.go(page, 'a/ben_test/file'); await L.settle(page, 400);
   const h2 = await head();
   const bn = await page.locator('.dethead .det-need a').evaluateAll(as => as.map(a => [a.textContent.trim(), a.getAttribute('href')]));
-  check(r, 'a cycle that ended: "ended 5 days ago", and its reason links to the File', /ended 5 days ago/.test(h2) && !/week \d+ of \d+/i.test(h2) && bn.some(n => /renew/.test(n[0]) && n[1] === '#a/ben_test/file'), { h2, bn });
+  check(r, 'a cycle that ended: "ended 5 days ago", and its reason links to the File', /Ended 5 days ago/.test(h2) && !/week \d+ of \d+/i.test(h2) && bn.some(n => /renew/.test(n[0]) && n[1] === '#a/ben_test/file'), { h2, bn });
   // 4. The actions on the right: WhatsApp (three cases are in whatsapp-number), View their app with programme days, View their Proof without.
   check(r, 'View their app is in the header when they have programme days', (await page.locator('.dethead .det-acts button', { hasText: 'View their app' }).count()) === 1, await head());
   await L.go(page, 'a/dan_proof/file'); await L.settle(page, 500);
@@ -5271,6 +5346,80 @@ S['file-groups'] = async (b) => {
   return r;
 };
 
+// ── Look A, part 1 (2026-11-28): the player card, the read, the sub-tabs ───────────────────────────────────────────────────────────────
+S['look-a-header-read'] = async (b) => {
+  const r = { id: 'look-a-header-read', title: 'Look A: the header is a player card (facts, cycle box, Needs you box), The read says the story in a sentence, and a training athlete has no Proof tab', checks: [] };
+  const { page, log, today } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  const FX = require('./fixtures');
+  const txt = sel => page.locator(sel).innerText().then(x => x.replace(/\s+/g, ' ').trim());
+  // A running cycle on Ava (week 2 of 4, 20 days left), an ended one on Ben (5 days ago).
+  await page.evaluate(([as, ae, bs, be]) => {
+    const pa = window.__DB.programs.find(x => x.athlete_id === 'ava_test'); pa.data.cycles[0].startDate = as; pa.data.cycles[0].endDate = ae;
+    const pb = window.__DB.programs.find(x => x.athlete_id === 'ben_test'); pb.data.cycles[0].startDate = bs; pb.data.cycles[0].endDate = be;
+    return hardRefresh();
+  }, [FX.daysAgo(today, 8), FX.daysAgo(today, -20), FX.daysAgo(today, 33), FX.daysAgo(today, 5)]);
+  await L.settle(page, 900);
+  await L.go(page, 'a/ava_test/work'); await L.settle(page, 500);
+  // 1. The player card's pieces.
+  const cells = await page.locator('.dethead .dh-cell').evaluateAll(es => es.map(e => [e.querySelector('b').textContent.trim(), e.querySelector('span').textContent.trim()]));
+  check(r, 'the card has a name, a 56 px avatar, chips, a facts row (sessions, habits, last active) and the actions', (await page.locator('.dethead h2.hd').innerText()) === 'Ava Example'
+    && (await page.locator('.dethead .det-ava').evaluate(e => e.getBoundingClientRect().width)) === 56 && (await page.locator('.dethead .sub .chip').count()) >= 1
+    && JSON.stringify(cells.map(c => c[1])) === JSON.stringify(['sessions in all', 'habits logged in the last 7 days', 'last active']) && /^3$/.test(cells[0][0]) && /^\d of 7$/.test(cells[1][0])
+    && (await page.locator('.dethead .det-acts button', { hasText: 'View their app' }).count()) === 1, cells);
+  const nameCss = await page.locator('.dethead h2.hd').evaluate(e => { const c = getComputedStyle(e); return { fam: c.fontFamily, tt: c.textTransform, px: c.fontSize }; });
+  check(r, 'the name is Archivo, 30 px, sentence case (not Barlow Condensed capitals)', /Archivo/.test(nameCss.fam) && nameCss.tt === 'none' && nameCss.px === '30px', nameCss);
+  // 2. The cycle box, running.
+  const cyc = await txt('.dethead .det-cycle');
+  check(r, 'the cycle box of a running cycle: "Cycle 2" name, "Week 2 of 4", "20 days left", both dates, a bar, the focus as a bullet', /Made-Up Block/.test(cyc) && /Week 2 of 4/.test(cyc) && /20 days left/.test(cyc)
+    && (await page.locator('.det-cycle .dc-dates span').count()) === 2 && (await page.locator('.det-cycle .dc-bar i').count()) === 1 && (await page.locator('.det-cycle .dc-fo li').count()) >= 1
+    && (await page.locator('.dethead .det-cycle').count()) === 1, cyc);
+  const pct = await page.locator('.det-cycle .dc-bar i').evaluate(e => parseFloat(e.style.width));
+  check(r, 'the bar is today\'s share of the cycle (8 of 28 days)', pct === Math.round(8 / 28 * 100), pct);
+  // 3. Needs you: rows with icons, the first warning primary, each a link; the goal line inside the box.
+  const rows = await page.locator('.dethead .det-need .dn-row').evaluateAll(es => es.map(e => ({ t: e.textContent.trim(), href: e.getAttribute('href'), cls: e.className, ico: !!e.querySelector('svg'), h: e.getBoundingClientRect().height, btn: /\bbtn\b/.test(e.className) })));
+  check(r, 'Needs you: the note row is the blue primary row, links to The work, has an icon, is at least 44 px and is not a .btn', rows.some(x => /note to read/.test(x.t) && /^\d/.test(x.t) && x.href === '#a/ava_test/work' && /primary/.test(x.cls) && /warn/.test(x.cls) && x.ico && x.h >= 44 && !x.btn), rows);
+  check(r, 'the box has the title "Needs you", the goal line as a row and "Add their WhatsApp" linking to the File', /^Needs you/.test(await txt('.det-need')) && (await page.locator('.det-need .dn-goal #goalLine').count()) === 1
+    && rows.some(x => /Add their WhatsApp/.test(x.t) && x.href === '#a/ava_test/file'), rows);
+  // 4. An ended cycle.
+  await L.go(page, 'a/ben_test/work'); await L.settle(page, 500);
+  const bc = await txt('.dethead .det-cycle');
+  check(r, 'an ended cycle: the chip says "Ended 5 days ago", the bar is full, and no days-left chip', /Ended 5 days ago/.test(bc) && !/days left/.test(bc) && (await page.locator('.det-cycle .dc-bar i').evaluate(e => e.style.width)) === '100%', bc);
+  // 5. The read for a seeded athlete: cycle + sessions + a lift gain + a weak habit + a note.
+  await L.go(page, 'a/ava_test/work'); await L.settle(page, 500);
+  const rd = await page.evaluate(([d0, d1]) => {
+    _D.a.oneRm = [{ lift: 'Back Squat', kg: 100, d: d0, t: 1 }, { lift: 'Back Squat', kg: 112.5, d: d1, t: 2 }, { lift: 'Bench Press', kg: 60, d: d0, t: 1 }, { lift: 'Bench Press', kg: 72.5, d: d1, t: 2 },
+      { lift: 'Deadlift', kg: 100, d: d0, t: 1 }, { lift: 'Deadlift', kg: 95, d: d1, t: 2 }, { lift: 'Leg Press', u: 'lb', kg: 200, d: d0, t: 1 }, { lift: 'Leg Press', u: 'lb', kg: 300, d: d1, t: 2 }];
+    const el = document.createElement('div'); el.innerHTML = readLineC(_D); return { text: el.textContent.trim(), bold: [...el.querySelectorAll('b')].map(x => x.textContent), tag: el.querySelector('.a-read .a-chip') && el.querySelector('.a-read .a-chip').textContent };
+  }, [FX.daysAgo(today, 30), FX.daysAgo(today, 2)]);
+  check(r, 'The read: the cycle, the sessions, the two lifts that went up the same amount (kg only, the lb one and the fall left out), the weak habits and the note', rd.tag === 'The read'
+    && /^The readWeek 2 of 4 of .*Made-Up Block\. Ava did 3 of the last 4 planned sessions and got stronger: (Back Squat and Bench Press|Bench Press and Back Squat) are both up 12\.5 kg\. But .+ (was|were) met on fewer than 3 days in 7\. 1 note to read\.$/.test(rd.text)
+    && rd.bold.length === 1 && /Made-Up Block\.$/.test(rd.bold[0]), rd);
+  const rd2 = await page.evaluate(([d0, d1]) => { _D.a.oneRm = [{ lift: 'Back Squat', kg: 100, d: d0, t: 1 }, { lift: 'Back Squat', kg: 112.5, d: d1, t: 2 }, { lift: 'Bench Press', kg: 60, d: d0, t: 1 }, { lift: 'Bench Press', kg: 65, d: d1, t: 2 }];
+    const el = document.createElement('div'); el.innerHTML = readLineC(_D); return el.textContent; }, [FX.daysAgo(today, 30), FX.daysAgo(today, 2)]);
+  check(r, 'two lifts with different gains: "A is up x kg and B y kg"', /Back Squat is up 12\.5 kg and Bench Press 5 kg\./.test(rd2), rd2);
+  const rd3 = await page.evaluate(() => { const D = Object.assign({}, _D, { a: Object.assign({}, _D.a, { cycle: null, needReplySessions: [], oneRm: [] }), program: null, metrics: {}, act: null }); D.a.blob = {}; return readLineC(D); });
+  check(r, 'nothing to say: no band at all', rd3 === '', rd3);
+  check(r, 'The read sits at the top of The work, above the score cards, and is the navy band with the chip', await page.evaluate(() => { const a = document.querySelector('#tabbody .a-read'); return !!a && getComputedStyle(a).backgroundColor === 'rgb(20, 33, 61)' && a.getBoundingClientRect().top < (document.querySelector('#tabbody .mstrip, #tabbody .a-scores') || { getBoundingClientRect: () => ({ top: 1e9 }) }).getBoundingClientRect().top; }), '');
+  // 6. The sub-tabs: pills, a count, and no Proof tab for someone who trains, while #a/<id>/proof still draws its body.
+  const tabs = await page.locator('.subrail .stab').evaluateAll(es => es.map(e => ({ t: e.childNodes[0].textContent.trim(), cur: e.getAttribute('aria-current'), n: (e.querySelector('.n') || {}).textContent || '', r: getComputedStyle(e).borderRadius })));
+  check(r, 'the sub-tabs are pills with the count; a training athlete has no Proof tab', JSON.stringify(tabs.map(t => t.t)) === JSON.stringify(['The work', 'File']) && tabs[0].cur === 'page' && tabs[0].n === '1' && tabs.every(t => parseFloat(t.r) >= 20), tabs);
+  await L.go(page, 'a/ava_test/proof'); await L.settle(page, 500);
+  check(r, 'the address #a/ava_test/proof still draws the Proof body', (await page.locator('#tabbody[data-sub="proof"]').count()) === 1 && (await page.locator('#tabbody').innerText()).trim().length > 20 && (await page.locator('.subrail .stab', { hasText: 'Proof' }).count()) === 0, await txt('#tabbody'));
+  await L.go(page, 'a/dan_proof/file'); await L.settle(page, 500);
+  check(r, 'someone with no training and habits still has the Proof tab', (await page.locator('.subrail .stab', { hasText: 'Proof' }).count()) === 1, await txt('.subrail'));
+  // 7. A phone: no sideways scroll, the card is one column.
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 844 });
+    await L.go(page, 'a/ava_test/work'); await L.settle(page, 400);
+    const sw = await page.evaluate(() => ({ over: document.documentElement.scrollWidth - document.documentElement.clientWidth, cols: getComputedStyle(document.querySelector('.dh-main')).gridTemplateColumns.split(' ').length }));
+    check(r, `at ${w} px the card is one column and nothing scrolls sideways`, sw.over <= 0 && sw.cols === 1, sw);
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 // ── The work tab is this cycle's (2026-10-12; Amir, a day into a new cycle: "all im seeing is his past cycle") ─────────────────────────
 S['work-this-cycle'] = async (b) => {
   const r = { id: 'work-this-cycle', title: "The work: a dated cycle's day cards hold only its own sessions; earlier ones are under Earlier cycles", checks: [] };
@@ -5306,6 +5455,81 @@ S['work-this-cycle'] = async (b) => {
   return r;
 };
 
+// ── Look A, part 5: the day cards (chips, Verdict, a folded note), Earlier cycles and the phone card ──
+S['look-a-sessions'] = async (b) => {
+  const r = { id: 'look-a-sessions', title: 'Look A sessions: header chips, "6 of 9 on plan", verdict chips incl. On plan, Your note folded (id, survives a redraw), their note visible, the phone card quiet or red, no sideways scroll at 390', checks: [] };
+  const FX = require('./fixtures');
+  const { page, log, today } = await L.openCoach(b, { tz: 'UTC', fixedTime: '2026-10-11T14:00:00Z' });
+  await page.evaluate(() => {
+    const p = window.__DB.programs.find(x => x.athlete_id === 'ava_test');
+    p.data.workouts.days[0].blocks[0].exercises[0].note = 'Sit back into the heels.';
+    const ss = window.__DB.session_history.filter(s => s.athlete_id === 'ava_test');
+    const d1 = ss.filter(s => s.day === 1).sort((a, c) => String(c.completed_on).localeCompare(String(a.completed_on)))[0];
+    d1.log = null; d1.session_rpe = 6; d1.duration_min = 39;
+    d1.summary = ['Day 1 — Legs First (fixture)', 'Status: Complete', '', 'Exercise log:', '', '[Primary]',
+      '• Goblet Squat (✓)', '    Set 1: 20 @7 ✓ ×10', '    Set 2: 20 @7 ✓ ×10', '    Set 3: 20 @7 ✓ ×10', '    Set 4: 20 @7 ✓ ×10', '    Note: felt heavy today',
+      '• Chest-Supported Dumbbell Row (✓)', '    Set 1: 14 @7 ✓'].join('\n');
+    return hardRefresh();
+  });
+  await L.go(page, 'a/ava_test/work');
+  await L.settle(page, 600);
+  await page.evaluate(() => { const d = document.querySelector('.wday'); if (d && !d.classList.contains('open')) d.querySelector('.wday-top').click(); });
+  await L.settle(page, 300);
+  const head = await page.evaluate(() => {
+    const d = document.querySelector('.wday.open'); if (!d) return null;
+    const t = el => (el ? el.textContent : '').replace(/\s+/g, ' ').trim();
+    return { tile: t(d.querySelector('.wday-n')), chips: d.querySelectorAll('.wday-meta .a-chip').length, meta: t(d.querySelector('.wday-meta')), score: t(d.querySelector('.dv-score')),
+      right: t(d.querySelector('.wday-right')), heads: t(d.querySelector('.cmp-head')), flags: [...d.querySelectorAll('.cmp-flags')].map(t) };
+  });
+  check(r, 'the header: a "Day N" tile and the facts as chips, no " · " string', !!head && /^Day \d/.test(head.tile) && head.chips >= 4 && !/ · /.test(head.meta), head);
+  check(r, 'the score reads "N of M on plan" with its chip', !!head && /^\d+ of \d+ on plan$/.test(head.score) && /not done|off plan|all on plan/.test(head.right), head);
+  check(r, 'the comparison heads are Exercise, Asked, Did, Verdict', !!head && head.heads === 'ExerciseAskedDidVerdict', head && head.heads);
+  check(r, 'a row with nothing wrong says "On plan"', !!head && head.flags.some(f => f === 'On plan'), head && head.flags);
+  const note = await page.evaluate(() => { const n = document.querySelector('.wday.open details.cmp-cnote'); return n ? { id: n.id, sum: n.querySelector('summary').textContent.trim(), open: n.open, txt: n.textContent } : null; });
+  check(r, 'Your note is a fold with a stable id, shut, with the note inside', !!note && /^cn-/.test(note.id) && note.sum === 'Your note' && !note.open && /Sit back into the heels/.test(note.txt), note);
+  const mine = await page.evaluate(() => { const a = document.querySelector('.wday.open .cmp-anote'); return a ? { vis: a.checkVisibility(), ico: !!a.querySelector('svg'), txt: a.textContent } : null; });
+  check(r, 'their own note stays visible, as a bubble with an icon', !!mine && mine.vis && mine.ico && /felt heavy today/.test(mine.txt), mine);
+  await page.evaluate(id => { document.getElementById(id).open = true; }, note ? note.id : 'x');
+  await page.evaluate(() => { assemble(); render(); }); await L.settle(page, 700);
+  const again = await page.evaluate(id => { const n = document.getElementById(id); return n ? n.open : null; }, note ? note.id : 'x');
+  check(r, 'Your note is still there, and still open, after a redraw', again === true, again);
+
+  // The phone card. Quiet when nothing is stuck: Day 1 finished on the phone and its session reached the server.
+  await page.evaluate(() => {
+    const blob = window.__DB.athlete_progress.find(p => p.athlete_id === 'ava_test').data;
+    const d1 = window.__DB.session_history.filter(s => s.athlete_id === 'ava_test' && s.day === 1).map(s => s.completed_on).sort().pop();
+    blob['ava_test_completed_d1'] = d1;
+    S.prog.find(p => p.athlete_id === 'ava_test').data = blob;
+    assemble(); render();
+  });
+  await L.settle(page, 500);
+  const quiet = await page.evaluate(() => { const q = document.querySelector('.a-phone'); const f = document.getElementById('livesnap');
+    return { cls: q ? q.className : null, txt: q ? q.textContent.replace(/\s+/g, ' ') : '', fold: f ? { open: f.open, tag: f.tagName } : null }; });
+  check(r, 'a synced athlete: the quiet line, the fold shut', /quiet/.test(quiet.cls || '') && /Their phone matches what reached you\./.test(quiet.txt) && /turns red when a session is stuck/.test(quiet.txt) && quiet.fold && quiet.fold.tag === 'DETAILS' && !quiet.fold.open, quiet);
+  // A day in progress (this morning) and a leftover with nothing on file: the red card.
+  await page.evaluate(() => {
+    const blob = window.__DB.athlete_progress.find(p => p.athlete_id === 'ava_test').data;
+    blob['ava_test_readiness_2'] = JSON.stringify({ timestamp: '2026-10-11T09:12:00Z', composite: 3.5, skipped: false });
+    blob['ava_test_readiness_3'] = JSON.stringify({ timestamp: '2026-09-20T09:00:00Z', composite: 3.5, skipped: false });
+    S.prog.find(p => p.athlete_id === 'ava_test').data = blob;
+    assemble(); render();
+  });
+  await L.settle(page, 700);
+  const red = await page.evaluate(() => { const q = document.querySelector('.a-phone'); const f = document.getElementById('livesnap');
+    return { cls: q ? q.className : null, txt: q ? q.textContent.replace(/\s+/g, ' ') : '', foldTxt: f ? f.textContent.replace(/\s+/g, ' ') : '' }; });
+  check(r, 'a day in progress and a leftover: the red card names both', /stuck/.test(red.cls || '') && /On their phone right now/.test(red.txt) && /Day 2: in progress/.test(red.txt) && /Day 3: started .*not finished, nothing reached you/.test(red.txt), red);
+  check(r, 'the old snapshot is the body of #livesnap', /in progress/.test(red.foldTxt) && /a leftover, not live/.test(red.foldTxt), red.foldTxt.slice(0, 200));
+
+  // The phone: one column, no sideways scroll.
+  await page.setViewportSize({ width: 390, height: 900 });
+  await L.settle(page, 400);
+  const sw = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth }));
+  check(r, 'at 390 px there is no sideways scroll', sw.sw <= sw.cw + 1, sw);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 // ── The week's cap judges every session of its week (Amir, 2026-10-12: "colour against the cap in those weeks"; dayTargetC / rpeTargetOn) ─────────
 S['work-week-cap'] = async (b) => {
   const r = { id: 'work-week-cap', title: "The work: in a week capped at RPE 7 every session is judged against 7, check-in or not; a lower day still reads 'that day'; a retest in the closing week keeps its own", checks: [] };
@@ -5335,7 +5559,7 @@ S['work-week-cap'] = async (b) => {
     if (!row) return null;
     const t = el => (el ? el.textContent : '').replace(/\s+/g, ' ').trim();
     return { rx: t(row.querySelector('.rx-rpe')), over: [...row.querySelectorAll('.rpe-set.over')].map(t), under: [...row.querySelectorAll('.rpe-set.under')].map(t),
-      perSet: t(row.querySelector('.did-detail')), flags: [...row.querySelectorAll('.cmp-flags .fl')].map(t), meta: t(card.querySelector('.wday-meta')), verdict: t(card.querySelector('.dv')) };
+      perSet: t(row.querySelector('.did-detail')), flags: [...row.querySelectorAll('.cmp-flags .a-chip')].map(t).filter(x => x !== 'On plan'), meta: t(card.querySelector('.wday-meta')), verdict: t(card.querySelector('.dv')) };
   }, [day, name]);
   const ROW = 'Chest-Supported Dumbbell Row', BENCH = 'Dumbbell Bench Press';
 
@@ -5515,10 +5739,10 @@ S['records-measure'] = async (b) => {
     return refetch(['prog']);
   });
   await L.go(page, 'a/ava_test/work'); await L.settle(page, 500);
-  const rows = await page.evaluate(() => [...document.querySelectorAll('.prlist .pr-row')].map(x => x.innerText.replace(/\s+/g, ' ').trim()));
+  const rows = await page.evaluate(() => [...document.querySelectorAll('.prlist .a-lift')].map(x => x.innerText.replace(/\s+/g, ' ').trim()));
   const sq = rows.find(x => /^Goblet Squat/.test(x)) || '', rw = rows.find(x => /^Chest-Supported Dumbbell Row/.test(x)) || '';
-  check(r, 'the lift lifted in pounds reads 290 lb, +10 lb since the first (its pounds series only: the 40 kg record is not "the first")', /290\s*lb/.test(sq) && /\+10\.0 lb since the first/.test(sq) && !/ kg/.test(sq), sq);
-  check(r, 'a lift last lifted on a stack reads in plates (9.5 plates), and its kg record is another series', /9\.5\s*plates/.test(rw) && /first estimate/.test(rw) && !/kg/.test(rw), rw);
+  check(r, 'the lift lifted in pounds is a gain card: +10.0 lb, first estimate 280 lb, now 290 lb (its pounds series only: the 40 kg record is not "the first")', /\+10\.0 lb/.test(sq) && /280\s*lb\s*first estimate/.test(sq) && /290\s*lb\s*now/.test(sq) && !/ kg/.test(sq), sq);
+  check(r, 'a lift last lifted on a stack reads in plates (9.5 plates) in the first-estimates list, and its kg record is another series', /9\.5\s*plates/.test(rw) && !/kg/.test(rw) && await page.evaluate(() => [...document.querySelectorAll('.a-first .a-lift')].some(x => /^Chest-Supported/.test(x.innerText)) && /First estimates/.test(document.querySelector('.a-first').innerText)), rw);
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;
@@ -7095,7 +7319,7 @@ S['lounge-game-line'] = async (b) => {
   check(r, 'her Instagram is a link that opens her page in a new tab', await page.evaluate(() => { const a = document.querySelector('#detGame a'); return !!a && a.getAttribute('href') === 'https://instagram.com/ava.plays' && a.target === '_blank' && /noopener/.test(a.rel); }), ava && ava.html);
   const reads = (await L.calls(page)).filter(c => c.kind === 'from' && c.name === 'athlete_profile');
   check(r, 'one read of the table, for this athlete only', reads.length === 1 && reads[0].op === 'select' && reads[0].filters.length === 1 && reads[0].filters[0] === 'athlete_id.eq."ava_test"', reads.map(c => c.filters));
-  check(r, 'it sits between the tier line and the cycle line, and it is on the page without a banner or a failure line', await page.evaluate(() => { const g = document.getElementById('detGame'); return g.previousElementSibling.classList.contains('sub') && /det-cycle/.test(g.nextElementSibling.className); }) && !(await L.failText(page)) && !(await page.locator('#loadwarn:not([hidden])').count()), await L.failText(page));
+  check(r, 'it sits between the tier line and the cycle line, and it is on the page without a banner or a failure line', await page.evaluate(() => { const g = document.getElementById('detGame'); return g.previousElementSibling.classList.contains('sub') && !!document.querySelector('.dethead .det-cycle') && !!(g.compareDocumentPosition(document.querySelector('.dethead .det-cycle')) & Node.DOCUMENT_POSITION_FOLLOWING); }) && !(await L.failText(page)) && !(await page.locator('#loadwarn:not([hidden])').count()), await L.failText(page));
   // opening her again, from another tab of her file, reads nothing more
   await L.go(page, 'a/ava_test/file');
   check(r, 'going to her File and back does not read it again (kept for the page)', (await L.calls(page)).filter(c => c.kind === 'from' && c.name === 'athlete_profile').length === 1 && (await game()).text === ava.text, '');
@@ -7167,7 +7391,7 @@ S['lounge-faces'] = async (b) => {
   // the file header
   await L.go(page, 'a/ava_test/work');
   const hd = await circle('.dethead .det-ava');
-  check(r, 'The file header: her face in the file\'s own circle (44 px)', hd && hd.img && hd.loaded && hd.w === 44 && hd.radius, hd);
+  check(r, 'The file header: her face in the file\'s own circle (56 px, look A)', hd && hd.img && hd.loaded && hd.w === 56 && hd.radius, hd);
   await L.go(page, 'a/ben_test/work');
   check(r, 'The file header: Ben keeps his initials', (await circle('.dethead .det-ava')).text === 'BE', '');
   check(r, 'None of this asked for the faces again (read once per load)', (await facesCalls()).length === 1, (await facesCalls()).length);
@@ -7770,14 +7994,14 @@ S['optional-day'] = async (b) => {
   }, sess);
   await L.settle(page, 900);
   await L.go(page, 'athletes'); await L.go(page, 'a/ava_test/work');
-  await page.locator('#chartsBtn').click(); await L.settle(page, 250);
   const ad = await page.evaluate(() => {
-    const c = [...document.querySelectorAll('#chartbox .chart-card')].find(x => x.querySelector('h4').textContent === 'Adherence');
-    return c ? { big: (c.querySelector('.chart-big') || {}).textContent || '', sub: c.querySelector('.chart-sub').textContent, legend: c.querySelector('.chart-legend').textContent } : null;
+    const c = document.querySelector('.a-score-done');
+    const t = c ? c.innerText.replace(/\s+/g, ' ') : '';
+    return c ? { big: t, sub: t, legend: t } : null;
   });
-  check(r, 'Adherence counts the plan days only: 4 of 8 planned (2 a week over 4 weeks), 50 %', !!ad && /^4 of 8 planned sessions completed/.test(ad.sub) && /^50%/.test(ad.big), ad);
+  check(r, 'Sessions done counts the plan days only: 4 of 8 planned (2 a week over 4 weeks), 50 %', !!ad && /4 of 8 planned sessions completed/.test(ad.sub) && /50% done/.test(ad.big), ad);
   check(r, 'the two optional sessions show as a bonus, never as "more than planned"', !!ad && /\+2 optional, a bonus/.test(ad.sub) && !/more than planned/.test(ad.sub), ad && ad.sub);
-  check(r, 'the legend says Planned = 2/week and names the optional day', !!ad && /Planned = 2\/week \(their program, plus 1 optional day that never counts as a miss\)/.test(ad.legend), ad && ad.legend);
+  check(r, 'the card says Planned = 2/week and names the optional day', !!ad && /Planned = 2\/week \(their program, plus 1 optional day that never counts as a miss\)/.test(ad.legend), ad && ad.legend);
   const card = (await page.locator('#wday-3 .wday-title').innerText()).replace(/\s+/g, ' ');
   check(r, 'the Day 3 card wears "optional · a bonus" (it was trained)', /optional · a bonus/.test(card), card);
   const other = (await page.locator('#wday-1 .wday-title').innerText()).replace(/\s+/g, ' ');
@@ -8132,7 +8356,7 @@ S['today-note-clears'] = async (b) => {
   await page.evaluate(() => refetch(['hist'])); await L.settle(page, 800);
   const unread = await page.evaluate(() => S.ath.ben_test.needReplySessions.length);
   const btn = page.locator('.det-need .btn', { hasText: 'Mark all read' });
-  check(r, 'the athlete\'s header has a quiet Mark all read beside "Needs you:" when there are new notes (recent and older)', unread === 3 && (await btn.count()) === 1 && /Needs you:/.test(await page.locator('.det-need').innerText()), unread);
+  check(r, 'the athlete\'s header has a quiet Mark all read beside "Needs you" when there are new notes (recent and older)', unread === 3 && (await btn.count()) === 1 && /Needs you/.test(await page.locator('.det-need').innerText()), unread);
   n0 = await L.nCalls(page);
   await btn.click(); await L.settle(page, 1000);
   u = await upd(n0);
@@ -8256,7 +8480,9 @@ S['roster-tidy'] = async (b) => {
 // ── Habits and court (2026-11-23, Amir picked "The Grid"): the grid in the file, Athletes -> Habits, a failed read, the demo ──────────────────────────
 // buildSeed({ habitGrid: true }): Ava has Mobility and a custom habit switched on six days ago, fourteen days of values and court time; Dan one easy court entry.
 const HG = { seed: { habitGrid: true }, fixedTime: '2026-12-10T10:00:00Z' };   // a fixed day: the Steps credit starts 2026-11-22, so all 14 days are after it
+// Look A (part 4): the 14-day grid is folded under "Show 14 days" (#hg14-<athlete>) inside the habits card; open the fold, then read the grid.
 const gridOf = (page) => page.evaluate(() => {
+  document.querySelectorAll('details[id^=hg14-]').forEach(d => { d.open = true; });
   const g = document.getElementById('habGrid');
   if (!g) return null;
   const rows = [...g.querySelectorAll('tbody tr')].map(tr => {
@@ -8266,7 +8492,7 @@ const gridOf = (page) => page.evaluate(() => {
   });
   const prev = g.previousElementSibling;
   return { title: g.querySelector('.phead .t').innerText.trim(), right: g.querySelector('.phead .r').innerText.trim(), head: [...g.querySelectorAll('thead th.hg-d')].map(x => x.textContent), todayCols: [...g.querySelectorAll('thead th')].map((x, i) => x.classList.contains('today') ? i : -1).filter(i => i >= 0),
-    rows, legend: g.querySelector('.hg-k').innerText.trim(), underFive: !!prev && (prev.classList.contains('fwc') || !document.querySelector('.fwc')), customDir: [...g.querySelectorAll('tbody th span[dir=auto]')].map(x => x.textContent), hasWrap: !!g.querySelector('.hg-wrap') };
+    rows, legend: g.querySelector('.hg-k').innerText.trim(), underFive: !!g.closest('.a-hab > details.a-hg14') && g.closest('details.a-hg14').querySelector('summary').textContent.trim() === 'Show 14 days', customDir: [...g.querySelectorAll('tbody th span[dir=auto]')].map(x => x.textContent), hasWrap: !!g.querySelector('.hg-wrap') };
 });
 const actSelects = (cs) => cs.filter(c => c.kind === 'from' && c.name === 'activity_log' && c.op === 'select');
 
@@ -8274,7 +8500,7 @@ S['habgrid-file'] = async (b) => {
   const r = { id: 'habgrid-file', title: 'The work -> Habits and court, last 14 days: one row a habit in catalogue order, a habit switched on midweek blank before that day, met / under / empty, a Court row with the hard day dark, the 7-day summary and clay under 3', checks: [] };
   const { page, log } = await L.openCoach(b, Object.assign({ hash: 'a/ava_test/work' }, HG));
   const g = await gridOf(page);
-  check(r, 'the panel is there, under Five weeks, with its heading and "7-day average" on the right', !!g && g.title === 'Habits and court · last 14 days' && g.right === '7-day average' && g.underFive, g && { t: g.title, r: g.right, u: g.underFive });
+  check(r, 'the panel is there, inside the habits card, under Show 14 days, with its heading and "7-day average" on the right', !!g && g.title === 'Habits and court · last 14 days' && g.right === '7-day average' && g.underFive, g && { t: g.title, r: g.right, u: g.underFive });
   check(r, 'the first header row is the 14 days\' weekday letters, today (the last) marked', !!g && g.head.length === 14 && g.head.every(x => /^[SMTWTFS]$/.test(x)) && g.todayCols.length === 1 && g.todayCols[0] === 14, g && { head: g.head.join(''), today: g.todayCols });
   const lab = x => x.label.replace(/^[^\p{L}]+/u, '');
   const labels = g ? g.rows.map(lab) : [];
@@ -8310,11 +8536,99 @@ S['habgrid-file'] = async (b) => {
   // under 600 px the table scrolls sideways inside its own box, the page does not
   await page.setViewportSize({ width: 390, height: 800 });
   await L.settle(page, 300);
-  const nar = await page.evaluate(() => { const w = document.querySelector('#habGrid .hg-wrap'); return { page: document.documentElement.scrollWidth <= window.innerWidth + 1, box: w.scrollWidth > w.clientWidth, ov: getComputedStyle(w).overflowX }; });
+  const nar = await page.evaluate(() => { document.querySelectorAll('details[id^=hg14-]').forEach(d => { d.open = true; }); const w = document.querySelector('#habGrid .hg-wrap'); return { page: document.documentElement.scrollWidth <= window.innerWidth + 1, box: w.scrollWidth > w.clientWidth, ov: getComputedStyle(w).overflowX }; });
   check(r, 'at 390 px the page does not scroll sideways; the grid scrolls inside its own container', nar.page && nar.box && nar.ov === 'auto', nar);
   await page.setViewportSize({ width: 1280, height: 900 });
   await L.go(page, 'a/ben_test/work');
   check(r, 'someone with no habit log and no court time has no panel at all', (await gridOf(page)) === null, '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// Look A, part 4 (2026-11-28): the habits card and the Getting stronger card, side by side on The work.
+S['look-a-habits-strength'] = async (b) => {
+  const r = { id: 'look-a-habits-strength', title: 'Look A: habits against their targets (verdict, two key habits as duels, the rest, chips, steps target, 14 days folded, wall lines) and Getting stronger (gains, first estimates, body weight), side by side at 1440 and stacked at 390', checks: [] };
+  const { page, log } = await L.openCoach(b, Object.assign({ hash: 'a/ava_test/work' }, HG));
+  const T = s => s.replace(/\s+/g, ' ').trim();
+  const txt = sel => page.evaluate(s => { const e = document.querySelector(s); return e ? e.innerText.replace(/\s+/g, ' ').trim() : null; }, sel);
+  // Ava: the cycle leans on Sleep and Steps; two lifts (one up, one still on its first estimate and due a retest), a flat body weight; a steps target of 6,000 set by the app.
+  await page.evaluate(() => {
+    const prog = window.__DB.programs.find(p => p.athlete_id === 'ava_test');
+    const d = JSON.parse(JSON.stringify(prog.data));
+    d.cycles = [Object.assign({}, (d.cycles || [])[0] || {}, { name: 'Cycle 2', focuses: ['Sleep', 'Steps'] })]; d.currentCycleIndex = 0;
+    d.workouts.days[1].blocks[0].exercises[0].test = true;   // Dumbbell Bench Press: due after 28 days
+    prog.data = d; prog.updated_at = new Date(Date.now() + 1000).toISOString();
+    const row = window.__DB.athlete_progress.find(p => p.athlete_id === 'ava_test'), dd = n => addDays(todayKey(), -n), wt = {};
+    for (let i = 0; i < 40; i++) wt[dd(i)] = { kg: 70, t: Date.now() - i * 86400000 };
+    row.data.ava_test_hab_wt = JSON.stringify(wt);
+    row.data.ava_test_1rm = [
+      { lift: 'Goblet Squat', kg: 20, w: 15, r: 5, rpe: 8, d: dd(20), t: 1 }, { lift: 'Goblet Squat', kg: 32.5, w: 25, r: 5, rpe: 8, d: dd(5), t: 2 },
+      { lift: 'Dumbbell Bench Press', kg: 27.5, w: 20, r: 5, rpe: 8, d: dd(40), t: 1 }];
+    window.__stCalls = [];
+    const orig = sb.rpc.bind(sb);
+    sb.rpc = (name, p) => name === 'get_steps_targets'
+      ? Promise.resolve({ data: { global: 10000, rows: [{ from: dd(4), steps: 6000, by: 'auto' }] }, error: null })
+      : name === 'coach_set_steps_target'
+        ? (window.__stCalls.push(p), Promise.resolve({ data: { global: 10000, rows: [{ from: todayKey(), steps: p.p_steps == null ? 7000 : p.p_steps, by: p.p_steps == null ? 'auto' : 'coach' }] }, error: null }))
+        : orig(name, p);
+    delete _stC.ava_test;
+    return Promise.all([refetch(['prog']), reloadPrograms()]);
+  });
+  await L.go(page, 'athletes'); await L.go(page, 'a/ava_test/work'); await L.settle(page, 700);
+
+  // 1. the habits card
+  const hab = await txt('.a-hab');
+  check(r, 'the habits card is titled "Habits against their targets" and its verdict is built from the last 7 days (Read 10 pages and Mobility met on under 3 days)', /^Habits against their targets Read 10 pages and Mobility are far under\./.test(hab || ''), hab && hab.slice(0, 120));
+  const keys = await page.evaluate(() => [...document.querySelectorAll('.a-hab .a-key')].map(k => ({ name: k.querySelector('.a-key-h b').textContent, chip: k.querySelector('.a-chip').textContent.trim(), tone: k.querySelector('.a-chip').className, nums: [...k.querySelectorAll('.a-split-n b')].map(x => x.textContent), labels: [...k.querySelectorAll('.a-split-n small')].map(x => x.textContent), bar: !!k.querySelector('.a-split-bar') })));
+  check(r, 'the two key habits are the ones the cycle names (Sleep, then Steps), each a duel: the 7-day average against the target', keys.length === 2 && keys[0].name === 'Sleep' && keys[1].name === 'Steps' && keys.every(k => k.bar), keys);
+  check(r, 'Sleep: 6.9 hours a day on average against 7.5, "target met 3 of 7 days" (watch)', !!keys[0] && keys[0].nums.join('|') === '6.9|7.5' && keys[0].labels.join('|') === 'hours a day, on average|target' && keys[0].chip === 'target met 3 of 7 days' && / watch/.test(keys[0].tone), keys[0]);
+  check(r, 'Steps: a grouped average against 10,000, "target met 5 of 7 days"', !!keys[1] && /^\d\d,\d{3}$/.test(keys[1].nums[0]) && keys[1].nums[1] === '10,000' && keys[1].labels[0] === 'a day, on average' && keys[1].chip === 'target met 5 of 7 days', keys[1]);
+  const rest = await page.evaluate(() => [...document.querySelectorAll('.a-hab .a-hr')].map(x => ({ t: x.innerText.replace(/\s+/g, ' ').trim(), dots: x.querySelectorAll('.sq').length, met: x.querySelectorAll('.sq.met').length, cls: x.className })));
+  const row = n => rest.find(x => x.t.startsWith(n));
+  check(r, 'the rest are rows with a dot a day and the count: Protein 2.8 of 3 meals 4 of 7, Water 6.8 of 8 glasses 4 of 7, Mobility 2 of 7, Read 10 pages 1 of 7 (Session and the two key habits are not among them)', rest.length === 4 && !!row('Protein') && /2\.8 of 3 meals 4 of 7$/.test(row('Protein').t) && /6\.8 of 8 glasses 4 of 7$/.test(row('Water').t) && /2 of 7$/.test(row('Mobility').t) && /1 of 7$/.test(row('Read 10 pages').t) && rest.every(x => x.dots === 7) && row('Protein').met === 4 && /miss/.test(row('Read 10 pages').cls) && /watch/.test(row('Protein').cls), rest);
+  const chips = await page.evaluate(() => [...document.querySelectorAll('.a-hab .a-chips4 .a-chip')].map(c => c.innerText.replace(/\s+/g, ' ').trim()));
+  check(r, 'two chips: "Court 4 h 30 this week" and "Sessions 2 this week"', chips.join('|') === 'Court 4 h 30 this week|Sessions 2 this week', chips);
+  // the steps target: the number set by the app, and "Change" opens the controls that call coach_set_steps_target
+  const stc = await page.evaluate(() => { const d = document.getElementById('stc-ava_test'); const i = document.getElementById('st-in-ava_test'); return d ? { open: d.open, head: d.querySelector('summary').innerText.replace(/\s+/g, ' ').trim(), inputShown: !!i && i.checkVisibility() } : null; });
+  check(r, 'the steps target row: "Steps target 6,000 set by the app on <day> Change", the number box hidden until Change', !!stc && /^Steps target 6,000 set by the app on \d+ \w+ Change$/.test(stc.head) && !stc.open && !stc.inputShown, stc);
+  await page.locator('#stc-ava_test summary').click(); await L.settle(page, 150);
+  check(r, '"Change" reveals #st-in-ava_test', await page.evaluate(() => document.getElementById('st-in-ava_test').checkVisibility()), '');
+  await page.locator('#st-in-ava_test').fill('7000');
+  await page.locator('#stc-ava_test .btn', { hasText: /^Set$/ }).click(); await L.settle(page, 700);
+  const sc = await page.evaluate(() => window.__stCalls);
+  check(r, 'Set calls coach_set_steps_target with the athlete and 7,000', sc.length === 1 && sc[0].p_athlete_id === 'ava_test' && sc[0].p_steps === 7000, sc);
+  check(r, 'and the row now says "set by you"', /set by you on/.test(await txt('#stc-ava_test summary') || ''), await txt('#stc-ava_test summary'));
+  // the 14 days, folded, the same grid
+  const f14 = await page.evaluate(() => { const d = document.getElementById('hg14-ava_test'); const wasOpen = d.open; const g = d.querySelector('#habGrid'); d.open = true; return { wasOpen, sum: d.querySelector('summary').textContent.trim(), has: !!g, cells: g ? g.querySelectorAll('td.hg-c').length : 0, met: g ? g.querySelectorAll('td.hg-c.met').length > 0 : false, shown: g ? g.checkVisibility() : false, borderless: g ? getComputedStyle(g).borderTopWidth === '0px' : false }; });
+  check(r, '"Show 14 days" is shut and holds the existing grid (#habGrid, its met cells), with no border of its own', !f14.wasOpen && f14.sum === 'Show 14 days' && f14.has && f14.cells > 14 * 5 && f14.met && f14.shown && f14.borderless, f14);
+  const wall = await page.evaluate(() => [...document.querySelectorAll('.a-hab .a-wl')].map(x => ({ t: x.innerText.replace(/\s+/g, ' ').trim(), btn: x.querySelector('button').textContent.trim() })));
+  check(r, 'the wall lines this week are listed with Hide', wall.length === 1 && /Fixture wall line from Ava\./.test(wall[0].t) && wall[0].btn === 'Hide', wall);
+
+  // 2. getting stronger
+  const str = await txt('.a-str');
+  check(r, 'Getting stronger: "Stronger, body weight steady." (a lift is up and the 30-day weight change is within 0.5 kg)', /^Getting stronger Stronger, body weight steady\./.test(str || ''), str && str.slice(0, 100));
+  const gain = await page.evaluate(() => [...document.querySelectorAll('.a-str .a-lifts .a-lift')].map(x => ({ t: x.innerText.replace(/\s+/g, ' ').trim(), chip: x.querySelector('.a-chip.good').textContent.trim(), nums: [...x.querySelectorAll('.a-split-n b')].map(y => y.textContent), gain: !!x.querySelector('.a-split.gain'), bar: !!x.querySelector('.a-split-bar') })));
+  check(r, 'the lift that went up: "+12.5 kg", first estimate 20 kg, now 32.5 kg on a gain bar, "from a set 5 days ago"', gain.length === 1 && /^Goblet Squat/.test(gain[0].t) && gain[0].chip === '+12.5 kg' && gain[0].nums.join('|') === '20 kg|32.5 kg' && gain[0].gain && gain[0].bar && /from a set 5 days ago$/.test(gain[0].t), gain);
+  const first = await page.evaluate(() => { const f = document.querySelector('.a-str .a-first'); return f ? { head: f.querySelector('p').textContent, rows: [...f.querySelectorAll('.a-lift')].map(x => x.innerText.replace(/\s+/g, ' ').trim()) } : null; });
+  check(r, 'First estimates, not retested yet: Dumbbell Bench Press 27.5 kg with its test tag and a "due a retest" chip', !!first && first.head === 'First estimates, not retested yet' && first.rows.length === 1 && /^Dumbbell Bench Press 5RM 27\.5 kg due a retest$/.test(first.rows[0]), first);
+  const body = await page.evaluate(() => { const x = document.querySelector('.a-str .a-body'); return x ? { t: x.innerText.replace(/\s+/g, ' ').trim(), spark: !!x.querySelector('svg.a-spark[role=img][aria-label]'), n: document.querySelectorAll('#wtdet').length, open: document.getElementById('wtdet').open, inBody: !!document.getElementById('wtdet').closest('.a-body'), chart: document.querySelector('#wtdet .chart-svg') ? document.querySelector('#wtdet .chart-svg').checkVisibility() : null } : null; });
+  check(r, 'Body weight: 70.0 kg, last weighed today, the 30-day change and "flat over 90 days", a sparkline with an aria-label', !!body && /^Body weight 70\.0 kg last weighed today/.test(body.t) && /over 30 days/.test(body.t) && /flat over 90 days/.test(body.t) && body.spark, body);
+  check(r, 'ONE #wtdet in the body-weight box, shut, its chart not on screen until it is opened', !!body && body.n === 1 && !body.open && body.inBody && body.chart === false, body);
+  check(r, 'the footer says the estimates are read-only, and the How this works fold is there', /Estimated one-rep maxes from their sets\. Read-only: they own the record\./.test(str || '') && (await page.locator('.a-str details#how-prs').count()) === 1, '');
+
+  // 3. layout: side by side at 1440, stacked at 390, no sideways scroll
+  const pos = () => page.evaluate(() => { const a = document.querySelector('.a-hab').getBoundingClientRect(), s = document.querySelector('.a-str').getBoundingClientRect(); return { aT: Math.round(a.top), sT: Math.round(s.top), aL: Math.round(a.left), sL: Math.round(s.left), aB: Math.round(a.bottom), over: document.documentElement.scrollWidth - window.innerWidth }; });
+  await page.setViewportSize({ width: 1440, height: 900 }); await L.settle(page, 300);
+  const wide = await pos();
+  check(r, 'at 1440 px the two cards sit side by side (same top, the strength card to the right)', Math.abs(wide.aT - wide.sT) <= 1 && wide.sL > wide.aL + 300 && wide.over <= 0, wide);
+  await page.setViewportSize({ width: 390, height: 844 }); await L.settle(page, 400);
+  const narrow = await pos();
+  check(r, 'at 390 px they are stacked and the page does not scroll sideways', narrow.sT >= narrow.aB && narrow.over <= 0, narrow);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  // an athlete with no habits and no records has neither card
+  await L.go(page, 'a/ben_test/work'); await L.settle(page, 400);
+  check(r, 'someone with no habit log, no records and no weigh-ins has neither card', (await page.locator('.a-hab').count()) === 0 && (await page.locator('.a-str').count()) === 0, '');
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;
@@ -8480,7 +8794,7 @@ S['habgrid-demo'] = async (b) => {
   page.on('pageerror', e => errs.push(String(e && e.message || e)));
   await page.route('**/*', route => route.request().url().startsWith(L.BASE) ? route.continue() : route.fulfill({ status: 204, body: '' }));
   await page.goto(L.BASE + '/coach.html?demo=1#a/demo_ana');
-  await page.waitForSelector('#habGrid', { timeout: 15000 });
+  await page.waitForSelector('#habGrid', { state: 'attached', timeout: 15000 });
   const g = await gridOf(page);
   const crt = g && g.rows.find(x => /Court/.test(x.label));
   check(r, 'Ana\'s file shows the grid with a Court row: a hard day dark and its title', !!crt && crt.cells.some(c => c.cls === 'court hard' && c.title === 'Tennis 120 min · hard') && crt.cells.some(c => c.title === 'Padel 60 min · normal'), crt && crt.cells.filter(c => c.title).map(c => c.title));
@@ -8514,9 +8828,9 @@ S['footprint-big-day-pill'] = async (b) => {
   const text = async n => ((await page.locator('#wday-' + n + ' .wday-meta').first().textContent()) || '').replace(/\s+/g, ' ').trim();
   const m1 = await meta(1), t1 = await text(1);
   check(r, 'Day 1 (sRPE 8) has the pill, class zpill fp-big, text "big day"', /<span class="zpill fp-big"[^>]*>big day<\/span>/.test(m1 || ''), m1);
-  check(r, 'it comes right after the sRPE text', /sRPE 8\/10(<\/[a-z]+>)*\s*<span class="zpill fp-big"/.test(m1 || '') || /sRPE 8\/10 big day/.test(t1), t1);
+  check(r, 'it comes right after the effort chip', /effort 8\/10(<\/[a-z]+>)*\s*<span class="zpill fp-big"/.test(m1 || '') || /effort 8\/10 big day/.test(t1), t1);
   const m2 = await meta(2), t2 = await text(2);
-  check(r, 'Day 2 (sRPE 6, sets at 6) shows sRPE 6/10 and no pill', /sRPE 6\/10/.test(t2) && !/fp-big/.test(m2 || '') && !/big day/.test(t2), t2);
+  check(r, 'Day 2 (sRPE 6, sets at 6) shows effort 6/10 and no pill', /effort 6\/10/.test(t2) && !/fp-big/.test(m2 || '') && !/big day/.test(t2), t2);
   check(r, 'the pill title gives the reason (session RPE 8+)', /title="Big day: session RPE 8\+"/.test(m1 || ''), m1);
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
@@ -8542,16 +8856,102 @@ S['stacked-panel'] = async (b) => {
   await L.settle(page, 500);
   const asked = (await L.calls(page)).filter(c => c.kind === 'rpc' && c.name === 'get_five_weeks' && c.payload && c.payload.p_athlete_id === 'ava_test');
   check(r, 'the file read Ava\'s weeks (get_five_weeks) once the work tab opened', asked.length >= 1 && asked[0].result && asked[0].result.ok, asked.map(c => c.result));
-  const stk = () => page.evaluate(() => { const s = document.querySelector('section.stk'); return s ? { line: (s.querySelector('p.stk-l') || {}).textContent, head: (s.querySelector('.hd') || {}).textContent, underFive: !!(s.previousElementSibling && s.previousElementSibling.classList.contains('fwc')) || undefined } : null; });
+  const stk = () => page.evaluate(() => { const s = document.querySelector('#cyCard'); return s ? { lines: [...s.querySelectorAll('.cy-line')].map(x => x.innerText.replace(/\s+/g, ' ').trim()), head: (s.querySelector('.a-h') || {}).innerText } : null; });
   const a = await stk();
-  check(r, 'Ava: section.stk with a p.stk-l line', !!a && !!a.line, a);
-  check(r, 'the line names "1 big gym day within a day of hard court"', !!a && /1 big gym day within a day of hard court/.test(a.line || ''), a && a.line);
-  check(r, 'it ends with the counts: 1 big day of 3 sessions, 1 hard court day logged', !!a && /1 big day of 3 sessions, 1 hard court day logged$/.test(a.line || ''), a && a.line);
-  check(r, 'the panel is headed Stacked', !!a && a.head === 'Stacked', a && a.head);
+  check(r, 'Ava: the cycle card (#cyCard) with its "What the calendar says" lines', !!a && a.lines.length > 0, a);
+  check(r, 'the same events as the old line, in plain words: "Back to back once" (hard padel, then the big gym session), the big-gym-day-near-court count folded into it', !!a && a.lines.some(l => /^Back to back once: hard padel Tue 8 Dec, then big gym session Wed 9 Dec\./.test(l)), a && a.lines);
+  check(r, 'it ends with the counts: "Big days: 1 of 3 sessions."', !!a && a.lines.some(l => /^Big days: 1 of 3 sessions\./.test(l)), a && a.lines);
+  check(r, 'the card is headed "The cycle, day by day"', !!a && /^The cycle, day by day/.test(a.head), a && a.head);
   await L.go(page, 'a/eli_new/work');
   await L.settle(page, 500);
   const e = await stk();
-  check(r, 'Eli (a dated cycle, no sessions in it): no .stk panel', e === null, e);
+  check(r, 'Eli (a dated cycle, no sessions in it): no cycle card', e === null, e);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── Look A, part 3: the cycle calendar on The work (coach.html cycleCardC): weeks as rows, sessions and court as cells, the back-to-back bracket, the tallies, the plain lines ──
+S['look-a-cycle-calendar'] = async (b) => {
+  const r = { id: 'look-a-cycle-calendar', title: 'Look A cycle calendar: one row per week, D-number + minutes cells, bolt on a big day, a half cell, a hard court cell, the back-to-back bracket, the tallies, the gap and back-to-back lines; undated cycle keeps the old panels; the grid scrolls inside its box at 390', checks: [] };
+  const FX = require('./fixtures'), TODAY = '2026-12-10', d = n => FX.daysAgo(TODAY, n);
+  const START = '2026-11-07', END = '2026-12-11';   // a Saturday to a Friday: five weeks, today in the last one
+  const fw = { n: 1, from: START, to: END, current: true, weeks: [{ w: 1, from: START, to: d(4), plan: 3, done: 0, held: false, now: false, days: [{ day: START, k: 'plan', mins: 73, title: 'Day 1' }] }],
+    acts: [{ day: d(2), kind: 'padel', mins: 60, effort: 'hard', id: 'a-padel-cal' }] };
+  const { page, log } = await L.openCoach(b, { fixedTime: TODAY + 'T10:00:00Z', seed: { stub: { fiveWeeks: { ava_test: fw } } } });
+  await page.evaluate(([start, end]) => {
+    const p = window.__DB.programs.find(x => x.athlete_id === 'ava_test'); p.data.cycles[0].startDate = start; p.data.cycles[0].endDate = end;
+    const rows = window.__DB.session_history, tpl = JSON.parse(JSON.stringify(rows.find(h => h.athlete_id === 'ava_test')));
+    for (let i = rows.length - 1; i >= 0; i--) if (rows[i].athlete_id === 'ava_test') rows.splice(i, 1);
+    [['2026-11-07', 1, 6, 73, 'Complete'], ['2026-11-09', 2, 8, 43, 'Complete'], ['2026-11-11', 3, 6, 60, 'Complete'], ['2026-11-28', 1, 8, 68, 'Complete'],
+      ['2026-11-30', 2, 6, 32, 'Partial'], ['2026-12-07', 1, 8, 39, 'Complete']].forEach(([on, day, rpe, mins, status]) => {
+      rows.push(Object.assign(JSON.parse(JSON.stringify(tpl)), { completed_on: on, day, session_rpe: rpe, duration_min: mins, status, log: [], readiness: null }));
+    });
+  }, [START, END]);
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
+  await L.go(page, 'a/ava_test/work');
+  await L.settle(page, 600);
+  const read = () => page.evaluate(() => {
+    const c = document.querySelector('#cyCard'); if (!c) return null;
+    const rows = [...c.querySelectorAll('.cy-r[data-week]')];
+    const txt = e => (e ? e.innerText.replace(/\s+/g, ' ').trim() : '');
+    const cell = (wi, ci) => rows[wi] && rows[wi].querySelectorAll('.cy-c')[ci];
+    const planned = (typeof planDaysC === 'function' && _D && _D.program) ? planDaysC(_D.program).length : null;
+    return {
+      title: txt(c.querySelector('.a-h')), legend: txt(c.querySelector('.cy-key')), head: txt(c.querySelector('.cy-hd')),
+      weeks: rows.map(x => x.dataset.week), labels: rows.map(x => txt(x.querySelector('.cy-wl'))), tallies: rows.map(x => txt(x.querySelector('.cy-wt'))),
+      held: rows.map(x => !!x.querySelector('.cy-wt .cy-ok')),
+      d1: txt(cell(0, 0)), d2: txt(cell(0, 2)), d2bolt: !!(cell(0, 2) && cell(0, 2).querySelector('.a-ico')), d1bolt: !!(cell(0, 0) && cell(0, 0).querySelector('.a-ico')),
+      half: !!(cell(3, 2) && cell(3, 2).querySelector('.is-half')), halfTxt: txt(cell(3, 2)),
+      courtCell: cell(4, 3) ? { cls: cell(4, 3).querySelector('.cy-p').className, txt: txt(cell(4, 3)), aria: cell(4, 3).getAttribute('aria-label') } : null,
+      aria2: cell(0, 2) && cell(0, 2).getAttribute('aria-label'),
+      emptyDashed: !!(cell(1, 0) && getComputedStyle(cell(1, 0)).borderTopStyle === 'dashed'),
+      today: rows.map(x => x.querySelector('.cy-c.is-today') ? txt(x.querySelector('.cy-c.is-today')) : null),
+      brackets: [...c.querySelectorAll('.cy-br')].map(x => ({ txt: txt(x), col: x.style.gridColumn, row: x.parentElement.previousElementSibling && x.parentElement.previousElementSibling.dataset.week })),
+      lines: [...c.querySelectorAll('.cy-line')].map(x => ({ cls: x.className, txt: txt(x) })), foot: txt(c.querySelector('.cy-foot')), planned,
+      scroll: (() => { const s = c.querySelector('.cy-scroll'); return { cw: s.clientWidth, sw: s.scrollWidth, ox: getComputedStyle(s).overflowX }; })(),
+      page: { cw: document.documentElement.clientWidth, sw: document.documentElement.scrollWidth },
+      oldFive: !!document.querySelector('.fwc'), oldStk: !!document.querySelector('section.stk')
+    };
+  });
+  const a = await read();
+  check(r, 'the card is there, titled "The cycle, day by day", with the week-start line', !!a && /^The cycle, day by day/.test(a.title) && /Weeks start on Saturday/.test(a.title), a && a.title);
+  check(r, 'the legend names Plan session, Half done, Big day, Court, Hard court, Today', !!a && /Plan session.*Half done.*Big day.*Court.*Hard court.*Today/.test(a.legend), a && a.legend);
+  check(r, 'the column heads start on the start date\'s weekday: Sat Sun Mon Tue Wed Thu Fri Week', !!a && a.head === 'Sat Sun Mon Tue Wed Thu Fri Week', a && a.head);
+  check(r, 'one row per week of the cycle: 5 rows from 7 Nov, none for a cycle that has not ended', !!a && a.weeks.join() === '2026-11-07,2026-11-14,2026-11-21,2026-11-28,2026-12-05', a && a.weeks);
+  check(r, 'the rows are labelled by their first day: 7 Nov ... 5 Dec', !!a && a.labels.join() === '7 Nov,14 Nov,21 Nov,28 Nov,5 Dec', a && a.labels);
+  check(r, 'a session cell shows its D-number and minutes (D1, 73′)', !!a && /^D1 73′$/.test(a.d1) && /^D2 43′$/.test(a.d2), a && [a.d1, a.d2]);
+  check(r, 'a big day (session effort 8) carries the bolt; a plain session does not', !!a && a.d2bolt === true && a.d1bolt === false, a && [a.d1bolt, a.d2bolt]);
+  check(r, 'a partial session is drawn half filled (.is-half), still D2 and 32′', !!a && a.half && /^D2 32′$/.test(a.halfTxt), a && [a.half, a.halfTxt]);
+  check(r, 'a hard Court Log row is a hard court cell: ball, "hard" and 60′, with a plain-words label', !!a && !!a.courtCell && /is-hard/.test(a.courtCell.cls) && /^hard 60′$/.test(a.courtCell.txt) && /Padel, 60 min, hard/.test(a.courtCell.aria), a && a.courtCell);
+  check(r, 'every cell has a title and an aria-label like "Mon 9 Nov: Day 2, 43 min, big day"', !!a && a.aria2 === 'Mon 9 Nov: Day 2, 43 min, big day', a && a.aria2);
+  check(r, 'an empty day is a dashed outline', !!a && a.emptyDashed, a && a.emptyDashed);
+  check(r, 'today (Thu 10 Dec) is outlined and says "today", in the last row only', !!a && a.today.filter(Boolean).length === 1 && a.today[4] === 'today', a && a.today);
+  check(r, 'one back-to-back bracket, under Mon 7 Dec and Tue 8 Dec (two cells), labelled "back to back"', !!a && a.brackets.length === 1 && /back to back/.test(a.brackets[0].txt) && /span 2/.test(a.brackets[0].col) && a.brackets[0].row === '2026-12-05', a && a.brackets);
+  const plan = a && a.planned;
+  check(r, 'the tallies: week 1 "3 of N" with the green check when held, week 4 "1.5 of N" (a partial counts half), a week with nothing "0 of N"',
+    !!a && plan > 0 && a.tallies[0] === `${Math.min(3, 3)} of ${plan}` && a.tallies[1] === `0 of ${plan}` && a.tallies[3] === `1.5 of ${plan}` && a.held[0] === (3 >= plan) && a.held[1] === false, a && { t: a.tallies, h: a.held, plan });
+  const lead = k => a && a.lines.find(x => x.txt.indexOf(k) === 0);
+  check(r, 'the gap line: "16 days off mid-cycle: no sessions from 12 to 27 Nov."', !!lead('16 days off mid-cycle') && /no sessions from 12 to 27 Nov\./.test(lead('16 days off mid-cycle').txt), a && a.lines);
+  check(r, 'the back-to-back line (stackedOfC\'s count of 1) names the big gym session and the hard padel, in a miss-tinted box', !!lead('Back to back once') && /big gym session Mon 7 Dec, then hard padel Tue 8 Dec\./.test(lead('Back to back once').txt) && /miss/.test(lead('Back to back once').cls), a && a.lines);
+  check(r, 'the big-days line counts from stackedOfC: 3 of 6 sessions, "run hard" because half were big', !!lead('Their sessions run hard') && /3 of their 6 sessions were big days/.test(lead('Their sessions run hard').txt), a && a.lines);
+  check(r, 'the court footer: 1 h logged, and the court log began 21 Nov', !!a && /^Court time: 1 h logged \(the court log started 21 Nov/.test(a.foot), a && a.foot);
+  check(r, 'the old Five weeks and Stacked panels are gone for a dated cycle', !!a && !a.oldFive && !a.oldStk, a && [a.oldFive, a.oldStk]);
+  check(r, 'the grid scrolls inside its own box (overflow-x auto) and the page does not at 1440', !!a && a.scroll.ox === 'auto' && a.page.sw <= a.page.cw, a && { s: a.scroll, p: a.page });
+  await page.screenshot({ path: require('path').join(L.OUT, 'look-a-cycle-1440.png'), fullPage: false });
+  await page.setViewportSize({ width: 390, height: 900 }); await L.settle(page, 400);
+  const m = await read();
+  check(r, 'at 390 px the grid scrolls sideways inside its box (wider than the box) and the page itself never does', !!m && m.scroll.sw > m.scroll.cw && m.page.sw <= m.page.cw, m && { s: m.scroll, p: m.page });
+  await page.evaluate(() => { const c = document.querySelector('#cyCard'); if (c) c.scrollIntoView(); });
+  await (await page.$('#cyCard')).screenshot({ path: require('path').join(L.OUT, 'look-a-cycle-390.png') });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  // An undated cycle keeps the old panels.
+  await page.evaluate(() => { const p = window.__DB.programs.find(x => x.athlete_id === 'ava_test'); delete p.data.cycles[0].startDate; delete p.data.cycles[0].endDate; });
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
+  await L.go(page, 'a/ava_test/work');
+  await L.settle(page, 600);
+  const u = await page.evaluate(() => ({ card: !!document.querySelector('#cyCard'), five: !!document.querySelector('.fwc') }));
+  check(r, 'an undated cycle draws no calendar card, and keeps the old Five weeks panel', u.card === false && u.five === true, u);
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;

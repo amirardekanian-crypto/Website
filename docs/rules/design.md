@@ -11,6 +11,8 @@ sat here until 2026-09-26 live in those files and in `IMAGES.md` §0. What must 
 - **All new social content is Farsi** (Amir, 2026-09-21): Vazirmatn, RTL, no uppercase or
   letter-spacing, Persian numerals. English only when he asks. Barlow is for app screens and Latin numerals.
 - **Clay `#C7552F` is the only accent. No yellow or gold, ever**: not in UI, prompts, props or wardrobe.
+  The coach dashboard is the one exception to the clay half (Amir, 2026-11-28: *"the dashboard doesnt have to follow my colors"*):
+  `coach.html` may carry its own palette (look A, `docs/rules/coach-dashboard.md`). No yellow, gold, ochre or amber there either.
 - **Never generate a picture or a clip before Amir says yes to a plan with the credit numbers in it**:
   the credits come from a pot shared with his own work. Reuse first (`/image` Step 0). Clips: `sound:
   "off"` (the default is ON), 3 seconds, the cheapest settings, and report the cost after (`/video`).
