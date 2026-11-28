@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RUSTBLOOD RALLY</title>
-    <script type="module" crossorigin src="./assets/index-D_HRBAft.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-CvWZkROP.css">
+    <script type="module" crossorigin src="./assets/index-R-LNQ6Y3.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CUAMRyfO.css">
   </head>
   <body>
     <canvas id="game"></canvas>
@@ -114,9 +114,18 @@
               <div><kbd>R</kbd> put car back on track</div>
               <div><kbd>ESC</kbd> pause &nbsp; <kbd>M</kbd> mute &nbsp; <kbd>Q</kbd> graphics</div>
             </div>
+            <div class="ctl-col">
+              <h3>GAMEPAD</h3>
+              <div><kbd>RT</kbd> accelerate &nbsp; <kbd>LT</kbd> brake / reverse</div>
+              <div><kbd>L-STICK</kbd> steer &nbsp; <kbd>X</kbd> drift</div>
+              <div><kbd>A</kbd> nitro &nbsp; <kbd>B</kbd> mine</div>
+              <div><kbd>RB</kbd> guns &nbsp; <kbd>LB</kbd> rockets</div>
+              <div><kbd>Y</kbd> reset car &nbsp; <kbd>START</kbd> pause</div>
+            </div>
           </div>
           <div class="tips">
-            <div>&#9654; Drift, jump the ramps and scrape past rivals for <b class="gold">style points</b>: they pay out as scrap.</div>
+            <div>&#9654; Drift, jump the ramps, smash the scenery and scrape past rivals for <b class="gold">style points</b>: they pay out as scrap.</div>
+            <div>&#9654; Hold a drift until the sparks turn blue, orange, then violet and let go for a <b class="gold">boost</b>. Tuck in behind a rival to charge a slingshot.</div>
             <div>&#9654; Guns aim themselves a little &mdash; just point your car at a rival.</div>
             <div>&#9654; Shoot the <b class="red">red barrels</b> when rivals drive past. Grab <b class="green">green</b> crates to repair.</div>
           </div>
@@ -173,6 +182,7 @@
           <button id="btn-retire" class="btn hidden">RETIRE FROM EVENT</button>
           <button id="btn-menu" class="btn">MAIN MENU</button>
           <div class="small-controls">WASD drive &bull; SPACE drift &bull; SHIFT nitro &bull; L-CLICK guns &bull; R-CLICK rockets &bull; E mines &bull; R reset car &bull; M mute</div>
+          <div class="small-controls">GAMEPAD: RT gas &bull; LT brake &bull; stick steer &bull; X drift &bull; A nitro &bull; RB guns &bull; LB rockets &bull; B mine &bull; Y reset &bull; START resume</div>
           <div class="small-controls">Retiring counts as a wreck: no prize, but you keep your bounties.</div>
           <div class="small-controls">GRAPHICS: <b id="quality-label">MEDIUM</b> &mdash; press <kbd>Q</kbd> to change</div>
         </div>
@@ -212,6 +222,6 @@
         </div>
       </div>
     </div>
-
+
   </body>
 </html>
