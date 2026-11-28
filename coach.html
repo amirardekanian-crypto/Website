@@ -7740,6 +7740,15 @@ function aSplit(o) {
       <div class="a-split-bar"><i style="flex:${pct} 1 0"></i><u style="flex:${Math.round((100 - pct) * 10) / 10} 1 0"></u></div>
     </div>`;
 }
+// One card that throws must not blank the whole tab (look A shipped 2026-11-28 without a look at every athlete's real data): the card says so
+// in one line, with the reason, and the rest of the page still draws. The error also goes to the console.
+function aSafeC(name, fn) {
+  try { return fn(); }
+  catch (e) {
+    console.error('Look A card failed: ' + name, e);
+    return `<div class="loadwarn" role="alert"><b>${esc(name)} could not be drawn.</b> The rest of the page is fine.<span class="lw-why">${esc(String((e && e.message) || e))}</span></div>`;
+  }
+}
 function workTabHtml(D) {
   const { athleteId, programDays, history, lib, metrics } = D;
   // The dates the athlete's phone uses for its renewal banner (SCHEMA.md: endDate); the header shows them on every sub-tab.
@@ -7759,27 +7768,27 @@ function workTabHtml(D) {
   // Only the most recently trained day opens by itself. Every card expanded at
   // once is how the old page got to four thousand pixels.
   const freshest = cur.length ? Number(cur[0].day) : null;
-  const cards = order.map(d => workDayCard(athleteId, programDays.find(p => Number(p.id) === d), d, byDay[d] || [], lib, d === freshest))
-    .concat(loggedOnly.map(d => workDayCard(athleteId, null, d, byDay[d], lib, d === freshest)));
+  const cards = order.map(d => aSafeC('Day ' + d, () => workDayCard(athleteId, programDays.find(p => Number(p.id) === d), d, byDay[d] || [], lib, d === freshest)))
+    .concat(loggedOnly.map(d => aSafeC('Day ' + d, () => workDayCard(athleteId, null, d, byDay[d], lib, d === freshest))));
 
   // (The cycle's name, week and dates are in the header on every sub-tab now: cycleLineHtml(), under renderDetail.)
   const logsWarn = D.logsErr ? `<div class="loadwarn" role="alert" style="margin:0 0 16px"><b>Their session logs did not load.</b> Every comparison below is blank because of that, not because they skipped the work.
       <button class="btn sm" onclick="retryLogs()">↻ Try again</button><span class="lw-why">${esc(D.logsErr)}</span></div>` : '';
   // Look A (2026-11-28), top to bottom: the read, the three score cards, her cycle day by day, habits beside strength, the sessions, then
   // Earlier cycles and her phone. Each card is one function; the two side by side take the full width when only one has something to say.
-  const side = [habitsCardC(D), strengthCardC(D)].filter(h => h && h.trim());
+  const side = [aSafeC('Habits', () => habitsCardC(D)), aSafeC('Getting stronger', () => strengthCardC(D))].filter(h => h && h.trim());
   return `${logsWarn}
     <div class="a-stack">
-      ${readLineC(D)}
-      ${scoreCardsC(D)}
-      ${cycleCardC(D)}
+      ${aSafeC('The read', () => readLineC(D))}
+      ${aSafeC('Score cards', () => scoreCardsC(D))}
+      ${aSafeC('The cycle', () => cycleCardC(D))}
       ${side.length === 2 ? `<div class="a-row2">${side.join('')}</div>` : side.join('')}
       ${cards.length ? `<h3 class="a-h a-sech">${aIco('list')}Sessions this cycle</h3><div class="a-days">${cards.join('')}</div>`
         : `<p class="empty">${D.a.tier === 'coached' || S.progSrc[athleteId] !== 'db'
         ? 'No training programme published yet, and no finished sessions.'
         : 'No training programme: this is a habit-only (Proof) athlete. Their habits are under Proof.'}</p>`}
-      ${earlierCyclesHtml(D, earlier)}
-      ${phoneCardC(D)}
+      ${aSafeC('Earlier cycles', () => earlierCyclesHtml(D, earlier))}
+      ${aSafeC('Their phone', () => phoneCardC(D))}
     </div>`;
 }
 // ── Five weeks, the coach's copy (#124 The Mirror, round 11, 2026-11-21) ─────────────────────────────────────────────────────
