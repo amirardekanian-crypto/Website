@@ -27,7 +27,7 @@
 <meta name="theme-color" content="#0E4A36">
 <link rel="manifest" href="/manifest-coach.json">
 <link rel="icon" href="/favicon.ico" sizes="any">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
 <!-- Pinned (2026-10-10): "@2" let any new 2.x build change how the dashboard signs in or reads
      with no change here. 2.117.3 is what @2 served that day and was tested against. To move on,
      bump the number and run the coach harness (Content/COACH-AUDIT.md). -->
@@ -1616,6 +1616,108 @@
   .bmap-wrap { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
   .bmap-say { font-size: 14px; line-height: 1.7; }
   .bmap-say i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin: 0 8px 0 0; }
+
+  /* ── THE ATHLETE PAGE, LOOK A "Match stats" (2026-11-28). Amir picked A off the board https://claude.ai/artifact/9aCZYM9qNmcqmmYC1Qtx3S after
+     "i dont understand what you built for me / its just text, not cards", and said "the dashboard doesnt have to follow my colors".
+     Every number on The work is a duel on one split bar (hers against her usual, her plan or her first estimate), with its verdict in words and
+     its chart in the same card. Scoped to #content.afa, which renderNow() sets on an athlete's file only. It keeps THE LOOK's five sizes and three
+     radii; it has its own palette and face (Archivo, expanded for figures and titles). Still no yellow, gold, ochre or amber, anywhere.
+     The shared parts are here; parts 1-4 below belong to the header and score cards, the cycle calendar, habits and strength, the sessions. ── */
+  #content.afa { --a-ground: #EEF1F6; --a-card: #FFFFFF; --a-ink: #14213D; --a-muted: #56627C; --a-line: #D9DFEA; --a-soft: #F4F6FA;
+    --a-her: #2B59C3; --a-her-100: rgba(43,89,195,0.10); --a-usual: #C3CCDB; --a-usual-ink: #6E7A93;
+    --a-good: #17855B; --a-good-100: rgba(23,133,91,0.12); --a-watch: #7A4FB3; --a-watch-100: rgba(122,79,179,0.12);
+    --a-miss: #D14B33; --a-miss-ink: #B23C28; --a-miss-100: rgba(209,75,51,0.10);
+    --a-court: #1E7FA6; --a-court-hard: #135E7A; --a-navy: #14213D;
+    --a-face: 'Archivo', 'Barlow', system-ui, sans-serif;
+    color: var(--a-ink); font-family: var(--a-face); }
+  body:has(#content.afa) { background: #EEF1F6; }
+  #content.afa .a-stack { display: grid; gap: var(--gap); }
+  #content.afa .a-stack > *, #content.afa .a-row3 > *, #content.afa .a-row2 > * { min-width: 0; }
+  #content.afa .a-row3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+  #content.afa .a-row2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+  @media (max-width: 1023px) { #content.afa .a-row3 { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 899px) { #content.afa .a-row2 { grid-template-columns: minmax(0, 1fr); } }
+  /* A card: white, one line, 12 px corners, no shadow (THE LOOK: one container level). */
+  #content.afa .a-card { background: var(--a-card); border: 1px solid var(--a-line); border-radius: 12px; padding: 20px 24px; min-width: 0;
+    animation: riseIn .4s cubic-bezier(.16,1,.3,1) both; }
+  #content.afa.no-anim .a-card, #tabbody.a-still .a-card { animation: none; }
+  @media (max-width: 480px) { #content.afa .a-card { padding: 16px; } }
+  /* A card's title: Archivo expanded, 17 px, an icon before it; .a-hsub is the grey line beside it. */
+  #content.afa .a-h { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-family: var(--a-face); font-stretch: 125%; font-weight: 750;
+    font-size: 17px; line-height: 1.25; color: var(--a-ink); }
+  #content.afa .a-h .a-ico { color: var(--a-her); width: 18px; height: 18px; }
+  #content.afa .a-hsub { font-stretch: 100%; font-weight: 400; font-size: 14px; color: var(--a-muted); }
+  /* The verdict in words: 22 px, its tone a class, an icon before it (colour is never the only signal). */
+  #content.afa .a-verdict { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-stretch: 125%; font-weight: 800; font-size: 22px; line-height: 1.2; }
+  #content.afa .a-verdict .a-ico { width: 20px; height: 20px; stroke-width: 2.25; }
+  #content.afa .a-good { color: var(--a-good); }
+  #content.afa .a-watch { color: var(--a-watch); }
+  #content.afa .a-miss { color: var(--a-miss-ink); }
+  #content.afa .a-her { color: var(--a-her); }
+  #content.afa .a-mut { color: var(--a-muted); }
+  /* The split bar (aSplit()): her number left in blue, the other right in grey, the bar split at her share of the two.
+     .gain draws a lift: the first estimate grey, the gain green. The halves grow out from the split once, on the first paint of a file. */
+  #content.afa .a-split { margin-top: 12px; }
+  #content.afa .a-split-n { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+  #content.afa .a-split-n > div:last-child { text-align: right; }
+  #content.afa .a-split-n b { display: block; font-stretch: 125%; font-weight: 800; font-size: 30px; line-height: 1; color: var(--a-her); font-variant-numeric: tabular-nums; }
+  #content.afa .a-split-n > div:last-child b { color: var(--a-usual-ink); }
+  #content.afa .a-split.gain .a-split-n > div:first-child b { color: var(--a-usual-ink); }
+  #content.afa .a-split.gain .a-split-n > div:last-child b { color: var(--a-ink); }
+  #content.afa .a-split-n small { display: block; margin-top: 4px; font-size: 12px; color: var(--a-muted); }
+  #content.afa .a-split-bar { display: flex; gap: 3px; height: 12px; margin-top: 8px; }
+  #content.afa .a-split-bar i, #content.afa .a-split-bar u { display: block; height: 100%; border-radius: 999px; min-width: 0; text-decoration: none; }
+  #content.afa .a-split-bar i { background: var(--a-her); }
+  #content.afa .a-split-bar u { background: var(--a-usual); }
+  #content.afa .a-split.gain .a-split-bar i { background: var(--a-usual); }
+  #content.afa .a-split.gain .a-split-bar u { background: var(--a-good); }
+  @media (prefers-reduced-motion: no-preference) {
+    #content.afa .a-split-bar i { transform-origin: right center; animation: aGrow .6s cubic-bezier(.16,1,.3,1) both; }
+    #content.afa .a-split-bar u { transform-origin: left center; animation: aGrow .6s cubic-bezier(.16,1,.3,1) both; }
+  }
+  #content.afa.no-anim .a-split-bar i, #content.afa.no-anim .a-split-bar u, #tabbody.a-still .a-split-bar i, #tabbody.a-still .a-split-bar u { animation: none; }
+  @keyframes aGrow { from { transform: scaleX(0); } to { transform: none; } }
+  /* Chips (aChip()): one shape (999, 12, 600); the tone is a class. */
+  #content.afa .a-chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--a-line);
+    background: var(--a-card); color: var(--a-ink); font-size: 12px; font-weight: 600; line-height: 1.5; white-space: nowrap; }
+  #content.afa .a-chip .a-ico { width: 12px; height: 12px; stroke-width: 2.25; }
+  #content.afa .a-chip.good { background: var(--a-good-100); border-color: transparent; color: var(--a-good); }
+  #content.afa .a-chip.watch { background: var(--a-watch-100); border-color: transparent; color: var(--a-watch); }
+  #content.afa .a-chip.miss { background: var(--a-miss-100); border-color: transparent; color: var(--a-miss-ink); }
+  #content.afa .a-chip.her { background: var(--a-her-100); border-color: transparent; color: var(--a-her); }
+  #content.afa .a-chip.ink { background: var(--a-navy); border-color: var(--a-navy); color: #FFFFFF; }
+  /* One line of context with an icon, and the "How to read it" box under a chart. */
+  #content.afa .a-ctx { display: flex; gap: 8px; align-items: flex-start; margin-top: 12px; font-size: 14px; font-weight: 600; }
+  #content.afa .a-ctx .a-ico { margin-top: 2px; color: var(--a-her); }
+  #content.afa .a-how { margin-top: 12px; padding: 8px 12px; border-radius: 8px; background: var(--a-soft); font-size: 12px; line-height: 1.45; color: var(--a-muted); }
+  #content.afa .a-how b { color: var(--a-ink); font-weight: 700; }
+  /* An icon (aIco()): a 1.75 px stroke in the text colour, never an emoji (a phone paints those yellow). */
+  #content.afa .a-ico { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+  /* A title that stands outside a card (Sessions this cycle). */
+  #content.afa .a-sech { margin: 8px 0 -8px; }
+  #content.afa .a-days { display: grid; gap: 12px; }
+
+  /* ── Look A, part 1: the header (the player card), the read, the three score cards ── */
+  /* part 1 goes here */
+  /* ── end of part 1 ── */
+  /*
+     (a gap, so the four parts of the build merge without touching each other)
+  */
+  /* ── Look A, part 2: her cycle, day by day ── */
+  /* part 2 goes here */
+  /* ── end of part 2 ── */
+  /*
+     (a gap, so the four parts of the build merge without touching each other)
+  */
+  /* ── Look A, part 3: habits against her targets, getting stronger ── */
+  /* part 3 goes here */
+  /* ── end of part 3 ── */
+  /*
+     (a gap, so the four parts of the build merge without touching each other)
+  */
+  /* ── Look A, part 4: the sessions, earlier cycles, her phone ── */
+  /* part 4 goes here */
+  /* ── end of part 4 ── */
 </style>
 </head>
 <body>
@@ -3358,6 +3460,7 @@ function renderNow() {
   fixLegacyHash();
   renderRail();
   const r = route();
+  $('content').classList.toggle('afa', r.view === 'detail');   // look A (2026-11-28) is the athlete's file only, for now
   // A new screen starts at the top. Same-page hash links keep the scroll offset, so a long roster
   // used to drop the coach halfway down a short screen. A redraw of the same screen keeps its place.
   const viewKey = r.view === 'detail' ? 'a/' + r.id + '/' + r.sub : r.sub ? r.view + '/' + r.sub : r.view;
@@ -4706,6 +4809,9 @@ function renderCharts(m) {
   </div>`;
   return `<div class="charts">${loadCard}${readyCard}${adhCard}</div>`;
 }
+// ── Look A, part 1 (2026-11-28): the read and the three score cards on The work. PLACEHOLDERS until part 1 lands: the old strip. ──
+function readLineC(D) { return ''; }
+function scoreCardsC(D) { return metricStripHtml(D.metrics); }
 
 // --- ATHLETES (roster) -------------------------------------------------------
 function tierChip(a) {
@@ -5305,6 +5411,8 @@ function stackedPanelC(D) {
     <p class="stk-l">${esc(stackedLineC(st))}</p>
   </section>`;
 }
+// ── Look A, part 2 (2026-11-28): her cycle, day by day. PLACEHOLDER until part 2 lands: the old Five weeks and Stacked. ──
+function cycleCardC(D) { return fiveWeeksPanelC(D) + stackedPanelC(D); }
 // ── Habits and court time, in the coach's file and across everyone (2026-11-23; Amir picked direction A, "The Grid") ─────────────────────────────
 // What a habit IS and when it is MET is the engine's, assets/js/habits-core.js, the file the athlete's app loads: nothing here retypes it (a second copy is how the
 // coach and the athlete end up disagreeing). The engine holds one athlete at a time, so every draw binds it to one athlete, asks, and binds the next. Court time is
@@ -5530,6 +5638,8 @@ function habGridPanelC(D) {
     <p class="hg-k"><span class="hg-sw met"></span>met <span class="hg-sw under"></span>logged, under <span class="hg-sw"></span>not logged <span class="hg-sw court"></span>court minutes (dark = hard)</p>
   </section>`;
 }
+// ── Look A, part 3 (2026-11-28): habits against her targets. PLACEHOLDER until part 3 lands: the old grid. ──
+function habitsCardC(D) { return habGridPanelC(D); }
 // ── Across everyone: Athletes -> Habits ──
 function setRosterView(v) { location.hash = v === 'habits' ? 'athletes/habits' : 'athletes'; }
 window.setRosterView = setRosterView;
@@ -6779,6 +6889,58 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
     </div>
   </div>`;
 }
+// ── The athlete page, look A "Match stats" (2026-11-28): the shared parts every card of The work draws with ──────────────────────
+// aIco(name): a stroke icon in the text colour (never an emoji: a phone paints those yellow). aChip(text, tone, icon): a chip, tone one of
+// good, watch, miss, her, ink or none. aSplit(o): the split bar, "hers | the other": o.a and o.b are the two numbers, o.fa and o.fb how they
+// print, o.la and o.lb the labels under them, o.aria the sentence a screen reader hears; o.gain draws a lift instead (o.a the first estimate,
+// o.b now: the first grey, the gain green). The CSS is the "THE ATHLETE PAGE, LOOK A" block.
+const A_ICO = {
+  load: '<path d="M5 20V11M12 20V5M19 20v-6"/>',
+  pulse: '<path d="M3 12h4l3-7 4 14 3-7h4"/>',
+  target: '<circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/>',
+  calendar: '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  calx: '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4M10 13.5l4 4M14 13.5l-4 4"/>',
+  list: '<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/>',
+  dumbbell: '<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/>',
+  check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  minus: '<path d="M5 12h14"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  up: '<path d="M12 19V5M6 11l6-6 6 6"/>',
+  down: '<path d="M12 5v14M6 13l6 6 6-6"/>',
+  alert: '<path d="M12 3.5 2.5 20h19L12 3.5Z"/><path d="M12 10v4.5M12 17.5v.01"/>',
+  bolt: '<path d="M13 2.5 4.5 13.5H11l-1 8 8.5-11H12l1-8Z"/>',
+  link: '<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/>',
+  heart: '<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z"/>',
+  phone: '<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>',
+  pen: '<path d="M4 20l4-1 11-11-3-3L5 16l-1 4Z"/><path d="M14 6l3 3"/>',
+  flag: '<path d="M5 21V4M5 4h12l-2 4 2 4H5"/>',
+  msg: '<path d="M4 5h16v11H9l-5 4V5Z"/>',
+  ball: '<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6c3 3 3 9.8 0 12.8M18.4 5.6c-3 3-3 9.8 0 12.8"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/>',
+  scale: '<rect x="3.5" y="4" width="17" height="16" rx="3"/><path d="M8 9.5a5 5 0 0 1 8 0l-3 2.5"/>',
+  note: '<path d="M5 4h10l4 4v12H5V4Z"/><path d="M15 4v4h4M8 12h8M8 16h5"/>',
+  eye: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/>',
+  chev: '<path d="m9 6 6 6-6 6"/>',
+  steps: '<path d="M8 3.5c1.7 0 2.5 2 2.5 4.5S9.7 12 8 12 5.5 10.5 5.5 8 6.3 3.5 8 3.5ZM16 9.5c1.7 0 2.5 2 2.5 4.5S17.7 18 16 18s-2.5-1.5-2.5-4 .8-4.5 2.5-4.5ZM6 15.5h4M14 21.5h4"/>',
+};
+function aIco(name, cls) {
+  const p = A_ICO[name];
+  return p ? `<svg class="a-ico${cls ? ' ' + cls : ''}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${p}</svg>` : '';
+}
+function aChip(text, tone, icon) { return `<span class="a-chip${tone ? ' ' + tone : ''}">${icon ? aIco(icon) : ''}${esc(text)}</span>`; }
+function aSplit(o) {
+  const a = Math.max(0, Number(o.a) || 0), b = Math.max(0, Number(o.b) || 0);
+  // Her share of the two; for a lift, the first estimate as a share of now (the rest of the bar is the gain).
+  const share = o.gain ? (b > 0 ? Math.min(1, a / b) : 0) : (a + b > 0 ? a / (a + b) : 0.5);
+  const pct = Math.round(share * 1000) / 10;
+  const aria = o.aria || `${o.la} ${o.fa}, ${o.lb} ${o.fb}`;
+  return `<div class="a-split${o.gain ? ' gain' : ''}" role="img" aria-label="${esc(aria)}">
+      <div class="a-split-n"><div><b>${esc(o.fa)}</b><small>${esc(o.la)}</small></div><div><b>${esc(o.fb)}</b><small>${esc(o.lb)}</small></div></div>
+      <div class="a-split-bar"><i style="flex:${pct} 1 0"></i><u style="flex:${Math.round((100 - pct) * 10) / 10} 1 0"></u></div>
+    </div>`;
+}
 function workTabHtml(D) {
   const { athleteId, programDays, history, lib, metrics } = D;
   // The dates the athlete's phone uses for its renewal banner (SCHEMA.md: endDate); the header shows them on every sub-tab.
@@ -6802,21 +6964,24 @@ function workTabHtml(D) {
     .concat(loggedOnly.map(d => workDayCard(athleteId, null, d, byDay[d], lib, d === freshest)));
 
   // (The cycle's name, week and dates are in the header on every sub-tab now: cycleLineHtml(), under renderDetail.)
-  const live = liveSnapshotHtml(D);
   const logsWarn = D.logsErr ? `<div class="loadwarn" role="alert" style="margin:0 0 16px"><b>Their session logs did not load.</b> Every comparison below is blank because of that, not because they skipped the work.
       <button class="btn sm" onclick="retryLogs()">↻ Try again</button><span class="lw-why">${esc(D.logsErr)}</span></div>` : '';
+  // Look A (2026-11-28), top to bottom: the read, the three score cards, her cycle day by day, habits beside strength, the sessions, then
+  // Earlier cycles and her phone. Each card is one function; the two side by side take the full width when only one has something to say.
+  const side = [habitsCardC(D), strengthCardC(D)].filter(h => h && h.trim());
   return `${logsWarn}
-    ${metricStripHtml(metrics)}
-    ${fiveWeeksPanelC(D)}
-    ${stackedPanelC(D)}
-    ${habGridPanelC(D)}
-    ${maxesPanel(D)}
-    ${weightPanel(D.a)}
-    ${cards.length ? cards.join('') : `<p class="empty">${D.a.tier === 'coached' || S.progSrc[athleteId] !== 'db'
+    <div class="a-stack">
+      ${readLineC(D)}
+      ${scoreCardsC(D)}
+      ${cycleCardC(D)}
+      ${side.length === 2 ? `<div class="a-row2">${side.join('')}</div>` : side.join('')}
+      ${cards.length ? `<h3 class="a-h a-sech">${aIco('list')}Sessions this cycle</h3><div class="a-days">${cards.join('')}</div>`
+        : `<p class="empty">${D.a.tier === 'coached' || S.progSrc[athleteId] !== 'db'
         ? 'No training programme published yet, and no finished sessions.'
         : 'No training programme: this is a habit-only (Proof) athlete. Their habits are under Proof.'}</p>`}
-    ${earlierCyclesHtml(D, earlier)}
-    ${live}`;
+      ${earlierCyclesHtml(D, earlier)}
+      ${phoneCardC(D)}
+    </div>`;
 }
 // ── Five weeks, the coach's copy (#124 The Mirror, round 11, 2026-11-21) ─────────────────────────────────────────────────────
 // The grid the athlete sees on Progress (program.html → Your weeks), from the same reader, get_five_weeks() (stage115; the coach
@@ -7166,6 +7331,8 @@ function liveSnapshotHtml(D) {
     </table></div>` : ''}
   </details>`;
 }
+// ── Look A, part 4 (2026-11-28): her phone. PLACEHOLDER until part 4 lands: the old snapshot. ──
+function phoneCardC(D) { return liveSnapshotHtml(D); }
 
 // --- athlete file ------------------------------------------------------------
 // One person, three screens. It used to be eight sections on a single scroll —
@@ -7348,12 +7515,17 @@ function restoreTabBody(st, athleteId, sub) {
   }
 }
 // `keep` is a snapshot taken before the whole page was replaced (renderDetail); a call from a handler takes its own.
+let _aPainted = '';   // the athlete and sub-tab last painted, so look A's entrance plays once per screen
 function renderDetailBody(keep) {
   if (!_D) return;
   const box = $('tabbody');
   if (!box) return;
   const D = _D;
   const st = keep && keep.athleteId ? keep : snapTabBody();
+  // A redraw of the screen already showing (a day opened, a save, a quiet refresh) does not replay look A's entrance or grow its bars again.
+  const paint = D.athleteId + '/' + D.sub;
+  box.classList.toggle('a-still', _aPainted === paint);
+  _aPainted = paint;
   if (D.sub === 'work') { box.innerHTML = workTabHtml(D); restoreExDrafts(); }
   else if (D.sub === 'proof') box.innerHTML = proofTabHtml(D);
   else box.innerHTML = fileTabHtml(D);
@@ -7422,6 +7594,8 @@ function weightPanel(a) {
       : `<p class="empty">One reading so far — a line needs a few more.</p>`}
   </details></section>`;
 }
+// ── Look A, part 3 (2026-11-28): getting stronger. PLACEHOLDER until part 3 lands: the old records and body weight. ──
+function strengthCardC(D) { return maxesPanel(D) + weightPanel(D.a); }
 // ── The File tab's building blocks (2026-10-12: four groups, one white panel each; label / value / action rows between hairlines) ──
 // A row: its label, then the value, its actions (right-aligned, wrapping under on a phone), one short muted hint, and `full` (a form, the
 // unsent password, the Erase panel: anything that wants the whole width). Every part but the label is optional.
